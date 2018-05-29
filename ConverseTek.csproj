@@ -30,6 +30,16 @@
     <PackageReference Include="CefSharp.Common" Version="63.0.3" />
     <PackageReference Include="Chromely.CefSharp.Winapi" Version="63.0.0" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="protobuf-net">
+      <HintPath>..\libs\protobuf-net.dll</HintPath>
+    </Reference>
+
+    <Reference Include="ShadowrunDTO">
+      <HintPath>..\libs\ShadowrunDTO.dll</HintPath>
+    </Reference>
+  </ItemGroup>
   
   <ItemGroup>
     <None Update="chromely.ico">

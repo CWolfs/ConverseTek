@@ -32,10 +32,16 @@
 namespace ChromelyReactCefSharp.Controllers
 {
     using System;
+    using System.IO;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
 
     using Chromely.Core.RestfulService;
+    using Chromely.Core.Infrastructure;
+
+    using isogame;
+    using ProtoBuf;
+    using ProtoBuf.Meta;
 
     /// <summary>
     /// The demo controller.
@@ -65,6 +71,16 @@ namespace ChromelyReactCefSharp.Controllers
         {
             List<MovieInfo> movieInfos = new List<MovieInfo>();
             string assemblyName = typeof(MovieInfo).Assembly.GetName().Name;
+
+            RuntimeTypeModel runtimeTypeModel = TypeModel.Create();
+
+            try {
+                FileStream fs = new FileStream("5a39e3bd6230353c12005747.convo.bytes", FileMode.Open);
+                Conversation conversation = runtimeTypeModel.Deserialize(fs, null, typeof(Conversation)) as Conversation;
+                Log.Info($"Conversation is of type {conversation.ToString()} with idRef of {conversation.idRef} with id of {conversation.idRef.id} with name of {conversation.ui_name}");
+            } catch (Exception error) {
+                Log.Error(error.ToString());
+            }
 
             movieInfos.Add(new MovieInfo(id: 1, title: "The Shawshank Redemption", year: 1994, votes: 678790, rating: 9.2, assembly: assemblyName));
             movieInfos.Add(new MovieInfo(id: 2, title: "The Godfather", year: 1972, votes: 511495, rating: 9.2, assembly: assemblyName));

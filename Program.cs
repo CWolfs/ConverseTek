@@ -67,10 +67,10 @@ namespace ChromelyReactCefSharp
                                               .Create()
                                               .WithAppArgs(args)
                                               .WithHostSize(1200, 900)
-                                              .WithLogFile("logs\\chromely.cef_new.log")
+                                              .WithLogFile("logs\\conversetek-interface.log")
                                               .WithStartUrl(startUrl)
                                               .WithLogSeverity(LogSeverity.Info)
-                                              .UseDefaultLogger()
+                                              .UseDefaultLogger("logs\\conversetek-core.log", true)
                                               .UseDefaultResourceSchemeHandler("local", string.Empty)
                                               .UseDefaultHttpSchemeHandler("http", "chromely.com")
                                               .UseDefautJsHandler("boundControllerAsync", true);
