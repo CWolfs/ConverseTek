@@ -1,0 +1,25 @@
+{
+  "extends": "airbnb",
+  "rules": {
+    "linebreak-style": 0,
+    "react/self-closing-comp": 0,
+    "react/jsx-filename-extension": 0,
+    "react/forbid-prop-types": 0,
+    "jsx-a11y/anchor-is-valid": [
+      "error", {
+        "components": ["Link"],
+        "specialLink": ["to"]
+     }]
+  },
+  "parser": "babel-eslint",
+  "globals": {
+    "window": true,
+    "__BUILD_DATE__": true,
+    "__WWW_HOST__": true,
+    "__APP_HOST__": true,
+    "__API_SSL__": true,
+    "__API_HOST__": true,
+    "__API_PORT__": true,
+    "__GOOGLE_ANALYTICS_CODE__": true
+  }
+}

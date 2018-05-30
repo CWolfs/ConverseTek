@@ -2,7 +2,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build",
+            "label": "Build",
             "command": "dotnet",
             "type": "process",
             "args": [
@@ -12,7 +12,7 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "run",
+            "label": "Build & Run",
             "command": "dotnet",
             "type": "process",
             "args": [
@@ -20,6 +20,16 @@
                 "D:/Modding/ConverseTek/ConverseTek.csproj"
             ],
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "UI Build",
+            "type": "shell",
+            "command": "yarn --cwd ./app build"
+        },
+        {
+            "label": "Fast Run",
+            "command": "D:/Modding/ConverseTek/bin/x64/Debug/net472/ConverseTek.exe",
+            "type": "shell"
         }
     ]
 }
