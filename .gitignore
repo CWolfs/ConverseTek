@@ -4,6 +4,7 @@ obj/
 
 # sensitive libs
 libs/ShadowrunSerializer.dll
+libs/ShadowrunDTO.dll
 
 # frontend
 app/dist
