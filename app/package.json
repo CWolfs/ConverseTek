@@ -1,7 +1,7 @@
 {
-  "name": "chromely-react-app",
+  "name": "conversetek",
   "version": "1.0.0",
-  "description": "Chromely React App",
+  "description": "Conversation editor for Battletech",
   "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server --mode development --open",
@@ -9,7 +9,7 @@
     "prod": "webpack --mode production",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Kola Oyewumi",
+  "author": "Richard Griffiths [CWolf] (cwolfs@gmail.com)",
   "license": "MIT",
   "devDependencies": {
     "babel-core": "^6.26.2",
