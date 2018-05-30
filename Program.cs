@@ -28,8 +28,7 @@
 // </note>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ChromelyReactCefSharp
-{
+namespace ChromelyReactCefSharp {
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Reflection;
@@ -44,8 +43,7 @@ namespace ChromelyReactCefSharp
     /// The program.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1400:AccessModifierMustBeDeclared", Justification = "Reviewed. Suppression is OK here.")]
-    class Program
-    {
+    class Program {
         /// <summary>
         /// The main.
         /// </summary>
@@ -55,10 +53,8 @@ namespace ChromelyReactCefSharp
         /// <returns>
         /// The <see cref="int"/>.
         /// </returns>
-        static int Main(string[] args)
-        {
-            try
-            {
+        public static int Main(string[] args) {
+            try {
                 HostHelpers.SetupDefaultExceptionHandlers();
 
                 string startUrl = "local://app/dist/index.html";
@@ -81,9 +77,9 @@ namespace ChromelyReactCefSharp
                 var factory = WinapiHostFactory.Init("chromely.ico");
                 using (var window = factory.CreateWindow(
                     () => new CefSharpBrowserHost(config),
-                    "chromely",
-                    constructionParams: new FrameWindowConstructionParams()))
-                {
+                    "ConverseTek",
+                    constructionParams: new FrameWindowConstructionParams())
+                ){
                     // Register external url schems
                     window.RegisterUrlScheme(new UrlScheme("https://github.com/mattkol/Chromely", true));
 
@@ -117,9 +113,7 @@ namespace ChromelyReactCefSharp
                     window.Show();
                     return new HostEventLoop().Run(window);
                 }
-            }
-            catch (Exception exception)
-            {
+            } catch (Exception exception) {
                 Log.Error(exception);
             }
 

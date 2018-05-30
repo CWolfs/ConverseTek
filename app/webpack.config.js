@@ -1,66 +1,67 @@
-'use strict'
+'use strict';
+const path = require('path');
 
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const path = require('path')
+const isLocal = (process.env.NODE_ENV === 'local');
+const isDev = (process.env.NODE_ENV === 'development');
+const isProd = (process.env.NODE_ENV === 'production');
 
-const utils = {
-  resolve: function (dir) {
-    return path.join(__dirname, '..', dir)
+const APP_DIR = path.resolve(__dirname, 'src');
+const BUILD_DIR = path.resolve(__dirname, 'dist');
+
+const localConfig = require('./webpack/webpack.local.config');
+const devConfig = require('./webpack/webpack.dev.config');
+const prodConfig = require('./webpack/webpack.prod.config');
+
+// loaders
+const jsxLoader = require('./webpack/loaders/jsx.loader');
+const lessLoader = require('./webpack/loaders/less.loader');
+const postcssLoader = require('./webpack/loaders/postcss.loader');
+const imageLoader = require('./webpack/loaders/image.loader');
+
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+let config = {
+  entry: [
+    `${APP_DIR}/index.js`,
+  ],
+
+  output: {
+    path: BUILD_DIR,
+    filename: 'bundle.js',
+    publicPath: '/dist/',
   },
 
-  assetsPath: function (_path) {
-    const assetsSubDirectory = 'static'
-    return path.posix.join(assetsSubDirectory, _path)
-  }
-}
-
-module.exports = {
   resolve: {
     extensions: ['.js', '.json'],
   },
 
   module: {
-    rules: [
-       {
-          test: /\.css$/,
-          loaders: [ 'style-loader', 'css-loader' ]
-        }, 
-       {
-        test: /\.js$/,
-        loader: 'babel-loader',
-        query: {
-          compact: 'false'
-        }
-      }, {
-        test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-        loader: 'url-loader',
-        options: {
-          limit: 10000,
-          name: utils.assetsPath('img/[name].[hash:7].[ext]')
-        }
-      }, {
-        test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
-        loader: 'url-loader',
-        options: {
-          limit: 10000,
-          name: utils.assetsPath('media/[name].[hash:7].[ext]')
-        }
-      }, {
-        test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-        loader: 'url-loader',
-        options: {
-          limit: 10000,
-          name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
-        }
-      }
-    ]
+    rules: [],
   },
 
   plugins: [
     new HtmlWebpackPlugin({
-      template: "src/index.html",
-      filename: "index.html",
-      inject: true
-    })
-  ]
+      template: 'src/index.html',
+      filename: 'index.html',
+      inject: true,
+    }),
+  ],
+};
+
+// Loader hooks
+config = jsxLoader(config, APP_DIR);
+config = lessLoader(config, APP_DIR);
+config = postcssLoader(config, APP_DIR);
+config = imageLoader(config, APP_DIR);
+
+if (isLocal) {
+  config = localConfig(config, APP_DIR, BUILD_DIR);
+} else if (isDev) {
+  config = devConfig(config);
+} else if (isProd) {
+  config = prodConfig(config);
+} else {
+  console.log('WARNING: NODE_ENV=environment (e.g. development or production) must be set on the package.json script hook');
 }
+
+module.exports = config;

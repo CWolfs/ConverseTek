@@ -1,8 +1,20 @@
-import React from "react";
-import ReactDOM from "react-dom";
+/* global document */
+import { AppContainer } from 'react-hot-loader';
+import React from 'react';
+import ReactDOM from 'react-dom';
 import App from './App';
 
-import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
-import './assets/css/chromely.css';
+const render = () => {
+  ReactDOM.render(
+    <AppContainer>
+      <App />
+    </AppContainer>,
+    document.getElementById('root'),
+  );
+};
 
-ReactDOM.render(<App />, document.getElementById("index"));
+render();
+
+if (module.hot) {
+  module.hot.accept('./App', render);
+}

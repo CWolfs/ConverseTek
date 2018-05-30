@@ -62,9 +62,11 @@
     </Exec>
     <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE." />
 
-    <Exec Command="npm run build" WorkingDirectory="app" ContinueOnError="false" ConsoleToMSBuild="true">
+    <Exec Command="yarn build" WorkingDirectory="app" ContinueOnError="false" ConsoleToMSBuild="true">
       <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
     </Exec>
+
+    <Exec Command="xcopy &quot;$(ProjectDir)app\dist&quot; &quot;$(TargetDir)app\dist&quot;   /i /s /r /y /c&#xD;&#xA;" />
   </Target>
 
   <Target Name="ReleaseRunReactApp" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Release' ">
@@ -74,13 +76,10 @@
     </Exec>
     <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE." />
 
-    <Exec Command="npm run prod" WorkingDirectory="app" ContinueOnError="true" ConsoleToMSBuild="false">
+    <Exec Command="yarn prod" WorkingDirectory="app" ContinueOnError="true" ConsoleToMSBuild="false">
       <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
     </Exec>
-  </Target>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="xcopy &quot;$(ProjectDir)app\dist&quot; &quot;$(TargetDir)app\dist&quot;   /i /s /r /y /c&#xD;&#xA;" />
   </Target>
-  
 </Project>
