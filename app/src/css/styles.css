@@ -6,13 +6,13 @@
   font-family: "Monospaced Number", "Chinese Quote", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-smoothing: antialiased;
   color: $textColourPrimary;
-  background-color: white;
+  background-color: $backgroundPrimary;
   background-repeat: repeat;
   background-position: center 0px;
   font-size: 14px;
   /* width: calc(100vw - $scrollbarWidth);*/  /* prevent scrollbar moving page when appearing */
   width: 100%;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 #root {

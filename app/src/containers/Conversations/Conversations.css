@@ -1,0 +1,5 @@
+@import '../../css/constants.css';
+
+.conversations {
+  padding: $smallMediumSpace;
+}

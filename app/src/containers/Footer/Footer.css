@@ -1,0 +1,6 @@
+@import '../../css/constants.css';
+
+.footer {
+  position: absolute;
+  bottom: 0;
+}

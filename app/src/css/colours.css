@@ -54,14 +54,14 @@ The palette consists of three colour types (primary, secondary, tertiary). Vario
 These are specific to the app pages.
 */
 
-$backgroundPrimary: white;
-$backgroundSecondary: $blue7;
+$backgroundPrimary: #1E1E1E;
+$backgroundSecondary: $blue8;
 $backgroundTertiary: rgb(240, 242, 245);
 
 $titleColourPrimary: $c2blue6;
 
-$textColourPrimary: rgba(0, 0, 0, 0.85);
-$textColourSecondary: white;
+$textColourPrimary: rgba(210, 210, 210, 0.85);
+$textColourSecondary: $grey4;
 $textColourTertiary: $blue6;
 
 $linkColourPrimary: $c1blue6;
@@ -74,34 +74,3 @@ $borderQuaternary: $blue8;      /* for use on blue background */
 
 $shadowPrimary: $grey4;
 $shadowSecondary: $grey5;
-
-/*
-=========================
-| Promo Palette Colours |
-=========================
-The palette consists of three colour types (primary, secondary, tertiary). Various combinations will provide the brand.
-These are specific to the promo pages.
-*/
-
-$promoBackgroundPrimary: white;
-$promoBackgroundSecondary: $blue6;
-$promoBackgroundTertiary: $blue10;
-
-$promoTitleColourPrimary: rgba(0, 0, 0, 0.85);
-$promoTitleColourSecondary: rgba(255, 255, 255, 0.85);
-
-$promoTextColourPrimary: rgba(0, 0, 0, 0.65);
-$promoTextColourSecondary: rgba(255, 255, 255, 0.65);
-$promoTextColourTertiary: $blue4;
-
-$promoLinkColourPrimary: $blue6;
-$promoLinkColourSecondary: white;
-
-$promoBorderPrimary: $blue7;
-$promoBorderSecondary: white;
-$promoBorderTertiary: lightgrey;
-
-$promoShadowPrimary: rgba(0, 0, 0, 0.15);
-$promoShadowSecondary: rgba(0, 0, 0, 0.3);
-
-$promoButtonColourPrimary: $green6;

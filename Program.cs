@@ -57,7 +57,7 @@ namespace ChromelyReactCefSharp {
             try {
                 HostHelpers.SetupDefaultExceptionHandlers();
 
-                string startUrl = "local://app/dist/index.html";
+                string startUrl = "local://dist/index.html";
 
                 ChromelyConfiguration config = ChromelyConfiguration
                                               .Create()

@@ -1,3 +1,7 @@
 import React from 'react';
 
-export default () => (<div>Footer</div>);
+import "./Footer.css";
+
+export default () => (
+  <div className="footer">Status</div>
+);

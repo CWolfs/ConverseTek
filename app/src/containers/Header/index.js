@@ -1,3 +1,7 @@
 import React from 'react';
 
-export default () => (<div>Header</div>);
+import './Header.css';
+
+export default () => (
+  <div className="header">File  Edit  Configure</div>
+);

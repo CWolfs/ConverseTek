@@ -12,7 +12,7 @@ module.exports = function(config, APP_DIR, BUILD_DIR) {
         devServer: {
             hot: true,
             contentBase: BUILD_DIR,
-            publicPath: '/dist/',
+            publicPath: '/',
             historyApiFallback: true,
             host: '127.0.0.1',
             port: 8080,

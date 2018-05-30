@@ -7,7 +7,7 @@ libs/ShadowrunSerializer.dll
 libs/ShadowrunDTO.dll
 
 # frontend
-app/dist
+dist/
 app/node_modules
 
 # logs

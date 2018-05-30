@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { injectIntl } from 'react-intl';
 import { observer, inject } from 'mobx-react';
@@ -11,30 +11,21 @@ import Footer from '../../containers/Footer';
 
 import './Main.css';
 
-class Layout extends Component {
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    const { children } = this.props;
-
-    return (
-      <div className="main">
-        <div className="main__content">
-          <Header />
-          <div className="main__children">
-            <Switch>
-              <Route exact path="/" component={Conversations} />
-            </Switch>
-            {children}
-          </div>
-          <Footer />
-        </div>
+const Layout = ({ children }) => (
+  <div className="main">
+    <div className="main__content">
+      <Header />
+      <div className="main__children">
+        <Switch>
+          <Route exact path="/(|index.html)" component={Conversations} />
+          <Route exact path="/test" component={() => (<div>Test</div>)} />
+        </Switch>
+        {children}
       </div>
-    );
-  }
-}
+      <Footer />
+    </div>
+  </div>
+);
 
 Layout.defaultProps = {
   children: undefined,
