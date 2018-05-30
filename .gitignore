@@ -3,9 +3,10 @@ bin/
 obj/
 
 # frontend
-reactapp/dist
-reactapp/node_modules
+app/dist
+app/node_modules
 
 # logs
 debug.log
 logs/
+libs/ShadowrunSerializer\.dll

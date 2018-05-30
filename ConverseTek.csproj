@@ -20,10 +20,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="reactapp\node_modules\**" />
-    <Content Remove="reactapp\**" />
-    <EmbeddedResource Remove="reactapp\node_modules\**" />
-    <None Remove="reactapp\node_modules\**" />
+    <Compile Remove="app\node_modules\**" />
+    <Content Remove="app\**" />
+    <EmbeddedResource Remove="app\node_modules\**" />
+    <None Remove="app\node_modules\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,8 +36,16 @@
       <HintPath>..\libs\protobuf-net.dll</HintPath>
     </Reference>
 
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\libs\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+
     <Reference Include="ShadowrunDTO">
       <HintPath>..\libs\ShadowrunDTO.dll</HintPath>
+    </Reference>
+
+    <Reference Include="ShadowrunSerializer">
+      <HintPath>..\libs\ShadowrunSerializer.dll</HintPath>
     </Reference>
   </ItemGroup>
   
@@ -54,7 +62,7 @@
     </Exec>
     <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE." />
 
-    <Exec Command="npm run build" WorkingDirectory="reactapp" ContinueOnError="false" ConsoleToMSBuild="true">
+    <Exec Command="npm run build" WorkingDirectory="app" ContinueOnError="false" ConsoleToMSBuild="true">
       <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
     </Exec>
   </Target>
@@ -66,13 +74,13 @@
     </Exec>
     <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE." />
 
-    <Exec Command="npm run prod" WorkingDirectory="reactapp" ContinueOnError="true" ConsoleToMSBuild="false">
+    <Exec Command="npm run prod" WorkingDirectory="app" ContinueOnError="true" ConsoleToMSBuild="false">
       <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
     </Exec>
   </Target>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(ProjectDir)reactapp\dist&quot; &quot;$(TargetDir)reactapp\dist&quot;   /i /s /r /y /c&#xD;&#xA;" />
+    <Exec Command="xcopy &quot;$(ProjectDir)app\dist&quot; &quot;$(TargetDir)app\dist&quot;   /i /s /r /y /c&#xD;&#xA;" />
   </Target>
   
 </Project>
