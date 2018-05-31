@@ -2,7 +2,7 @@
 @import './constants.css';
 @import './ant-overrides.css';
 
-:root {
+body {
   font-family: "Monospaced Number", "Chinese Quote", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-smoothing: antialiased;
   color: $textColourPrimary;
@@ -30,18 +30,22 @@ h1 {
   margin: 0 0 $mediumLargeSpace 1px; /* 1px left to avoid optical illusions with <Card /> borders */ 
 }
 
-/* TODO: Fix this as it shouldn't be using fontSizeTitle */
 h2 {
-  font-size: $fontSizeTitle;
-  line-height: $lineHeightTitle;
-  margin: 0 0 $mediumLargeSpace 1px; /* 1px left to avoid optical illusions with <Card /> borders */
+  font-size: $fontSizeLargest;
+  line-height: $lineHeightLargest;
+  margin: 0 0 $smallMediumSpace 1px; /* 1px left to avoid optical illusions with <Card /> borders */
 }
 
-/* TODO: Fix this as it shouldn't be using fontSizeTitle */
 h3 {
-  font-size: $fontSizeTitle;
-  line-height: $lineHeightTitle;
-  margin: 0 0 $mediumLargeSpace 1px; /* 1px left to avoid optical illusions with <Card /> borders */
+  font-size: $fontSizeLarger;
+  line-height: $lineHeightLarger;
+  margin: 0 0 $smallSpace 1px; /* 1px left to avoid optical illusions with <Card /> borders */
+}
+
+h4 {
+  font-size: $fontSizeLarge;
+  line-height: $lineHeightLarge;
+  margin: 0 0 $tinySpace 1px; /* 1px left to avoid optical illusions with <Card /> borders */
 }
 
 h3[type="secondary"] {

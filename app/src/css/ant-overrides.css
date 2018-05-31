@@ -43,3 +43,19 @@
     border: 0 solid $backgroundSecondary;
   } 
 }
+
+.ant-tree,
+.ant-tree li .ant-tree-node-content-wrapper {
+  color: $textColourPrimary;
+}
+
+.ant-tree.ant-tree-show-line li span.ant-tree-switcher {
+  color: white;
+  background-color: $backgroundTertiary;
+}
+
+.ant-tree li .ant-tree-node-content-wrapper:hover, 
+.ant-tree li .ant-tree-node-content-wrapper.ant-tree-node-selected {
+  background-color: #2ab0f77d;
+  color: white;
+}

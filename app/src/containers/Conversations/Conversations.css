@@ -1,5 +1,18 @@
 @import '../../css/constants.css';
 
 .conversations {
-  padding: $smallMediumSpace;
+  height: 100%;
+  display: flex;
+
+  &__tree {
+    height: 100%;
+    flex-basis: 20%;
+    padding: $smallMediumSpace;
+    background-color: $backgroundTertiary;
+    border-right: 1px solid #828282;
+  }
+
+  &__editor {
+    padding: $smallMediumSpace;
+  }
 }

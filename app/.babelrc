@@ -16,5 +16,8 @@
       ]
     }
   },
-  "plugins": ["transform-decorators-legacy"]
+  "plugins": [
+    "transform-decorators-legacy",
+    ["import", {"libraryName": "antd", "style": true} ]
+  ]
 }

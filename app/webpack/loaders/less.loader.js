@@ -17,6 +17,7 @@ module.exports = function(config, APP_DIR) {
             {
                 loader: 'less-loader',
                 options: {
+                    javascriptEnabled: true,
                     // modifyVars: { "@primary-color": "#52c41a" }
                 }
             }

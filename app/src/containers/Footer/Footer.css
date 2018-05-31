@@ -1,6 +1,7 @@
 @import '../../css/constants.css';
 
 .footer {
-  position: absolute;
-  bottom: 0;
+  background-color: $backgroundSecondary;
+  padding: $tinySpace;
+  color: $grey4;
 }
