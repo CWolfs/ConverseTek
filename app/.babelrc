@@ -15,5 +15,9 @@
         ["env", { "targets": { "node": "current" }}]
       ]
     }
-}
+  },
+  "plugins": [
+    "transform-decorators-legacy",
+    ["import", {"libraryName": "antd", "style": true} ]
+  ]
 }

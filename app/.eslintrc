@@ -1,5 +1,5 @@
 {
-  "extends": "airbnb",
+  "extends": ["airbnb"],
   "rules": {
     "linebreak-style": 0,
     "react/self-closing-comp": 0,
@@ -15,11 +15,6 @@
   "globals": {
     "window": true,
     "__BUILD_DATE__": true,
-    "__WWW_HOST__": true,
-    "__APP_HOST__": true,
-    "__API_SSL__": true,
-    "__API_HOST__": true,
-    "__API_PORT__": true,
-    "__GOOGLE_ANALYTICS_CODE__": true
+    "boundControllerAsync": true,
   }
 }

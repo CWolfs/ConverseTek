@@ -1,0 +1,8 @@
+@import '../../css/constants.css';
+
+.file-tree {
+  &__title {
+    font-weight: bold;
+    color: $textColourSecondary;
+  }
+}

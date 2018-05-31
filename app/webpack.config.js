@@ -1,4 +1,3 @@
-'use strict';
 const path = require('path');
 
 const isLocal = (process.env.NODE_ENV === 'local');
@@ -6,7 +5,7 @@ const isDev = (process.env.NODE_ENV === 'development');
 const isProd = (process.env.NODE_ENV === 'production');
 
 const APP_DIR = path.resolve(__dirname, 'src');
-const BUILD_DIR = path.resolve(__dirname, 'dist');
+const BUILD_DIR = path.resolve(__dirname, '../dist');
 
 const localConfig = require('./webpack/webpack.local.config');
 const devConfig = require('./webpack/webpack.dev.config');
@@ -18,17 +17,19 @@ const lessLoader = require('./webpack/loaders/less.loader');
 const postcssLoader = require('./webpack/loaders/postcss.loader');
 const imageLoader = require('./webpack/loaders/image.loader');
 
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+// const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 let config = {
   entry: [
+    'babel-polyfill',
     `${APP_DIR}/index.js`,
   ],
 
   output: {
     path: BUILD_DIR,
     filename: 'bundle.js',
-    publicPath: '/dist/',
+    publicPath: '.',
   },
 
   resolve: {
@@ -40,12 +41,21 @@ let config = {
   },
 
   plugins: [
+    new CopyWebpackPlugin([
+      { from: 'src/index.html', to: 'index.html' },
+      { from: 'src/assets/', to: 'assets/' },
+    ]),
+  ],
+
+  /*
+  plugins: [
     new HtmlWebpackPlugin({
       template: 'src/index.html',
       filename: 'index.html',
       inject: true,
     }),
   ],
+  */
 };
 
 // Loader hooks

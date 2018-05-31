@@ -1,0 +1,89 @@
+@import './reset.css';
+@import './constants.css';
+@import './ant-overrides.css';
+
+body {
+  font-family: "Monospaced Number", "Chinese Quote", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-smoothing: antialiased;
+  color: $textColourPrimary;
+  background-color: $backgroundPrimary;
+  background-repeat: repeat;
+  background-position: center 0px;
+  font-size: 14px;
+  /* width: calc(100vw - $scrollbarWidth);*/  /* prevent scrollbar moving page when appearing */
+  width: 100%;
+  overflow: hidden;
+}
+
+#root {
+  height: 100%;
+}
+
+a {
+  color: $linkColourPrimary;
+  text-decoration: none;
+}
+
+h1 {
+  font-size: $fontSizeTitle;
+  line-height: $lineHeightTitle;
+  margin: 0 0 $mediumLargeSpace 1px; /* 1px left to avoid optical illusions with <Card /> borders */ 
+}
+
+h2 {
+  font-size: $fontSizeLargest;
+  line-height: $lineHeightLargest;
+  margin: 0 0 $smallMediumSpace 1px; /* 1px left to avoid optical illusions with <Card /> borders */
+}
+
+h3 {
+  font-size: $fontSizeLarger;
+  line-height: $lineHeightLarger;
+  margin: 0 0 $smallSpace 1px; /* 1px left to avoid optical illusions with <Card /> borders */
+}
+
+h4 {
+  font-size: $fontSizeLarge;
+  line-height: $lineHeightLarge;
+  margin: 0 0 $tinySpace 1px; /* 1px left to avoid optical illusions with <Card /> borders */
+}
+
+h3[type="secondary"] {
+  color: $textColourSecondary;
+}
+
+.ant-select-selection__placeholder {
+  color: #bfbfbf; /* Ant placeholder colour that isn't taking on <Autocomplete> placeholders */
+  font-weight: 400;
+}
+
+.ant-btn[disabled] {
+  background-color: transparent;
+  border-color: none;
+}
+
+.text-button {
+  background: none;
+  color: $linkColourPrimary;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+}
+
+.icon-button {
+  background: none;
+  color: $linkColourPrimary;
+  border: none;
+  padding: 0 $smallMediumSpace;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
+}
+
+.debug {
+  &__deploy-date {
+    color: rgba(0, 0, 0, 0.2);
+  }
+}

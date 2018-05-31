@@ -1,0 +1,61 @@
+@import './constants.css';
+
+.ant-btn-primary {
+  color: #fff;
+  background-color: $green6;
+  border-color: $green6;
+
+  &:active {
+    color: #fff;
+    background-color: $green6;
+    border-color: $green6;
+  }
+
+  &:focus, &:hover {
+    color: #fff;
+    background-color: $green6;
+    border-color: $green6;
+  }
+
+  &.ant-btn-clicked:after {
+    border: 0 solid $green6;
+  }
+}
+
+.ant-btn-secondary {
+  color: #fff;
+  background-color: $backgroundSecondary;
+  border-color: $backgroundSecondary;
+
+  &:active {
+    color: #fff;
+    background-color: $backgroundSecondary;
+    border-color: $backgroundSecondary;
+  }
+
+  &:focus, &:hover {
+    color: #fff;
+    background-color: $backgroundSecondary;
+    border-color: $backgroundSecondary;
+  }
+
+  &.ant-btn-clicked:after {
+    border: 0 solid $backgroundSecondary;
+  } 
+}
+
+.ant-tree,
+.ant-tree li .ant-tree-node-content-wrapper {
+  color: $textColourPrimary;
+}
+
+.ant-tree.ant-tree-show-line li span.ant-tree-switcher {
+  color: white;
+  background-color: $backgroundTertiary;
+}
+
+.ant-tree li .ant-tree-node-content-wrapper:hover, 
+.ant-tree li .ant-tree-node-content-wrapper.ant-tree-node-selected {
+  background-color: #2ab0f77d;
+  color: white;
+}
