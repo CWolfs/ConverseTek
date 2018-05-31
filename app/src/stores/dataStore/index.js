@@ -4,7 +4,8 @@ class DataStore {
   @observable conversations = observable.map();
 
   @action setConversations(conversations) {
-    conversations.forEach(conversation => this.conversations.set(conversation.id, conversation));
+    conversations.forEach(conversation =>
+      this.conversations.set(conversation.idRef.id, conversation));
   }
 
   @action reset = () => {

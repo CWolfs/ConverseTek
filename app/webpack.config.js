@@ -22,6 +22,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 let config = {
   entry: [
+    'babel-polyfill',
     `${APP_DIR}/index.js`,
   ],
 

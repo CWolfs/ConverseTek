@@ -26,7 +26,12 @@ namespace ConverseTek.Controllers {
         private ChromelyResponse GetConversations(ChromelyRequest request) {
             ConversationService conversationService = ConversationService.getInstance();
             List<Conversation> conversations = conversationService.LoadConversations();
-            return null;
+
+            string conversationsJson = JsonConvert.SerializeObject(conversations);
+
+            ChromelyResponse response = new ChromelyResponse();
+            response.Data = conversationsJson;
+            return response;
         }
 
         //private ChromelyResponse GetConversation(ChromelyRequest request) {
