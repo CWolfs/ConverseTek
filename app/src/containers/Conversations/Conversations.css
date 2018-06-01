@@ -12,7 +12,6 @@
   }
 
   &__main {
-    /* padding: $smallMediumSpace; */
     flex-grow: 1;
   }
 }

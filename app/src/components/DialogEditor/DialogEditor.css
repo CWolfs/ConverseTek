@@ -1,0 +1,33 @@
+@import '../../css/constants.css';
+
+.dialog-editor {
+  padding: 0 $smallMediumSpace;
+  background-color: $backgroundTertiary;
+  border: 1px solid white;
+  width: 74vw;
+
+  .ant-tree li .ant-tree-node-content-wrapper:hover,
+  .ant-tree li .ant-tree-node-content-wrapper.ant-tree-node-selected {
+    background-color: transparent;
+  }
+
+  .ant-tree-title {
+    white-space: normal;
+  }
+
+  .ant-tree li .ant-tree-node-content-wrapper {
+    position: absolute;
+  }
+
+  .ant-tree-title:hover,
+  .ant-tree-node-selected .ant-tree-title {
+    color: white;
+    background-color: #2ab0f77d;
+  }
+
+  .ant-tree.ant-tree-show-line li span.ant-tree-switcher.ant-tree-switcher-noop:after {
+    content: "\E6AB";
+    transform: scaleX(-1);
+    color: gold;
+  }
+}

@@ -16,7 +16,7 @@ const Conversations = ({ dataStore }) => {
   getConversations();
 
   const mainView = (activeConversationAsset) ?
-    <ConversationEditor /> : <SplashScreen />;
+    <ConversationEditor conversationAsset={activeConversationAsset} /> : <SplashScreen />;
 
   return (
     <div className="conversations">
