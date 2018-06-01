@@ -1,0 +1,38 @@
+@import '../../css/constants.css';
+
+.dialog-editor {
+  padding: 0 $smallMediumSpace;
+  background-color: $backgroundTertiary;
+  border: 1px solid white;
+
+  &__tree {
+    height: 40vh;
+  }
+
+  .rstcustom__node {
+    height: unset !important;
+    position: relative !important;
+    top: unset !important;
+  }
+
+  .rst__lineHalfHorizontalRight::before, .rst__lineFullVertical::after, .rst__lineHalfVerticalTop::after, .rst__lineHalfVerticalBottom::after,
+  .rst__lineChildren::after {
+    background-color: gold;
+  }
+
+  .rst__virtualScrollOverride * {
+    color: black;
+  }
+  
+  .rst__moveHandle {
+    background-color: #2f71d4;
+  }
+
+  .rst__rowTitle {
+    font-weight: unset !important;
+  }
+
+  .rst__virtualScrollOverride {
+    overflow: hidden !important;
+  }
+}
