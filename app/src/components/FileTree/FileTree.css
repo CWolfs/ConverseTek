@@ -13,6 +13,6 @@
   }
 
   .ant-tree {
-    padding-right: $smallSpace;
+    padding-right: $smallMediumSpace;
   }
 }

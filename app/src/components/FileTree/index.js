@@ -9,13 +9,10 @@ import './FileTree.css';
 
 const { TreeNode } = Tree;
 
+/* eslint-disable react/prefer-stateless-function */
 class FileTree extends Component {
-  onSelect = (selectedKeys, info) => {
-    console.log('selected', selectedKeys, info);
-  }
-
   render() {
-    const { title, data } = this.props;
+    const { title, data, onSelected } = this.props;
 
     return (
       <div className="file-tree">
@@ -25,9 +22,9 @@ class FileTree extends Component {
             <Tree
               showLine
               defaultExpandedKeys={['0']}
-              onSelect={this.onSelect}
+              onSelect={onSelected}
             >
-              <TreeNode title="simGameConversations" key="0">
+              <TreeNode title={(data && data.length) ? 'simGameConversations' : 'Loading Conversations...'} key="0">
                 {data.map(item => <TreeNode key={item.key} title={item.label} />)}
               </TreeNode>
             </Tree>
@@ -41,6 +38,7 @@ class FileTree extends Component {
 FileTree.defaultProps = {
   title: undefined,
   data: null,
+  onSelected: () => {},
 };
 
 FileTree.propTypes = {
@@ -49,6 +47,7 @@ FileTree.propTypes = {
     key: PropTypes.string,
     label: PropTypes.string,
   })),
+  onSelected: PropTypes.func,
 };
 
 export default FileTree;

@@ -10,9 +10,22 @@ import './ConversationTree.css';
 class ConversationTree extends Component {
   static remapConversationData(conversationAssets) {
     return conversationAssets.values().map(asset => ({
-      key: asset.FileName,
+      key: asset.Conversation.idRef.id,
       label: asset.Conversation.ui_name,
     }));
+  }
+
+  constructor(props) {
+    super(props);
+
+    this.onNodeSelected = this.onNodeSelected.bind(this);
+  }
+
+  onNodeSelected(selectedKeys, info) {
+    const { dataStore } = this.props;
+
+    console.debug('selected', selectedKeys, info);
+    dataStore.setActiveConversation(selectedKeys[0]);
   }
 
   render() {
@@ -23,7 +36,7 @@ class ConversationTree extends Component {
 
     return (
       <div className="conversation-tree">
-        <FileTree title="Conversations" data={data} />
+        <FileTree title="Conversations" data={data} onSelected={this.onNodeSelected} />
       </div>
     );
   }
