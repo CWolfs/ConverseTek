@@ -9,11 +9,8 @@ namespace ConverseTek.Controllers {
     using Chromely.Core.RestfulService;
     using Chromely.Core.Infrastructure;
 
+    using ConverseTek.Data;
     using ConverseTek.Services;
-
-    using isogame;
-    using ProtoBuf;
-    using ProtoBuf.Meta;
 
     [ControllerProperty(Name = "ConversationController", Route = "conversations")]
     public class ConversationController : ChromelyController {
@@ -25,7 +22,7 @@ namespace ConverseTek.Controllers {
 
         private ChromelyResponse GetConversations(ChromelyRequest request) {
             ConversationService conversationService = ConversationService.getInstance();
-            List<Conversation> conversations = conversationService.LoadConversations();
+            List<ConversationAsset> conversations = conversationService.LoadConversations();
 
             string conversationsJson = JsonConvert.SerializeObject(conversations);
 

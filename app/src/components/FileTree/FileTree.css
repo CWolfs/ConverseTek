@@ -1,8 +1,18 @@
 @import '../../css/constants.css';
 
 .file-tree {
+  height: 100%;
+  
   &__title {
     font-weight: bold;
     color: $textColourSecondary;
+  }
+
+  &__tree {
+    height: 97%;
+  }
+
+  .ant-tree {
+    padding-right: $smallSpace;
   }
 }

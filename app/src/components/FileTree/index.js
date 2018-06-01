@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Tree } from 'antd';
+import CustomScroll from 'react-custom-scroll';
+
+import 'react-custom-scroll/dist/customScroll.css';
 
 import './FileTree.css';
 
@@ -12,25 +15,24 @@ class FileTree extends Component {
   }
 
   render() {
-    const { title } = this.props;
+    const { title, data } = this.props;
 
     return (
       <div className="file-tree">
         {title && <h4 className="file-tree__title">{title}</h4>}
-        <Tree
-          showLine
-          defaultExpandedKeys={['0']}
-          onSelect={this.onSelect}
-        >
-          <TreeNode title="simGameConversations" key="0">
-            <TreeNode title="5a3ab7376230353c12005c60.convo" key="0-0" />
-            <TreeNode title="5a3abc456230353c12005f73.convo" key="0-1" />
-            <TreeNode title="5a3abc646230353c12005f7d.convo" key="0-2" />
-            <TreeNode title="5a3d5fc2623035dc17000045.convo" key="0-3" />
-            <TreeNode title="5a5cf51a623035b41e00002a.convo" key="0-4" />
-            <TreeNode title="5a9c39f462303538160005e7.convo" key="0-5" />
-          </TreeNode>
-        </Tree>
+        <div className="file-tree__tree">
+          <CustomScroll heightRelativeToParent="calc(100% - 1px)">
+            <Tree
+              showLine
+              defaultExpandedKeys={['0']}
+              onSelect={this.onSelect}
+            >
+              <TreeNode title="simGameConversations" key="0">
+                {data.map(item => <TreeNode key={item.key} title={item.label} />)}
+              </TreeNode>
+            </Tree>
+          </CustomScroll>
+        </div>
       </div>
     );
   }
@@ -38,10 +40,15 @@ class FileTree extends Component {
 
 FileTree.defaultProps = {
   title: undefined,
+  data: null,
 };
 
 FileTree.propTypes = {
   title: PropTypes.string,
+  data: PropTypes.arrayOf(PropTypes.shape({
+    key: PropTypes.string,
+    label: PropTypes.string,
+  })),
 };
 
 export default FileTree;

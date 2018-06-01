@@ -12,6 +12,7 @@ const devConfig = require('./webpack/webpack.dev.config');
 const prodConfig = require('./webpack/webpack.prod.config');
 
 // loaders
+const cssLoader = require('./webpack/loaders/css.loader');
 const jsxLoader = require('./webpack/loaders/jsx.loader');
 const lessLoader = require('./webpack/loaders/less.loader');
 const postcssLoader = require('./webpack/loaders/postcss.loader');
@@ -59,6 +60,7 @@ let config = {
 };
 
 // Loader hooks
+config = cssLoader(config, APP_DIR);
 config = jsxLoader(config, APP_DIR);
 config = lessLoader(config, APP_DIR);
 config = postcssLoader(config, APP_DIR);

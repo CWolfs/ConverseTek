@@ -1,11 +1,11 @@
 import { observable, action } from 'mobx';
 
 class DataStore {
-  @observable conversations = observable.map();
+  @observable conversationAssets = observable.map();
 
-  @action setConversations(conversations) {
-    conversations.forEach(conversation =>
-      this.conversations.set(conversation.idRef.id, conversation));
+  @action setConversations(conversationAssets) {
+    conversationAssets.forEach(conversationAsset =>
+      this.conversationAssets.set(conversationAsset.Conversation.idRef.id, conversationAsset));
   }
 
   @action reset = () => {

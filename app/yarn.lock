@@ -8071,6 +8071,10 @@ rc@^1.1.2, rc@^1.1.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
+react-custom-scroll@^3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/react-custom-scroll/-/react-custom-scroll-3.2.1.tgz#e0d727621386297e50ab0fce7f0ed22f2034f3b8"
+
 react-dom@^16.4.0:
   version "16.4.0"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.4.0.tgz#099f067dd5827ce36a29eaf9a6cdc7cbf6216b1e"

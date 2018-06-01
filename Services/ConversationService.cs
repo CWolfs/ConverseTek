@@ -21,58 +21,56 @@ namespace ConverseTek.Services {
       return instance;
     }
 
-    public ConversationService() {
+    public ConversationService() {}
 
-    }
-
-    public List<Conversation> LoadConversations() {
-      List<Conversation> conversations = new List<Conversation>();
+    public List<ConversationAsset> LoadConversations() {
+      List<ConversationAsset> conversations = new List<ConversationAsset>();
       // string[] conversationPaths = Directory.GetFiles("D:/Program Files (x86)/Steam/steamapps/common/BATTLETECH/BattleTech_Data/StreamingAssets/data/simGameConversations");
       string[] conversationPaths = Directory.GetFiles("C:/Data");
 
       foreach (string conversationPath in conversationPaths) {
-        Conversation conversation = LoadConversation(conversationPath);
-        ExportConversation(conversation, FileFormat.BINARY, conversationPath);
-        conversations.Add(conversation);
+        ConversationAsset conversationAsset = LoadConversation(conversationPath);
+        conversations.Add(conversationAsset);
       }
 
       return conversations;
     }
 
-    public Conversation LoadConversation(string filePath) {
-      Conversation conversation = null;
+    public ConversationAsset LoadConversation(string filePath) {
+      ConversationAsset conversationAsset = null;
       RuntimeTypeModel runtimeTypeModel = TypeModel.Create();
 
       try {
         using (FileStream fileStream = new FileStream(filePath, FileMode.Open)) {
-          conversation = runtimeTypeModel.Deserialize(fileStream, null, typeof(Conversation)) as Conversation;
+          Conversation conversation = runtimeTypeModel.Deserialize(fileStream, null, typeof(Conversation)) as Conversation;
+          conversationAsset = new ConversationAsset(filePath, conversation);
         }
       } catch (Exception error) {
           Log.Error(error.ToString());
           return null;
       }
 
-      return conversation;
+      return conversationAsset;
     }
 
-    public void ExportConversation(Conversation conversation, FileFormat fileFormat, string path) {
+    public void ExportConversation(ConversationAsset conversationAsset, FileFormat fileFormat, string path) {
       if (fileFormat == FileFormat.JSON) {
-        ExportJsonConversation(conversation, path);
+        ExportJsonConversation(conversationAsset, path);
       } else if (fileFormat == FileFormat.BINARY) {
-        ExportBinaryConversation(conversation, path);
+        ExportBinaryConversation(conversationAsset, path);
       }
     }
 
-    private void ExportJsonConversation(Conversation conversation, string path) {
-      File.WriteAllText(Path.ChangeExtension(path, ".json"), JsonConvert.SerializeObject(conversation, Formatting.Indented));
+    private void ExportJsonConversation(ConversationAsset conversationAsset, string path) {
+      File.WriteAllText(Path.ChangeExtension(path, ".json"), JsonConvert.SerializeObject(conversationAsset.Conversation, Formatting.Indented));
     }
 
-    private void ExportBinaryConversation(Conversation conversation, string path) {
+    private void ExportBinaryConversation(ConversationAsset conversationAsset, string path) {
       RuntimeTypeModel runtimeTypeModel = TypeModel.Create();
 
       try {
-        using (FileStream fileStream = new FileStream(Path.ChangeExtension(path, ".byte1"), FileMode.Create)) {
-          runtimeTypeModel.Serialize(fileStream, conversation);
+        using (FileStream fileStream = new FileStream(Path.ChangeExtension(path, ".byte"), FileMode.Create)) {
+          runtimeTypeModel.Serialize(fileStream, conversationAsset.Conversation);
         }
       } catch (Exception error) {
           Log.Error(error.ToString());
