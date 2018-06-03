@@ -20,7 +20,7 @@ const imageLoader = require('./webpack/loaders/image.loader');
 
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
-const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
+// const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 
 let config = {
   entry: [

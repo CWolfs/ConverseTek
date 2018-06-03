@@ -21,7 +21,8 @@ module.exports = function(config, APP_DIR) {
                     // modifyVars: { "@primary-color": "#52c41a" }
                 }
             }
-        ]
+        ],
+        exclude: APP_DIR
     });
 
     return config;

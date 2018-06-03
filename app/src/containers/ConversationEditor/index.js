@@ -13,12 +13,8 @@ const ConversationEditor = ({ conversationAsset }) => {
       <h2>Editor</h2>
       <div>Id: {Conversation.idRef.id}</div>
       <div>Name: {Conversation.ui_name}</div>
-      <div>Node Count: {Conversation.nodes.length}</div>
-      <div>Roots Count: {Conversation.roots.length}</div>
       <div>Default Speaker Id: {Conversation.default_speaker_id}</div>
-      <div>Default Speaker Override: {Conversation.default_speaker_override}</div>
       <div>Persistent Conversation: {Conversation.persistent_conversation}</div>
-      <div>Speaker Override Id: {Conversation.speaker_override_id}</div>
       <DialogEditor2 conversationAsset={conversationAsset} />
     </div>
   );
