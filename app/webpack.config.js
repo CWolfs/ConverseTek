@@ -20,6 +20,7 @@ const imageLoader = require('./webpack/loaders/image.loader');
 
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
+const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 
 let config = {
   entry: [
@@ -66,5 +67,9 @@ if (isLocal) {
 } else {
   console.log('WARNING: NODE_ENV=environment (e.g. development or production) must be set on the package.json script hook');
 }
+
+// Speed check
+// const smp = new SpeedMeasurePlugin();
+// config = smp.wrap(config);
 
 module.exports = config;

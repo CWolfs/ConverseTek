@@ -3,21 +3,14 @@
     ["env", {
       "modules": false,
       "targets": {
-        "browsers": ["> 1%", "chrome 63"]
+        "browsers": ["chrome 63"]
       }
     }],
     "react",
     "stage-2"
   ],
-  "env": {
-    "test": {
-      "presets": [
-        ["env", { "targets": { "node": "current" }}]
-      ]
-    }
-  },
   "plugins": [
     "transform-decorators-legacy",
-    ["import", {"libraryName": "antd", "style": true} ]
+    ["import", {"libraryName": "antd", "style": true}]
   ]
 }
