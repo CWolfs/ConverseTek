@@ -18,8 +18,8 @@ const lessLoader = require('./webpack/loaders/less.loader');
 const postcssLoader = require('./webpack/loaders/postcss.loader');
 const imageLoader = require('./webpack/loaders/image.loader');
 
-// const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 
 let config = {
   entry: [
@@ -46,17 +46,8 @@ let config = {
       { from: 'src/index.html', to: 'index.html' },
       { from: 'src/assets/', to: 'assets/' },
     ]),
+    new HardSourceWebpackPlugin(),
   ],
-
-  /*
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: 'src/index.html',
-      filename: 'index.html',
-      inject: true,
-    }),
-  ],
-  */
 };
 
 // Loader hooks
