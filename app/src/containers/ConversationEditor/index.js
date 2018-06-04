@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import DialogEditor2 from '../../components/DialogEditor2';
+import DialogEditor from '../../components/DialogEditor';
 
 import './ConversationEditor.css';
 
@@ -15,7 +15,7 @@ const ConversationEditor = ({ conversationAsset }) => {
       <div>Name: {Conversation.ui_name}</div>
       <div>Default Speaker Id: {Conversation.default_speaker_id}</div>
       <div>Persistent Conversation: {Conversation.persistent_conversation}</div>
-      <DialogEditor2 conversationAsset={conversationAsset} />
+      <DialogEditor conversationAsset={conversationAsset} />
     </div>
   );
 };

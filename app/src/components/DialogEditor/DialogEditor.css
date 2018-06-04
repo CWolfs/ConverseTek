@@ -4,30 +4,48 @@
   padding: 0 $smallMediumSpace;
   background-color: $backgroundTertiary;
   border: 1px solid white;
-  width: 74vw;
 
-  .ant-tree li .ant-tree-node-content-wrapper:hover,
-  .ant-tree li .ant-tree-node-content-wrapper.ant-tree-node-selected {
-    background-color: transparent;
+  &__tree {
+    font-size: $fontSizeSmall;
+    line-height: $lineHeightSmall;
   }
 
-  .ant-tree-title {
-    white-space: normal;
+  .rstcustom__node {
+    height: unset !important;
+    position: relative !important;
+    top: unset !important;
   }
 
-  .ant-tree li .ant-tree-node-content-wrapper {
-    position: absolute;
+  .rst__lineHalfHorizontalRight::before, .rst__lineFullVertical::after, .rst__lineHalfVerticalTop::after, .rst__lineHalfVerticalBottom::after,
+  .rst__lineChildren::after {
+    background-color: gold;
   }
 
-  .ant-tree-title:hover,
-  .ant-tree-node-selected .ant-tree-title {
-    color: white;
-    background-color: #2ab0f77d;
+  .rst__virtualScrollOverride * {
+    color: black;
+  }
+  
+  .rst__moveHandle {
+    background-color: #2f71d4;
   }
 
-  .ant-tree.ant-tree-show-line li span.ant-tree-switcher.ant-tree-switcher-noop:after {
-    content: "\E6AB";
-    transform: scaleX(-1);
-    color: gold;
+  .rst__rowTitle {
+    font-weight: unset !important;
+  }
+
+  .rst__virtualScrollOverride {
+    overflow: hidden !important;
+  }
+
+  .rst__rowContents {
+    min-width: unset !important;
+  }
+
+  .rst__rowLabel {
+    padding-right: 5px !important;
+  }
+
+  .rst__rowWrapper {
+    padding: 5px 5px 5px 0 !important;
   }
 }
