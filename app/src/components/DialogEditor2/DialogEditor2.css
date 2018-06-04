@@ -6,7 +6,8 @@
   border: 1px solid white;
 
   &__tree {
-    height: 40vh;
+    font-size: $fontSizeSmall;
+    line-height: $lineHeightSmall;
   }
 
   .rstcustom__node {
@@ -34,5 +35,17 @@
 
   .rst__virtualScrollOverride {
     overflow: hidden !important;
+  }
+
+  .rst__rowContents {
+    min-width: unset !important;
+  }
+
+  .rst__rowLabel {
+    padding-right: 5px !important;
+  }
+
+  .rst__rowWrapper {
+    padding: 5px 5px 5px 0 !important;
   }
 }

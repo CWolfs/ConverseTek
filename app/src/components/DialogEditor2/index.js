@@ -13,14 +13,33 @@ class DialogEditor2 extends Component {
   static buildTreeData(conversationAsset) {
     const data = [{
       title: 'Root',
+      id: 0,
       children: conversationAsset.Conversation.nodes.map(node => ({
         title: node.text,
         id: node.idRef.id,
         expanded: true,
       })),
+      expanded: true,
     }];
 
     return data;
+  }
+
+  static getDerivedStateFromProps(props, state) {
+    let modifiedState = false;
+    const { conversationAsset: stateConversationAsset } = state;
+    const { conversationAsset: propConversationAsset } = props;
+
+    const newState = { ...state };
+
+    if (propConversationAsset !== stateConversationAsset) {
+      newState.conversationAsset = propConversationAsset;
+      newState.treeData = DialogEditor2.buildTreeData(propConversationAsset);
+      modifiedState = true;
+    }
+
+    if (modifiedState) return newState;
+    return state;
   }
 
   constructor(props) {
@@ -41,13 +60,24 @@ class DialogEditor2 extends Component {
     return (
       <div className="dialog-editor">
         <div className="dialog-editor__tree">
-          {/* <CustomScroll heightRelativeToParent="calc(100% - 1px)"> */}
-          <SortableTree
-            treeData={data}
-            onChange={treeData => this.setState({ treeData })}
-            getNodeKey={node => node.id}
-          />
-          {/* </CustomScroll> */}
+          <CustomScroll heightRelativeToParent="55vh">
+            <SortableTree
+              treeData={data}
+              onChange={treeData => this.setState({ treeData })}
+              getNodeKey={nodeContainer => nodeContainer.node.id}
+              rowHeight={40}
+              canDrag={nodeContainer => !(nodeContainer.node.id === 0)}
+              canDrop={nodeContainer => !(nodeContainer.nextParent === null)}
+              reactVirtualizedListProps={{
+                autoHeight: false,
+                overscanRowCount: 9999,
+                style: {
+                  minHeight: 10,
+                  height: 'unset',
+                },
+              }}
+            />
+          </CustomScroll>
         </div>
       </div>
     );
