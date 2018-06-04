@@ -28,13 +28,6 @@ export function get(url, parameters = null) {
   });
 }
 
-/*
-* Get request for RegisterAsyncJsObject
-* https://github.com/mattkol/Chromely/wiki/Expose-.NET-class-to-JavaScript
-* url - Chromely route path
-* request - a Json object
-* response - callback response method
-*/
 export function post(url, parameters, postData) {
   return new Promise(async (resolve, reject) => {
     const context = { resolve, reject };
@@ -42,6 +35,18 @@ export function post(url, parameters, postData) {
       url,
       parameters,
       postData,
+      promiseSupportedCallback.bind(context),
+    );
+  });
+}
+
+export function put(url, parameters, putData) {
+  return new Promise(async (resolve, reject) => {
+    const context = { resolve, reject };
+    boundControllerAsync.putJson(
+      url,
+      parameters,
+      putData,
       promiseSupportedCallback.bind(context),
     );
   });

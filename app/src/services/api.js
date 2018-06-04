@@ -1,4 +1,4 @@
-import { get, post } from './rest';
+import { get, post, put } from './rest';
 
 import dataStore from '../stores/dataStore';
 
@@ -21,3 +21,9 @@ export function getConversations() {
     dataStore.setConversations(conversations);
   });
 }
+
+/*
+export function updateConversation(id, data) {
+  return put('/conversations'
+}
+*/
