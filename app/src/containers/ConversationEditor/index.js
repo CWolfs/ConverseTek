@@ -43,7 +43,9 @@ class ConversationEditor extends Component {
   onSaveButtonClicked() {
     const { dataStore } = this.props;
     const { conversationAsset } = this.state;
-    dataStore.setConversation(conversationAsset);
+
+    updateConversation(conversationAsset.Conversation.idRef.id, conversationAsset);
+    dataStore.setConversation(conversationAsset); // local update for speed
   }
 
   handleIdChange(event) {
