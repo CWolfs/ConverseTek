@@ -44,6 +44,28 @@
   } 
 }
 
+.ant-btn-tertiary {
+  color: #fff;
+  background-color: $buttonBackgroundPrimary;
+  border-color: $buttonBackgroundPrimary;
+
+  &:active {
+    color: #fff;
+    background-color: $buttonBackgroundPrimary;
+    border-color: $buttonBackgroundPrimary;
+  }
+
+  &:focus, &:hover {
+    color: #fff;
+    background-color: $buttonBackgroundPrimary;
+    border-color: $buttonBackgroundPrimary;
+  }
+
+  &.ant-btn-clicked:after {
+    border: 0 solid $buttonBackgroundPrimary;
+  } 
+}
+
 .ant-tree,
 .ant-tree li .ant-tree-node-content-wrapper {
   color: $textColourPrimary;

@@ -21,10 +21,8 @@ class ConversationTree extends Component {
     this.onNodeSelected = this.onNodeSelected.bind(this);
   }
 
-  onNodeSelected(selectedKeys, info) {
+  onNodeSelected(selectedKeys) {
     const { dataStore } = this.props;
-
-    console.debug('selected', selectedKeys, info);
     dataStore.setActiveConversation(selectedKeys[0]);
   }
 

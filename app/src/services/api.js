@@ -1,6 +1,11 @@
-import { get, post, put } from './rest';
+import { get, post } from './rest';
 
 import dataStore from '../stores/dataStore';
+
+/*
+* CHROMELY DOESN'T SUPPORT PUTS SO PUTS AND DELETES ARE CURRENTLY POSTS WITH method DATA
+* e.g. { method: 'DELETE' }
+*/
 
 /*
 ======================
@@ -22,8 +27,8 @@ export function getConversations() {
   });
 }
 
-/*
-export function updateConversation(id, data) {
-  return put('/conversations'
+export function updateConversation(id, conversationAsset) {
+  return post('/conversations/put', { id }, { method: 'PUT', conversationAsset }).then((conversations) => {
+    dataStore.setConversations(conversations);
+  });
 }
-*/

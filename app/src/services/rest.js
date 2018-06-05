@@ -46,7 +46,7 @@ export function put(url, parameters, putData) {
     boundControllerAsync.putJson(
       url,
       parameters,
-      putData,
+      JSON.stringify(putData),
       promiseSupportedCallback.bind(context),
     );
   });

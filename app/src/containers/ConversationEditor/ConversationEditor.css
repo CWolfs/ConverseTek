@@ -2,4 +2,12 @@
 
 .conversation-editor {
   padding: $smallMediumSpace;
+
+  h2 {
+    display: inline-block;
+  }
+  
+  &__save-button {
+    float: right;
+  }
 }

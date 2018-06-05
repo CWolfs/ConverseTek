@@ -5,6 +5,7 @@ namespace ConverseTek.Controllers {
     using System.Diagnostics.CodeAnalysis;
 
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     using Chromely.Core.RestfulService;
     using Chromely.Core.Infrastructure;
@@ -17,7 +18,7 @@ namespace ConverseTek.Controllers {
 
         public ConversationController() {
             this.RegisterGetRequest("/conversations", this.GetConversations);
-            // this.RegisterGetRequest("/conversations/id:", this.GetConversation);
+            this.RegisterPostRequest("/conversations/put", this.UpdateConversations);
         }
 
         private ChromelyResponse GetConversations(ChromelyRequest request) {
@@ -31,15 +32,21 @@ namespace ConverseTek.Controllers {
             return response;
         }
 
-        //private ChromelyResponse GetConversation(ChromelyRequest request) {
-            /*string conversationJson = JsonConvert.SerializeObject(conversation);
-            Log.Info("JSON: " + conversationJson);
-            Log.Info($"Conversation is of type {conversation.ToString()} with idRef of {conversation.idRef} with id of {conversation.idRef.id} with name of {conversation.ui_name}");
+        private ChromelyResponse UpdateConversations(ChromelyRequest request) {
+            IDictionary<string, object> parameters = request.Parameters;
+            string postDataJson = (string)request.PostData.EnsureJson();
+            JObject data = JObject.Parse(postDataJson);
 
-            ChromelyResponse response = new ChromelyResponse();
-            response.Data = conversationJson;
-            return response;
-            */
-        //}
+            Log.Info("UpdateConversations works with: " + parameters["id"]);
+            Log.Info("Data[method] is " + data["method"]);
+            Log.Info("Data[conversationAsset] is " + data["conversationAsset"]);
+
+            ConversationAsset conversationAsset = JsonConvert.DeserializeObject(data["conversationAsset"].ToString()) as ConversationAsset;
+
+            ConversationService conversationService = ConversationService.getInstance();
+            // conversationService.SaveConversation(conversationAsset);
+
+            return null;
+        }
     }
 }

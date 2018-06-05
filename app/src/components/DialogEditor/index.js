@@ -25,23 +25,6 @@ class DialogEditor extends Component {
     return data;
   }
 
-  static getDerivedStateFromProps(props, state) {
-    let modifiedState = false;
-    const { conversationAsset: stateConversationAsset } = state;
-    const { conversationAsset: propConversationAsset } = props;
-
-    const newState = { ...state };
-
-    if (propConversationAsset !== stateConversationAsset) {
-      newState.conversationAsset = propConversationAsset;
-      newState.treeData = DialogEditor.buildTreeData(propConversationAsset);
-      modifiedState = true;
-    }
-
-    if (modifiedState) return newState;
-    return state;
-  }
-
   constructor(props) {
     super(props);
 
@@ -51,6 +34,19 @@ class DialogEditor extends Component {
       conversationAsset,
       treeData: DialogEditor.buildTreeData(conversationAsset),
     };
+  }
+
+  static componentWillReceiveProps(nextProps) {
+    const { conversationAsset: stateConversationAsset } = this.state;
+    const { conversationAsset: propConversationAsset } = nextProps;
+
+    const newState = { ...this.state };
+
+    if (propConversationAsset !== stateConversationAsset) {
+      newState.conversationAsset = propConversationAsset;
+      newState.treeData = DialogEditor.buildTreeData(propConversationAsset);
+      this.setState(newState);
+    }
   }
 
   render() {
