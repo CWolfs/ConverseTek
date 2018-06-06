@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import mobx from 'mobx';
 import { observer, inject } from 'mobx-react';
 import { message, Button, Row, Col, Form, Input, Icon } from 'antd';
 

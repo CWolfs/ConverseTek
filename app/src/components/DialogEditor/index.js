@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { observer, inject } from 'mobx-react';
 import SortableTree from 'react-sortable-tree';
 import CustomScroll from 'react-custom-scroll';
 
@@ -9,6 +10,7 @@ import 'react-sortable-tree/style.css';
 import './DialogEditor.css';
 
 /* eslint-disable react/no-unused-state */
+@observer
 class DialogEditor extends Component {
   static buildTreeData(conversationAsset) {
     const data = [{
@@ -28,7 +30,9 @@ class DialogEditor extends Component {
   constructor(props) {
     super(props);
 
-    const { conversationAsset } = this.props;
+    const { nodeStore, conversationAsset } = this.props;
+    nodeStore.build(conversationAsset);
+
 
     this.state = {
       conversationAsset,
@@ -37,12 +41,14 @@ class DialogEditor extends Component {
   }
 
   static componentWillReceiveProps(nextProps) {
+    const { nodeStore } = nextProps;
     const { conversationAsset: stateConversationAsset } = this.state;
     const { conversationAsset: propConversationAsset } = nextProps;
 
     const newState = { ...this.state };
 
     if (propConversationAsset !== stateConversationAsset) {
+      nodeStore.build(propConversationAsset);
       newState.conversationAsset = propConversationAsset;
       newState.treeData = DialogEditor.buildTreeData(propConversationAsset);
       this.setState(newState);
@@ -50,7 +56,7 @@ class DialogEditor extends Component {
   }
 
   render() {
-    const { onSelected } = this.props;
+    // const { onSelected } = this.props;
     const { treeData: data } = this.state;
 
     return (
@@ -85,8 +91,9 @@ DialogEditor.defaultProps = {
 };
 
 DialogEditor.propTypes = {
+  nodeStore: PropTypes.object.isRequired,
   conversationAsset: PropTypes.object.isRequired,
   onSelected: PropTypes.func,
 };
 
-export default DialogEditor;
+export default inject('nodeStore')(DialogEditor);
