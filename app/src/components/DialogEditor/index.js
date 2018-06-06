@@ -12,15 +12,11 @@ import './DialogEditor.css';
 /* eslint-disable react/no-unused-state */
 @observer
 class DialogEditor extends Component {
-  static buildTreeData(conversationAsset) {
+  static buildTreeData(nodeStore, conversationAsset) {
     const data = [{
       title: 'Root',
       id: 0,
-      children: conversationAsset.Conversation.roots.map(node => ({
-        title: node.text,
-        id: node.idRef.id,
-        expanded: true,
-      })),
+      children: nodeStore.getChildrenFromRoots(conversationAsset.Conversation.roots),
       expanded: true,
     }];
 
@@ -33,14 +29,13 @@ class DialogEditor extends Component {
     const { nodeStore, conversationAsset } = this.props;
     nodeStore.build(conversationAsset);
 
-
     this.state = {
       conversationAsset,
-      treeData: DialogEditor.buildTreeData(conversationAsset),
+      treeData: DialogEditor.buildTreeData(nodeStore, conversationAsset),
     };
   }
 
-  static componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps) {
     const { nodeStore } = nextProps;
     const { conversationAsset: stateConversationAsset } = this.state;
     const { conversationAsset: propConversationAsset } = nextProps;
@@ -50,7 +45,7 @@ class DialogEditor extends Component {
     if (propConversationAsset !== stateConversationAsset) {
       nodeStore.build(propConversationAsset);
       newState.conversationAsset = propConversationAsset;
-      newState.treeData = DialogEditor.buildTreeData(propConversationAsset);
+      newState.treeData = DialogEditor.buildTreeData(nodeStore, propConversationAsset);
       this.setState(newState);
     }
   }
@@ -87,13 +82,13 @@ class DialogEditor extends Component {
 }
 
 DialogEditor.defaultProps = {
-  onSelected: () => {},
+  // onSelected: () => {},
 };
 
 DialogEditor.propTypes = {
   nodeStore: PropTypes.object.isRequired,
   conversationAsset: PropTypes.object.isRequired,
-  onSelected: PropTypes.func,
+  // onSelected: PropTypes.func,
 };
 
 export default inject('nodeStore')(DialogEditor);
