@@ -11,9 +11,9 @@ import { getConversations } from '../../services/api';
 import './Conversations.css';
 
 const Conversations = ({ dataStore }) => {
-  const { activeConversationAsset } = dataStore;
+  const { conversationAssets, activeConversationAsset } = dataStore;
 
-  getConversations();
+  if (conversationAssets.size <= 0) getConversations();
 
   const mainView = (activeConversationAsset) ?
     <ConversationEditor conversationAsset={activeConversationAsset} /> : <SplashScreen />;
