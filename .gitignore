@@ -2,9 +2,15 @@
 bin/
 obj/
 
+# sensitive libs
+libs/ShadowrunSerializer.dll
+libs/ShadowrunDTO.dll
+
 # frontend
-reactapp/dist
-reactapp/node_modules
+dist/
+app/node_modules
 
 # logs
 debug.log
+logs/
+app/yarn-error.log

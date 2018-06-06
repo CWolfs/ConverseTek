@@ -20,15 +20,33 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="reactapp\node_modules\**" />
-    <Content Remove="reactapp\**" />
-    <EmbeddedResource Remove="reactapp\node_modules\**" />
-    <None Remove="reactapp\node_modules\**" />
+    <Compile Remove="app\node_modules\**" />
+    <Content Remove="app\**" />
+    <EmbeddedResource Remove="app\node_modules\**" />
+    <None Remove="app\node_modules\**" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CefSharp.Common" Version="63.0.3" />
     <PackageReference Include="Chromely.CefSharp.Winapi" Version="63.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="protobuf-net">
+      <HintPath>..\libs\protobuf-net.dll</HintPath>
+    </Reference>
+
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\libs\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+
+    <Reference Include="ShadowrunDTO">
+      <HintPath>..\libs\ShadowrunDTO.dll</HintPath>
+    </Reference>
+
+    <Reference Include="ShadowrunSerializer">
+      <HintPath>..\libs\ShadowrunSerializer.dll</HintPath>
+    </Reference>
   </ItemGroup>
   
   <ItemGroup>
@@ -37,32 +55,38 @@
     </None>
   </ItemGroup>
 
-  <Target Name="DebugRunReactApp" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' ">
+  <Target Name="BuildServer" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' ">
+  </Target>
+
+  <Target Name="BuildDebug" Condition=" '$(Configuration)' == 'Debug' ">
     <!-- Ensure Node.js is installed -->
     <Exec Command="node --version" ContinueOnError="false">
       <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
     </Exec>
     <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE." />
 
-    <Exec Command="npm run build" WorkingDirectory="reactapp" ContinueOnError="false" ConsoleToMSBuild="true">
+    <Exec Command="yarn build" WorkingDirectory="app" ContinueOnError="false" ConsoleToMSBuild="true">
       <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
     </Exec>
+
+    <Exec Command="xcopy &quot;$(ProjectDir)dist&quot; &quot;$(TargetDir)dist&quot;   /i /s /r /y /c&#xD;&#xA;" />
+
+    <CallTarget Targets="Build"/>  
   </Target>
 
-  <Target Name="ReleaseRunReactApp" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Release' ">
+  <Target Name="BuildRelease" Condition=" '$(Configuration)' == 'Release' ">
     <!-- Ensure Node.js is installed -->
     <Exec Command="node --version" ContinueOnError="false">
       <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
     </Exec>
     <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE." />
 
-    <Exec Command="npm run prod" WorkingDirectory="reactapp" ContinueOnError="true" ConsoleToMSBuild="false">
+    <Exec Command="yarn prod" WorkingDirectory="app" ContinueOnError="true" ConsoleToMSBuild="false">
       <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
     </Exec>
-  </Target>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="xcopy &quot;$(ProjectDir)reactapp\dist&quot; &quot;$(TargetDir)reactapp\dist&quot;   /i /s /r /y /c&#xD;&#xA;" />
+    <Exec Command="xcopy &quot;$(ProjectDir)dist&quot; &quot;$(TargetDir)dist&quot;   /i /s /r /y /c&#xD;&#xA;" />
+
+    <CallTarget Targets="Build"/> 
   </Target>
-  
 </Project>

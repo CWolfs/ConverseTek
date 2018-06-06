@@ -1,0 +1,17 @@
+@import '../../css/constants.css';
+
+.conversations {
+  height: 100%;
+  display: flex;
+
+  &__tree {
+    height: 100%;
+    padding: $smallMediumSpace 0 $smallMediumSpace $smallMediumSpace;
+    background-color: $backgroundTertiary;
+    border-right: 1px solid #828282;
+  }
+
+  &__main {
+    flex-grow: 1;
+  }
+}

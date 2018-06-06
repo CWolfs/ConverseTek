@@ -28,8 +28,7 @@
 // </note>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ChromelyReactCefSharp
-{
+namespace ConverseTek {
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Reflection;
@@ -40,12 +39,13 @@ namespace ChromelyReactCefSharp
     using Chromely.Core.Infrastructure;
     using WinApi.Windows;
 
+    using ConverseTek.Handlers;
+
     /// <summary>
     /// The program.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1400:AccessModifierMustBeDeclared", Justification = "Reviewed. Suppression is OK here.")]
-    class Program
-    {
+    class Program {
         /// <summary>
         /// The main.
         /// </summary>
@@ -55,25 +55,24 @@ namespace ChromelyReactCefSharp
         /// <returns>
         /// The <see cref="int"/>.
         /// </returns>
-        static int Main(string[] args)
-        {
-            try
-            {
+        public static int Main(string[] args) {
+            try {
                 HostHelpers.SetupDefaultExceptionHandlers();
 
-                string startUrl = "local://reactapp/dist/index.html";
+                string startUrl = "local://dist/index.html";
 
                 ChromelyConfiguration config = ChromelyConfiguration
                                               .Create()
                                               .WithAppArgs(args)
                                               .WithHostSize(1200, 900)
-                                              .WithLogFile("logs\\chromely.cef_new.log")
+                                              .WithLogFile("logs\\conversetek-interface.log")
                                               .WithStartUrl(startUrl)
                                               .WithLogSeverity(LogSeverity.Info)
-                                              .UseDefaultLogger()
+                                              .UseDefaultLogger("logs\\conversetek-core.log", true)
                                               .UseDefaultResourceSchemeHandler("local", string.Empty)
                                               .UseDefaultHttpSchemeHandler("http", "chromely.com")
                                               .UseDefautJsHandler("boundControllerAsync", true);
+                                              // .RegisterJsHandler(new ChromelyJsHandler("boundControllerAsync", new ConverseTekBoundObject(), null, true));
 
                                               // Alternate approach for multi-process, is to add a subprocess application
                                               // .WithCustomSetting(CefSettingKeys.SingleProcess, true);
@@ -81,9 +80,9 @@ namespace ChromelyReactCefSharp
                 var factory = WinapiHostFactory.Init("chromely.ico");
                 using (var window = factory.CreateWindow(
                     () => new CefSharpBrowserHost(config),
-                    "chromely",
-                    constructionParams: new FrameWindowConstructionParams()))
-                {
+                    "ConverseTek",
+                    constructionParams: new FrameWindowConstructionParams())
+                ){
                     // Register external url schems
                     window.RegisterUrlScheme(new UrlScheme("https://github.com/mattkol/Chromely", true));
 
@@ -115,11 +114,9 @@ namespace ChromelyReactCefSharp
                     window.SetSize(config.HostWidth, config.HostHeight);
                     window.CenterToScreen();
                     window.Show();
-                    return new HostEventLoop().Run(window);
+                    return new EventLoop().Run(window);
                 }
-            }
-            catch (Exception exception)
-            {
+            } catch (Exception exception) {
                 Log.Error(exception);
             }
 

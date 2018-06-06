@@ -1,0 +1,11 @@
+.main {
+  height: 100%;
+
+  &__content {
+    height: 100%;
+  }
+
+  &__children {
+    height: calc(100vh - 60px);
+  }
+}

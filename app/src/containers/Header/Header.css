@@ -1,0 +1,7 @@
+@import '../../css/constants.css';
+
+.header {
+  background-color: $backgroundSecondary;
+  padding: $smallMediumSpace;
+  color: $grey4;
+}

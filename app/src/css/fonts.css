@@ -1,0 +1,49 @@
+/*
+===================
+| App Font Values |
+===================
+Font related CSS values for the main app.
+*/
+
+$fontWeightNormal: 400;
+$fontWeightMedium: 500;
+$fontWeightSemibold: 600;
+$fontWeightBold: 700;
+
+$fontSizeSmall: 12px;
+$fontSizeNormal: 14px;
+$fontSizeLarge: 16px;
+$fontSizeLarger: 20px;
+$fontSizeLargest: 24px;
+$fontSizeTitle: 30px;
+
+$lineHeightSmall: 20px;
+$lineHeightNormal: 22px;
+$lineHeightLarge: 24px;
+$lineHeightLarger: 28px;
+$lineHeightLargest: 32px;
+$lineHeightTitle: 38px;
+
+/*
+=====================
+| Promo Font Values |
+=====================
+Font related CSS values for the promotional pages.
+*/
+
+$promoFontWeightNormal: 400;
+$promoFontWeightMedium: 500;
+$promoFontWeightSemibold: 600;
+$promoFontWeightBold: 700;
+
+$promoFontSizeNormal: 14px;
+$promoFontSizeLarge: 16px;
+$promoFontSizeLarger: 20px;
+$promoFontSizeLargest: 24px;
+$promoFontSizeTitle: 30px;
+
+$promoLineHeightNormal: 22px;
+$promoLineHeightLarge: 24px;
+$promoLineHeightLarger: 28px;
+$promoLineHeightLargest: 32px;
+$promoLineHeightTitle: 38px;

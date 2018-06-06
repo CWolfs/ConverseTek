@@ -1,0 +1,23 @@
+@import '../../css/constants.css';
+
+.file-tree {
+  height: 100%;
+  
+  &__title {
+    font-weight: bold;
+    color: $textColourSecondary;
+  }
+
+  &__tree {
+    height: 97%;
+  }
+
+  .ant-tree {
+    padding-right: $smallMediumSpace;
+  }
+
+  .ant-tree.ant-tree-show-line li span.ant-tree-switcher.ant-tree-switcher-noop:after {
+    content: "\E999";
+    color: gold;
+  }
+}
