@@ -37,14 +37,13 @@ namespace ConverseTek.Controllers {
             string postDataJson = (string)request.PostData.EnsureJson();
             JObject data = JObject.Parse(postDataJson);
 
-            Log.Info("UpdateConversations works with: " + parameters["id"]);
-            Log.Info("Data[method] is " + data["method"]);
-            Log.Info("Data[conversationAsset] is " + data["conversationAsset"]);
-
-            ConversationAsset conversationAsset = JsonConvert.DeserializeObject(data["conversationAsset"].ToString()) as ConversationAsset;
-
-            ConversationService conversationService = ConversationService.getInstance();
-            // conversationService.SaveConversation(conversationAsset);
+            try {
+                ConversationAsset conversationAsset = JsonConvert.DeserializeObject<ConversationAsset>(data["conversationAsset"].ToString());
+                ConversationService conversationService = ConversationService.getInstance();
+                conversationService.SaveConversation(conversationAsset, FileFormat.BINARY);
+            } catch (Exception e) {
+                Log.Error(e);
+            }
 
             return null;
         }

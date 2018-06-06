@@ -29,28 +29,30 @@ export function get(url, parameters = null) {
 }
 
 export function post(url, parameters, postData) {
+  const postJsonData = JSON.stringify(postData);
   return new Promise(async (resolve, reject) => {
     const context = { resolve, reject };
     boundControllerAsync.postJson(
       url,
       parameters,
-      postData,
+      postJsonData,
       promiseSupportedCallback.bind(context),
     );
   });
 }
 
+/*
 export function put(url, parameters, putData) {
   return new Promise(async (resolve, reject) => {
     const context = { resolve, reject };
     boundControllerAsync.putJson(
       url,
       parameters,
-      JSON.stringify(putData),
+      putJsonData,
       promiseSupportedCallback.bind(context),
     );
   });
-}
+*/
 
 export default {
   infoTemp,

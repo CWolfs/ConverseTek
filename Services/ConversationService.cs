@@ -53,23 +53,27 @@ namespace ConverseTek.Services {
       return conversationAsset;
     }
 
-    public void ExportConversation(ConversationAsset conversationAsset, FileFormat fileFormat, string path) {
+    public void SaveConversation(ConversationAsset conversationAsset, FileFormat fileFormat) {
+      SaveConversation(conversationAsset, fileFormat, conversationAsset.FilePath);
+    }
+
+    public void SaveConversation(ConversationAsset conversationAsset, FileFormat fileFormat, string path) {
       if (fileFormat == FileFormat.JSON) {
-        ExportJsonConversation(conversationAsset, path);
+        SaveJsonConversation(conversationAsset, path);
       } else if (fileFormat == FileFormat.BINARY) {
-        ExportBinaryConversation(conversationAsset, path);
+        SaveBinaryConversation(conversationAsset, path);
       }
     }
 
-    private void ExportJsonConversation(ConversationAsset conversationAsset, string path) {
+    private void SaveJsonConversation(ConversationAsset conversationAsset, string path) {
       File.WriteAllText(Path.ChangeExtension(path, ".json"), JsonConvert.SerializeObject(conversationAsset.Conversation, Formatting.Indented));
     }
 
-    private void ExportBinaryConversation(ConversationAsset conversationAsset, string path) {
+    private void SaveBinaryConversation(ConversationAsset conversationAsset, string path) {
       RuntimeTypeModel runtimeTypeModel = TypeModel.Create();
 
       try {
-        using (FileStream fileStream = new FileStream(Path.ChangeExtension(path, ".byte"), FileMode.Create)) {
+        using (FileStream fileStream = new FileStream(Path.ChangeExtension(path, ".bytes"), FileMode.Create)) {
           runtimeTypeModel.Serialize(fileStream, conversationAsset.Conversation);
         }
       } catch (Exception error) {

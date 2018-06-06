@@ -55,7 +55,10 @@
     </None>
   </ItemGroup>
 
-  <Target Name="DebugRunReactApp" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' ">
+  <Target Name="BuildServer" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' ">
+  </Target>
+
+  <Target Name="BuildDebug" Condition=" '$(Configuration)' == 'Debug' ">
     <!-- Ensure Node.js is installed -->
     <Exec Command="node --version" ContinueOnError="false">
       <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
@@ -67,9 +70,11 @@
     </Exec>
 
     <Exec Command="xcopy &quot;$(ProjectDir)dist&quot; &quot;$(TargetDir)dist&quot;   /i /s /r /y /c&#xD;&#xA;" />
+
+    <CallTarget Targets="Build"/>  
   </Target>
 
-  <Target Name="ReleaseRunReactApp" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Release' ">
+  <Target Name="BuildRelease" Condition=" '$(Configuration)' == 'Release' ">
     <!-- Ensure Node.js is installed -->
     <Exec Command="node --version" ContinueOnError="false">
       <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
@@ -81,5 +86,7 @@
     </Exec>
 
     <Exec Command="xcopy &quot;$(ProjectDir)dist&quot; &quot;$(TargetDir)dist&quot;   /i /s /r /y /c&#xD;&#xA;" />
+
+    <CallTarget Targets="Build"/> 
   </Target>
 </Project>
