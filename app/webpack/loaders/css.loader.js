@@ -2,23 +2,16 @@
 var webpack = require('webpack');
 
 module.exports = function(config, APP_DIR) {
-    console.log('Using css and less loader');
+    console.log('Using packages-scoped css loader');
 
     config.module.rules.push({
-        test: /\.less$/,
+        test: /\.css$/,
         use: [
             'style-loader',
             {
                 loader: 'css-loader',
                 options: {
                     importLoaders: 1
-                }
-            },
-            {
-                loader: 'less-loader',
-                options: {
-                    javascriptEnabled: true,
-                    // modifyVars: { "@primary-color": "#52c41a" }
                 }
             }
         ],

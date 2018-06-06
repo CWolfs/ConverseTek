@@ -6,12 +6,12 @@
 
   &__tree {
     height: 100%;
-    padding: $smallMediumSpace;
+    padding: $smallMediumSpace 0 $smallMediumSpace $smallMediumSpace;
     background-color: $backgroundTertiary;
     border-right: 1px solid #828282;
   }
 
-  &__editor {
-    padding: $smallMediumSpace;
+  &__main {
+    flex-grow: 1;
   }
 }

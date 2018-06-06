@@ -44,18 +44,49 @@
   } 
 }
 
+.ant-btn-tertiary {
+  color: #fff;
+  background-color: $buttonBackgroundPrimary;
+  border-color: $buttonBackgroundPrimary;
+
+  &:active {
+    color: #fff;
+    background-color: $buttonBackgroundPrimary;
+    border-color: $buttonBackgroundPrimary;
+  }
+
+  &:focus, &:hover {
+    color: #fff;
+    background-color: $buttonBackgroundPrimary;
+    border-color: $buttonBackgroundPrimary;
+  }
+
+  &.ant-btn-clicked:after {
+    border: 0 solid $buttonBackgroundPrimary;
+  } 
+}
+
 .ant-tree,
 .ant-tree li .ant-tree-node-content-wrapper {
   color: $textColourPrimary;
 }
 
 .ant-tree.ant-tree-show-line li span.ant-tree-switcher {
-  color: white;
   background-color: $backgroundTertiary;
+  color: white;
 }
 
 .ant-tree li .ant-tree-node-content-wrapper:hover, 
 .ant-tree li .ant-tree-node-content-wrapper.ant-tree-node-selected {
   background-color: #2ab0f77d;
   color: white;
+}
+
+.ant-form-item-label label {
+  color: white;
+}
+
+.ant-input {
+  background-color: $backgroundTertiary;  
+  color: $textColourPrimary;
 }

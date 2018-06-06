@@ -10,12 +10,14 @@ $fontWeightMedium: 500;
 $fontWeightSemibold: 600;
 $fontWeightBold: 700;
 
+$fontSizeSmall: 12px;
 $fontSizeNormal: 14px;
 $fontSizeLarge: 16px;
 $fontSizeLarger: 20px;
 $fontSizeLargest: 24px;
 $fontSizeTitle: 30px;
 
+$lineHeightSmall: 20px;
 $lineHeightNormal: 22px;
 $lineHeightLarge: 24px;
 $lineHeightLarger: 28px;

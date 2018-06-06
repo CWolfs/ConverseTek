@@ -15,7 +15,7 @@ module.exports = function(ctx) {
       'postcss-calc': {},             // https://github.com/postcss/postcss-calc | Reduces calcs by collapsing them
       'postcss-nested-ancestors': {}, // https://github.com/toomuchdesign/postcss-nested-ancestors | Allows for ^& parent selection
       'postcss-nested': {},           // https://github.com/postcss/postcss-nested | Nested css like SASS
-      'postcss-sprites': {},          // https://github.com/2createStudio/postcss-sprites | Atlassing,
+      // 'postcss-sprites': {},          // https://github.com/2createStudio/postcss-sprites | Atlassing,
     }
   }
 }

@@ -28,7 +28,7 @@
 // </note>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ChromelyReactCefSharp {
+namespace ConverseTek {
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Reflection;
@@ -38,6 +38,8 @@ namespace ChromelyReactCefSharp {
     using Chromely.Core.Helpers;
     using Chromely.Core.Infrastructure;
     using WinApi.Windows;
+
+    using ConverseTek.Handlers;
 
     /// <summary>
     /// The program.
@@ -70,6 +72,7 @@ namespace ChromelyReactCefSharp {
                                               .UseDefaultResourceSchemeHandler("local", string.Empty)
                                               .UseDefaultHttpSchemeHandler("http", "chromely.com")
                                               .UseDefautJsHandler("boundControllerAsync", true);
+                                              // .RegisterJsHandler(new ChromelyJsHandler("boundControllerAsync", new ConverseTekBoundObject(), null, true));
 
                                               // Alternate approach for multi-process, is to add a subprocess application
                                               // .WithCustomSetting(CefSettingKeys.SingleProcess, true);

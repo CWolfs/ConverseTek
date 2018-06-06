@@ -2,22 +2,24 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build",
+            "label": "Build All",
             "command": "dotnet",
             "type": "process",
             "args": [
                 "build",
-                "D:/Modding/ConverseTek/ConverseTek.csproj"
+                "D:/Modding/ConverseTek/ConverseTek.csproj",
+                "/t:BuildDebug"
             ],
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "Build & Run",
+            "label": "Build Server",
             "command": "dotnet",
             "type": "process",
             "args": [
-                "run",
-                "D:/Modding/ConverseTek/ConverseTek.csproj"
+                "build",
+                "D:/Modding/ConverseTek/ConverseTek.csproj",
+                "/t:BuildServer"
             ],
             "problemMatcher": "$msCompile"
         },

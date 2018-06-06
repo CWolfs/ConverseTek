@@ -28,24 +28,28 @@ h1 {
   font-size: $fontSizeTitle;
   line-height: $lineHeightTitle;
   margin: 0 0 $mediumLargeSpace 1px; /* 1px left to avoid optical illusions with <Card /> borders */ 
+  color: white;
 }
 
 h2 {
   font-size: $fontSizeLargest;
   line-height: $lineHeightLargest;
   margin: 0 0 $smallMediumSpace 1px; /* 1px left to avoid optical illusions with <Card /> borders */
+  color: white;
 }
 
 h3 {
   font-size: $fontSizeLarger;
   line-height: $lineHeightLarger;
   margin: 0 0 $smallSpace 1px; /* 1px left to avoid optical illusions with <Card /> borders */
+  color: white;
 }
 
 h4 {
   font-size: $fontSizeLarge;
   line-height: $lineHeightLarge;
   margin: 0 0 $tinySpace 1px; /* 1px left to avoid optical illusions with <Card /> borders */
+  color: white;
 }
 
 h3[type="secondary"] {

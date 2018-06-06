@@ -6,7 +6,7 @@ module.exports = function(config, APP_DIR) {
 
     config.module.rules.push({
       test: /\.jsx?$/,
-      loaders: ['babel-loader'],
+      loaders: ['babel-loader?cacheDirectory'],
       include: APP_DIR
     });
 

@@ -8,7 +8,7 @@
             "name": ".NET Core Launch (console)",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "Build",
             "cwd": "${workspaceFolder}",
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/bin/x64/Debug/net472/ConverseTek.exe",

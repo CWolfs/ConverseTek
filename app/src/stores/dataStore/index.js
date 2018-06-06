@@ -1,17 +1,31 @@
 import { observable, action } from 'mobx';
 
 class DataStore {
-  @observable conversations = observable.map();
+  @observable conversationAssets = observable.map();
+  @observable activeConversationAsset;
 
-  @action setConversations(conversations) {
-    conversations.forEach(conversation =>
-      this.conversations.set(conversation.idRef.id, conversation));
+  @action setConversations(conversationAssets) {
+    conversationAssets.forEach(conversationAsset =>
+      this.conversationAssets.set(conversationAsset.Conversation.idRef.id, conversationAsset));
+  }
+
+  @action setConversation(conversationAsset) {
+    this.conversationAssets.set(conversationAsset.Conversation.idRef.id, conversationAsset);
+  }
+
+  @action removeConversation(id) {
+    this.conversationAssets.delete(id);
+  }
+
+  @action setActiveConversation(id) {
+    if (this.conversationAssets.has(id)) {
+      this.activeConversationAsset = this.conversationAssets.get(id);
+    }
   }
 
   @action reset = () => {
-    this.organisation = null;
-    this.teams = null;
-    this.sensors = null;
+    this.conversationAssets.clear();
+    this.activeConversationAsset = null;
   }
 }
 
