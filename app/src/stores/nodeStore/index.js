@@ -46,6 +46,9 @@ class NodeStore {
   getChildren(node) {
     const { nextNodeIndex } = node;
 
+    // GUARD - End of branch so this would be tagged as a DIALOG END node
+    if (nextNodeIndex === -1) return null;
+
     // GUARD - Error if there's a mistake in the file and
     //         no node exists of the index being looked for
     if (!this.nodes.has(nextNodeIndex)) {
