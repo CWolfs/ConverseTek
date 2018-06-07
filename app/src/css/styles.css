@@ -91,18 +91,3 @@ h3[type="secondary"] {
     color: rgba(0, 0, 0, 0.2);
   }
 }
-
-::-webkit-scrollbar {
-  height: 6px;
-  width: 6px;
-  background: $backgroundTertiary
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: rgba(78, 183, 245, 0.7);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-corner {
-  background: $backgroundTertiary
-}

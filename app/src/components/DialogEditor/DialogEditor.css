@@ -1,15 +1,13 @@
 @import '../../css/constants.css';
 
 .dialog-editor {
+  padding: 0 $smallMediumSpace;
   background-color: $backgroundTertiary;
   border: 1px solid white;
-  border-radius: 2px;
 
   &__tree {
     font-size: $fontSizeSmall;
     line-height: $lineHeightSmall;
-    height: 55vh;
-    overflow: auto;
   }
 
   .rstcustom__node {
