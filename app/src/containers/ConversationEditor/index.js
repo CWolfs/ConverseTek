@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { observer, inject } from 'mobx-react';
-import { Button, Row, Col, Form, Input, Icon } from 'antd';
+import { message, Button, Row, Col, Form, Input, Icon } from 'antd';
 
 import DialogEditor from '../../components/DialogEditor';
 
@@ -32,11 +32,8 @@ class ConversationEditor extends Component {
     const { conversationAsset: stateConversationAsset } = this.state;
     const { conversationAsset: propConversationAsset } = nextProps;
 
-    const newState = { ...this.state };
-
     if (propConversationAsset !== stateConversationAsset) {
-      newState.conversationAsset = propConversationAsset;
-      this.setState(newState);
+      this.createNewUnsavedConversation(propConversationAsset);
     }
   }
 
@@ -44,8 +41,21 @@ class ConversationEditor extends Component {
     const { dataStore } = this.props;
     const { conversationAsset } = this.state;
 
-    updateConversation(conversationAsset.Conversation.idRef.id, conversationAsset);
-    dataStore.setConversation(conversationAsset); // local update for speed
+    this.createNewUnsavedConversation(conversationAsset);
+
+    updateConversation(conversationAsset.Conversation.idRef.id, conversationAsset)
+      .then(() => {
+        message.success('Save successful');
+      });
+    dataStore.updateActiveConversation(conversationAsset); // local update for speed
+  }
+
+  createNewUnsavedConversation(conversationAsset) {
+    const unsavedConversationAsset = { ...conversationAsset };
+
+    this.setState({
+      conversationAsset: unsavedConversationAsset,
+    });
   }
 
   handleIdChange(event) {
