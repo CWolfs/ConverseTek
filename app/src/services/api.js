@@ -30,6 +30,5 @@ export function getConversations() {
 export function updateConversation(id, conversationAsset) {
   return post('/conversations/put', { id }, { method: 'PUT', conversationAsset }).then((conversations) => {
     dataStore.setConversations(conversations);
-    return conversations;
   });
 }

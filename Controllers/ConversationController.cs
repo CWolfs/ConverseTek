@@ -37,20 +37,15 @@ namespace ConverseTek.Controllers {
             string postDataJson = (string)request.PostData.EnsureJson();
             JObject data = JObject.Parse(postDataJson);
 
-            ConversationService conversationService = ConversationService.getInstance();
-
             try {
                 ConversationAsset conversationAsset = JsonConvert.DeserializeObject<ConversationAsset>(data["conversationAsset"].ToString());
+                ConversationService conversationService = ConversationService.getInstance();
                 conversationService.SaveConversation(conversationAsset, FileFormat.BINARY);
             } catch (Exception e) {
                 Log.Error(e);
             }
 
-            List<ConversationAsset> conversations = conversationService.LoadConversations();
-            string conversationsJson = JsonConvert.SerializeObject(conversations);
-            ChromelyResponse response = new ChromelyResponse();
-            response.Data = conversationsJson;
-            return response;
+            return null;
         }
     }
 }
