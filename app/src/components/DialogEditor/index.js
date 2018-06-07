@@ -5,6 +5,8 @@ import SortableTree from 'react-sortable-tree';
 
 import 'react-sortable-tree/style.css';
 
+import ConverseTekNodeRenderer from './ConverseTekNodeRenderer';
+
 import './DialogEditor.css';
 
 /* eslint-disable react/no-unused-state */
@@ -62,6 +64,7 @@ class DialogEditor extends Component {
             rowHeight={40}
             canDrag={nodeContainer => !(nodeContainer.node.id === 0)}
             canDrop={nodeContainer => !(nodeContainer.nextParent === null)}
+            nodeContentRenderer={ConverseTekNodeRenderer}
             reactVirtualizedListProps={{
               autoHeight: false,
               overscanRowCount: 9999,
