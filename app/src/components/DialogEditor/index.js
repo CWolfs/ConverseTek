@@ -2,9 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { observer, inject } from 'mobx-react';
 import SortableTree from 'react-sortable-tree';
-import CustomScroll from 'react-custom-scroll';
 
-import 'react-custom-scroll/dist/customScroll.css';
 import 'react-sortable-tree/style.css';
 
 import './DialogEditor.css';
@@ -57,24 +55,23 @@ class DialogEditor extends Component {
     return (
       <div className="dialog-editor">
         <div className="dialog-editor__tree">
-          <CustomScroll heightRelativeToParent="55vh">
-            <SortableTree
-              treeData={data}
-              onChange={treeData => this.setState({ treeData })}
-              getNodeKey={nodeContainer => nodeContainer.node.id}
-              rowHeight={40}
-              canDrag={nodeContainer => !(nodeContainer.node.id === 0)}
-              canDrop={nodeContainer => !(nodeContainer.nextParent === null)}
-              reactVirtualizedListProps={{
-                autoHeight: false,
-                overscanRowCount: 9999,
-                style: {
-                  minHeight: 10,
-                  height: 'unset',
-                },
-              }}
-            />
-          </CustomScroll>
+          <SortableTree
+            treeData={data}
+            onChange={treeData => this.setState({ treeData })}
+            getNodeKey={nodeContainer => nodeContainer.node.id}
+            rowHeight={40}
+            canDrag={nodeContainer => !(nodeContainer.node.id === 0)}
+            canDrop={nodeContainer => !(nodeContainer.nextParent === null)}
+            reactVirtualizedListProps={{
+              autoHeight: false,
+              overscanRowCount: 9999,
+              style: {
+                minHeight: 10,
+                height: 'unset',
+                width: 9999,
+              },
+            }}
+          />
         </div>
       </div>
     );
