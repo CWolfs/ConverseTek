@@ -1,10 +1,11 @@
 import { observable, action } from 'mobx';
 
 class DataStore {
-  @observable conversationAssets = observable.map();
+  @observable conversationAssets = observable.shallowMap();
   @observable activeConversationAsset;
 
   @action setConversations(conversationAssets) {
+    this.conversationAssets.clear();
     conversationAssets.forEach(conversationAsset =>
       this.conversationAssets.set(conversationAsset.Conversation.idRef.id, conversationAsset));
   }
@@ -15,6 +16,11 @@ class DataStore {
 
   @action removeConversation(id) {
     this.conversationAssets.delete(id);
+  }
+
+  @action updateActiveConversation(conversationAsset) {
+    this.setConversation(conversationAsset);
+    this.activeConversationAsset = conversationAsset;
   }
 
   @action setActiveConversation(id) {
