@@ -9,6 +9,7 @@ import './ConverseTekNodeRenderer.css';
 /* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
 const ConverseTekNodeRenderer = ({
   nodeStore,
+  activeNodeId,
   scaffoldBlockPxWidth,
   toggleChildrenVisibility,
   connectDragPreview,
@@ -37,6 +38,7 @@ const ConverseTekNodeRenderer = ({
   const nodeTitle = title || node.title;
   const nodeSubtitle = subtitle || node.subtitle;
   const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : null;
+  const isActiveNode = (activeNodeId === node.id);
 
   let handle;
   if (canDrag) {
@@ -117,6 +119,8 @@ const ConverseTekNodeRenderer = ({
           <div
             className={classnames(
               'rst__row',
+              'node-renderer__row',
+              isActiveNode && 'node-renderer__row--active',
               isLandingPadActive && 'rst__rowLandingPad',
               isLandingPadActive && !canDrop && 'rst__rowCancelPad',
               isSearchMatch && 'rst__rowSearchMatch',
@@ -134,6 +138,7 @@ const ConverseTekNodeRenderer = ({
             <div
               className={classnames(
                 'rst__rowContents',
+                'node-renderer__row-contents',
                 !canDrag && 'rst__rowContentsDragDisabled',
                 rowDirectionClass,
               )}

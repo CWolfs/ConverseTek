@@ -1,3 +1,20 @@
+@import '../../../css/constants.css';
+
+.node-renderer {
+  &__row {
+    border: 1px transparent solid;
+
+    &:focus, &:hover, &--active {
+      border: 1px $borderSecondary solid;
+      box-shadow: 0px 0px 6px gold;
+    }
+  }
+
+  &__row-contents {
+    cursor: pointer;
+  }
+}
+
 .rst__rowWrapper {
   padding: 10px 10px 10px 0;
   height: 100%;

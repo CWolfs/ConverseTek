@@ -35,6 +35,11 @@ class NodeStore {
     }
   }
 
+  getActiveNodeId() {
+    if (!this.activeNode) return null;
+    return NodeStore.getId(this.activeNode.idRef);
+  }
+
   buildRoots(roots) {
     roots.forEach((root) => {
       const id = NodeStore.getId(root.idRef);

@@ -68,7 +68,7 @@ $linkColourPrimary: $c1blue6;
 $linkColourSecondary: white;
 
 $borderPrimary: $grey4;         /* for use on white background */
-$borderSecondary: white;        /* for use on blue background */
+$borderSecondary: gold;        /* for use on blue background */
 $borderTertiary: lightgrey;     /* for use on white or blue background */
 $borderQuaternary: $blue8;      /* for use on blue background */
 
