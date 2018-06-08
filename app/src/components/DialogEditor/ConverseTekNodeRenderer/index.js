@@ -39,10 +39,14 @@ const ConverseTekNodeRenderer = observer(({
   const nodeSubtitle = subtitle || node.subtitle;
   const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : null;
   const isActiveNode = (activeNodeId === node.id);
-  let storedNode = nodeStore.getNode(node.id, node.type);
-  if (storedNode === null) storedNode = {};
-  // const nodeTitle = title || node.title
-  const nodeTitle = storedNode.text || storedNode.responseText;
+  const storedNode = nodeStore.getNode(node.id, node.type);
+
+  let nodeTitle = '';
+  if (storedNode === null) {
+    nodeTitle = title || node.title;
+  } else {
+    nodeTitle = storedNode.text || storedNode.responseText;
+  }
 
   let handle;
   if (canDrag) {
