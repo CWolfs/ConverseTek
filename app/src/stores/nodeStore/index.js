@@ -40,6 +40,17 @@ class NodeStore {
     return NodeStore.getId(this.activeNode.idRef);
   }
 
+  getNode(nodeId, nodeType) {
+    if (nodeType === 'root') {
+      return this.roots.get(nodeId);
+    } else if (nodeType === 'node') {
+      return this.nodes.values().find(node => nodeId === NodeStore.getId(node.idRef));
+    } else if (nodeType === 'branch') {
+      return this.branches.get(nodeId);
+    }
+    return null;
+  }
+
   buildRoots(roots) {
     roots.forEach((root) => {
       const id = NodeStore.getId(root.idRef);
@@ -113,7 +124,9 @@ class NodeStore {
 
   @action reset = () => {
     this.roots.clear();
-    this.roots.clear();
+    this.nodes.clear();
+    this.branches.clear();
+    this.activeNode = null;
   }
 }
 

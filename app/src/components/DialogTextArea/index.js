@@ -1,18 +1,43 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { observer } from 'mobx-react';
 import { Input } from 'antd';
 
 const { TextArea } = Input;
 
-const DialogTextArea = ({ node }) => {
-  const text = node.text || node.responseText;
+/* eslint-disable no-param-reassign */
+@observer
+class DialogTextArea extends Component {
+  constructor(props) {
+    super(props);
 
-  return (
-    <div className="dialog-text-area">
-      <TextArea value={text} />
-    </div>
-  );
-};
+    this.handleDialogChange = this.handleDialogChange.bind(this);
+  }
+
+  handleDialogChange(event) {
+    const { node } = this.props;
+    const type = (node.text) ? 'node' : 'branch';
+
+    const inputText = event.target.value.trim();
+
+    if (type === 'node') {
+      node.text = inputText;
+    } else {
+      node.responseText = inputText;
+    }
+  }
+
+  render() {
+    const { node } = this.props;
+    const text = node.text || node.responseText;
+
+    return (
+      <div className="dialog-text-area">
+        <TextArea value={text} onChange={this.handleDialogChange} />
+      </div>
+    );
+  }
+}
 
 DialogTextArea.propTypes = {
   node: PropTypes.object.isRequired,

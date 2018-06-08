@@ -1,13 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
+import { observer } from 'mobx-react';
 
 import { isDescendant } from '../../../utils/tree-data-utils';
 
 import './ConverseTekNodeRenderer.css';
 
 /* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
-const ConverseTekNodeRenderer = ({
+const ConverseTekNodeRenderer = observer(({
   nodeStore,
   activeNodeId,
   scaffoldBlockPxWidth,
@@ -35,10 +36,13 @@ const ConverseTekNodeRenderer = ({
   rowDirection,
   ...otherProps
 }) => {
-  const nodeTitle = title || node.title;
   const nodeSubtitle = subtitle || node.subtitle;
   const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : null;
   const isActiveNode = (activeNodeId === node.id);
+  let storedNode = nodeStore.getNode(node.id, node.type);
+  if (storedNode === null) storedNode = {};
+  // const nodeTitle = title || node.title
+  const nodeTitle = storedNode.text || storedNode.responseText;
 
   let handle;
   if (canDrag) {
@@ -189,9 +193,10 @@ const ConverseTekNodeRenderer = ({
       </div>
     </div>
   );
-};
+});
 
 ConverseTekNodeRenderer.defaultProps = {
+  activeNodeId: null,
   isSearchMatch: false,
   isSearchFocus: false,
   canDrag: false,
@@ -209,6 +214,7 @@ ConverseTekNodeRenderer.defaultProps = {
 
 ConverseTekNodeRenderer.propTypes = {
   nodeStore: PropTypes.object.isRequired,
+  activeNodeId: PropTypes.string,
   node: PropTypes.shape({}).isRequired,
   title: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
   subtitle: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
