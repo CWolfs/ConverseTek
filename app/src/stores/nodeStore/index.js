@@ -2,7 +2,8 @@ import { observable, action } from 'mobx';
 
 class NodeStore {
   @observable roots = observable.shallowMap();
-  @observable nodes = observable.shallowMap(); // NOT including roots
+  @observable nodes = observable.shallowMap();
+  @observable branches = observable.shallowMap();
   @observable activeNode;
 
   static getId(idRef) {
@@ -27,8 +28,10 @@ class NodeStore {
   @action setActiveNode(nodeId, nodeType) {
     if (nodeType === 'root') {
       this.activeNode = this.roots.get(nodeId);
-    } else if ((nodeType === 'node' || nodeType === 'branch')) {
+    } else if (nodeType === 'node') {
       this.activeNode = this.nodes.values().find(node => nodeId === NodeStore.getId(node.idRef));
+    } else if (nodeType === 'branch') {
+      this.activeNode = this.branches.get(nodeId);
     }
   }
 
@@ -43,6 +46,13 @@ class NodeStore {
     nodes.forEach((node) => {
       const { index } = node;
       this.nodes.set(index, node);
+    });
+  }
+
+  buildBranches(branches) {
+    branches.forEach((branch) => {
+      const id = NodeStore.getId(branch.idRef);
+      this.branches.set(id, branch);
     });
   }
 
@@ -72,6 +82,7 @@ class NodeStore {
     }
 
     const childNode = this.nodes.get(nextNodeIndex);
+    this.buildBranches(childNode.branches);
 
     return [
       {

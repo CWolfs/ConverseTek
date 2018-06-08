@@ -5,7 +5,7 @@ import { Input } from 'antd';
 const { TextArea } = Input;
 
 const DialogTextArea = ({ node }) => {
-  const text = node.text || node.response;
+  const text = node.text || node.responseText;
 
   return (
     <div className="dialog-text-area">
