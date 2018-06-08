@@ -60,7 +60,10 @@ class DialogEditor extends Component {
           <SortableTree
             treeData={data}
             onChange={treeData => this.setState({ treeData })}
-            getNodeKey={nodeContainer => nodeContainer.node.id}
+            getNodeKey={({ node, treeIndex }) => {
+              if (!node.id) return treeIndex;
+              return node.id;
+            }}
             rowHeight={40}
             canDrag={nodeContainer => !(nodeContainer.node.id === 0)}
             canDrop={nodeContainer => !(nodeContainer.nextParent === null)}

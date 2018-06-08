@@ -7,6 +7,7 @@ class NodeStore {
 
   constructor() {
     this.ownerId = null;
+    this.idMap = new Map();
   }
 
   @action build(conversationAsset) {
@@ -57,17 +58,20 @@ class NodeStore {
     }
 
     const childNode = this.nodes.get(nextNodeIndex);
+    const childNodeId = childNode.idRef.id.split(':')[1] || childNode.idRef.id;
+
     return [
       {
         title: childNode.text,
-        id: childNode.idRef.id.split(':')[1],
+        id: childNodeId,
         expanded: true,
         children: childNode.branches.map((branch) => {
           const { auxiliaryLink } = branch;
+          const branchNodeId = branch.idRef.id.split(':')[1];
 
           return {
             title: branch.responseText,
-            id: branch.idRef.id.split(':')[1],
+            id: branchNodeId,
             expanded: true,
             children: (auxiliaryLink) ? [{ title: `[Link to NODE ${branch.nextNodeIndex}]` }] : this.getChildren(branch),
           };
