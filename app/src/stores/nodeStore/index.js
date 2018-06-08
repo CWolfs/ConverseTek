@@ -1,27 +1,40 @@
 import { observable, action } from 'mobx';
 
-/* eslint-disable class-methods-use-this */
 class NodeStore {
   @observable roots = observable.shallowMap();
   @observable nodes = observable.shallowMap(); // NOT including roots
+  @observable activeNode;
+
+  static getId(idRef) {
+    const { id } = idRef;
+    return id.split(':')[1] || id;
+  }
 
   constructor() {
     this.ownerId = null;
-    this.idMap = new Map();
+    this.activeNode = null;
   }
 
   @action build(conversationAsset) {
     const { roots, nodes } = conversationAsset.Conversation;
-    this.ownerId = conversationAsset.Conversation.idRef.id;
+    this.ownerId = NodeStore.getId(conversationAsset.Conversation.idRef);
 
     this.reset();
     this.buildRoots(roots);
     this.buildNodes(nodes);
   }
 
+  @action setActiveNode(nodeId, nodeType) {
+    if (nodeType === 'root') {
+      this.activeNode = this.roots.get(nodeId);
+    } else if ((nodeType === 'node' || nodeType === 'branch')) {
+      this.activeNode = this.nodes.values().find(node => nodeId === NodeStore.getId(node.idRef));
+    }
+  }
+
   buildRoots(roots) {
     roots.forEach((root) => {
-      const id = root.idRef.id.split(':')[1];
+      const id = NodeStore.getId(root.idRef);
       this.roots.set(id, root);
     });
   }
@@ -37,7 +50,8 @@ class NodeStore {
     return roots.map(root => (
       {
         title: root.responseText,
-        id: root.idRef.id.split(':')[1],
+        id: NodeStore.getId(root.idRef),
+        type: 'root',
         expanded: true,
         children: this.getChildren(root),
       }
@@ -58,20 +72,21 @@ class NodeStore {
     }
 
     const childNode = this.nodes.get(nextNodeIndex);
-    const childNodeId = childNode.idRef.id.split(':')[1] || childNode.idRef.id;
 
     return [
       {
         title: childNode.text,
-        id: childNodeId,
+        id: NodeStore.getId(childNode.idRef),
+        type: 'node',
         expanded: true,
         children: childNode.branches.map((branch) => {
           const { auxiliaryLink } = branch;
-          const branchNodeId = branch.idRef.id.split(':')[1];
+          const branchNodeId = NodeStore.getId(branch.idRef);
 
           return {
             title: branch.responseText,
             id: branchNodeId,
+            type: 'branch',
             expanded: true,
             children: (auxiliaryLink) ? [{ title: `[Link to NODE ${branch.nextNodeIndex}]` }] : this.getChildren(branch),
           };

@@ -6,7 +6,9 @@ import { isDescendant } from '../../../utils/tree-data-utils';
 
 import './ConverseTekNodeRenderer.css';
 
+/* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
 const ConverseTekNodeRenderer = ({
+  nodeStore,
   scaffoldBlockPxWidth,
   toggleChildrenVisibility,
   connectDragPreview,
@@ -135,6 +137,7 @@ const ConverseTekNodeRenderer = ({
                 !canDrag && 'rst__rowContentsDragDisabled',
                 rowDirectionClass,
               )}
+              onClick={() => nodeStore.setActiveNode(node.id, node.type)}
             >
               <div className={classnames('rst__rowLabel', rowDirectionClass)}>
                 <span
@@ -200,6 +203,7 @@ ConverseTekNodeRenderer.defaultProps = {
 };
 
 ConverseTekNodeRenderer.propTypes = {
+  nodeStore: PropTypes.object.isRequired,
   node: PropTypes.shape({}).isRequired,
   title: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
   subtitle: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),

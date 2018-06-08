@@ -4,6 +4,7 @@
   background-color: $backgroundTertiary;
   border: 1px solid white;
   border-radius: 2px;
+  margin-bottom: $smallSpace;
 
   &__tree {
     font-size: $fontSizeSmall;

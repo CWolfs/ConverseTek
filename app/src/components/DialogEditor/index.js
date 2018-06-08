@@ -51,7 +51,7 @@ class DialogEditor extends Component {
   }
 
   render() {
-    // const { onSelected } = this.props;
+    const { nodeStore } = this.props;
     const { treeData: data } = this.state;
 
     return (
@@ -67,6 +67,7 @@ class DialogEditor extends Component {
             rowHeight={40}
             canDrag={nodeContainer => !(nodeContainer.node.id === 0)}
             canDrop={nodeContainer => !(nodeContainer.nextParent === null)}
+            generateNodeProps={() => ({ nodeStore })}
             nodeContentRenderer={ConverseTekNodeRenderer}
             reactVirtualizedListProps={{
               autoHeight: false,
