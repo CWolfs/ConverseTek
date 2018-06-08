@@ -1,6 +1,9 @@
 @import '../../css/constants.css';
 
 .conversation-editor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   padding: $smallMediumSpace;
 
   h2 {
@@ -9,5 +12,22 @@
   
   &__save-button {
     float: right;
+  }
+
+  &__details {
+    flex: 1;
+
+    & * {
+      height: 100%;
+    }
+
+    textarea.ant-input {
+      resize: none;
+      height: 100%;
+    }
+  }
+
+  .ant-form-item {
+    margin-bottom: $smallMediumSpace;
   }
 }
