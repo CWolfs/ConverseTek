@@ -2,6 +2,18 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "Release",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "D:/Modding/ConverseTek/ConverseTek.csproj",
+                "/t:BuildRelease",
+                "-c Release"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
             "label": "Build All",
             "command": "dotnet",
             "type": "process",
