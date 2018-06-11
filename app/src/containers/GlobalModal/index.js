@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { Modal } from 'antd';
 import { observer, inject } from 'mobx-react';
 
+import './GlobalModal.css';
+
 @observer
 class GlobalModal extends Component {
   constructor(props) {
@@ -19,6 +21,7 @@ class GlobalModal extends Component {
       isVisible,
       ModalContent,
       onOk,
+      okLabel,
       onCancel,
     } = modalStore;
     const { confirmLoading } = this.state;
@@ -30,8 +33,11 @@ class GlobalModal extends Component {
         title="Select a conversation directory"
         visible={isVisible}
         onOk={onOk}
+        okText={okLabel}
         confirmLoading={confirmLoading}
         onCancel={onCancel}
+        wrapClassName="global-modal"
+        width="70vw"
       >
         {content}
       </Modal>

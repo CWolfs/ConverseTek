@@ -1,3 +1,33 @@
-.file-system-picker {
+@import '../../css/constants.css';
 
+.file-system-picker {
+  display: flex;
+
+  &__quick-links {
+    margin-right: $mediumLargeSpace;
+  }
+
+  &__directory-list {
+    flex-grow: 1;
+    max-height: 70vh;
+    margin-left: $tinySpace;
+  }
+
+  &__directory-item {
+    cursor: pointer;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  &__directory-item:hover, &__directory-item:focus, &__directory-item--active {
+    background-color: #2ab0f77d;
+  }
+
+  &__directory-icon {
+    margin-right: $smallMediumSpace;
+  }
+
+  &__directory-name {
+    line-height: 1;
+  }
 }

@@ -33,3 +33,22 @@ export function updateConversation(id, conversationAsset) {
     return conversations;
   });
 }
+
+/*
+==========================
+ || FILE SYSTEM METHODS ||
+ =========================
+*/
+export function getRootDrives() {
+  return get('/filesystem').then((directories) => {
+    return directories;
+  });
+}
+
+export function getDirectoryChildren(path) {
+
+}
+
+export function saveWorkingDirectory(path) {
+
+}

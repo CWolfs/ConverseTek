@@ -4,6 +4,7 @@ class ModalStore {
   @observable ModalContent;
   @observable isVisible = false;
   @observable onOk;
+  @observable okLabel = 'Ok';
   @observable onCancel;
 
   constructor() {
@@ -17,6 +18,10 @@ class ModalStore {
 
   @action setOnOk(onOk) {
     this.onOk = onOk;
+  }
+
+  @action setOkLabel(label) {
+    this.okLabel = label;
   }
 
   @action showModal(flag) {
