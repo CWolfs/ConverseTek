@@ -33,11 +33,11 @@ Dragging dialog nodes around isn't supported in _v0.1.0_. I left in the UI funct
 
 ### "What is an action?"
 
-An **action** is what Battletech uses to trigger something from a dialog node. These may be playing music, with _Play BattleTech Audio Event_ for example, or triggering a
-game screen fade with _Set BattleTech Fade_.
+An **action** is what Battletech uses to trigger something from a dialog node. These may be playing music, with `Play BattleTech Audio Event` for example, or triggering a
+game screen fade with `Set BattleTech Fade`.
 
 ### "What is a condition?"
 
 A **condition** is what Battletech uses to control which dialog branches to display to the player, and which ones to hide. It can check against various things like
-your player's history like if you selected your back story to include having an accident when you were young, *commander_youth_accident_* for instance. It can
-also check against game milestone tags like *oc04_post_argo*.
+your player's history like if you selected your back story to include having an accident when you were young, `commander_youth_accident_` for instance. It can
+also check against game milestone tags like `oc04_post_argo`.
