@@ -4,6 +4,8 @@ Conversation editor for HBS's Battletech.
 
 Battletech uses a binary data format for its conversations. It isn't possible to edit those files directly so this tool is being developed to allow for editing and creating new conversations.
 
+![Example Conversation](./images/conversetek-example.png)
+
 ## Overview
 
 Latest release: **v0.1.0** | [Download](https://github.com/CWolfs/ConverseTek/releases/tag/v0.1.0)
