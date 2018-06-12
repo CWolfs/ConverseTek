@@ -2,17 +2,17 @@
 
 ## Conversation Editor
 
-## "What's the purpose of this tool?"
+### "What's the purpose of this tool?"
 
 It's a Battletech sim (non-combat) conversation editor.
 
 Battletech uses a binary data format for its conversations. It isn't possible to edit those files directly so this tool is being developed to allow for editing and creating new conversations.
 
-## "What can the tool do exactly?"
+### "What can the tool do exactly?"
 
 Check out the [Roadmap](https://github.com/CWolfs/ConverseTek/#roadmap) for a full feature list.
 
-## "Is ConverseTek compatible with ModTek?"
+### "Is ConverseTek compatible with ModTek?"
 
 Yes. Conversation files created or edited with ConverseTek work with ModTek since the conversation files are loaded from the manifest file.
 
