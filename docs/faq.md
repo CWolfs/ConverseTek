@@ -22,8 +22,8 @@ there might be a clash with the conversation ids (_idRefs_). Check the [Roadmap]
 ![Conversation Empty Node](./images/conversation-empty-node.png)
 
 An empty node is not actually empty, it just has no dialog text associated with it. Battletech uses these mainly as conditional check points, or gateways to larger
-branches of dialog. ConverseTek _v0.1.0_ does not support editing **actions** or **conditions**. In later versions you'll be able to select these nodes
-and add/remove the actions and conditions.
+branches of dialog. ConverseTek _v0.1.0_ does not support editing **actions** or **conditions**. In later versions you'll be able to select any node
+and add/remove actions and conditions.
 
 Action and condition icons will be added to the dialog nodes to better indicate which nodes have actions and dialogs.
 
