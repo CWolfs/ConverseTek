@@ -27,7 +27,7 @@ Some questions are answered in the [FAQ section](./docs/faq.md).
 
 ## Feedback
 
-All feedback is welcome in the [issues section](https://github.com/CWolfs/ConverseTek/issues) of github
+All feedback is welcome in the [issues section](https://github.com/CWolfs/ConverseTek/issues).
 
 ## Roadmap
 
