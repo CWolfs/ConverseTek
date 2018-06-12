@@ -125,3 +125,9 @@
   color: $linkColourTertiary;
   background-color: $backgroundQuaternary;
 }
+
+.ant-modal-content {
+  & ::-webkit-scrollbar {
+    background: $borderPrimary;
+  }
+}
