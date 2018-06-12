@@ -42,6 +42,8 @@ All feedback is welcome in the [issues section](https://github.com/CWolfs/Conver
 | Conversation - Id regeneration | 0.2.0 | :soon: |
 | Conversation - Save as... | 0.2.0 | :soon: |
 | Conversation - New | 0.2.0 | :soon: |
+| Conversation - Edit dialog node speaker | 0.2.0 | :soon: |
+| Conversation - Edit conversation default speaker | 0.2.0 | :soon: |
 | Conversation - Drag node rearrange | 0.3.0 | :heavy_minus_sign: |
 | Conversation - Linking | 0.3.0 | :heavy_minus_sign: |
 | Conversation - Delete node | 0.3.0 | :heavy_minus_sign: |
