@@ -2,9 +2,15 @@
 
 Conversation editor for HBS's Battletech.
 
+Battletech uses a binary data format for its conversations. It isn't possible to edit those files directly so this tool is being developed to allow for editing and creating new conversations.
+
 ## Overview
 
-Version: 0.1.0 | Release Link
+Version: 0.1.0 | Release Link#
+
+## Feedback
+
+All feedback is welcome in the [issues section](https://github.com/CWolfs/ConverseTek/issues) of github
 
 ## Roadmap
 
@@ -27,3 +33,9 @@ Version: 0.1.0 | Release Link
 | Conversation - Remove actions | 0.4.0 | :heavy_minus_sign: |
 | Conversation - Add conditions | 0.4.0 | :heavy_minus_sign: |
 | Conversation - Remove conditions | 0.4.0 | :heavy_minus_sign: |
+
+## Author
+
+Richard Griffiths (CWolf)
+  * [Twitter](https://twitter.com/CWolf)
+  * [LinkedIn](https://www.linkedin.com/in/richard-griffiths-436b7a19/)
