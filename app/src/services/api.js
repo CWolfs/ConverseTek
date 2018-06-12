@@ -40,13 +40,11 @@ export function updateConversation(id, conversationAsset) {
  =========================
 */
 export function getRootDrives() {
-  return get('/filesystem').then((directories) => {
-    return directories;
-  });
+  return get('/filesystem');
 }
 
-export function getDirectoryChildren(path) {
-
+export function getDirectories(path) {
+  return get('/directories', { path });
 }
 
 export function saveWorkingDirectory(path) {

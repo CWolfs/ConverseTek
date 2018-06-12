@@ -4,8 +4,9 @@ import { List, Icon } from 'antd';
 import classnames from 'classnames';
 import remove from 'lodash.remove';
 import sortBy from 'lodash.sortby';
+import debounce from 'lodash.debounce';
 
-import { getRootDrives } from '../../services/api';
+import { getRootDrives, getDirectories } from '../../services/api';
 
 import './FileSystemPicker.css';
 
@@ -21,13 +22,11 @@ class FileSystemPicker extends Component {
       directories: [],
     };
 
-    getRootDrives().then((directories) => {
-      console.log(`Directories ${JSON.stringify(directories)}`);
-      this.setState({ directories });
-    });
+    getRootDrives().then(directories => this.setState({ directories }));
 
     this.onOk = this.onOk.bind(this);
     this.onDirectoryClicked = this.onDirectoryClicked.bind(this);
+    this.onDirectoryDoubleClicked = this.onDirectoryDoubleClicked.bind(this);
 
     modalStore.setOnOk(this.onOk);
     modalStore.setOkLabel('Load');
@@ -39,24 +38,43 @@ class FileSystemPicker extends Component {
   }
 
   onDirectoryClicked(item) {
-    const { directories } = this.state;
-    let newDirectories = [...directories];
+    // Array of debounced click events
+    this.debouncedClickEvents = this.debouncedClickEvents || [];
 
-    const clickedItem = {
-      ...item,
-      active: !item.active,
-    };
+    const callback = debounce(() => {
+      const { directories } = this.state;
+      let newDirectories = [...directories];
 
-    remove(newDirectories, directory => directory.Path === clickedItem.Path);
-    newDirectories = newDirectories.map(nonSelectedItem => ({ ...nonSelectedItem, active: false }));
-    newDirectories.push(clickedItem);
-    newDirectories = sortBy(newDirectories, directory => directory.Name);
+      const clickedItem = {
+        ...item,
+        active: !item.active,
+      };
 
-    this.setState({ directories: newDirectories });
+      remove(newDirectories, directory => directory.Path === clickedItem.Path);
+      newDirectories =
+        newDirectories.map(nonSelectedItem => ({ ...nonSelectedItem, active: false }));
+      newDirectories.push(clickedItem);
+      newDirectories = sortBy(newDirectories, directory => directory.Name.toLowerCase());
+
+      this.setState({ directories: newDirectories });
+
+      this.debouncedClickEvents = [];
+    }, 100);
+
+    this.debouncedClickEvents.push(callback);
+    callback();
   }
 
   onDirectoryDoubleClicked(item) {
+    // If there were click events registered we cancel them
+    if (this.debouncedClickEvents && this.debouncedClickEvents.length > 0) {
+      this.debouncedClickEvents.forEach(debouncedClickEvent => debouncedClickEvent.cancel());
+      this.debouncedClickEvents = [];
+    }
 
+    if (item.HasChildren) {
+      getDirectories(item.Path).then(directories => this.setState({ directories }));
+    }
   }
 
   render() {
@@ -65,7 +83,7 @@ class FileSystemPicker extends Component {
     return (
       <div className="file-system-picker">
         <div className="file-system-picker__quick-links">
-          Nav
+          <Icon type="desktop" />
         </div>
         <div className="file-system-picker__directory-list">
           <List
