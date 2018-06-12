@@ -18,7 +18,7 @@ class DialogTextArea extends Component {
     const { node } = this.props;
     const type = (node.text) ? 'node' : 'branch';
 
-    const inputText = event.target.value.trim();
+    const inputText = event.target.value;
 
     if (type === 'node') {
       node.text = inputText;

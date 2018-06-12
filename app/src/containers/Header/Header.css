@@ -2,6 +2,10 @@
 
 .header {
   background-color: $backgroundSecondary;
-  padding: $smallMediumSpace;
+  padding: 0 $smallMediumSpace;
   color: $grey4;
+
+  & * {
+    transition: none;
+  }
 }
