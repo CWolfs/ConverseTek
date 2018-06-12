@@ -6,11 +6,14 @@ Battletech uses a binary data format for its conversations. It isn't possible to
 
 ![Example Conversation](./docs/images/conversetek-example.png)
 
-![Example Editor](./docs/images/conversetek-example-2.png)
-
 ## Overview
 
 Latest release: **v0.1.0** | [Download](https://github.com/CWolfs/ConverseTek/releases/tag/v0.1.0)
+
+## Example
+
+* [In-game Edited Conversation](./docs/images/conversetek-example.png)
+* [Editor View](./docs/images/conversetek-example-2.png)
 
 ## FAQ
 
