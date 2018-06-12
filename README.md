@@ -15,6 +15,11 @@ Latest release: **v0.1.0** | [Download](https://github.com/CWolfs/ConverseTek/re
 * [Editor View](./docs/images/conversetek-example-2.png)
 * [In-Game Edited Conversation](./docs/images/conversetek-example.png)
 
+## Installation Instructions
+
+* Copy `ShadowrunDTO.dll` and `ShadowrunSerializer.dll` from your `BATTLETECH/BattleTech_Data/Managed` directory into the `ConverseTek` application folder
+* Run `ConverseTek.exe` from the `ConverseTek` application folder
+
 ## FAQ
 
 Some questions are answered in the [FAQ section](./docs/faq.md).
