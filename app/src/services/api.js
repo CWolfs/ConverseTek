@@ -48,5 +48,5 @@ export function getDirectories(path) {
 }
 
 export function saveWorkingDirectory(path) {
-
+  return post('/working-directory', { path });
 }

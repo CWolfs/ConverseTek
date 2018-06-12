@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Modal } from 'antd';
+import { Modal, Button } from 'antd';
 import { observer, inject } from 'mobx-react';
 
 import './GlobalModal.css';
@@ -21,21 +21,31 @@ class GlobalModal extends Component {
       isVisible,
       ModalContent,
       onOk,
+      disableOk,
       okLabel,
       onCancel,
+      isLoading,
+      loadingLabel,
     } = modalStore;
     const { confirmLoading } = this.state;
 
     const content = (ModalContent) ? <ModalContent modalStore={modalStore} /> : undefined;
 
+    const footer = [
+      <Button key="cancel" onClick={onCancel}>Cancel</Button>,
+      <Button key="submit" type="primary" onClick={onOk} loading={isLoading} disabled={disableOk}>
+        {(isLoading) ? loadingLabel : okLabel}
+      </Button>,
+    ];
+
     return (
       <Modal
         title="Select a conversation directory"
         visible={isVisible}
-        onOk={onOk}
-        okText={okLabel}
         confirmLoading={confirmLoading}
         onCancel={onCancel}
+        footer={footer}
+        loading={isLoading}
         wrapClassName="global-modal"
         width="70vw"
       >

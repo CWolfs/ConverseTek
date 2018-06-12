@@ -18,6 +18,8 @@ namespace ConverseTek.Services {
       return instance;
     }
 
+    public string WorkingDirectory { get; set; }
+
     public FileSystemService() {}
 
     public List<FsDirectory> GetRootDrives() {

@@ -6,7 +6,12 @@ import remove from 'lodash.remove';
 import sortBy from 'lodash.sortby';
 import debounce from 'lodash.debounce';
 
-import { getRootDrives, getDirectories } from '../../services/api';
+import {
+  getRootDrives,
+  getDirectories,
+  saveWorkingDirectory,
+  getConversations,
+} from '../../services/api';
 
 import './FileSystemPicker.css';
 
@@ -20,6 +25,8 @@ class FileSystemPicker extends Component {
 
     this.state = {
       directories: [],
+      selectedItem: null,
+      loading: false,
     };
 
     getRootDrives().then(directories => this.setState({ directories }));
@@ -30,14 +37,31 @@ class FileSystemPicker extends Component {
 
     modalStore.setOnOk(this.onOk);
     modalStore.setOkLabel('Load');
+    modalStore.setLoadingLabel('Loading');
   }
 
   onOk() {
     const { modalStore } = this.props;
-    modalStore.closeModal();
+    const { selectedItem } = this.state;
+
+    this.setState({ loading: true });
+    modalStore.setIsLoading(true);
+
+    saveWorkingDirectory(selectedItem.Path)
+      .then(() => getConversations())
+      .then(modalStore.closeModal());
   }
 
   onDirectoryClicked(item) {
+    const { modalStore } = this.props;
+    const { loading } = this.state;
+
+    // GUARD - lock down things if loading
+    if (loading) return;
+
+    // GUARD - prevent selection of backLinks
+    if (item.Name === '..') return;
+
     // Array of debounced click events
     this.debouncedClickEvents = this.debouncedClickEvents || [];
 
@@ -56,7 +80,12 @@ class FileSystemPicker extends Component {
       newDirectories.push(clickedItem);
       newDirectories = sortBy(newDirectories, directory => directory.Name.toLowerCase());
 
-      this.setState({ directories: newDirectories });
+      modalStore.setDisableOk(!clickedItem.active);
+
+      this.setState({
+        directories: newDirectories,
+        selectedItem: (clickedItem.active) ? clickedItem : null,
+      });
 
       this.debouncedClickEvents = [];
     }, 100);
@@ -66,6 +95,15 @@ class FileSystemPicker extends Component {
   }
 
   onDirectoryDoubleClicked(item) {
+    const { modalStore } = this.props;
+    const { loading } = this.state;
+
+    // GUARD - lock down things if loading
+    if (loading) return;
+
+    // GUARD - If item has no children then ignore double clicks
+    if (!item.HasChildren) return;
+
     // If there were click events registered we cancel them
     if (this.debouncedClickEvents && this.debouncedClickEvents.length > 0) {
       this.debouncedClickEvents.forEach(debouncedClickEvent => debouncedClickEvent.cancel());
@@ -73,6 +111,8 @@ class FileSystemPicker extends Component {
     }
 
     if (item.HasChildren) {
+      this.setState({ selectedItem: null });
+      modalStore.setDisableOk(true);
       getDirectories(item.Path).then(directories => this.setState({ directories }));
     }
   }

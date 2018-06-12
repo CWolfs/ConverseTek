@@ -20,6 +20,7 @@ namespace ConverseTek.Controllers {
         public FileSystemController() {
             this.RegisterGetRequest("/filesystem", this.GetRootDrives);
             this.RegisterGetRequest("/directories", this.GetDirectories);
+            this.RegisterPostRequest("/working-directory", this.SetWorkingDirectory);
         }
 
         private ChromelyResponse GetRootDrives(ChromelyRequest request) {
@@ -44,6 +45,22 @@ namespace ConverseTek.Controllers {
 
                 ChromelyResponse response = new ChromelyResponse();
                 response.Data = directoryJson;
+                return response;
+            } catch (Exception e) {
+                Log.Error(e);
+                return null;
+            }
+        }
+
+        private ChromelyResponse SetWorkingDirectory(ChromelyRequest request) {
+            try {
+                IDictionary<string, object> requestParams = request.Parameters;
+                string path = (string)requestParams["path"];
+
+                FileSystemService fileSystemService = FileSystemService.getInstance();
+                fileSystemService.WorkingDirectory = path;
+
+                ChromelyResponse response = new ChromelyResponse();
                 return response;
             } catch (Exception e) {
                 Log.Error(e);

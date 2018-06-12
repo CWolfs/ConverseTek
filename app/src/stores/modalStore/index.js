@@ -4,8 +4,11 @@ class ModalStore {
   @observable ModalContent;
   @observable isVisible = false;
   @observable onOk;
+  @observable disableOk = true;
   @observable okLabel = 'Ok';
+  @observable loadingLabel = 'Loading';
   @observable onCancel;
+  @observable isLoading = false;
 
   constructor() {
     this.onCancel = this.closeModal;
@@ -20,8 +23,20 @@ class ModalStore {
     this.onOk = onOk;
   }
 
+  @action setDisableOk(flag) {
+    this.disableOk = flag;
+  }
+
   @action setOkLabel(label) {
     this.okLabel = label;
+  }
+
+  @action setIsLoading(flag) {
+    this.isLoading = flag;
+  }
+
+  @action setLoadingLabel(label) {
+    this.loadingLabel = label;
   }
 
   @action showModal(flag) {
@@ -36,6 +51,11 @@ class ModalStore {
     this.isVisible = false;
     this.ModalContent = null;
     this.onOk = null;
+    this.disableOk = true;
+    this.okLabel = 'Ok';
+    this.loadingLabel = 'Loading';
+    this.onCancel = null;
+    this.isLoading = false;
   }
 }
 
