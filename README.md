@@ -8,6 +8,10 @@ Battletech uses a binary data format for its conversations. It isn't possible to
 
 Version: 0.1.0 | Release Link#
 
+## FAQ
+
+Some questions are answered in the [FAQ section](./docs/faq.md).
+
 ## Feedback
 
 All feedback is welcome in the [issues section](https://github.com/CWolfs/ConverseTek/issues) of github
