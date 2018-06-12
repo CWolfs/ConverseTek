@@ -17,4 +17,12 @@ Version: 0.1.0 | Release Link
 | Conversation - Id regeneration | 0.2.0 | :soon: |
 | Conversation - Save as... | 0.2.0 | :soon: |
 | Conversation - New | 0.2.0 | :soon: |
-| Conversation - Drag rearrange | 0.3.0 | :heavy_minus_sign: |
+| Conversation - Drag node rearrange | 0.3.0 | :heavy_minus_sign: |
+| Conversation - Delete node | 0.3.0 | 0.3.0 |  :heavy_minus_sign: |
+| Conversation - Add node | 0.3.0 | :heavy_minus_sign: |
+| Conversation - Visual indicators - Actions | 0.4.0 | :heavy_minus_sign: |
+| Conversation - Visual indicators - Conditions | 0.4.0 | :heavy_minus_sign: |
+| Conversation - Add actions | 0.4.0 | :heavy_minus_sign: |
+| Conversation - Remove actions | 0.4.0 | :heavy_minus_sign: |
+| Conversation - Add conditions | 0.4.0 | :heavy_minus_sign: |
+| Conversation - Remove conditions | 0.4.0 | :heavy_minus_sign: |
