@@ -2,10 +2,20 @@
 
 ## Conversation Editor
 
+## "What's the purpose of this tool?"
+
+It's a Battletech sim (non-combat) conversation editor.
+
+Battletech uses a binary data format for its conversations. It isn't possible to edit those files directly so this tool is being developed to allow for editing and creating new conversations.
+
+## "What can the tool do exactly?"
+
+Check out the [Roadmap](https://github.com/CWolfs/ConverseTek/#roadmap) for a full feature list.
+
 ### "Why does my new dialog not work? I've copyed it from an existing one"
 
 Conversation files use unique ids for the conversation itself, and all dialog nodes. Since _v0.1.0_ does not officially support creating entirely new conversations yet
-there might be a clash with the _idRef_s. Check the [Roadmap](https://github.com/CWolfs/ConverseTek/#roadmap) to see the supported features per version.
+there might be a clash with the conversation ids (_idRefs_). Check the [Roadmap](https://github.com/CWolfs/ConverseTek/#roadmap) to see the supported features per version.
 
 ### "What does an empty dialog node mean?"
 
@@ -27,3 +37,7 @@ An **action** is what Battletech uses to trigger something from a dialog node. T
 game screen fade with _Set BattleTech Fade_.
 
 ### "What is a condition?"
+
+A **condition** is what Battletech uses to control which dialog branches to display to the player, and which ones to hide. It can check against various things like
+your player's history like if you selected your back story to include having an accident when you were young, *commander_youth_accident_* for instance. It can
+also check against game milestone tags like *oc04_post_argo*.
