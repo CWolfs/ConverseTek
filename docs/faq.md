@@ -12,9 +12,9 @@ Battletech uses a binary data format for its conversations. It isn't possible to
 
 Check out the [Roadmap](https://github.com/CWolfs/ConverseTek/#roadmap) for a full feature list.
 
-### "Is ConverseTek compatible with ModTek?"
+### "Is ConverseTek compatible with [ModTek](https://github.com/Mpstark/ModTek)?"
 
-Yes. Conversation files created or edited with ConverseTek work with ModTek since the conversation files are loaded from the manifest file.
+Yes. Conversation files created or edited with ConverseTek work with [ModTek](https://github.com/Mpstark/ModTek) since the conversation files are loaded from the manifest file.
 
 ### "Why does my new dialog not work? I've copyed it from an existing one."
 
