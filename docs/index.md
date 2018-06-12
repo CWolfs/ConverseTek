@@ -8,9 +8,7 @@ Version: 0.1.0
 
 | Feature | Expected Version | Status  |
 | ------- | ---------------- | ------- |
-| Directory selection | 0.1.0 | ```diff
-+ Complete
-```
-| Conversation - Loading | 0.1.0 | Complete |
-| Conversation - Edit id | 0.1.0 | Complete |
+| Directory selection | 0.1.0 | :white_check_mark: |
+| Conversation - Loading | 0.1.0 | :white_check_mark: |
+| Conversation - Edit id | 0.1.0 | :white_check_mark: |
 | Conversation - Edit name | 0.1.0 |
