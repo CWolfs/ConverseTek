@@ -4,7 +4,7 @@
 
 ### "Why does my new dialog not work? I've copyed it from an existing one"
 
-Conversion files use unique ids for the conversation itsef, and all dialog nodes. Since _v0.1.0_ does not officially support creating entirely new conversations yet
+Conversation files use unique ids for the conversation itself, and all dialog nodes. Since _v0.1.0_ does not officially support creating entirely new conversations yet
 there might be a clash with the _idRef_s. Check the [Roadmap](https://github.com/CWolfs/ConverseTek/#roadmap) to see the supported features per version.
 
 ### "What does an empty dialog node mean?"
@@ -15,9 +15,11 @@ An empty node is not actually empty, it just has no dialog text associated with 
 branches of dialog. ConverseTek _v0.1.0_ does not support editing **actions** or **conditions**. In later versions you'll be able to select these nodes
 and add/remove the actions and conditions.
 
+Action and condition icons will be added to the dialog nodes to better indicate which nodes have actions and dialogs.
+
 ### "I can drag dialog nodes around but it doesn't seem to do anything at all. When I save and load the conversation everything is reset!"
 
-Dragging dialog nodes around isn't supported in _v0.1.0_. I left in the UI functionality as it'll be a feature **ComingSoon(tm)**.
+Dragging dialog nodes around isn't supported in _v0.1.0_. I left in the UI functionality as it'll be a feature **_ComingSoon(tm)_**.
 
 ### "What is an action?"
 
