@@ -54,7 +54,7 @@ class ModalStore {
     this.disableOk = true;
     this.okLabel = 'Ok';
     this.loadingLabel = 'Loading';
-    this.onCancel = null;
+    this.onCancel = this.closeModal;
     this.isLoading = false;
   }
 }

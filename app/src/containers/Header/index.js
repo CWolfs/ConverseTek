@@ -19,13 +19,17 @@ const Header = observer(({ modalStore }) => (
         >
           Open Folder
         </MenuItem>
+        {/*
         <MenuItem>Save Conversation</MenuItem>
         <MenuItem>Save Conversation As...</MenuItem>
         <MenuItem>Export as JSON</MenuItem>
+        */}
       </SubMenu>
+      {/*
       <SubMenu title="Options">
         <MenuItem>Option 1</MenuItem>
       </SubMenu>
+      */}
     </Menu>
   </div>
 ));
