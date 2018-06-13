@@ -31,8 +31,15 @@ namespace ConverseTek.Services {
         string[] conversationPaths = Directory.GetFiles(FileSystemService.getInstance().WorkingDirectory);
 
         foreach (string conversationPath in conversationPaths) {
-          ConversationAsset conversationAsset = LoadConversation(conversationPath);
-          conversations.Add(conversationAsset);
+
+          // This is a ConversationSpeakerList instead of a Conversation
+          if (conversationPath.Contains(".cvsl.bytes")) {
+            SpeakerListAsset speakerListAsset = LoadSpeakersList(conversationPath);
+            SaveJsonSpeakerList(speakerListAsset, speakerListAsset.FilePath);
+          } else {
+            ConversationAsset conversationAsset = LoadConversation(conversationPath);
+            conversations.Add(conversationAsset);
+          }
         }
       }
 
@@ -78,6 +85,47 @@ namespace ConverseTek.Services {
       try {
         using (FileStream fileStream = new FileStream(Path.ChangeExtension(path, ".bytes"), FileMode.Create)) {
           runtimeTypeModel.Serialize(fileStream, conversationAsset.Conversation);
+        }
+      } catch (Exception error) {
+          Log.Error(error.ToString());
+      }
+    }
+
+    public SpeakerListAsset LoadSpeakersList(string filePath) {
+      SpeakerListAsset speakerListAsset = null;
+      RuntimeTypeModel runtimeTypeModel = TypeModel.Create();
+
+      try {
+        using (FileStream fileStream = new FileStream(filePath, FileMode.Open)) {
+          ConversationSpeakerList speakerList = runtimeTypeModel.Deserialize(fileStream, null, typeof(ConversationSpeakerList)) as ConversationSpeakerList;
+          speakerListAsset = new SpeakerListAsset(filePath, speakerList);
+        }
+      } catch (Exception error) {
+          Log.Error(error.ToString());
+          return null;
+      }
+
+      return speakerListAsset;
+    }
+
+    public void SaveSpeakersList(SpeakerListAsset speakerList, FileFormat fileFormat, string path) {
+      if (fileFormat == FileFormat.JSON) {
+        SaveJsonSpeakerList(speakerList, path);
+      } else if (fileFormat == FileFormat.BINARY) {
+        SaveBinarySpeakerList(speakerList, path);
+      }
+    }
+
+    private void SaveJsonSpeakerList(SpeakerListAsset speakerList, string path) {
+      File.WriteAllText(Path.ChangeExtension(path, ".json"), JsonConvert.SerializeObject(speakerList.SpeakerList, Formatting.Indented));
+    }
+
+    private void SaveBinarySpeakerList(SpeakerListAsset speakerList, string path) {
+      RuntimeTypeModel runtimeTypeModel = TypeModel.Create();
+
+      try {
+        using (FileStream fileStream = new FileStream(Path.ChangeExtension(path, ".bytes"), FileMode.Create)) {
+          runtimeTypeModel.Serialize(fileStream, speakerList.SpeakerList);
         }
       } catch (Exception error) {
           Log.Error(error.ToString());
