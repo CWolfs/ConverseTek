@@ -18,21 +18,24 @@ class GlobalModal extends Component {
   render() {
     const { modalStore } = this.props;
     const {
+      title,
       isVisible,
       ModalContent,
       onOk,
       disableOk,
       okLabel,
       onCancel,
+      showCancelButton,
       isLoading,
       loadingLabel,
+      width,
     } = modalStore;
     const { confirmLoading } = this.state;
 
     const content = (ModalContent) ? <ModalContent modalStore={modalStore} /> : undefined;
 
     const footer = [
-      <Button key="cancel" onClick={onCancel}>Cancel</Button>,
+      (showCancelButton) ? <Button key="cancel" onClick={onCancel}>Cancel</Button> : null,
       <Button key="submit" type="primary" onClick={onOk} loading={isLoading} disabled={disableOk}>
         {(isLoading) ? loadingLabel : okLabel}
       </Button>,
@@ -40,14 +43,14 @@ class GlobalModal extends Component {
 
     return (
       <Modal
-        title="Select a conversation directory"
+        title={title}
         visible={isVisible}
         confirmLoading={confirmLoading}
         onCancel={onCancel}
         footer={footer}
         loading={isLoading}
         wrapClassName="global-modal"
-        width="70vw"
+        width={width}
       >
         {content}
       </Modal>

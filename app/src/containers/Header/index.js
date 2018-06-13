@@ -4,6 +4,7 @@ import { Menu } from 'antd';
 import { observer, inject } from 'mobx-react';
 
 import FileSystemPicker from '../../components/FileSystemPicker';
+import About from '../../components/About';
 
 import './Header.css';
 
@@ -18,6 +19,18 @@ const Header = observer(({ modalStore }) => (
           onClick={() => modalStore.setModelContent(FileSystemPicker)}
         >
           Open Folder
+        </MenuItem>
+        {/*
+        <MenuItem>Save Conversation</MenuItem>
+        <MenuItem>Save Conversation As...</MenuItem>
+        <MenuItem>Export as JSON</MenuItem>
+        */}
+      </SubMenu>
+      <SubMenu title="Help">
+        <MenuItem
+          onClick={() => modalStore.setModelContent(About)}
+        >
+          About
         </MenuItem>
         {/*
         <MenuItem>Save Conversation</MenuItem>

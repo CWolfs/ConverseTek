@@ -21,7 +21,6 @@ const ListItem = List.Item;
 class FileSystemPicker extends Component {
   constructor(props) {
     super(props);
-    const { modalStore } = this.props;
 
     this.state = {
       directories: [],
@@ -35,9 +34,11 @@ class FileSystemPicker extends Component {
     this.onDirectoryClicked = this.onDirectoryClicked.bind(this);
     this.onDirectoryDoubleClicked = this.onDirectoryDoubleClicked.bind(this);
 
-    modalStore.setOnOk(this.onOk);
-    modalStore.setOkLabel('Load');
-    modalStore.setLoadingLabel('Loading');
+    this.setupModal();
+  }
+
+  componentWillReceiveProps() {
+    this.setupModal();
   }
 
   onOk() {
@@ -115,6 +116,14 @@ class FileSystemPicker extends Component {
       modalStore.setDisableOk(true);
       getDirectories(item.Path).then(directories => this.setState({ directories }));
     }
+  }
+
+  setupModal() {
+    const { modalStore } = this.props;
+    modalStore.setOnOk(this.onOk);
+    modalStore.setTitle('Select a conversation directory');
+    modalStore.setOkLabel('Load');
+    modalStore.setLoadingLabel('Loading');
   }
 
   render() {

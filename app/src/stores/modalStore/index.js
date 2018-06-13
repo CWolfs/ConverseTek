@@ -1,7 +1,9 @@
 import { observable, action } from 'mobx';
+import defer from 'lodash.defer';
 
 class ModalStore {
   @observable ModalContent;
+  @observable title = '';
   @observable isVisible = false;
   @observable onOk;
   @observable disableOk = true;
@@ -9,6 +11,8 @@ class ModalStore {
   @observable loadingLabel = 'Loading';
   @observable onCancel;
   @observable isLoading = false;
+  @observable width = '70vw';
+  @observable showCancelButton = true;
 
   constructor() {
     this.onCancel = this.closeModal;
@@ -17,6 +21,18 @@ class ModalStore {
   @action setModelContent(component, show = true) {
     this.ModalContent = component;
     if (show) this.showModal(true);
+  }
+
+  @action setTitle(title) {
+    this.title = title;
+  }
+
+  @action setWidth(width) {
+    this.width = width;
+  }
+
+  @action setShowCancelButton(flag) {
+    this.showCancelButton = flag;
   }
 
   @action setOnOk(onOk) {
@@ -49,13 +65,17 @@ class ModalStore {
 
   @action reset = () => {
     this.isVisible = false;
-    this.ModalContent = null;
-    this.onOk = null;
-    this.disableOk = true;
-    this.okLabel = 'Ok';
-    this.loadingLabel = 'Loading';
-    this.onCancel = this.closeModal;
-    this.isLoading = false;
+    defer(() => {
+      this.ModalContent = null;
+      this.onOk = null;
+      this.disableOk = true;
+      this.okLabel = 'Ok';
+      this.loadingLabel = 'Loading';
+      this.onCancel = this.closeModal;
+      this.isLoading = false;
+      this.width = '70vw';
+      this.showCancelButton = true;
+    });
   }
 }
 

@@ -1,0 +1,36 @@
+@import '../../css/constants.css';
+
+.about {
+  h3 {
+    color: $textColourTertiary;
+  }
+
+  &__author {
+    &-avatar {
+      background-image: resolve('cwolf-avatar.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      width: 20vw;
+      height: 150px;
+      background-position: center;
+      margin: auto;
+      display: inline-block;
+    }
+
+    &-details {
+      display: inline-block;
+      vertical-align: top;
+      margin-top: $mediumLargeSpace;
+      font-size: $promoFontSizeLarge;
+      line-height: $promoLineHeightLargest;
+    }
+  }
+
+  &__version {
+    div {
+      font-size: 22px;
+      margin-left: 52px;
+    }
+  }
+
+}
