@@ -4,6 +4,7 @@ import { observer, inject } from 'mobx-react';
 import { message, Button, Row, Col, Form, Input, Icon } from 'antd';
 
 import DialogEditor from '../../components/DialogEditor';
+import DialogTextArea from '../../components/DialogTextArea';
 
 import { updateConversation } from '../../services/api';
 
@@ -72,8 +73,10 @@ class ConversationEditor extends Component {
 
   render() {
     const { conversationAsset } = this.state;
+    const { nodeStore } = this.props;
     const { Conversation } = conversationAsset;
     const conversationId = Conversation.idRef.id;
+    const { activeNode } = nodeStore;
 
     const formItemLayout = {
       labelCol: {
@@ -129,6 +132,16 @@ class ConversationEditor extends Component {
         <div>Persistent Conversation: {Conversation.persistent_conversation}</div>
         */}
         <DialogEditor conversationAsset={conversationAsset} />
+
+        {activeNode && (
+        <div className="conversation-editor__details">
+          <Row gutter={16}>
+            <Col md={24} lg={12}>
+              <DialogTextArea node={activeNode} />
+            </Col>
+          </Row>
+        </div>
+        )}
       </div>
     );
   }
@@ -136,7 +149,8 @@ class ConversationEditor extends Component {
 
 ConversationEditor.propTypes = {
   dataStore: PropTypes.object.isRequired,
+  nodeStore: PropTypes.object.isRequired,
   conversationAsset: PropTypes.object.isRequired,
 };
 
-export default inject('dataStore')(ConversationEditor);
+export default inject('dataStore', 'nodeStore')(ConversationEditor);

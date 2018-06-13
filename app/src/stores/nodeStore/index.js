@@ -1,26 +1,59 @@
 import { observable, action } from 'mobx';
 
-/* eslint-disable class-methods-use-this */
 class NodeStore {
   @observable roots = observable.shallowMap();
-  @observable nodes = observable.shallowMap(); // NOT including roots
+  @observable nodes = observable.shallowMap();
+  @observable branches = observable.shallowMap();
+  @observable activeNode;
+
+  static getId(idRef) {
+    const { id } = idRef;
+    return id.split(':')[1] || id;
+  }
 
   constructor() {
     this.ownerId = null;
+    this.activeNode = null;
   }
 
   @action build(conversationAsset) {
     const { roots, nodes } = conversationAsset.Conversation;
-    this.ownerId = conversationAsset.Conversation.idRef.id;
+    this.ownerId = NodeStore.getId(conversationAsset.Conversation.idRef);
 
     this.reset();
     this.buildRoots(roots);
     this.buildNodes(nodes);
   }
 
+  @action setActiveNode(nodeId, nodeType) {
+    if (nodeType === 'root') {
+      this.activeNode = this.roots.get(nodeId);
+    } else if (nodeType === 'node') {
+      this.activeNode = this.nodes.values().find(node => nodeId === NodeStore.getId(node.idRef));
+    } else if (nodeType === 'branch') {
+      this.activeNode = this.branches.get(nodeId);
+    }
+  }
+
+  getActiveNodeId() {
+    if (!this.activeNode) return null;
+    return NodeStore.getId(this.activeNode.idRef);
+  }
+
+  getNode(nodeId, nodeType) {
+    if (nodeType === 'root') {
+      return this.roots.get(nodeId);
+    } else if (nodeType === 'node') {
+      return this.nodes.values().find(node => nodeId === NodeStore.getId(node.idRef));
+    } else if (nodeType === 'branch') {
+      return this.branches.get(nodeId);
+    }
+    return null;
+  }
+
   buildRoots(roots) {
     roots.forEach((root) => {
-      const id = root.idRef.id.split(':')[1];
+      const id = NodeStore.getId(root.idRef);
       this.roots.set(id, root);
     });
   }
@@ -32,11 +65,19 @@ class NodeStore {
     });
   }
 
+  buildBranches(branches) {
+    branches.forEach((branch) => {
+      const id = NodeStore.getId(branch.idRef);
+      this.branches.set(id, branch);
+    });
+  }
+
   getChildrenFromRoots(roots) {
     return roots.map(root => (
       {
         title: root.responseText,
-        id: root.idRef.id.split(':')[1],
+        id: NodeStore.getId(root.idRef),
+        type: 'root',
         expanded: true,
         children: this.getChildren(root),
       }
@@ -57,17 +98,22 @@ class NodeStore {
     }
 
     const childNode = this.nodes.get(nextNodeIndex);
+    this.buildBranches(childNode.branches);
+
     return [
       {
         title: childNode.text,
-        id: childNode.idRef.id.split(':')[1],
+        id: NodeStore.getId(childNode.idRef),
+        type: 'node',
         expanded: true,
         children: childNode.branches.map((branch) => {
           const { auxiliaryLink } = branch;
+          const branchNodeId = NodeStore.getId(branch.idRef);
 
           return {
             title: branch.responseText,
-            id: branch.idRef.id.split(':')[1],
+            id: branchNodeId,
+            type: 'branch',
             expanded: true,
             children: (auxiliaryLink) ? [{ title: `[Link to NODE ${branch.nextNodeIndex}]` }] : this.getChildren(branch),
           };
@@ -78,7 +124,9 @@ class NodeStore {
 
   @action reset = () => {
     this.roots.clear();
-    this.roots.clear();
+    this.nodes.clear();
+    this.branches.clear();
+    this.activeNode = null;
   }
 }
 

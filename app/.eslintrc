@@ -15,6 +15,6 @@
   "globals": {
     "window": true,
     "__BUILD_DATE__": true,
-    "boundControllerAsync": true,
+    "boundControllerAsync": true
   }
 }

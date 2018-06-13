@@ -57,6 +57,7 @@ These are specific to the app pages.
 $backgroundPrimary: #1E1E1E;
 $backgroundSecondary: $blue8;
 $backgroundTertiary: #2f2f2f;
+$backgroundQuaternary: white;
 
 $titleColourPrimary: $c2blue6;
 
@@ -66,9 +67,10 @@ $textColourTertiary: $blue6;
 
 $linkColourPrimary: $c1blue6;
 $linkColourSecondary: white;
+$linkColourTertiary: $blue8;
 
 $borderPrimary: $grey4;         /* for use on white background */
-$borderSecondary: white;        /* for use on blue background */
+$borderSecondary: gold;        /* for use on blue background */
 $borderTertiary: lightgrey;     /* for use on white or blue background */
 $borderQuaternary: $blue8;      /* for use on blue background */
 

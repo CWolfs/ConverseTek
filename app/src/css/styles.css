@@ -13,6 +13,7 @@ body {
   /* width: calc(100vw - $scrollbarWidth);*/  /* prevent scrollbar moving page when appearing */
   width: 100%;
   overflow: hidden;
+  user-select: none;
 }
 
 #root {

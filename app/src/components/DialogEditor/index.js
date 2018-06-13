@@ -5,6 +5,8 @@ import SortableTree from 'react-sortable-tree';
 
 import 'react-sortable-tree/style.css';
 
+import ConverseTekNodeRenderer from './ConverseTekNodeRenderer';
+
 import './DialogEditor.css';
 
 /* eslint-disable react/no-unused-state */
@@ -49,8 +51,9 @@ class DialogEditor extends Component {
   }
 
   render() {
-    // const { onSelected } = this.props;
+    const { nodeStore } = this.props;
     const { treeData: data } = this.state;
+    const activeNodeId = nodeStore.getActiveNodeId();
 
     return (
       <div className="dialog-editor">
@@ -58,10 +61,20 @@ class DialogEditor extends Component {
           <SortableTree
             treeData={data}
             onChange={treeData => this.setState({ treeData })}
-            getNodeKey={nodeContainer => nodeContainer.node.id}
+            getNodeKey={({ node, treeIndex }) => {
+              if (!node.id) return treeIndex;
+              return node.id;
+            }}
             rowHeight={40}
             canDrag={nodeContainer => !(nodeContainer.node.id === 0)}
             canDrop={nodeContainer => !(nodeContainer.nextParent === null)}
+            generateNodeProps={() => (
+              {
+                nodeStore,
+                activeNodeId,
+              }
+            )}
+            nodeContentRenderer={ConverseTekNodeRenderer}
             reactVirtualizedListProps={{
               autoHeight: false,
               overscanRowCount: 9999,

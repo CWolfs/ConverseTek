@@ -4,4 +4,5 @@
   background-color: $backgroundSecondary;
   padding: $tinySpace;
   color: $grey4;
+  text-align: right;
 }

@@ -24,7 +24,7 @@ class FileTree extends Component {
               defaultExpandedKeys={['0']}
               onSelect={onSelected}
             >
-              <TreeNode title={(data && data.length) ? 'simGameConversations' : 'Loading Conversations...'} key="0">
+              <TreeNode title={(data && data.length) ? 'simGameConversations' : 'No Conversations'} key="0">
                 {data.map(item => <TreeNode key={item.key} title={item.label} />)}
               </TreeNode>
             </Tree>

@@ -25,12 +25,15 @@ namespace ConverseTek.Services {
 
     public List<ConversationAsset> LoadConversations() {
       List<ConversationAsset> conversations = new List<ConversationAsset>();
-      // string[] conversationPaths = Directory.GetFiles("D:/Program Files (x86)/Steam/steamapps/common/BATTLETECH/BattleTech_Data/StreamingAssets/data/simGameConversations");
-      string[] conversationPaths = Directory.GetFiles("C:/Data");
 
-      foreach (string conversationPath in conversationPaths) {
-        ConversationAsset conversationAsset = LoadConversation(conversationPath);
-        conversations.Add(conversationAsset);
+      // Guard - Only load if working directory is set
+      if (FileSystemService.getInstance().WorkingDirectory != null) {
+        string[] conversationPaths = Directory.GetFiles(FileSystemService.getInstance().WorkingDirectory);
+
+        foreach (string conversationPath in conversationPaths) {
+          ConversationAsset conversationAsset = LoadConversation(conversationPath);
+          conversations.Add(conversationAsset);
+        }
       }
 
       return conversations;

@@ -1,7 +1,7 @@
 import React from 'react';
 
-import "./Footer.css";
+import './Footer.css';
 
 export default () => (
-  <div className="footer">Status</div>
+  <div className="footer">v0.1.0</div>
 );

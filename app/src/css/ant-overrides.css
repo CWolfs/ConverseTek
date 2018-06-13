@@ -90,3 +90,44 @@
   background-color: $backgroundTertiary;  
   color: $textColourPrimary;
 }
+
+.ant-menu-horizontal {
+  background: transparent;
+  border-bottom: none;
+  color: white;
+  line-height: 12px;
+}
+
+.ant-menu-horizontal > .ant-menu-item:hover, .ant-menu-horizontal > .ant-menu-submenu:hover, .ant-menu-horizontal > .ant-menu-item-active, .ant-menu-horizontal > .ant-menu-submenu-active, .ant-menu-horizontal > .ant-menu-item-open, .ant-menu-horizontal > .ant-menu-submenu-open, .ant-menu-horizontal > .ant-menu-item-selected, .ant-menu-horizontal > .ant-menu-submenu-selected {
+  border-bottom: none;
+  color: white;
+}
+
+.ant-menu-item:active {
+  background: none;
+}
+
+.ant-menu-horizontal > .ant-menu-item, .ant-menu-horizontal > .ant-menu-submenu {
+  border-bottom: none;
+  padding: 12px 0;
+}
+
+.ant-menu-submenu > .ant-menu {
+  border-radius: 2px;
+}
+
+.ant-menu-vertical > .ant-menu-item, .ant-menu-vertical-left > .ant-menu-item, .ant-menu-vertical-right > .ant-menu-item, .ant-menu-inline > .ant-menu-item, .ant-menu-vertical > .ant-menu-submenu > .ant-menu-submenu-title, .ant-menu-vertical-left > .ant-menu-submenu > .ant-menu-submenu-title, .ant-menu-vertical-right > .ant-menu-submenu > .ant-menu-submenu-title, .ant-menu-inline > .ant-menu-submenu > .ant-menu-submenu-title {
+  line-height: 32px;
+  height: 32px;
+}
+
+.ant-menu-item:hover, .ant-menu-item-active, .ant-menu:not(.ant-menu-inline) .ant-menu-submenu-open, .ant-menu-submenu-active, .ant-menu-submenu-title:hover {
+  color: $linkColourTertiary;
+  background-color: $backgroundQuaternary;
+}
+
+.ant-modal-content {
+  & ::-webkit-scrollbar {
+    background: $borderPrimary;
+  }
+}
