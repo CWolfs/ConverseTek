@@ -46,7 +46,7 @@ class About extends Component {
         </div>
         <div className="about__version">
           <h3>Version</h3>
-          <div>v0.1.0</div>
+          <div>v0.2.0</div>
         </div>
       </div>
     );
