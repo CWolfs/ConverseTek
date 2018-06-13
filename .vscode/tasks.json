@@ -6,10 +6,9 @@
             "command": "dotnet",
             "type": "process",
             "args": [
-                "build",
+                "build --configuration Release",
                 "D:/Modding/ConverseTek/ConverseTek.csproj",
-                "/t:BuildRelease",
-                "-c Release"
+                "/t:BuildRelease"
             ],
             "problemMatcher": "$msCompile"
         },
