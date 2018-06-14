@@ -47,7 +47,7 @@ All feedback is welcome in the [issues section](https://github.com/CWolfs/Conver
 | Conversation - Add/Edit comments | 0.3.0 | :soon: |
 | Conversation - Delete node | 0.3.0 | :heavy_minus_sign: |
 | Conversation - Add node | 0.3.0 | :heavy_minus_sign: |
-| Conversation - Node toggle 'Only Available Once' | 0.3.0 | :heavy_minus_sign |
+| Conversation - Node toggle 'Only Available Once' | 0.3.0 | :heavy_minus_sign: |
 | Conversation - Drag node rearrange | 0.4.0 | :heavy_minus_sign: |
 | Conversation - Linking | 0.4.0 | :heavy_minus_sign: |
 | Conversation - Visual indicators - Actions | 0.5.0 | :heavy_minus_sign: |
