@@ -39,11 +39,12 @@ All feedback is welcome in the [issues section](https://github.com/CWolfs/Conver
 | Conversation - Edit name | 0.1.0 | :white_check_mark: |
 | Conversation - Edit dialog text | 0.1.0 | :white_check_mark: |
 | Conversation - Save | 0.1.0 | :white_check_mark: |
+| Conversation - Edit conversation speaker lists | 0.2.0 | :soon: |
 | Conversation - Id regeneration | 0.2.0 | :soon: |
 | Conversation - Save as... | 0.2.0 | :soon: |
 | Conversation - New | 0.2.0 | :soon: |
 | Conversation - Edit dialog node speaker override | 0.2.0 | :soon: |
-| Conversation - Add/Edit comments | 0.2.0 | :soon: |
+| Conversation - Add/Edit comments | 0.3.0 | :soon: |
 | Conversation - Delete node | 0.3.0 | :heavy_minus_sign: |
 | Conversation - Add node | 0.3.0 | :heavy_minus_sign: |
 | Conversation - Node toggle 'Only Available Once' | 0.3.0 | :heavy_minus_sign |
