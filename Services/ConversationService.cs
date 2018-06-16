@@ -31,6 +31,8 @@ namespace ConverseTek.Services {
         string[] conversationPaths = Directory.GetFiles(FileSystemService.getInstance().WorkingDirectory);
 
         foreach (string conversationPath in conversationPaths) {
+          // GUARD - Only process .bytes files
+          if (!conversationPath.EndsWith(".bytes")) continue;
 
           // This is a ConversationSpeakerList instead of a Conversation
           if (conversationPath.Contains(".cvsl.bytes")) {
