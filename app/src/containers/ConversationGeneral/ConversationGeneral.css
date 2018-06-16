@@ -1,0 +1,5 @@
+@import '../../css/constants.css';
+
+.conversation-general {
+  background-color: $backgroundTertiary;
+}

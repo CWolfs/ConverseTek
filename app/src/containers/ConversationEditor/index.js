@@ -1,16 +1,18 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { observer, inject } from 'mobx-react';
-import { message, Button, Row, Col, Form, Input, Icon } from 'antd';
+import { message, Button, Row, Col, Form, Input, Icon, Tabs } from 'antd';
 
 import DialogEditor from '../../components/DialogEditor';
 import DialogTextArea from '../../components/DialogTextArea';
+import ConversationGeneral from '../ConversationGeneral';
 
 import { updateConversation } from '../../services/api';
 
 import './ConversationEditor.css';
 
 const FormItem = Form.Item;
+const { TabPane } = Tabs;
 
 @observer
 class ConversationEditor extends Component {
@@ -127,17 +129,21 @@ class ConversationEditor extends Component {
             </Col>
           </Row>
         </Form>
-        {/*
-        <div>Default Speaker Id: {Conversation.default_speaker_id}</div>
-        <div>Persistent Conversation: {Conversation.persistent_conversation}</div>
-        */}
+
         <DialogEditor conversationAsset={conversationAsset} />
 
         {activeNode && (
         <div className="conversation-editor__details">
           <Row gutter={16}>
-            <Col md={24} lg={12}>
+            <Col md={24} lg={12} className="conversation-editor__details-left">
               <DialogTextArea node={activeNode} />
+            </Col>
+            <Col md={24} lg={12} className="conversation-editor__details-right">
+              <Tabs defaultActiveKey="1">
+                <TabPane tab="General" key="1"><ConversationGeneral node={activeNode} /></TabPane>
+                <TabPane tab="Conditions" key="2">Conditions</TabPane>
+                <TabPane tab="Actions" key="3">Actions</TabPane>
+              </Tabs>
             </Col>
           </Row>
         </div>
