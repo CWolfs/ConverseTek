@@ -1,7 +1,7 @@
 import { observable, action } from 'mobx';
 import defer from 'lodash.defer';
 
-/* eslint-disable no-return-assign */
+/* eslint-disable no-return-assign, no-param-reassign */
 class NodeStore {
   @observable roots = observable.shallowMap();
   @observable nodes = observable.shallowMap();
@@ -47,10 +47,8 @@ class NodeStore {
     if (nodeType === 'root') {
       this.activeNode = this.roots.get(nodeId);
     } else if (nodeType === 'node') {
-      this.activeNode = this.nodes.values().find((node) => {
-        return nodeId === NodeStore.getId(node.idRef);
-      });
-    } else if (nodeType === 'branch') {
+      this.activeNode = this.nodes.values().find(node => nodeId === NodeStore.getId(node.idRef));
+    } else if (nodeType === 'response') {
       this.activeNode = this.branches.get(nodeId);
     }
   }
@@ -64,10 +62,8 @@ class NodeStore {
     if (nodeType === 'root') {
       return this.roots.get(nodeId);
     } else if (nodeType === 'node') {
-      return this.nodes.values().find((node) => {
-        return nodeId === NodeStore.getId(node.idRef);
-      });
-    } else if (nodeType === 'branch') {
+      return this.nodes.values().find(node => nodeId === NodeStore.getId(node.idRef));
+    } else if (nodeType === 'response') {
       return this.branches.get(nodeId);
     }
     return null;
@@ -77,6 +73,7 @@ class NodeStore {
     roots.forEach((root) => {
       const id = NodeStore.getId(root.idRef);
       this.roots.set(id, root);
+      root.type = 'root';
     });
   }
 
@@ -84,6 +81,7 @@ class NodeStore {
     nodes.forEach((node) => {
       const { index } = node;
       this.nodes.set(index, node);
+      node.type = 'node';
     });
   }
 
@@ -91,6 +89,7 @@ class NodeStore {
     branches.forEach((branch) => {
       const id = NodeStore.getId(branch.idRef);
       this.branches.set(id, branch);
+      branch.type = 'response';
     });
   }
 
@@ -135,7 +134,7 @@ class NodeStore {
           return {
             title: branch.responseText,
             id: branchNodeId,
-            type: 'branch',
+            type: 'response',
             expanded: true,
             children: (auxiliaryLink) ? [{ title: `[Link to NODE ${branch.nextNodeIndex}]` }] : this.getChildren(branch),
           };

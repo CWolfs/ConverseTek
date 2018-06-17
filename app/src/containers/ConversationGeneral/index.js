@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Card, Row, Col, Input } from 'antd';
 import { observer, inject } from 'mobx-react';
+import capitalize from 'lodash.capitalize';
 
 import './ConversationGeneral.css';
 
@@ -39,6 +40,16 @@ class ConversationGeneral extends Component {
     const { node } = this.props;
     return (
       <Card className="conversation-general" title={null}>
+        <Row gutter={16}>
+          <Col {...colOneLayout}>
+            <div className="conversation-general__label">Type</div>
+          </Col>
+          <Col {...colTwoLayout}>
+            <div>
+              {capitalize(node.type)}
+            </div>
+          </Col>
+        </Row>
         <Row gutter={16}>
           <Col {...colOneLayout}>
             <div className="conversation-general__label">Id</div>
@@ -82,6 +93,7 @@ class ConversationGeneral extends Component {
 }
 
 ConversationGeneral.propTypes = {
+  nodeStore: PropTypes.object.isRequired,
   node: PropTypes.object.isRequired,
 };
 

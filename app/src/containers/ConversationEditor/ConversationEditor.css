@@ -30,6 +30,12 @@
     }
 
     &-right {
+      margin-top: -6px;
+
+      .ant-row {
+        margin-bottom: $smallSpace;
+      }
+
       .ant-tabs {
         color: white;
         
@@ -45,6 +51,10 @@
           margin: $smallSpace;
           padding: 0;
           color: $textColourPrimary;
+
+          & *:last-child {
+            margin: 0;
+          }
         }
       }
 
