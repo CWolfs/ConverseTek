@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { observer, inject } from 'mobx-react';
-import { message, Button, Row, Col, Form, Input, Icon, Tabs } from 'antd';
+import { message, Button, Row, Col, Form, Input, Icon, Tabs, Popconfirm } from 'antd';
 
 import DialogEditor from '../../components/DialogEditor';
 import DialogTextArea from '../../components/DialogTextArea';
@@ -29,6 +29,7 @@ class ConversationEditor extends Component {
     this.handleIdChange = this.handleIdChange.bind(this);
     this.handleNameChange = this.handleNameChange.bind(this);
     this.onSaveButtonClicked = this.onSaveButtonClicked.bind(this);
+    this.onRegenerateIdsButtonClicked = this.onRegenerateIdsButtonClicked.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -51,6 +52,10 @@ class ConversationEditor extends Component {
         message.success('Save successful');
       });
     dataStore.updateActiveConversation(conversationAsset); // local update for speed
+  }
+
+  onRegenerateIdsButtonClicked() {
+    console.log('regen id clickd');
   }
 
   createNewUnsavedConversation(conversationAsset) {
@@ -99,14 +104,32 @@ class ConversationEditor extends Component {
       <div className="conversation-editor">
         <div>
           <h2>Editor</h2>
-          <Button
-            className="conversation-editor__save-button"
-            type="primary"
-            size="small"
-            onClick={this.onSaveButtonClicked}
-          >
-            <Icon type="save" />
-          </Button>
+          <div className="conversation-editor__buttons">
+            <Popconfirm
+              title="Are you sure you want to regenerate all ids?"
+              placement="bottomRight"
+              onConfirm={this.onRegenerateIdsButtonClicked}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button
+                className="conversation-editor__regenerate-ids-button"
+                type="secondary"
+                size="small"
+                onClick={this.onRegenerateIds}
+              >
+                <Icon type="retweet" />
+              </Button>
+            </Popconfirm>
+            <Button
+              className="conversation-editor__save-button"
+              type="primary"
+              size="small"
+              onClick={this.onSaveButtonClicked}
+            >
+              <Icon type="save" />
+            </Button>
+          </div>
         </div>
 
         <Form>

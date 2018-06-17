@@ -9,11 +9,15 @@
   h2 {
     display: inline-block;
   }
-  
-  &__save-button {
+
+  &__buttons {
     float: right;
   }
 
+  &__regenerate-ids-button {
+    margin-right: $smallSpace;
+  }
+  
   &__details {
     flex: 1;
 
