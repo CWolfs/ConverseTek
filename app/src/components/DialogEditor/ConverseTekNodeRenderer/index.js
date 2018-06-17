@@ -42,7 +42,7 @@ const ConverseTekNodeRenderer = observer(({
   const storedNode = nodeStore.getNode(node.id, node.type);
 
   let nodeTitle = '';
-  if (storedNode === null) {
+  if (storedNode === null || storedNode === undefined) {
     nodeTitle = title || node.title;
   } else {
     nodeTitle = storedNode.text || storedNode.responseText;
@@ -150,7 +150,9 @@ const ConverseTekNodeRenderer = observer(({
                 !canDrag && 'rst__rowContentsDragDisabled',
                 rowDirectionClass,
               )}
-              onClick={() => nodeStore.setActiveNode(node.id, node.type)}
+              onClick={() => {
+                return nodeStore.setActiveNode(node.id, node.type);
+              }}
             >
               <div className={classnames('rst__rowLabel', rowDirectionClass)}>
                 <span

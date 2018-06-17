@@ -39,6 +39,8 @@ $grey10: #000000;
 $c1grey1: #f0f9ff;
 $c1grey6: #b6bbc2;
 
+$c2grey6: #828282;
+
 
 /* CUSTOM blue 1 */
 $c1blue6: #0084C1;
@@ -64,6 +66,7 @@ $titleColourPrimary: $c2blue6;
 $textColourPrimary: rgba(210, 210, 210, 0.85);
 $textColourSecondary: $grey4;
 $textColourTertiary: $blue6;
+$textColourQuaternary: white;
 
 $linkColourPrimary: $c1blue6;
 $linkColourSecondary: white;
@@ -71,7 +74,7 @@ $linkColourTertiary: $blue8;
 
 $borderPrimary: $grey4;         /* for use on white background */
 $borderSecondary: gold;        /* for use on blue background */
-$borderTertiary: lightgrey;     /* for use on white or blue background */
+$borderTertiary: $c2grey6;     /* for use on white or blue background */
 $borderQuaternary: $blue8;      /* for use on blue background */
 
 $shadowPrimary: $grey4;

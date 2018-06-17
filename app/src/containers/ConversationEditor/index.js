@@ -78,7 +78,7 @@ class ConversationEditor extends Component {
     const { nodeStore } = this.props;
     const { Conversation } = conversationAsset;
     const conversationId = Conversation.idRef.id;
-    const { activeNode } = nodeStore;
+    const { activeNode, rebuild } = nodeStore;
 
     const formItemLayout = {
       labelCol: {
@@ -130,7 +130,7 @@ class ConversationEditor extends Component {
           </Row>
         </Form>
 
-        <DialogEditor conversationAsset={conversationAsset} />
+        <DialogEditor conversationAsset={conversationAsset} rebuild={rebuild} />
 
         {activeNode && (
         <div className="conversation-editor__details">
