@@ -60,6 +60,7 @@
     "lodash.defer": "^4.1.0",
     "lodash.remove": "^4.7.0",
     "lodash.sortby": "^4.7.0",
+    "md5": "^2.2.1",
     "mobx": "^3.5.1",
     "mobx-devtools-mst": "^0.9.9",
     "mobx-react": "^4.3.5",
@@ -71,6 +72,7 @@
     "react-hot-loader": "^4.2.0",
     "react-intl": "^2.4.0",
     "react-router-dom": "^4.2.2",
-    "react-sortable-tree": "^2.1.2"
+    "react-sortable-tree": "^2.1.2",
+    "uuid": "^3.2.1"
   }
 }

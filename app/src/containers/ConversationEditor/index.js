@@ -8,6 +8,7 @@ import DialogTextArea from '../../components/DialogTextArea';
 import ConversationGeneral from '../ConversationGeneral';
 
 import { updateConversation } from '../../services/api';
+import { regenerateIds } from '../../utils/conversation-utils';
 
 import './ConversationEditor.css';
 
@@ -55,7 +56,11 @@ class ConversationEditor extends Component {
   }
 
   onRegenerateIdsButtonClicked() {
-    console.log('regen id clickd');
+    const { conversationAsset } = this.state;
+    const { nodeStore } = this.props;
+
+    regenerateIds(conversationAsset);
+    nodeStore.setRebuild(true);
   }
 
   createNewUnsavedConversation(conversationAsset) {
