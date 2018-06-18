@@ -3,6 +3,12 @@ import { observable, action } from 'mobx';
 class DataStore {
   @observable conversationAssets = observable.shallowMap();
   @observable activeConversationAsset;
+  @observable unsavedActiveConversationAsset;
+
+  constructor() {
+    this.activeConversationAsset = null;
+    this.unsavedActiveConversationAsset = null;
+  }
 
   @action setConversations(conversationAssets) {
     this.conversationAssets.clear();
@@ -29,9 +35,14 @@ class DataStore {
     }
   }
 
+  @action setUnsavedActiveConversation(conversationAsset) {
+    this.unsavedActiveConversationAsset = conversationAsset;
+  }
+
   @action reset = () => {
     this.conversationAssets.clear();
     this.activeConversationAsset = null;
+    this.unsavedActiveConversationAsset = null;
   }
 }
 

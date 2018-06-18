@@ -1,0 +1,12 @@
+@import '../../css/constants.css';
+
+.save-as {
+  h3 {
+    color: $textColourTertiary;
+  }
+
+  .ant-input {
+    background-color: transparent;
+    color: #262626;
+  }
+}

@@ -28,13 +28,20 @@ class ConversationTree extends Component {
 
   render() {
     const { dataStore } = this.props;
-    const { conversationAssets } = dataStore;
+    const { conversationAssets, activeConversationAsset } = dataStore;
 
     const data = ConversationTree.remapConversationData(conversationAssets);
+    const selectedKeys = (activeConversationAsset) ?
+      [activeConversationAsset.Conversation.idRef.id] : undefined;
 
     return (
       <div className="conversation-tree">
-        <FileTree title="Conversations" data={data} onSelected={this.onNodeSelected} />
+        <FileTree
+          title="Conversations"
+          data={data}
+          onSelected={this.onNodeSelected}
+          selectedKeys={selectedKeys}
+        />
       </div>
     );
   }
