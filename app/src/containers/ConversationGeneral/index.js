@@ -38,6 +38,8 @@ class ConversationGeneral extends Component {
 
   render() {
     const { node } = this.props;
+    const { type } = node;
+
     return (
       <Card className="conversation-general" title={null}>
         <Row gutter={16}>
@@ -46,7 +48,7 @@ class ConversationGeneral extends Component {
           </Col>
           <Col {...colTwoLayout}>
             <div>
-              {capitalize(node.type)}
+              {capitalize(type)}
             </div>
           </Col>
         </Row>
@@ -64,6 +66,8 @@ class ConversationGeneral extends Component {
             </div>
           </Col>
         </Row>
+
+        {type === 'node' && (
         <Row gutter={16}>
           <Col {...colOneLayout}>
             <div className="conversation-general__label">Index</div>
@@ -72,6 +76,8 @@ class ConversationGeneral extends Component {
             <div>{node.index}</div>
           </Col>
         </Row>
+        )}
+
         <Row gutter={16}>
           <Col {...colOneLayout}>
             <div className="conversation-general__label">Speaker Id</div>
