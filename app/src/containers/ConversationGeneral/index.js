@@ -4,6 +4,8 @@ import { Card, Row, Col, Input } from 'antd';
 import { observer, inject } from 'mobx-react';
 import capitalize from 'lodash.capitalize';
 
+import { getId, createId } from '../../utils/conversation-utils';
+
 import './ConversationGeneral.css';
 
 const colOneLayout = {
@@ -32,7 +34,7 @@ class ConversationGeneral extends Component {
 
   handleIdChange(event) {
     const { nodeStore, node } = this.props;
-    node.idRef.id = event.target.value.trim();
+    node.idRef.id = createId(node.idRef, event.target.value.trim());
     nodeStore.setRebuild(true);
   }
 
@@ -59,7 +61,7 @@ class ConversationGeneral extends Component {
           <Col {...colTwoLayout}>
             <div>
               <Input
-                value={node.idRef.id}
+                value={getId(node.idRef)}
                 onChange={this.handleIdChange}
                 spellCheck="false"
               />

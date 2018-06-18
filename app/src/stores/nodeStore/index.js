@@ -1,5 +1,6 @@
 import { observable, action } from 'mobx';
 import defer from 'lodash.defer';
+import { getId } from '../../utils/conversation-utils';
 
 /* eslint-disable no-return-assign, no-param-reassign */
 class NodeStore {
@@ -8,11 +9,6 @@ class NodeStore {
   @observable branches = observable.shallowMap();
   @observable activeNode;
   @observable rebuild = false;
-
-  static getId(idRef) {
-    const { id } = idRef;
-    return id.split(':')[1] || id;
-  }
 
   constructor() {
     this.ownerId = null;
@@ -27,7 +23,7 @@ class NodeStore {
   @action build(conversationAsset) {
     const { roots, nodes } = conversationAsset.Conversation;
 
-    const nextOwnerId = NodeStore.getId(conversationAsset.Conversation.idRef);
+    const nextOwnerId = getId(conversationAsset.Conversation.idRef);
 
     // save the active node if it's the same conversation
     if (this.ownerId !== nextOwnerId) {
@@ -47,7 +43,7 @@ class NodeStore {
     if (nodeType === 'root') {
       this.activeNode = this.roots.get(nodeId);
     } else if (nodeType === 'node') {
-      this.activeNode = this.nodes.values().find(node => nodeId === NodeStore.getId(node.idRef));
+      this.activeNode = this.nodes.values().find(node => nodeId === getId(node.idRef));
     } else if (nodeType === 'response') {
       this.activeNode = this.branches.get(nodeId);
     }
@@ -55,14 +51,14 @@ class NodeStore {
 
   getActiveNodeId() {
     if (!this.activeNode) return null;
-    return NodeStore.getId(this.activeNode.idRef);
+    return getId(this.activeNode.idRef);
   }
 
   getNode(nodeId, nodeType) {
     if (nodeType === 'root') {
       return this.roots.get(nodeId);
     } else if (nodeType === 'node') {
-      return this.nodes.values().find(node => nodeId === NodeStore.getId(node.idRef));
+      return this.nodes.values().find(node => nodeId === getId(node.idRef));
     } else if (nodeType === 'response') {
       return this.branches.get(nodeId);
     }
@@ -71,7 +67,7 @@ class NodeStore {
 
   buildRoots(roots) {
     roots.forEach((root) => {
-      const id = NodeStore.getId(root.idRef);
+      const id = getId(root.idRef);
       this.roots.set(id, root);
       root.type = 'root';
     });
@@ -87,7 +83,7 @@ class NodeStore {
 
   buildBranches(branches) {
     branches.forEach((branch) => {
-      const id = NodeStore.getId(branch.idRef);
+      const id = getId(branch.idRef);
       this.branches.set(id, branch);
       branch.type = 'response';
     });
@@ -97,7 +93,7 @@ class NodeStore {
     return roots.map(root => (
       {
         title: root.responseText,
-        id: NodeStore.getId(root.idRef),
+        id: getId(root.idRef),
         type: 'root',
         expanded: true,
         children: this.getChildren(root),
@@ -124,12 +120,12 @@ class NodeStore {
     return [
       {
         title: childNode.text,
-        id: NodeStore.getId(childNode.idRef),
+        id: getId(childNode.idRef),
         type: 'node',
         expanded: true,
         children: childNode.branches.map((branch) => {
           const { auxiliaryLink } = branch;
-          const branchNodeId = NodeStore.getId(branch.idRef);
+          const branchNodeId = getId(branch.idRef);
 
           return {
             title: branch.responseText,
