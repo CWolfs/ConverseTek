@@ -146,6 +146,22 @@ class ConversationEditor extends Component {
                   onChange={this.handleIdChange}
                 />
               </FormItem>
+              <Popconfirm
+                title="Are you sure you want to regenerate the conversation id?"
+                placement="bottomRight"
+                onConfirm={this.onRegenerateIdsButtonClicked}
+                okText="Yes"
+                cancelText="No"
+              >
+                <Button
+                  className="conversation-editor__regenerate-ids-button"
+                  type="secondary"
+                  size="small"
+                  onClick={this.onRegenerateIds}
+                >
+                  <Icon type="retweet" />
+                </Button>
+              </Popconfirm>
             </Col>
             <Col span={12}>
               <FormItem {...formItemLayout} label="Name">

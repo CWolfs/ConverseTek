@@ -70,24 +70,26 @@ class ConversationGeneral extends Component {
         </Row>
 
         {type === 'node' && (
-        <Row gutter={16}>
-          <Col {...colOneLayout}>
-            <div className="conversation-general__label">Index</div>
-          </Col>
-          <Col {...colTwoLayout}>
-            <div>{node.index}</div>
-          </Col>
-        </Row>
+        <section>
+          <Row gutter={16}>
+            <Col {...colOneLayout}>
+              <div className="conversation-general__label">Index</div>
+            </Col>
+            <Col {...colTwoLayout}>
+              <div>{node.index}</div>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col {...colOneLayout}>
+              <div className="conversation-general__label">Speaker Id</div>
+            </Col>
+            <Col {...colTwoLayout}>
+              <div>{node.speaker_override_id}</div>
+            </Col>
+          </Row>
+        </section>
         )}
 
-        <Row gutter={16}>
-          <Col {...colOneLayout}>
-            <div className="conversation-general__label">Speaker Id</div>
-          </Col>
-          <Col {...colTwoLayout}>
-            <div>{node.speaker_override_id}</div>
-          </Col>
-        </Row>
         <Row gutter={16}>
           <Col {...colOneLayout}>
             <div className="conversation-general__label">Comment</div>
