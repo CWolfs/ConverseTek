@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import packageJson from '../../../package.json';
 
 import './About.css';
 
@@ -46,7 +47,7 @@ class About extends Component {
         </div>
         <div className="about__version">
           <h3>Version</h3>
-          <div>v0.1.0</div>
+          <div>v{packageJson.version}</div>
         </div>
       </div>
     );

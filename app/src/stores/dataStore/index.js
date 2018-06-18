@@ -20,7 +20,7 @@ class DataStore {
 
   @action updateActiveConversation(conversationAsset) {
     this.setConversation(conversationAsset);
-    this.setActiveConversation(conversationAsset.idRef.id);
+    this.setActiveConversation(conversationAsset.Conversation.idRef.id);
   }
 
   @action setActiveConversation(id) {

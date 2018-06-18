@@ -1,26 +1,40 @@
 import { observable, action } from 'mobx';
+import defer from 'lodash.defer';
+import { getId } from '../../utils/conversation-utils';
 
+/* eslint-disable no-return-assign, no-param-reassign */
 class NodeStore {
   @observable roots = observable.shallowMap();
   @observable nodes = observable.shallowMap();
   @observable branches = observable.shallowMap();
   @observable activeNode;
-
-  static getId(idRef) {
-    const { id } = idRef;
-    return id.split(':')[1] || id;
-  }
+  @observable rebuild = false;
 
   constructor() {
     this.ownerId = null;
     this.activeNode = null;
   }
 
+  @action setRebuild(flag) {
+    this.rebuild = flag;
+    if (this.rebuild) defer(() => this.rebuild = false);
+  }
+
   @action build(conversationAsset) {
     const { roots, nodes } = conversationAsset.Conversation;
-    this.ownerId = NodeStore.getId(conversationAsset.Conversation.idRef);
+
+    const nextOwnerId = getId(conversationAsset.Conversation.idRef);
+
+    // save the active node if it's the same conversation
+    if (this.ownerId !== nextOwnerId) {
+      this.ownerId = nextOwnerId;
+      this.activeNode = null;
+    } else {
+      this.ownerId = nextOwnerId;
+    }
 
     this.reset();
+
     this.buildRoots(roots);
     this.buildNodes(nodes);
   }
@@ -29,23 +43,23 @@ class NodeStore {
     if (nodeType === 'root') {
       this.activeNode = this.roots.get(nodeId);
     } else if (nodeType === 'node') {
-      this.activeNode = this.nodes.values().find(node => nodeId === NodeStore.getId(node.idRef));
-    } else if (nodeType === 'branch') {
+      this.activeNode = this.nodes.values().find(node => nodeId === getId(node.idRef));
+    } else if (nodeType === 'response') {
       this.activeNode = this.branches.get(nodeId);
     }
   }
 
   getActiveNodeId() {
     if (!this.activeNode) return null;
-    return NodeStore.getId(this.activeNode.idRef);
+    return getId(this.activeNode.idRef);
   }
 
   getNode(nodeId, nodeType) {
     if (nodeType === 'root') {
       return this.roots.get(nodeId);
     } else if (nodeType === 'node') {
-      return this.nodes.values().find(node => nodeId === NodeStore.getId(node.idRef));
-    } else if (nodeType === 'branch') {
+      return this.nodes.values().find(node => nodeId === getId(node.idRef));
+    } else if (nodeType === 'response') {
       return this.branches.get(nodeId);
     }
     return null;
@@ -53,8 +67,9 @@ class NodeStore {
 
   buildRoots(roots) {
     roots.forEach((root) => {
-      const id = NodeStore.getId(root.idRef);
+      const id = getId(root.idRef);
       this.roots.set(id, root);
+      root.type = 'root';
     });
   }
 
@@ -62,13 +77,15 @@ class NodeStore {
     nodes.forEach((node) => {
       const { index } = node;
       this.nodes.set(index, node);
+      node.type = 'node';
     });
   }
 
   buildBranches(branches) {
     branches.forEach((branch) => {
-      const id = NodeStore.getId(branch.idRef);
+      const id = getId(branch.idRef);
       this.branches.set(id, branch);
+      branch.type = 'response';
     });
   }
 
@@ -76,7 +93,7 @@ class NodeStore {
     return roots.map(root => (
       {
         title: root.responseText,
-        id: NodeStore.getId(root.idRef),
+        id: getId(root.idRef),
         type: 'root',
         expanded: true,
         children: this.getChildren(root),
@@ -103,17 +120,17 @@ class NodeStore {
     return [
       {
         title: childNode.text,
-        id: NodeStore.getId(childNode.idRef),
+        id: getId(childNode.idRef),
         type: 'node',
         expanded: true,
         children: childNode.branches.map((branch) => {
           const { auxiliaryLink } = branch;
-          const branchNodeId = NodeStore.getId(branch.idRef);
+          const branchNodeId = getId(branch.idRef);
 
           return {
             title: branch.responseText,
             id: branchNodeId,
-            type: 'branch',
+            type: 'response',
             expanded: true,
             children: (auxiliaryLink) ? [{ title: `[Link to NODE ${branch.nextNodeIndex}]` }] : this.getChildren(branch),
           };
@@ -126,7 +143,7 @@ class NodeStore {
     this.roots.clear();
     this.nodes.clear();
     this.branches.clear();
-    this.activeNode = null;
+    // this.activeNode = null;
   }
 }
 

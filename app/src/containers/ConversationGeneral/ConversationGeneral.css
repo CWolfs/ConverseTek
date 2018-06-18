@@ -1,0 +1,14 @@
+@import '../../css/constants.css';
+
+.conversation-general {
+  background-color: $backgroundPrimary;
+
+  &.ant-card-bordered {
+    border: 1px solid $borderTertiary;
+  }
+
+  &__label {
+    color: $textColourQuaternary;
+    text-align: right;
+  }
+}

@@ -8,7 +8,7 @@ Battletech uses a binary data format for its conversations. It isn't possible to
 
 ## Overview
 
-Latest release: **v0.1.0** | [Download](https://github.com/CWolfs/ConverseTek/releases/tag/v0.1.0)
+Latest release: **v0.2.0** | [Download](https://github.com/CWolfs/ConverseTek/releases/tag/v0.2.0)
 
 ## Example
 
@@ -39,21 +39,25 @@ All feedback is welcome in the [issues section](https://github.com/CWolfs/Conver
 | Conversation - Edit name | 0.1.0 | :white_check_mark: |
 | Conversation - Edit dialog text | 0.1.0 | :white_check_mark: |
 | Conversation - Save | 0.1.0 | :white_check_mark: |
+| Conversation - Edit node id | 0.2.0 | :white_check_mark: |
 | Conversation - Id regeneration | 0.2.0 | :soon: |
 | Conversation - Save as... | 0.2.0 | :soon: |
 | Conversation - New | 0.2.0 | :soon: |
-| Conversation - Edit dialog node speaker | 0.2.0 | :soon: |
-| Conversation - Edit conversation default speaker | 0.2.0 | :soon: |
-| Conversation - Drag node rearrange | 0.3.0 | :heavy_minus_sign: |
-| Conversation - Linking | 0.3.0 | :heavy_minus_sign: |
+| Conversation - Edit dialog node speaker by speaker id | 0.2.0 | :soon: |
+| Conversation - Edit dialog node speaker by cast id | 0.2.0 | :soon: |
+| Conversation - Add/Edit comments | 0.3.0 | :soon: |
 | Conversation - Delete node | 0.3.0 | :heavy_minus_sign: |
 | Conversation - Add node | 0.3.0 | :heavy_minus_sign: |
-| Conversation - Visual indicators - Actions | 0.4.0 | :heavy_minus_sign: |
-| Conversation - Visual indicators - Conditions | 0.4.0 | :heavy_minus_sign: |
-| Conversation - Add actions | 0.4.0 | :heavy_minus_sign: |
-| Conversation - Remove actions | 0.4.0 | :heavy_minus_sign: |
-| Conversation - Add conditions | 0.4.0 | :heavy_minus_sign: |
-| Conversation - Remove conditions | 0.4.0 | :heavy_minus_sign: |
+| Conversation - Node toggle 'Only Available Once' | 0.3.0 | :heavy_minus_sign: |
+| Conversation - Drag node rearrange | 0.4.0 | :heavy_minus_sign: |
+| Conversation - Linking | 0.4.0 | :heavy_minus_sign: |
+| Conversation - Visual indicators - Actions | 0.5.0 | :heavy_minus_sign: |
+| Conversation - Visual indicators - Conditions | 0.5.0 | :heavy_minus_sign: |
+| Conversation - Add actions | 0.5.0 | :heavy_minus_sign: |
+| Conversation - Remove actions | 0.5.0 | :heavy_minus_sign: |
+| Conversation - Add conditions | 0.5.0 | :heavy_minus_sign: |
+| Conversation - Remove conditions | 0.5.0 | :heavy_minus_sign: |
+| Conversation - Search | 0.6.0 | :heavy_minus_sign: |
 
 ## Author
 
