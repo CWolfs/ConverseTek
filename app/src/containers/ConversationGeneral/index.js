@@ -59,6 +59,7 @@ class ConversationGeneral extends Component {
               <Input
                 value={node.idRef.id}
                 onChange={this.handleIdChange}
+                spellCheck="false"
               />
             </div>
           </Col>
