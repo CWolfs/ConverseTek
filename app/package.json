@@ -58,6 +58,7 @@
     "lodash.capitalize": "^4.2.1",
     "lodash.debounce": "^4.0.8",
     "lodash.defer": "^4.1.0",
+    "lodash.delay": "^4.1.1",
     "lodash.remove": "^4.7.0",
     "lodash.sortby": "^4.7.0",
     "md5": "^2.2.1",

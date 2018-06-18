@@ -20,12 +20,14 @@ class ConversationEditor extends Component {
   constructor(props) {
     super(props);
 
-    const { conversationAsset } = this.props;
+    const { dataStore, conversationAsset } = this.props;
     const unsavedConversationAsset = { ...conversationAsset };
 
     this.state = {
       conversationAsset: unsavedConversationAsset,
     };
+
+    dataStore.setUnsavedActiveConversation(unsavedConversationAsset);
 
     this.handleIdChange = this.handleIdChange.bind(this);
     this.handleNameChange = this.handleNameChange.bind(this);
@@ -72,11 +74,14 @@ class ConversationEditor extends Component {
   }
 
   createNewUnsavedConversation(conversationAsset) {
+    const { dataStore } = this.props;
     const unsavedConversationAsset = { ...conversationAsset };
 
     this.setState({
       conversationAsset: unsavedConversationAsset,
     });
+
+    dataStore.setUnsavedActiveConversation(unsavedConversationAsset);
   }
 
   handleIdChange(event) {
