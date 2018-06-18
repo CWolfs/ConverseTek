@@ -30,6 +30,9 @@ export function getId(idRef) {
 export function createId(idRef, newId) {
   const { id } = idRef;
 
+  // strip any colons - this is a special character for ids
+  if (newId.includes(':')) newId.replace(':', '');
+
   if (id.includes(':')) {
     const builtId = id.split(':')[0];
     return `${builtId}:${newId}`;
