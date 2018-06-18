@@ -8,7 +8,7 @@ import DialogTextArea from '../../components/DialogTextArea';
 import ConversationGeneral from '../ConversationGeneral';
 
 import { updateConversation } from '../../services/api';
-import { regenerateIds } from '../../utils/conversation-utils';
+import { regenerateNodeIds, regenerateConversationId } from '../../utils/conversation-utils';
 
 import './ConversationEditor.css';
 
@@ -30,7 +30,9 @@ class ConversationEditor extends Component {
     this.handleIdChange = this.handleIdChange.bind(this);
     this.handleNameChange = this.handleNameChange.bind(this);
     this.onSaveButtonClicked = this.onSaveButtonClicked.bind(this);
-    this.onRegenerateIdsButtonClicked = this.onRegenerateIdsButtonClicked.bind(this);
+    this.onRegenerateNodeIdsButtonClicked = this.onRegenerateNodeIdsButtonClicked.bind(this);
+    this.onRegenerateConversationIdButtonClicked =
+      this.onRegenerateConversationIdButtonClicked.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -55,12 +57,18 @@ class ConversationEditor extends Component {
     dataStore.updateActiveConversation(conversationAsset); // local update for speed
   }
 
-  onRegenerateIdsButtonClicked() {
+  onRegenerateNodeIdsButtonClicked() {
     const { conversationAsset } = this.state;
     const { nodeStore } = this.props;
 
-    regenerateIds(conversationAsset);
+    regenerateNodeIds(conversationAsset);
     nodeStore.setRebuild(true);
+  }
+
+  onRegenerateConversationIdButtonClicked() {
+    const { conversationAsset } = this.state;
+
+    regenerateConversationId(conversationAsset);
   }
 
   createNewUnsavedConversation(conversationAsset) {
@@ -111,9 +119,9 @@ class ConversationEditor extends Component {
           <h2>Editor</h2>
           <div className="conversation-editor__buttons">
             <Popconfirm
-              title="Are you sure you want to regenerate all ids?"
+              title="Are you sure you want to regenerate all dialog node ids?"
               placement="bottomRight"
-              onConfirm={this.onRegenerateIdsButtonClicked}
+              onConfirm={this.onRegenerateNodeIdsButtonClicked}
               okText="Yes"
               cancelText="No"
             >
@@ -121,7 +129,6 @@ class ConversationEditor extends Component {
                 className="conversation-editor__regenerate-ids-button"
                 type="secondary"
                 size="small"
-                onClick={this.onRegenerateIds}
               >
                 <Icon type="retweet" />
               </Button>
@@ -142,26 +149,26 @@ class ConversationEditor extends Component {
             <Col span={11}>
               <FormItem {...formItemLayout} label="Id">
                 <Input
+                  className="conversation-editor__id-input"
                   value={conversationId}
                   onChange={this.handleIdChange}
                 />
-              </FormItem>
-              <Popconfirm
-                title="Are you sure you want to regenerate the conversation id?"
-                placement="bottomRight"
-                onConfirm={this.onRegenerateIdsButtonClicked}
-                okText="Yes"
-                cancelText="No"
-              >
-                <Button
-                  className="conversation-editor__regenerate-ids-button"
-                  type="secondary"
-                  size="small"
-                  onClick={this.onRegenerateIds}
+                <Popconfirm
+                  title="Are you sure you want to regenerate the conversation id?"
+                  placement="bottomRight"
+                  onConfirm={this.onRegenerateConversationIdButtonClicked}
+                  okText="Yes"
+                  cancelText="No"
                 >
-                  <Icon type="retweet" />
-                </Button>
-              </Popconfirm>
+                  <Button
+                    className="conversation-editor__regenerate-ids-button"
+                    type="secondary"
+                    size="small"
+                  >
+                    <Icon type="retweet" />
+                  </Button>
+                </Popconfirm>
+              </FormItem>
             </Col>
             <Col span={12}>
               <FormItem {...formItemLayout} label="Name">

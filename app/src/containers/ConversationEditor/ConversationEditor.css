@@ -10,6 +10,11 @@
     display: inline-block;
   }
 
+  &__id-input {
+    width: 88%;
+    margin-right: $tinySpace;
+  }
+
   &__buttons {
     float: right;
   }
