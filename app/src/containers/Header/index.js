@@ -4,6 +4,7 @@ import { message, Menu } from 'antd';
 import { observer, inject } from 'mobx-react';
 
 import FileSystemPicker from '../../components/FileSystemPicker';
+import SaveAs from '../../components/SaveAs';
 import About from '../../components/About';
 
 import { updateConversation } from '../../services/api';
@@ -46,7 +47,11 @@ class Header extends Component {
             )}
 
             {hasActiveConversation && (
-              <MenuItem>Save Conversation As...</MenuItem>
+              <MenuItem
+                onClick={() => modalStore.setModelContent(SaveAs)}
+              >
+                Save Conversation As...
+              </MenuItem>
             )}
 
             {/*

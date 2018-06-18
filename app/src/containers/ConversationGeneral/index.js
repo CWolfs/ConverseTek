@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Card, Row, Col, Input } from 'antd';
 import { observer, inject } from 'mobx-react';
 import capitalize from 'lodash.capitalize';
+import debounce from 'lodash.debounce';
 
 import { getId, createId } from '../../utils/conversation-utils';
 
@@ -29,17 +30,39 @@ class ConversationGeneral extends Component {
   constructor(props) {
     super(props);
 
+    const { node } = this.props;
+
+    this.state = {
+      nodeId: getId(node.idRef),
+    };
+
     this.handleIdChange = this.handleIdChange.bind(this);
+    this.handleIdBlur = this.handleIdBlur.bind(this);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { node: stateNode } = this.state;
+    const { node: propNode } = nextProps;
+
+    if (propNode !== stateNode) {
+      this.setState({ nodeId: getId(propNode.idRef) });
+    }
   }
 
   handleIdChange(event) {
+    this.setState({ nodeId: event.target.value.trim() });
+  }
+
+  handleIdBlur() {
     const { nodeStore, node } = this.props;
-    node.idRef.id = createId(node.idRef, event.target.value.trim());
+    const { nodeId } = this.state;
+    node.idRef.id = createId(node.idRef, nodeId);
     nodeStore.setRebuild(true);
   }
 
   render() {
     const { node } = this.props;
+    const { nodeId } = this.state;
     const { type } = node;
 
     return (
@@ -61,8 +84,9 @@ class ConversationGeneral extends Component {
           <Col {...colTwoLayout}>
             <div>
               <Input
-                value={getId(node.idRef)}
+                value={nodeId}
                 onChange={this.handleIdChange}
+                onBlur={this.handleIdBlur}
                 spellCheck="false"
               />
             </div>

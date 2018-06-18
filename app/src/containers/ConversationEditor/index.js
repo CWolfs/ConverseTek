@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { toJS } from 'mobx';
 import { observer, inject } from 'mobx-react';
 import { message, Button, Row, Col, Form, Input, Icon, Tabs, Popconfirm } from 'antd';
 
@@ -21,12 +22,7 @@ class ConversationEditor extends Component {
     super(props);
 
     const { dataStore, conversationAsset } = this.props;
-    const unsavedConversationAsset = { ...conversationAsset };
-
-    this.state = {
-      conversationAsset: unsavedConversationAsset,
-    };
-
+    const unsavedConversationAsset = { ...toJS(conversationAsset) };
     dataStore.setUnsavedActiveConversation(unsavedConversationAsset);
 
     this.handleIdChange = this.handleIdChange.bind(this);
@@ -38,17 +34,18 @@ class ConversationEditor extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { conversationAsset: stateConversationAsset } = this.state;
+    const { dataStore } = this.props;
+    const { unsavedActiveConversationAsset } = dataStore;
     const { conversationAsset: propConversationAsset } = nextProps;
 
-    if (propConversationAsset !== stateConversationAsset) {
+    if (propConversationAsset !== unsavedActiveConversationAsset) {
       this.createNewUnsavedConversation(propConversationAsset);
     }
   }
 
   onSaveButtonClicked() {
     const { dataStore } = this.props;
-    const { conversationAsset } = this.state;
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
 
     this.createNewUnsavedConversation(conversationAsset);
 
@@ -60,45 +57,40 @@ class ConversationEditor extends Component {
   }
 
   onRegenerateNodeIdsButtonClicked() {
-    const { conversationAsset } = this.state;
-    const { nodeStore } = this.props;
+    const { dataStore, nodeStore } = this.props;
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
 
     regenerateNodeIds(conversationAsset);
     nodeStore.setRebuild(true);
   }
 
   onRegenerateConversationIdButtonClicked() {
-    const { conversationAsset } = this.state;
-
+    const { dataStore } = this.props;
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     regenerateConversationId(conversationAsset);
   }
 
   createNewUnsavedConversation(conversationAsset) {
     const { dataStore } = this.props;
-    const unsavedConversationAsset = { ...conversationAsset };
-
-    this.setState({
-      conversationAsset: unsavedConversationAsset,
-    });
-
+    const unsavedConversationAsset = { ...toJS(conversationAsset) };
     dataStore.setUnsavedActiveConversation(unsavedConversationAsset);
   }
 
   handleIdChange(event) {
-    const { conversationAsset } = this.state;
+    const { dataStore } = this.props;
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     conversationAsset.Conversation.idRef.id = event.target.value.trim();
-    this.setState({ conversationAsset });
   }
 
   handleNameChange(event) {
-    const { conversationAsset } = this.state;
+    const { dataStore } = this.props;
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     conversationAsset.Conversation.ui_name = event.target.value.trim();
-    this.setState({ conversationAsset });
   }
 
   render() {
-    const { conversationAsset } = this.state;
-    const { nodeStore } = this.props;
+    const { dataStore, nodeStore } = this.props;
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     const { Conversation } = conversationAsset;
     const conversationId = Conversation.idRef.id;
     const { activeNode, rebuild } = nodeStore;
