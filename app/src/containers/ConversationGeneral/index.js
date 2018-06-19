@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Card, Row, Col, Input, Select } from 'antd';
+import { Card, Row, Col, Input, Select, Tooltip, Icon } from 'antd';
 import { observer, inject } from 'mobx-react';
 import capitalize from 'lodash.capitalize';
 
@@ -37,6 +37,9 @@ class ConversationGeneral extends Component {
     this.handleIdChange = this.handleIdChange.bind(this);
     this.handleIdBlur = this.handleIdBlur.bind(this);
     this.handleSpeakerChange = this.handleSpeakerChange.bind(this);
+    this.handleCastIdChange = this.handleCastIdChange.bind(this);
+    this.handleSpeakerIdChange = this.handleSpeakerIdChange.bind(this);
+    this.handleCommentChange = this.handleCommentChange.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -83,7 +86,41 @@ class ConversationGeneral extends Component {
   }
 
   handleSpeakerChange(value) {
+    const { node } = this.props;
+
+    node.speakerType = value;
+
     this.setState({ selectedSpeaker: value });
+  }
+
+  handleCastIdChange(event) {
+    const { node } = this.props;
+    const castId = event.target.value.trim();
+    if (!node.sourceInSceneRef) {
+      node.sourceInSceneRef = { id: castId };
+    } else {
+      node.sourceInSceneRef.id = castId;
+    }
+
+    this.setState({
+      castId,
+    });
+  }
+
+  handleSpeakerIdChange(event) {
+    const { node } = this.props;
+    const speakerId = event.target.value.trim();
+    node.speaker_override_id = speakerId;
+
+    this.setState({
+      speakerId,
+    });
+  }
+
+  handleCommentChange(event) {
+    const { node } = this.props;
+    const comment = event.target.value.trim();
+    node.comment = comment;
   }
 
   render() {
@@ -127,7 +164,12 @@ class ConversationGeneral extends Component {
         {type === 'node' && (
         <Row gutter={16}>
           <Col {...colOneLayout}>
-            <div className="conversation-general__label">Speaker</div>
+            <div className="conversation-general__speaker-group-label">
+              <Tooltip title="'Cast Id' will not be saved if 'Speaker Id' is selected">
+                <Icon type="exclamation-circle-o" />
+              </Tooltip>
+              <div className="conversation-general__label">Speaker</div>
+            </div>
           </Col>
           <Col {...colTwoLayout}>
             <div className="conversation-general__speaker-group">
@@ -143,12 +185,14 @@ class ConversationGeneral extends Component {
               {(selectedSpeaker === 'castId' &&
                 <Input
                   value={castId}
+                  onChange={this.handleCastIdChange}
                   spellCheck="false"
                 />
               )}
               {(selectedSpeaker === 'speakerId' &&
                 <Input
                   value={speakerId}
+                  onChange={this.handleSpeakerIdChange}
                   spellCheck="false"
                 />
               )}
@@ -162,7 +206,11 @@ class ConversationGeneral extends Component {
             <div className="conversation-general__label last">Comment</div>
           </Col>
           <Col {...colTwoLayout}>
-            <div>{node.comment}</div>
+            <Input
+              value={node.comment}
+              onChange={this.handleCommentChange}
+              spellCheck="false"
+            />
           </Col>
         </Row>
       </Card>

@@ -16,6 +16,17 @@
     display: flex;
   }
 
+  &__speaker-group-label {
+    display: flex;
+    justify-content: flex-end;
+    align-items: baseline;
+
+    .anticon {
+      margin-right: $smallSpace;
+      color: gold;
+    }
+  }
+
   &__speaker-select {
     flex: 0 0 115px;
     margin-right: $tinySpace;

@@ -160,3 +160,12 @@
     }
   }
 }
+
+.ant-tooltip-inner {
+  background-color: gold;
+  color: black;
+}
+
+.ant-tooltip-placement-top .ant-tooltip-arrow {
+  border-top-color: gold;
+}
