@@ -33,16 +33,16 @@ All feedback is welcome in the [issues section](https://github.com/CWolfs/Conver
 
 | Feature | Expected Version | Status  |
 | ------- | ---------------- | ------- |
-| Directory selection | 0.1.0 | :white_check_mark: |
-| Conversation - Loading | 0.1.0 | :white_check_mark: |
-| Conversation - Edit id | 0.1.0 | :white_check_mark: |
-| Conversation - Edit name | 0.1.0 | :white_check_mark: |
-| Conversation - Edit dialog text | 0.1.0 | :white_check_mark: |
-| Conversation - Save | 0.1.0 | :white_check_mark: |
-| Conversation - Edit node id | 0.2.0 | :white_check_mark: |
-| Conversation - Id regeneration | 0.2.0 | :white_check_mark: |
-| Conversation - Save as... | 0.2.0 | :white_check_mark: |
-| Conversation - New | 0.2.0 | :soon: |
+| Directory selection | 0.1.0 | :heavy_check_mark: |
+| Conversation - Loading | 0.1.0 | :heavy_check_mark: |
+| Conversation - Edit id | 0.1.0 | :heavy_check_mark: |
+| Conversation - Edit name | 0.1.0 | :heavy_check_mark: |
+| Conversation - Edit dialog text | 0.1.0 | :heavy_check_mark: |
+| Conversation - Save | 0.1.0 | :heavy_check_mark: |
+| Conversation - Edit node id | 0.2.0 | :heavy_check_mark: |
+| Conversation - Id regeneration | 0.2.0 | :heavy_check_mark: |
+| Conversation - Save as... | 0.2.0 | :heavy_check_mark: |
+| Conversation - New | 0.2.0 | :heavy_check_mark: |
 | Conversation - Edit dialog node speaker by speaker id | 0.2.0 | :soon: |
 | Conversation - Edit dialog node speaker by cast id | 0.2.0 | :soon: |
 | Conversation - Add/Edit comments | 0.3.0 | :heavy_minus_sign: |
