@@ -1,4 +1,5 @@
 import { observable, action } from 'mobx';
+import { createConversation } from '../../utils/conversation-utils';
 
 class DataStore {
   @observable workingDirectory;
@@ -17,7 +18,8 @@ class DataStore {
   }
 
   @action createNewConversation() {
-    console.log('Create new convo');
+    const conversation = createConversation(this.workingDirectory);
+    this.updateActiveConversation(conversation);
   }
 
   @action setConversations(conversationAssets) {

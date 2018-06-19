@@ -43,4 +43,27 @@ export function createId(idRef, newId) {
   return newId;
 }
 
+export function createConversation(filePath) {
+  const id = generateId();
+  const fileName = `${id}.convo`;
+  const conversation = {
+    FileName: fileName,
+    FilePath: `${filePath}/${fileName}.bytes`,
+    Conversation: {
+      idRef: {
+        id: generateId(),
+      },
+      ui_name: 'Unnamed-Conversation',
+      nodes: [],
+      roots: [],
+      default_speaker_id: '',
+      default_speaker_override: null,
+      persistent_conversation: false,
+      speaker_override_id: '',
+    },
+  };
+
+  return conversation;
+}
+
 export default {};
