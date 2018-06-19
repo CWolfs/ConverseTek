@@ -48,5 +48,6 @@ export function getDirectories(path) {
 }
 
 export function saveWorkingDirectory(path) {
+  dataStore.setWorkingDirectory(path);
   return post('/working-directory', { path });
 }

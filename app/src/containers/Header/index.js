@@ -19,6 +19,7 @@ const { SubMenu } = Menu;
 class Header extends Component {
   render() {
     const { dataStore, modalStore } = this.props;
+    const { workingDirectory } = dataStore;
     const hasActiveConversation = (dataStore.activeConversationAsset !== null);
 
     return (
@@ -30,6 +31,14 @@ class Header extends Component {
             >
               Open Folder
             </MenuItem>
+
+            {workingDirectory && (
+              <MenuItem
+                onClick={() => dataStore.createNewConversation()}
+              >
+                New Conversation
+              </MenuItem>
+            )}
 
             {hasActiveConversation && (
             <MenuItem

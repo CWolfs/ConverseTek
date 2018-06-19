@@ -5,11 +5,11 @@ import { message, Input } from 'antd';
 
 import { updateConversation } from '../../services/api';
 
-import './SaveAs.css';
+import './SaveConversationAs.css';
 
 /* eslint-disable react/prefer-stateless-function, no-useless-constructor, class-methods-use-this */
 @observer
-class About extends Component {
+class SaveConversationAs extends Component {
   constructor(props) {
     super(props);
     const { dataStore } = this.props;
@@ -72,7 +72,7 @@ class About extends Component {
     const { modifiedFileName, suggestedFileName } = this.state;
 
     return (
-      <div className="save-as">
+      <div className="save-conversation-as">
         <Input
           value={modifiedFileName || suggestedFileName}
           onChange={this.handleFileNameChange}
@@ -82,9 +82,9 @@ class About extends Component {
   }
 }
 
-About.propTypes = {
+SaveConversationAs.propTypes = {
   dataStore: PropTypes.object.isRequired,
   modalStore: PropTypes.object.isRequired,
 };
 
-export default inject('dataStore')(About);
+export default inject('dataStore')(SaveConversationAs);
