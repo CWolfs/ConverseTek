@@ -11,4 +11,13 @@
     color: $textColourQuaternary;
     text-align: right;
   }
+
+  &__speaker-group {
+    display: flex;
+  }
+
+  &__speaker-select {
+    flex: 0 0 115px;
+    margin-right: $tinySpace;
+  }
 }

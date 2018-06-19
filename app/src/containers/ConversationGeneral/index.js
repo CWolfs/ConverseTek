@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Card, Row, Col, Input } from 'antd';
+import { Card, Row, Col, Input, Select } from 'antd';
 import { observer, inject } from 'mobx-react';
 import capitalize from 'lodash.capitalize';
-import debounce from 'lodash.debounce';
 
 import { getId, createId } from '../../utils/conversation-utils';
 
 import './ConversationGeneral.css';
+
+const { Option } = Select;
 
 const colOneLayout = {
   xs: { span: 24 },
@@ -31,13 +32,11 @@ class ConversationGeneral extends Component {
     super(props);
 
     const { node } = this.props;
-
-    this.state = {
-      nodeId: getId(node.idRef),
-    };
+    this.populateState(node, true);
 
     this.handleIdChange = this.handleIdChange.bind(this);
     this.handleIdBlur = this.handleIdBlur.bind(this);
+    this.handleSpeakerChange = this.handleSpeakerChange.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -45,7 +44,30 @@ class ConversationGeneral extends Component {
     const { node: propNode } = nextProps;
 
     if (propNode !== stateNode) {
-      this.setState({ nodeId: getId(propNode.idRef) });
+      this.populateState(propNode);
+    }
+  }
+
+  populateState(node, init = false) {
+    const { speaker_override_id: speakerOverrideId, sourceInSceneRef } = node;
+    const castId = (sourceInSceneRef && sourceInSceneRef.id) ? sourceInSceneRef.id : null;
+    const speakerId = (speakerOverrideId !== '') ? speakerOverrideId : null;
+    const defaultSpeaker = (castId !== null || speakerId === null) ? 'castId' : 'speakerId';
+
+    if (init) {
+      this.state = {
+        nodeId: getId(node.idRef),
+        selectedSpeaker: defaultSpeaker,
+        castId,
+        speakerId,
+      };
+    } else {
+      this.setState({
+        nodeId: getId(node.idRef),
+        selectedSpeaker: defaultSpeaker,
+        castId,
+        speakerId,
+      });
     }
   }
 
@@ -60,9 +82,18 @@ class ConversationGeneral extends Component {
     nodeStore.setRebuild(true);
   }
 
+  handleSpeakerChange(value) {
+    this.setState({ selectedSpeaker: value });
+  }
+
   render() {
     const { node } = this.props;
-    const { nodeId } = this.state;
+    const {
+      nodeId,
+      selectedSpeaker,
+      castId,
+      speakerId,
+    } = this.state;
     const { type } = node;
 
     return (
@@ -94,29 +125,41 @@ class ConversationGeneral extends Component {
         </Row>
 
         {type === 'node' && (
-        <section>
-          <Row gutter={16}>
-            <Col {...colOneLayout}>
-              <div className="conversation-general__label">Index</div>
-            </Col>
-            <Col {...colTwoLayout}>
-              <div>{node.index}</div>
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col {...colOneLayout}>
-              <div className="conversation-general__label">Speaker Id</div>
-            </Col>
-            <Col {...colTwoLayout}>
-              <div>{node.speaker_override_id}</div>
-            </Col>
-          </Row>
-        </section>
+        <Row gutter={16}>
+          <Col {...colOneLayout}>
+            <div className="conversation-general__label">Speaker</div>
+          </Col>
+          <Col {...colTwoLayout}>
+            <div className="conversation-general__speaker-group">
+              <Select
+                className="conversation-general__speaker-select"
+                value={selectedSpeaker}
+                style={{ width: 115 }}
+                onChange={this.handleSpeakerChange}
+              >
+                <Option value="castId">Cast Id</Option>
+                <Option value="speakerId">Speaker Id</Option>
+              </Select>
+              {(selectedSpeaker === 'castId' &&
+                <Input
+                  value={castId}
+                  spellCheck="false"
+                />
+              )}
+              {(selectedSpeaker === 'speakerId' &&
+                <Input
+                  value={speakerId}
+                  spellCheck="false"
+                />
+              )}
+            </div>
+          </Col>
+        </Row>
         )}
 
         <Row gutter={16}>
           <Col {...colOneLayout}>
-            <div className="conversation-general__label">Comment</div>
+            <div className="conversation-general__label last">Comment</div>
           </Col>
           <Col {...colTwoLayout}>
             <div>{node.comment}</div>

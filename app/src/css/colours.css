@@ -48,6 +48,9 @@ $c1blue6: #0084C1;
 /* CUSTOM blue 2 */
 $c2blue6: #318ce0;
 
+/* CUSTOM blue 3 */
+$c3blue6: #2ab0f77d;
+
 /*
 =======================
 | App Palette Colours |
@@ -81,3 +84,6 @@ $shadowPrimary: $grey4;
 $shadowSecondary: $grey5;
 
 $buttonBackgroundPrimary: gold;
+
+$highlightColourPrimary: $c3blue6;
+$highlightColourSecondary: gold;

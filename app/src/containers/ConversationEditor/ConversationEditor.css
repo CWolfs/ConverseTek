@@ -61,7 +61,7 @@
           padding: 0;
           color: $textColourPrimary;
 
-          & *:last-child {
+          & .ant-row:last-child {
             margin: 0;
           }
         }
