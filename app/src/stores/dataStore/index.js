@@ -1,6 +1,8 @@
 import { observable, action } from 'mobx';
+import { createConversation } from '../../utils/conversation-utils';
 
 class DataStore {
+  @observable workingDirectory;
   @observable conversationAssets = observable.shallowMap();
   @observable activeConversationAsset;
   @observable unsavedActiveConversationAsset;
@@ -8,6 +10,16 @@ class DataStore {
   constructor() {
     this.activeConversationAsset = null;
     this.unsavedActiveConversationAsset = null;
+    this.workingDirectory = null;
+  }
+
+  @action setWorkingDirectory(directoryPath) {
+    this.workingDirectory = directoryPath;
+  }
+
+  @action createNewConversation() {
+    const conversation = createConversation(this.workingDirectory);
+    this.updateActiveConversation(conversation);
   }
 
   @action setConversations(conversationAssets) {
@@ -43,6 +55,7 @@ class DataStore {
     this.conversationAssets.clear();
     this.activeConversationAsset = null;
     this.unsavedActiveConversationAsset = null;
+    this.workingDirectory = null;
   }
 }
 

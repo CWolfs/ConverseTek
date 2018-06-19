@@ -4,7 +4,7 @@ import { message, Menu } from 'antd';
 import { observer, inject } from 'mobx-react';
 
 import FileSystemPicker from '../../components/FileSystemPicker';
-import SaveAs from '../../components/SaveAs';
+import SaveConversationAs from '../../components/SaveConversationAs';
 import About from '../../components/About';
 
 import { updateConversation } from '../../services/api';
@@ -19,6 +19,7 @@ const { SubMenu } = Menu;
 class Header extends Component {
   render() {
     const { dataStore, modalStore } = this.props;
+    const { workingDirectory } = dataStore;
     const hasActiveConversation = (dataStore.activeConversationAsset !== null);
 
     return (
@@ -30,6 +31,14 @@ class Header extends Component {
             >
               Open Folder
             </MenuItem>
+
+            {workingDirectory && (
+              <MenuItem
+                onClick={() => dataStore.createNewConversation()}
+              >
+                New Conversation
+              </MenuItem>
+            )}
 
             {hasActiveConversation && (
             <MenuItem
@@ -48,7 +57,7 @@ class Header extends Component {
 
             {hasActiveConversation && (
               <MenuItem
-                onClick={() => modalStore.setModelContent(SaveAs)}
+                onClick={() => modalStore.setModelContent(SaveConversationAs)}
               >
                 Save Conversation As...
               </MenuItem>

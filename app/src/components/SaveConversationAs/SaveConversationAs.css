@@ -1,6 +1,6 @@
 @import '../../css/constants.css';
 
-.save-as {
+.save-conversation-as {
   h3 {
     color: $textColourTertiary;
   }
