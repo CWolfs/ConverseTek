@@ -66,4 +66,14 @@ export function createConversation(filePath) {
   return conversation;
 }
 
+export function consolidateSpeaker(conversationAsset) {
+  const { nodes } = conversationAsset.Conversation;
+  nodes.forEach((node) => {
+    const { speakerType } = node;
+    if (speakerType === 'speakerId') {
+      node.sourceInSceneRef = null;
+    }
+  });
+}
+
 export default {};

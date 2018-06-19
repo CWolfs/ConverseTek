@@ -161,7 +161,6 @@ class NodeStore {
     this.roots.clear();
     this.nodes.clear();
     this.branches.clear();
-    // this.activeNode = null;
   }
 }
 
