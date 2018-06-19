@@ -8,6 +8,7 @@ class NodeStore {
   @observable nodes = observable.shallowMap();
   @observable branches = observable.shallowMap();
   @observable activeNode;
+  @observable dirtyActiveNode = false;
   @observable rebuild = false;
 
   constructor() {
@@ -37,6 +38,23 @@ class NodeStore {
 
     this.buildRoots(roots);
     this.buildNodes(nodes);
+  }
+
+  @action setNode(node) {
+    const { type } = node;
+
+    if (type === 'root') {
+      this.activeNode = this.roots.set(getId(node.idRef), node);
+    } else if (type === 'node') {
+      this.activeNode = this.nodes.set(getId(node.idRef), node);
+    } else if (type === 'response') {
+      this.activeNode = this.branches.set(getId(node.idRef), node);
+    }
+  }
+
+  @action updateActiveNode(node) {
+    this.setNode(node);
+    this.setActiveNode(getId(node.idRef), node.type);
   }
 
   @action setActiveNode(nodeId, nodeType) {

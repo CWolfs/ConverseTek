@@ -37,6 +37,8 @@ class ConversationGeneral extends Component {
     this.handleIdChange = this.handleIdChange.bind(this);
     this.handleIdBlur = this.handleIdBlur.bind(this);
     this.handleSpeakerChange = this.handleSpeakerChange.bind(this);
+    this.handleCastIdChange = this.handleCastIdChange.bind(this);
+    this.handleSpeakerIdChange = this.handleSpeakerIdChange.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -84,6 +86,30 @@ class ConversationGeneral extends Component {
 
   handleSpeakerChange(value) {
     this.setState({ selectedSpeaker: value });
+  }
+
+  handleCastIdChange(event) {
+    const { node } = this.props;
+    const castId = event.target.value.trim();
+    if (!node.sourceInSceneRef) {
+      node.sourceInSceneRef = { id: castId };
+    } else {
+      node.sourceInSceneRef.id = castId;
+    }
+
+    this.setState({
+      castId,
+    });
+  }
+
+  handleSpeakerIdChange(event) {
+    const { node } = this.props;
+    const speakerId = event.target.value.trim();
+    node.speaker_override_id = speakerId;
+
+    this.setState({
+      speakerId,
+    });
   }
 
   render() {
@@ -143,12 +169,14 @@ class ConversationGeneral extends Component {
               {(selectedSpeaker === 'castId' &&
                 <Input
                   value={castId}
+                  onChange={this.handleCastIdChange}
                   spellCheck="false"
                 />
               )}
               {(selectedSpeaker === 'speakerId' &&
                 <Input
                   value={speakerId}
+                  onChange={this.handleSpeakerIdChange}
                   spellCheck="false"
                 />
               )}
