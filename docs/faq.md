@@ -52,4 +52,4 @@ This is an logic condition with the conversation system in Battletech itself. If
 
 ### "I've created new conversation file with 'New Convesation'. I can't figure out how to add dialog nodes."
 
-You can't yet with _v0.2.0_0. This feature will come in _v0.4.0_.
+You can't yet with _v0.2.0_. This feature will come in _v0.4.0_.
