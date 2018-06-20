@@ -12,7 +12,7 @@ Latest release: **v0.2.0** | [Download](https://github.com/CWolfs/ConverseTek/re
 
 ## Example
 
-* [Editor View](./docs/images/conversetek-example-2.png)
+* [Editor View](./docs/images/0.2.0/conversetek-example.png)
 * [In-Game Edited Conversation](./docs/images/conversetek-example.png)
 
 ## Installation Instructions
