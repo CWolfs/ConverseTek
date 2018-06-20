@@ -20,7 +20,7 @@ Yes. Conversation files created or edited with ConverseTek work with [ModTek](ht
 
 Conversations that are initiated must have specific ids per dropship crew member. These ids are found in the `SimGameConstants.json` file under `CrewConversationNames` and `CrewConversationList`. Ensure the conversation id is set to one of these ids if you wish to use your conversation for a one-on-one conversation.
 
-For group conversations, conversation files use unique ids for the conversation itself, and all dialog nodes. Your conversation may have an id clash. To resolve this, select the blue button on the top of the conversation editor (next to the save button). This will regenerate all node ids and may help.
+For group conversations or conversations not initiated from clicking the dropship crew member (or menu item), conversation files use unique ids for the conversation itself, and all dialog nodes. Your conversation may have an id clash. To resolve this, select the blue button on the top of the conversation editor (next to the save button). This will regenerate all node ids and may help.
 
 ### "What does an empty dialog node mean?"
 
