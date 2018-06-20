@@ -186,6 +186,7 @@ class ConversationGeneral extends Component {
                 <Input
                   value={castId}
                   onChange={this.handleCastIdChange}
+                  placeholder="e.g. DariusDefault (without 'castDef_')"
                   spellCheck="false"
                 />
               )}

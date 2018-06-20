@@ -169,3 +169,8 @@
 .ant-tooltip-placement-top .ant-tooltip-arrow {
   border-top-color: gold;
 }
+
+.ant-input::-webkit-input-placeholder {
+  font-style: italic;
+  color: #ffffff2e;
+}
