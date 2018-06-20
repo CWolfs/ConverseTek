@@ -50,7 +50,13 @@ class FileSystemPicker extends Component {
 
     saveWorkingDirectory(selectedItem.Path)
       .then(() => getConversations())
-      .then(modalStore.closeModal());
+      .then(() => {
+        this.setState({
+          selectedItem: null,
+          loading: false,
+        });
+        return modalStore.closeModal();
+      });
   }
 
   onDirectoryClicked(item) {

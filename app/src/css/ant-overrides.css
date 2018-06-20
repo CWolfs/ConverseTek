@@ -131,3 +131,46 @@
     background: $borderPrimary;
   }
 }
+
+.ant-select-selection {
+  background-color: $backgroundTertiary;  
+  color: $textColourPrimary;
+}
+
+.ant-select-arrow {
+  color: $textColourQuaternary;
+}
+
+.ant-select-dropdown {
+  background-color: $backgroundTertiary;
+  color: $textColourPrimary;
+
+  &-menu-item {
+    background-color: $backgroundTertiary;
+    color: $textColourPrimary;
+
+    &:hover {
+      background-color: $highlightColourPrimary;
+      color: white;
+    }
+
+    &-selected {
+      background-color: $backgroundTertiary;
+      color: $textColourTertiary;
+    }
+  }
+}
+
+.ant-tooltip-inner {
+  background-color: gold;
+  color: black;
+}
+
+.ant-tooltip-placement-top .ant-tooltip-arrow {
+  border-top-color: gold;
+}
+
+.ant-input::-webkit-input-placeholder {
+  font-style: italic;
+  color: #ffffff2e;
+}

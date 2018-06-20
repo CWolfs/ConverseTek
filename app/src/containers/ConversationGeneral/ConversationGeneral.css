@@ -1,0 +1,34 @@
+@import '../../css/constants.css';
+
+.conversation-general {
+  background-color: $backgroundPrimary;
+
+  &.ant-card-bordered {
+    border: 1px solid $borderTertiary;
+  }
+
+  &__label {
+    color: $textColourQuaternary;
+    text-align: right;
+  }
+
+  &__speaker-group {
+    display: flex;
+  }
+
+  &__speaker-group-label {
+    display: flex;
+    justify-content: flex-end;
+    align-items: baseline;
+
+    .anticon {
+      margin-right: $smallSpace;
+      color: gold;
+    }
+  }
+
+  &__speaker-select {
+    flex: 0 0 115px;
+    margin-right: $tinySpace;
+  }
+}
