@@ -17,6 +17,7 @@ Latest release: **v0.1.0** | [Download](https://github.com/CWolfs/ConverseTek/re
 
 ## Installation Instructions
 
+* Download and install [.NET 4.72 Runtime](https://www.microsoft.com/net/download/thank-you/net472)
 * Download the [latest release](https://github.com/CWolfs/ConverseTek/releases/) and unzip it
 * Copy `ShadowrunDTO.dll` and `ShadowrunSerializer.dll` from your `BATTLETECH/BattleTech_Data/Managed` directory into the `ConverseTek` application folder
 * Run `ConverseTek.exe` from the `ConverseTek` application folder
