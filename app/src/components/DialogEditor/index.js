@@ -36,13 +36,12 @@ class DialogEditor extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { nodeStore } = nextProps;
     const { conversationAsset: stateConversationAsset } = this.state;
-    const { conversationAsset: propConversationAsset } = nextProps;
+    const { conversationAsset: propConversationAsset, nodeStore, rebuild } = nextProps;
 
     const newState = { ...this.state };
 
-    if (propConversationAsset !== stateConversationAsset) {
+    if (propConversationAsset !== stateConversationAsset || rebuild) {
       nodeStore.build(propConversationAsset);
       newState.conversationAsset = propConversationAsset;
       newState.treeData = DialogEditor.buildTreeData(nodeStore, propConversationAsset);
@@ -92,13 +91,13 @@ class DialogEditor extends Component {
 }
 
 DialogEditor.defaultProps = {
-  // onSelected: () => {},
+  rebuild: false,
 };
 
 DialogEditor.propTypes = {
   nodeStore: PropTypes.object.isRequired,
   conversationAsset: PropTypes.object.isRequired,
-  // onSelected: PropTypes.func,
+  rebuild: PropTypes.bool,
 };
 
 export default inject('nodeStore')(DialogEditor);

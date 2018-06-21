@@ -67,6 +67,17 @@ h3[type="secondary"] {
   border-color: none;
 }
 
+.ant-menu-sub {
+  .ant-menu-item-active {
+    background-color: #e6f7ff !important;
+  }
+}
+
+.ant-menu:not(.ant-menu-horizontal) .ant-menu-item-selected {
+  background: none;
+  color: rgba(0, 0, 0, 0.65);
+}
+
 .text-button {
   background: none;
   color: $linkColourPrimary;

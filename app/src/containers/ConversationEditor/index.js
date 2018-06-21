@@ -1,46 +1,51 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { toJS } from 'mobx';
 import { observer, inject } from 'mobx-react';
-import { message, Button, Row, Col, Form, Input, Icon } from 'antd';
+import { message, Button, Row, Col, Form, Input, Icon, Tabs, Popconfirm } from 'antd';
 
 import DialogEditor from '../../components/DialogEditor';
 import DialogTextArea from '../../components/DialogTextArea';
+import ConversationGeneral from '../ConversationGeneral';
 
 import { updateConversation } from '../../services/api';
+import { regenerateNodeIds, regenerateConversationId } from '../../utils/conversation-utils';
 
 import './ConversationEditor.css';
 
 const FormItem = Form.Item;
+const { TabPane } = Tabs;
 
 @observer
 class ConversationEditor extends Component {
   constructor(props) {
     super(props);
 
-    const { conversationAsset } = this.props;
-    const unsavedConversationAsset = { ...conversationAsset };
-
-    this.state = {
-      conversationAsset: unsavedConversationAsset,
-    };
+    const { dataStore, conversationAsset } = this.props;
+    const unsavedConversationAsset = { ...toJS(conversationAsset) };
+    dataStore.setUnsavedActiveConversation(unsavedConversationAsset);
 
     this.handleIdChange = this.handleIdChange.bind(this);
     this.handleNameChange = this.handleNameChange.bind(this);
     this.onSaveButtonClicked = this.onSaveButtonClicked.bind(this);
+    this.onRegenerateNodeIdsButtonClicked = this.onRegenerateNodeIdsButtonClicked.bind(this);
+    this.onRegenerateConversationIdButtonClicked =
+      this.onRegenerateConversationIdButtonClicked.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
-    const { conversationAsset: stateConversationAsset } = this.state;
+    const { dataStore } = this.props;
+    const { unsavedActiveConversationAsset } = dataStore;
     const { conversationAsset: propConversationAsset } = nextProps;
 
-    if (propConversationAsset !== stateConversationAsset) {
+    if (propConversationAsset !== unsavedActiveConversationAsset) {
       this.createNewUnsavedConversation(propConversationAsset);
     }
   }
 
   onSaveButtonClicked() {
     const { dataStore } = this.props;
-    const { conversationAsset } = this.state;
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
 
     this.createNewUnsavedConversation(conversationAsset);
 
@@ -51,32 +56,44 @@ class ConversationEditor extends Component {
     dataStore.updateActiveConversation(conversationAsset); // local update for speed
   }
 
-  createNewUnsavedConversation(conversationAsset) {
-    const unsavedConversationAsset = { ...conversationAsset };
+  onRegenerateNodeIdsButtonClicked() {
+    const { dataStore, nodeStore } = this.props;
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
 
-    this.setState({
-      conversationAsset: unsavedConversationAsset,
-    });
+    regenerateNodeIds(conversationAsset);
+    nodeStore.setRebuild(true);
+  }
+
+  onRegenerateConversationIdButtonClicked() {
+    const { dataStore } = this.props;
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+    regenerateConversationId(conversationAsset);
+  }
+
+  createNewUnsavedConversation(conversationAsset) {
+    const { dataStore } = this.props;
+    const unsavedConversationAsset = { ...toJS(conversationAsset) };
+    dataStore.setUnsavedActiveConversation(unsavedConversationAsset);
   }
 
   handleIdChange(event) {
-    const { conversationAsset } = this.state;
+    const { dataStore } = this.props;
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     conversationAsset.Conversation.idRef.id = event.target.value.trim();
-    this.setState({ conversationAsset });
   }
 
   handleNameChange(event) {
-    const { conversationAsset } = this.state;
+    const { dataStore } = this.props;
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     conversationAsset.Conversation.ui_name = event.target.value.trim();
-    this.setState({ conversationAsset });
   }
 
   render() {
-    const { conversationAsset } = this.state;
-    const { nodeStore } = this.props;
+    const { dataStore, nodeStore } = this.props;
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     const { Conversation } = conversationAsset;
     const conversationId = Conversation.idRef.id;
-    const { activeNode } = nodeStore;
+    const { activeNode, rebuild } = nodeStore;
 
     const formItemLayout = {
       labelCol: {
@@ -97,14 +114,31 @@ class ConversationEditor extends Component {
       <div className="conversation-editor">
         <div>
           <h2>Editor</h2>
-          <Button
-            className="conversation-editor__save-button"
-            type="primary"
-            size="small"
-            onClick={this.onSaveButtonClicked}
-          >
-            <Icon type="save" />
-          </Button>
+          <div className="conversation-editor__buttons">
+            <Popconfirm
+              title="Are you sure you want to regenerate all dialog node ids?"
+              placement="bottomRight"
+              onConfirm={this.onRegenerateNodeIdsButtonClicked}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button
+                className="conversation-editor__regenerate-ids-button"
+                type="secondary"
+                size="small"
+              >
+                <Icon type="retweet" />
+              </Button>
+            </Popconfirm>
+            <Button
+              className="conversation-editor__save-button"
+              type="primary"
+              size="small"
+              onClick={this.onSaveButtonClicked}
+            >
+              <Icon type="save" />
+            </Button>
+          </div>
         </div>
 
         <Form>
@@ -112,9 +146,25 @@ class ConversationEditor extends Component {
             <Col span={11}>
               <FormItem {...formItemLayout} label="Id">
                 <Input
+                  className="conversation-editor__id-input"
                   value={conversationId}
                   onChange={this.handleIdChange}
                 />
+                <Popconfirm
+                  title="Are you sure you want to regenerate the conversation id?"
+                  placement="bottomRight"
+                  onConfirm={this.onRegenerateConversationIdButtonClicked}
+                  okText="Yes"
+                  cancelText="No"
+                >
+                  <Button
+                    className="conversation-editor__regenerate-ids-button"
+                    type="secondary"
+                    size="small"
+                  >
+                    <Icon type="retweet" />
+                  </Button>
+                </Popconfirm>
               </FormItem>
             </Col>
             <Col span={12}>
@@ -127,17 +177,21 @@ class ConversationEditor extends Component {
             </Col>
           </Row>
         </Form>
-        {/*
-        <div>Default Speaker Id: {Conversation.default_speaker_id}</div>
-        <div>Persistent Conversation: {Conversation.persistent_conversation}</div>
-        */}
-        <DialogEditor conversationAsset={conversationAsset} />
+
+        <DialogEditor conversationAsset={conversationAsset} rebuild={rebuild} />
 
         {activeNode && (
         <div className="conversation-editor__details">
           <Row gutter={16}>
-            <Col md={24} lg={12}>
+            <Col md={24} lg={12} className="conversation-editor__details-left">
               <DialogTextArea node={activeNode} />
+            </Col>
+            <Col md={24} lg={12} className="conversation-editor__details-right">
+              <Tabs defaultActiveKey="1">
+                <TabPane tab="General" key="1"><ConversationGeneral node={activeNode} /></TabPane>
+                <TabPane tab="Conditions" key="2">Conditions</TabPane>
+                <TabPane tab="Actions" key="3">Actions</TabPane>
+              </Tabs>
             </Col>
           </Row>
         </div>

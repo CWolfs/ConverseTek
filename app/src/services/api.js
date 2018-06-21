@@ -2,6 +2,8 @@ import { get, post } from './rest';
 
 import dataStore from '../stores/dataStore';
 
+import { consolidateSpeaker } from '../utils/conversation-utils';
+
 /*
 * CHROMELY DOESN'T SUPPORT PUTS SO PUTS AND DELETES ARE CURRENTLY POSTS WITH method DATA
 * e.g. { method: 'DELETE' }
@@ -28,6 +30,7 @@ export function getConversations() {
 }
 
 export function updateConversation(id, conversationAsset) {
+  consolidateSpeaker(conversationAsset);
   return post('/conversations/put', { id }, { method: 'PUT', conversationAsset }).then((conversations) => {
     dataStore.setConversations(conversations);
     return conversations;
@@ -48,5 +51,6 @@ export function getDirectories(path) {
 }
 
 export function saveWorkingDirectory(path) {
+  dataStore.setWorkingDirectory(path);
   return post('/working-directory', { path });
 }

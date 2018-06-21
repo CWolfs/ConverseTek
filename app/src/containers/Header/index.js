@@ -1,54 +1,93 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Menu } from 'antd';
+import { message, Menu } from 'antd';
 import { observer, inject } from 'mobx-react';
 
 import FileSystemPicker from '../../components/FileSystemPicker';
+import SaveConversationAs from '../../components/SaveConversationAs';
 import About from '../../components/About';
+
+import { updateConversation } from '../../services/api';
 
 import './Header.css';
 
 const MenuItem = Menu.Item;
 const { SubMenu } = Menu;
 
-const Header = observer(({ modalStore }) => (
-  <div className="header">
-    <Menu mode="horizontal">
-      <SubMenu title="File">
-        <MenuItem
-          onClick={() => modalStore.setModelContent(FileSystemPicker)}
-        >
-          Open Folder
-        </MenuItem>
-        {/*
-        <MenuItem>Save Conversation</MenuItem>
-        <MenuItem>Save Conversation As...</MenuItem>
-        <MenuItem>Export as JSON</MenuItem>
-        */}
-      </SubMenu>
-      <SubMenu title="Help">
-        <MenuItem
-          onClick={() => modalStore.setModelContent(About)}
-        >
-          About
-        </MenuItem>
-        {/*
-        <MenuItem>Save Conversation</MenuItem>
-        <MenuItem>Save Conversation As...</MenuItem>
-        <MenuItem>Export as JSON</MenuItem>
-        */}
-      </SubMenu>
-      {/*
-      <SubMenu title="Options">
-        <MenuItem>Option 1</MenuItem>
-      </SubMenu>
-      */}
-    </Menu>
-  </div>
-));
+/* eslint-disable no-return-assign, no-param-reassign */
+@observer
+class Header extends Component {
+  render() {
+    const { dataStore, modalStore } = this.props;
+    const { workingDirectory } = dataStore;
+    const hasActiveConversation = (dataStore.activeConversationAsset !== null);
+
+    return (
+      <div className="header">
+        <Menu mode="horizontal">
+          <SubMenu title="File">
+            <MenuItem
+              onClick={() => modalStore.setModelContent(FileSystemPicker)}
+            >
+              Open Folder
+            </MenuItem>
+
+            {workingDirectory && (
+              <MenuItem
+                onClick={() => dataStore.createNewConversation()}
+              >
+                New Conversation
+              </MenuItem>
+            )}
+
+            {hasActiveConversation && (
+            <MenuItem
+              onClick={() => {
+                const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+                updateConversation(conversationAsset.Conversation.idRef.id, conversationAsset)
+                  .then(() => {
+                    message.success('Save successful');
+                  });
+                dataStore.updateActiveConversation(conversationAsset); // local update for speed
+              }}
+            >
+              Save Conversation
+            </MenuItem>
+            )}
+
+            {hasActiveConversation && (
+              <MenuItem
+                onClick={() => modalStore.setModelContent(SaveConversationAs)}
+              >
+                Save Conversation As...
+              </MenuItem>
+            )}
+
+            {/*
+            <MenuItem>Export as JSON</MenuItem>
+            */}
+          </SubMenu>
+          {/*
+          <SubMenu title="Options">
+            <MenuItem>Option 1</MenuItem>
+          </SubMenu>
+          */}
+          <SubMenu title="Help">
+            <MenuItem
+              onClick={() => modalStore.setModelContent(About)}
+            >
+              About
+            </MenuItem>
+          </SubMenu>
+        </Menu>
+      </div>
+    );
+  }
+}
 
 Header.propTypes = {
+  dataStore: PropTypes.object.isRequired,
   modalStore: PropTypes.object.isRequired,
 };
 
-export default inject('modalStore')(Header);
+export default inject('dataStore', 'modalStore')(Header);

@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>README.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+	font-size: 14px;
+	padding: 0 12px;
+	line-height: 22px;
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	color: #4080D0;
+	text-decoration: none;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+	font-size: inherit;
+	line-height: auto;
+}
+
+a:hover {
+	color: #4080D0;
+	text-decoration: underline;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left: 5px solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 14px;
+	line-height: 19px;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+.mac code {
+	font-size: 12px;
+	line-height: 18px;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+/** Theming */
+
+.vscode-light,
+.vscode-light pre code {
+	color: rgb(30, 30, 30);
+}
+
+.vscode-dark,
+.vscode-dark pre code {
+	color: #DDD;
+}
+
+.vscode-high-contrast,
+.vscode-high-contrast pre code {
+	color: white;
+}
+
+.vscode-light code {
+	color: #A31515;
+}
+
+.vscode-dark code {
+	color: #D7BA7D;
+}
+
+.vscode-light pre:not(.hljs),
+.vscode-light code > div {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre:not(.hljs),
+.vscode-dark code > div {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre:not(.hljs),
+.vscode-high-contrast code > div {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+.vscode-light blockquote,
+.vscode-dark blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.vscode-high-contrast blockquote {
+	background: transparent;
+	border-color: #fff;
+}
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family:  "Meiryo", "Segoe WPC", "Segoe UI", "SFUIText-Light", "HelveticaNeue-Light", sans-serif, "Droid Sans Fallback";
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+</head>
+<body>
+<h1 id="conversetek">ConverseTek</h1>
+<p>Conversation editor for HBS's <a href="http://battletechgame.com/">Battletech</a>.</p>
+<p>Battletech uses a binary data format for its conversations. It isn't possible to edit those files directly so this tool is being developed to allow for editing and creating new conversations.</p>
+<p><img src="./docs/images/conversetek-example.png" alt="Example Conversation Edit">
+<img src="./docs/images/conversetek-example-speaker-override.png" alt="Example Speaker Override"></p>
+<h2 id="overview">Overview</h2>
+<p>Latest release: <strong>v0.2.0</strong> | <a href="https://github.com/CWolfs/ConverseTek/releases/tag/v0.2.0">Download</a></p>
+<h2 id="example">Example</h2>
+<ul>
+<li><a href="https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/0.2.0/conversetek-example.png">Editor View</a></li>
+<li><a href="https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/conversetek-example.png">In-Game Edited Conversation</a></li>
+</ul>
+<h2 id="installation-instructions">Installation Instructions</h2>
+<ul>
+<li>Download the <a href="https://github.com/CWolfs/ConverseTek/releases/">latest release</a> and unzip it</li>
+<li>Copy <code>ShadowrunDTO.dll</code> and <code>ShadowrunSerializer.dll</code> from your <code>BATTLETECH/BattleTech_Data/Managed</code> directory into the <code>ConverseTek</code> application folder</li>
+<li>Run <code>ConverseTek.exe</code> from the <code>ConverseTek</code> application folder</li>
+</ul>
+<h2 id="faq">FAQ</h2>
+<p>Some questions are answered in the <a href="./docs/faq.md">FAQ section</a>.</p>
+<h2 id="feedback">Feedback</h2>
+<p>All feedback is welcome in the <a href="https://github.com/CWolfs/ConverseTek/issues">issues section</a>.</p>
+<h2 id="roadmap">Roadmap</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Expected Version</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Directory selection</td>
+<td>0.1.0</td>
+<td><img class="emoji" alt="heavy_check_mark" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAADY0lEQVRo3u2YS0gUcRzH/+Jz9jWzD3f2/bDZdX3srs4iQRBEYoFkHewQeKlDJQgVRBIIlkIQJHSwoPAg6MUukZ6kNOoQSngoJSzBHtrTcjOwrAx/XQrU+f3X2XX3f9rv5zbz/873+9vdeewQklVWjBQLyW3ysPxOjsvx2KL8qLqRYXg0KPfFfsRgA5PM4uUG+bMMCi4xiq+qqf5eDQq+lXlZffzDVaAkepNRfGRn9E8UNhP5FQ4zKhDuj4CS8G1G8WWByDISvxbZzWr+q2FAGCU5bOa3V8YrQUlFA6P5K9orAGGC5DGJ9wnl8+WgpLSJ0fzlp7D48mmpkEm8qA29KAMloROM5i89FgIlpS9FLZN4qTD4pBSUBM8ymj94JAhKAvM+gU1+bmAMKyC1M5pfOhQAJdKCX2STnyeNSYBwkdH8vv0lgPBph5VRAf89rIC/k1G8p9YPSnxfHW5GBbwjPlDi7UrmGPmemLvZfc3T7+lxNxfrkpvfCwhLquf32t1t3qcbzPddXBIFRrACnstq7Sfdbz2gQPXtw1mLuMG9YFV3/juvuwHDNaP2M3CNoH61578LaDha1M2PeZ0Lotrz3wk0HHNGfmu/YwT1XlD9A7IvOICGvW0rt60edc4bTKoL2M7RCzi+mFwJzbmOccxnS+b+b+Ttc3agYetO5BUPop5XQnL3f/GMDaisWCNUY4FtAvOIST//aazPRaBhvUOzWZtQxzTRJH0lpxzqH5YDqIkTn6GFU3r+z7eMFwOVKWwmcwu21vKYFKR0NzPvtazRK5hbN68XBMscuraepCrLLQvQMC8Km16sWDrQdXdJ6tIHzctmoGEa2DC/z7SErPltriHbkamTXsAMxnV/rk29aMlesk0ZjLMmoGGc/X95Me0yriL740bPdgsQ/rAREnCDEEJIjvAA3XuepEPCYKIKfCMhwlF031QKlx/0W5CEJQFo8B+EPfwssn2NryPpkuE0D3QMP9HtPSSNyuNHE1VAeKNL778ffciwZAD16NP/9kt/XA9q0XWTTEjfp7LAOMnQyxdeO6mDrdC+LiohmZKuQre4VbyukmRS2n2aFS1QeVgokUyrsE7zXgMIH7nWFB88kq4Q4Aa41fXh3Iymo8hHWKqolrvCDXFD3CDXxTUSG8kqq7ToL8JsOYC12dzxAAAAAElFTkSuQmCC" /></td>
+</tr>
+<tr>
+<td>Conversation - Loading</td>
+<td>0.1.0</td>
+<td><img class="emoji" alt="heavy_check_mark" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAADY0lEQVRo3u2YS0gUcRzH/+Jz9jWzD3f2/bDZdX3srs4iQRBEYoFkHewQeKlDJQgVRBIIlkIQJHSwoPAg6MUukZ6kNOoQSngoJSzBHtrTcjOwrAx/XQrU+f3X2XX3f9rv5zbz/873+9vdeewQklVWjBQLyW3ysPxOjsvx2KL8qLqRYXg0KPfFfsRgA5PM4uUG+bMMCi4xiq+qqf5eDQq+lXlZffzDVaAkepNRfGRn9E8UNhP5FQ4zKhDuj4CS8G1G8WWByDISvxbZzWr+q2FAGCU5bOa3V8YrQUlFA6P5K9orAGGC5DGJ9wnl8+WgpLSJ0fzlp7D48mmpkEm8qA29KAMloROM5i89FgIlpS9FLZN4qTD4pBSUBM8ymj94JAhKAvM+gU1+bmAMKyC1M5pfOhQAJdKCX2STnyeNSYBwkdH8vv0lgPBph5VRAf89rIC/k1G8p9YPSnxfHW5GBbwjPlDi7UrmGPmemLvZfc3T7+lxNxfrkpvfCwhLquf32t1t3qcbzPddXBIFRrACnstq7Sfdbz2gQPXtw1mLuMG9YFV3/juvuwHDNaP2M3CNoH61578LaDha1M2PeZ0Lotrz3wk0HHNGfmu/YwT1XlD9A7IvOICGvW0rt60edc4bTKoL2M7RCzi+mFwJzbmOccxnS+b+b+Ttc3agYetO5BUPop5XQnL3f/GMDaisWCNUY4FtAvOIST//aazPRaBhvUOzWZtQxzTRJH0lpxzqH5YDqIkTn6GFU3r+z7eMFwOVKWwmcwu21vKYFKR0NzPvtazRK5hbN68XBMscuraepCrLLQvQMC8Km16sWDrQdXdJ6tIHzctmoGEa2DC/z7SErPltriHbkamTXsAMxnV/rk29aMlesk0ZjLMmoGGc/X95Me0yriL740bPdgsQ/rAREnCDEEJIjvAA3XuepEPCYKIKfCMhwlF031QKlx/0W5CEJQFo8B+EPfwssn2NryPpkuE0D3QMP9HtPSSNyuNHE1VAeKNL778ffciwZAD16NP/9kt/XA9q0XWTTEjfp7LAOMnQyxdeO6mDrdC+LiohmZKuQre4VbyukmRS2n2aFS1QeVgokUyrsE7zXgMIH7nWFB88kq4Q4Aa41fXh3Iymo8hHWKqolrvCDXFD3CDXxTUSG8kqq7ToL8JsOYC12dzxAAAAAElFTkSuQmCC" /></td>
+</tr>
+<tr>
+<td>Conversation - Edit id</td>
+<td>0.1.0</td>
+<td><img class="emoji" alt="heavy_check_mark" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAADY0lEQVRo3u2YS0gUcRzH/+Jz9jWzD3f2/bDZdX3srs4iQRBEYoFkHewQeKlDJQgVRBIIlkIQJHSwoPAg6MUukZ6kNOoQSngoJSzBHtrTcjOwrAx/XQrU+f3X2XX3f9rv5zbz/873+9vdeewQklVWjBQLyW3ysPxOjsvx2KL8qLqRYXg0KPfFfsRgA5PM4uUG+bMMCi4xiq+qqf5eDQq+lXlZffzDVaAkepNRfGRn9E8UNhP5FQ4zKhDuj4CS8G1G8WWByDISvxbZzWr+q2FAGCU5bOa3V8YrQUlFA6P5K9orAGGC5DGJ9wnl8+WgpLSJ0fzlp7D48mmpkEm8qA29KAMloROM5i89FgIlpS9FLZN4qTD4pBSUBM8ymj94JAhKAvM+gU1+bmAMKyC1M5pfOhQAJdKCX2STnyeNSYBwkdH8vv0lgPBph5VRAf89rIC/k1G8p9YPSnxfHW5GBbwjPlDi7UrmGPmemLvZfc3T7+lxNxfrkpvfCwhLquf32t1t3qcbzPddXBIFRrACnstq7Sfdbz2gQPXtw1mLuMG9YFV3/juvuwHDNaP2M3CNoH61578LaDha1M2PeZ0Lotrz3wk0HHNGfmu/YwT1XlD9A7IvOICGvW0rt60edc4bTKoL2M7RCzi+mFwJzbmOccxnS+b+b+Ttc3agYetO5BUPop5XQnL3f/GMDaisWCNUY4FtAvOIST//aazPRaBhvUOzWZtQxzTRJH0lpxzqH5YDqIkTn6GFU3r+z7eMFwOVKWwmcwu21vKYFKR0NzPvtazRK5hbN68XBMscuraepCrLLQvQMC8Km16sWDrQdXdJ6tIHzctmoGEa2DC/z7SErPltriHbkamTXsAMxnV/rk29aMlesk0ZjLMmoGGc/X95Me0yriL740bPdgsQ/rAREnCDEEJIjvAA3XuepEPCYKIKfCMhwlF031QKlx/0W5CEJQFo8B+EPfwssn2NryPpkuE0D3QMP9HtPSSNyuNHE1VAeKNL778ffciwZAD16NP/9kt/XA9q0XWTTEjfp7LAOMnQyxdeO6mDrdC+LiohmZKuQre4VbyukmRS2n2aFS1QeVgokUyrsE7zXgMIH7nWFB88kq4Q4Aa41fXh3Iymo8hHWKqolrvCDXFD3CDXxTUSG8kqq7ToL8JsOYC12dzxAAAAAElFTkSuQmCC" /></td>
+</tr>
+<tr>
+<td>Conversation - Edit name</td>
+<td>0.1.0</td>
+<td><img class="emoji" alt="heavy_check_mark" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAADY0lEQVRo3u2YS0gUcRzH/+Jz9jWzD3f2/bDZdX3srs4iQRBEYoFkHewQeKlDJQgVRBIIlkIQJHSwoPAg6MUukZ6kNOoQSngoJSzBHtrTcjOwrAx/XQrU+f3X2XX3f9rv5zbz/873+9vdeewQklVWjBQLyW3ysPxOjsvx2KL8qLqRYXg0KPfFfsRgA5PM4uUG+bMMCi4xiq+qqf5eDQq+lXlZffzDVaAkepNRfGRn9E8UNhP5FQ4zKhDuj4CS8G1G8WWByDISvxbZzWr+q2FAGCU5bOa3V8YrQUlFA6P5K9orAGGC5DGJ9wnl8+WgpLSJ0fzlp7D48mmpkEm8qA29KAMloROM5i89FgIlpS9FLZN4qTD4pBSUBM8ymj94JAhKAvM+gU1+bmAMKyC1M5pfOhQAJdKCX2STnyeNSYBwkdH8vv0lgPBph5VRAf89rIC/k1G8p9YPSnxfHW5GBbwjPlDi7UrmGPmemLvZfc3T7+lxNxfrkpvfCwhLquf32t1t3qcbzPddXBIFRrACnstq7Sfdbz2gQPXtw1mLuMG9YFV3/juvuwHDNaP2M3CNoH61578LaDha1M2PeZ0Lotrz3wk0HHNGfmu/YwT1XlD9A7IvOICGvW0rt60edc4bTKoL2M7RCzi+mFwJzbmOccxnS+b+b+Ttc3agYetO5BUPop5XQnL3f/GMDaisWCNUY4FtAvOIST//aazPRaBhvUOzWZtQxzTRJH0lpxzqH5YDqIkTn6GFU3r+z7eMFwOVKWwmcwu21vKYFKR0NzPvtazRK5hbN68XBMscuraepCrLLQvQMC8Km16sWDrQdXdJ6tIHzctmoGEa2DC/z7SErPltriHbkamTXsAMxnV/rk29aMlesk0ZjLMmoGGc/X95Me0yriL740bPdgsQ/rAREnCDEEJIjvAA3XuepEPCYKIKfCMhwlF031QKlx/0W5CEJQFo8B+EPfwssn2NryPpkuE0D3QMP9HtPSSNyuNHE1VAeKNL778ffciwZAD16NP/9kt/XA9q0XWTTEjfp7LAOMnQyxdeO6mDrdC+LiohmZKuQre4VbyukmRS2n2aFS1QeVgokUyrsE7zXgMIH7nWFB88kq4Q4Aa41fXh3Iymo8hHWKqolrvCDXFD3CDXxTUSG8kqq7ToL8JsOYC12dzxAAAAAElFTkSuQmCC" /></td>
+</tr>
+<tr>
+<td>Conversation - Edit dialog text</td>
+<td>0.1.0</td>
+<td><img class="emoji" alt="heavy_check_mark" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAADY0lEQVRo3u2YS0gUcRzH/+Jz9jWzD3f2/bDZdX3srs4iQRBEYoFkHewQeKlDJQgVRBIIlkIQJHSwoPAg6MUukZ6kNOoQSngoJSzBHtrTcjOwrAx/XQrU+f3X2XX3f9rv5zbz/873+9vdeewQklVWjBQLyW3ysPxOjsvx2KL8qLqRYXg0KPfFfsRgA5PM4uUG+bMMCi4xiq+qqf5eDQq+lXlZffzDVaAkepNRfGRn9E8UNhP5FQ4zKhDuj4CS8G1G8WWByDISvxbZzWr+q2FAGCU5bOa3V8YrQUlFA6P5K9orAGGC5DGJ9wnl8+WgpLSJ0fzlp7D48mmpkEm8qA29KAMloROM5i89FgIlpS9FLZN4qTD4pBSUBM8ymj94JAhKAvM+gU1+bmAMKyC1M5pfOhQAJdKCX2STnyeNSYBwkdH8vv0lgPBph5VRAf89rIC/k1G8p9YPSnxfHW5GBbwjPlDi7UrmGPmemLvZfc3T7+lxNxfrkpvfCwhLquf32t1t3qcbzPddXBIFRrACnstq7Sfdbz2gQPXtw1mLuMG9YFV3/juvuwHDNaP2M3CNoH61578LaDha1M2PeZ0Lotrz3wk0HHNGfmu/YwT1XlD9A7IvOICGvW0rt60edc4bTKoL2M7RCzi+mFwJzbmOccxnS+b+b+Ttc3agYetO5BUPop5XQnL3f/GMDaisWCNUY4FtAvOIST//aazPRaBhvUOzWZtQxzTRJH0lpxzqH5YDqIkTn6GFU3r+z7eMFwOVKWwmcwu21vKYFKR0NzPvtazRK5hbN68XBMscuraepCrLLQvQMC8Km16sWDrQdXdJ6tIHzctmoGEa2DC/z7SErPltriHbkamTXsAMxnV/rk29aMlesk0ZjLMmoGGc/X95Me0yriL740bPdgsQ/rAREnCDEEJIjvAA3XuepEPCYKIKfCMhwlF031QKlx/0W5CEJQFo8B+EPfwssn2NryPpkuE0D3QMP9HtPSSNyuNHE1VAeKNL778ffciwZAD16NP/9kt/XA9q0XWTTEjfp7LAOMnQyxdeO6mDrdC+LiohmZKuQre4VbyukmRS2n2aFS1QeVgokUyrsE7zXgMIH7nWFB88kq4Q4Aa41fXh3Iymo8hHWKqolrvCDXFD3CDXxTUSG8kqq7ToL8JsOYC12dzxAAAAAElFTkSuQmCC" /></td>
+</tr>
+<tr>
+<td>Conversation - Save</td>
+<td>0.1.0</td>
+<td><img class="emoji" alt="heavy_check_mark" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAADY0lEQVRo3u2YS0gUcRzH/+Jz9jWzD3f2/bDZdX3srs4iQRBEYoFkHewQeKlDJQgVRBIIlkIQJHSwoPAg6MUukZ6kNOoQSngoJSzBHtrTcjOwrAx/XQrU+f3X2XX3f9rv5zbz/873+9vdeewQklVWjBQLyW3ysPxOjsvx2KL8qLqRYXg0KPfFfsRgA5PM4uUG+bMMCi4xiq+qqf5eDQq+lXlZffzDVaAkepNRfGRn9E8UNhP5FQ4zKhDuj4CS8G1G8WWByDISvxbZzWr+q2FAGCU5bOa3V8YrQUlFA6P5K9orAGGC5DGJ9wnl8+WgpLSJ0fzlp7D48mmpkEm8qA29KAMloROM5i89FgIlpS9FLZN4qTD4pBSUBM8ymj94JAhKAvM+gU1+bmAMKyC1M5pfOhQAJdKCX2STnyeNSYBwkdH8vv0lgPBph5VRAf89rIC/k1G8p9YPSnxfHW5GBbwjPlDi7UrmGPmemLvZfc3T7+lxNxfrkpvfCwhLquf32t1t3qcbzPddXBIFRrACnstq7Sfdbz2gQPXtw1mLuMG9YFV3/juvuwHDNaP2M3CNoH61578LaDha1M2PeZ0Lotrz3wk0HHNGfmu/YwT1XlD9A7IvOICGvW0rt60edc4bTKoL2M7RCzi+mFwJzbmOccxnS+b+b+Ttc3agYetO5BUPop5XQnL3f/GMDaisWCNUY4FtAvOIST//aazPRaBhvUOzWZtQxzTRJH0lpxzqH5YDqIkTn6GFU3r+z7eMFwOVKWwmcwu21vKYFKR0NzPvtazRK5hbN68XBMscuraepCrLLQvQMC8Km16sWDrQdXdJ6tIHzctmoGEa2DC/z7SErPltriHbkamTXsAMxnV/rk29aMlesk0ZjLMmoGGc/X95Me0yriL740bPdgsQ/rAREnCDEEJIjvAA3XuepEPCYKIKfCMhwlF031QKlx/0W5CEJQFo8B+EPfwssn2NryPpkuE0D3QMP9HtPSSNyuNHE1VAeKNL778ffciwZAD16NP/9kt/XA9q0XWTTEjfp7LAOMnQyxdeO6mDrdC+LiohmZKuQre4VbyukmRS2n2aFS1QeVgokUyrsE7zXgMIH7nWFB88kq4Q4Aa41fXh3Iymo8hHWKqolrvCDXFD3CDXxTUSG8kqq7ToL8JsOYC12dzxAAAAAElFTkSuQmCC" /></td>
+</tr>
+<tr>
+<td>Conversation - Edit node id</td>
+<td>0.2.0</td>
+<td><img class="emoji" alt="heavy_check_mark" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAADY0lEQVRo3u2YS0gUcRzH/+Jz9jWzD3f2/bDZdX3srs4iQRBEYoFkHewQeKlDJQgVRBIIlkIQJHSwoPAg6MUukZ6kNOoQSngoJSzBHtrTcjOwrAx/XQrU+f3X2XX3f9rv5zbz/873+9vdeewQklVWjBQLyW3ysPxOjsvx2KL8qLqRYXg0KPfFfsRgA5PM4uUG+bMMCi4xiq+qqf5eDQq+lXlZffzDVaAkepNRfGRn9E8UNhP5FQ4zKhDuj4CS8G1G8WWByDISvxbZzWr+q2FAGCU5bOa3V8YrQUlFA6P5K9orAGGC5DGJ9wnl8+WgpLSJ0fzlp7D48mmpkEm8qA29KAMloROM5i89FgIlpS9FLZN4qTD4pBSUBM8ymj94JAhKAvM+gU1+bmAMKyC1M5pfOhQAJdKCX2STnyeNSYBwkdH8vv0lgPBph5VRAf89rIC/k1G8p9YPSnxfHW5GBbwjPlDi7UrmGPmemLvZfc3T7+lxNxfrkpvfCwhLquf32t1t3qcbzPddXBIFRrACnstq7Sfdbz2gQPXtw1mLuMG9YFV3/juvuwHDNaP2M3CNoH61578LaDha1M2PeZ0Lotrz3wk0HHNGfmu/YwT1XlD9A7IvOICGvW0rt60edc4bTKoL2M7RCzi+mFwJzbmOccxnS+b+b+Ttc3agYetO5BUPop5XQnL3f/GMDaisWCNUY4FtAvOIST//aazPRaBhvUOzWZtQxzTRJH0lpxzqH5YDqIkTn6GFU3r+z7eMFwOVKWwmcwu21vKYFKR0NzPvtazRK5hbN68XBMscuraepCrLLQvQMC8Km16sWDrQdXdJ6tIHzctmoGEa2DC/z7SErPltriHbkamTXsAMxnV/rk29aMlesk0ZjLMmoGGc/X95Me0yriL740bPdgsQ/rAREnCDEEJIjvAA3XuepEPCYKIKfCMhwlF031QKlx/0W5CEJQFo8B+EPfwssn2NryPpkuE0D3QMP9HtPSSNyuNHE1VAeKNL778ffciwZAD16NP/9kt/XA9q0XWTTEjfp7LAOMnQyxdeO6mDrdC+LiohmZKuQre4VbyukmRS2n2aFS1QeVgokUyrsE7zXgMIH7nWFB88kq4Q4Aa41fXh3Iymo8hHWKqolrvCDXFD3CDXxTUSG8kqq7ToL8JsOYC12dzxAAAAAElFTkSuQmCC" /></td>
+</tr>
+<tr>
+<td>Conversation - Id regeneration</td>
+<td>0.2.0</td>
+<td><img class="emoji" alt="heavy_check_mark" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAADY0lEQVRo3u2YS0gUcRzH/+Jz9jWzD3f2/bDZdX3srs4iQRBEYoFkHewQeKlDJQgVRBIIlkIQJHSwoPAg6MUukZ6kNOoQSngoJSzBHtrTcjOwrAx/XQrU+f3X2XX3f9rv5zbz/873+9vdeewQklVWjBQLyW3ysPxOjsvx2KL8qLqRYXg0KPfFfsRgA5PM4uUG+bMMCi4xiq+qqf5eDQq+lXlZffzDVaAkepNRfGRn9E8UNhP5FQ4zKhDuj4CS8G1G8WWByDISvxbZzWr+q2FAGCU5bOa3V8YrQUlFA6P5K9orAGGC5DGJ9wnl8+WgpLSJ0fzlp7D48mmpkEm8qA29KAMloROM5i89FgIlpS9FLZN4qTD4pBSUBM8ymj94JAhKAvM+gU1+bmAMKyC1M5pfOhQAJdKCX2STnyeNSYBwkdH8vv0lgPBph5VRAf89rIC/k1G8p9YPSnxfHW5GBbwjPlDi7UrmGPmemLvZfc3T7+lxNxfrkpvfCwhLquf32t1t3qcbzPddXBIFRrACnstq7Sfdbz2gQPXtw1mLuMG9YFV3/juvuwHDNaP2M3CNoH61578LaDha1M2PeZ0Lotrz3wk0HHNGfmu/YwT1XlD9A7IvOICGvW0rt60edc4bTKoL2M7RCzi+mFwJzbmOccxnS+b+b+Ttc3agYetO5BUPop5XQnL3f/GMDaisWCNUY4FtAvOIST//aazPRaBhvUOzWZtQxzTRJH0lpxzqH5YDqIkTn6GFU3r+z7eMFwOVKWwmcwu21vKYFKR0NzPvtazRK5hbN68XBMscuraepCrLLQvQMC8Km16sWDrQdXdJ6tIHzctmoGEa2DC/z7SErPltriHbkamTXsAMxnV/rk29aMlesk0ZjLMmoGGc/X95Me0yriL740bPdgsQ/rAREnCDEEJIjvAA3XuepEPCYKIKfCMhwlF031QKlx/0W5CEJQFo8B+EPfwssn2NryPpkuE0D3QMP9HtPSSNyuNHE1VAeKNL778ffciwZAD16NP/9kt/XA9q0XWTTEjfp7LAOMnQyxdeO6mDrdC+LiohmZKuQre4VbyukmRS2n2aFS1QeVgokUyrsE7zXgMIH7nWFB88kq4Q4Aa41fXh3Iymo8hHWKqolrvCDXFD3CDXxTUSG8kqq7ToL8JsOYC12dzxAAAAAElFTkSuQmCC" /></td>
+</tr>
+<tr>
+<td>Conversation - Save as...</td>
+<td>0.2.0</td>
+<td><img class="emoji" alt="heavy_check_mark" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAADY0lEQVRo3u2YS0gUcRzH/+Jz9jWzD3f2/bDZdX3srs4iQRBEYoFkHewQeKlDJQgVRBIIlkIQJHSwoPAg6MUukZ6kNOoQSngoJSzBHtrTcjOwrAx/XQrU+f3X2XX3f9rv5zbz/873+9vdeewQklVWjBQLyW3ysPxOjsvx2KL8qLqRYXg0KPfFfsRgA5PM4uUG+bMMCi4xiq+qqf5eDQq+lXlZffzDVaAkepNRfGRn9E8UNhP5FQ4zKhDuj4CS8G1G8WWByDISvxbZzWr+q2FAGCU5bOa3V8YrQUlFA6P5K9orAGGC5DGJ9wnl8+WgpLSJ0fzlp7D48mmpkEm8qA29KAMloROM5i89FgIlpS9FLZN4qTD4pBSUBM8ymj94JAhKAvM+gU1+bmAMKyC1M5pfOhQAJdKCX2STnyeNSYBwkdH8vv0lgPBph5VRAf89rIC/k1G8p9YPSnxfHW5GBbwjPlDi7UrmGPmemLvZfc3T7+lxNxfrkpvfCwhLquf32t1t3qcbzPddXBIFRrACnstq7Sfdbz2gQPXtw1mLuMG9YFV3/juvuwHDNaP2M3CNoH61578LaDha1M2PeZ0Lotrz3wk0HHNGfmu/YwT1XlD9A7IvOICGvW0rt60edc4bTKoL2M7RCzi+mFwJzbmOccxnS+b+b+Ttc3agYetO5BUPop5XQnL3f/GMDaisWCNUY4FtAvOIST//aazPRaBhvUOzWZtQxzTRJH0lpxzqH5YDqIkTn6GFU3r+z7eMFwOVKWwmcwu21vKYFKR0NzPvtazRK5hbN68XBMscuraepCrLLQvQMC8Km16sWDrQdXdJ6tIHzctmoGEa2DC/z7SErPltriHbkamTXsAMxnV/rk29aMlesk0ZjLMmoGGc/X95Me0yriL740bPdgsQ/rAREnCDEEJIjvAA3XuepEPCYKIKfCMhwlF031QKlx/0W5CEJQFo8B+EPfwssn2NryPpkuE0D3QMP9HtPSSNyuNHE1VAeKNL778ffciwZAD16NP/9kt/XA9q0XWTTEjfp7LAOMnQyxdeO6mDrdC+LiohmZKuQre4VbyukmRS2n2aFS1QeVgokUyrsE7zXgMIH7nWFB88kq4Q4Aa41fXh3Iymo8hHWKqolrvCDXFD3CDXxTUSG8kqq7ToL8JsOYC12dzxAAAAAElFTkSuQmCC" /></td>
+</tr>
+<tr>
+<td>Conversation - New</td>
+<td>0.2.0</td>
+<td><img class="emoji" alt="heavy_check_mark" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAADY0lEQVRo3u2YS0gUcRzH/+Jz9jWzD3f2/bDZdX3srs4iQRBEYoFkHewQeKlDJQgVRBIIlkIQJHSwoPAg6MUukZ6kNOoQSngoJSzBHtrTcjOwrAx/XQrU+f3X2XX3f9rv5zbz/873+9vdeewQklVWjBQLyW3ysPxOjsvx2KL8qLqRYXg0KPfFfsRgA5PM4uUG+bMMCi4xiq+qqf5eDQq+lXlZffzDVaAkepNRfGRn9E8UNhP5FQ4zKhDuj4CS8G1G8WWByDISvxbZzWr+q2FAGCU5bOa3V8YrQUlFA6P5K9orAGGC5DGJ9wnl8+WgpLSJ0fzlp7D48mmpkEm8qA29KAMloROM5i89FgIlpS9FLZN4qTD4pBSUBM8ymj94JAhKAvM+gU1+bmAMKyC1M5pfOhQAJdKCX2STnyeNSYBwkdH8vv0lgPBph5VRAf89rIC/k1G8p9YPSnxfHW5GBbwjPlDi7UrmGPmemLvZfc3T7+lxNxfrkpvfCwhLquf32t1t3qcbzPddXBIFRrACnstq7Sfdbz2gQPXtw1mLuMG9YFV3/juvuwHDNaP2M3CNoH61578LaDha1M2PeZ0Lotrz3wk0HHNGfmu/YwT1XlD9A7IvOICGvW0rt60edc4bTKoL2M7RCzi+mFwJzbmOccxnS+b+b+Ttc3agYetO5BUPop5XQnL3f/GMDaisWCNUY4FtAvOIST//aazPRaBhvUOzWZtQxzTRJH0lpxzqH5YDqIkTn6GFU3r+z7eMFwOVKWwmcwu21vKYFKR0NzPvtazRK5hbN68XBMscuraepCrLLQvQMC8Km16sWDrQdXdJ6tIHzctmoGEa2DC/z7SErPltriHbkamTXsAMxnV/rk29aMlesk0ZjLMmoGGc/X95Me0yriL740bPdgsQ/rAREnCDEEJIjvAA3XuepEPCYKIKfCMhwlF031QKlx/0W5CEJQFo8B+EPfwssn2NryPpkuE0D3QMP9HtPSSNyuNHE1VAeKNL778ffciwZAD16NP/9kt/XA9q0XWTTEjfp7LAOMnQyxdeO6mDrdC+LiohmZKuQre4VbyukmRS2n2aFS1QeVgokUyrsE7zXgMIH7nWFB88kq4Q4Aa41fXh3Iymo8hHWKqolrvCDXFD3CDXxTUSG8kqq7ToL8JsOYC12dzxAAAAAElFTkSuQmCC" /></td>
+</tr>
+<tr>
+<td>Conversation - Edit dialog node speaker by speaker id</td>
+<td>0.2.0</td>
+<td><img class="emoji" alt="heavy_check_mark" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAADY0lEQVRo3u2YS0gUcRzH/+Jz9jWzD3f2/bDZdX3srs4iQRBEYoFkHewQeKlDJQgVRBIIlkIQJHSwoPAg6MUukZ6kNOoQSngoJSzBHtrTcjOwrAx/XQrU+f3X2XX3f9rv5zbz/873+9vdeewQklVWjBQLyW3ysPxOjsvx2KL8qLqRYXg0KPfFfsRgA5PM4uUG+bMMCi4xiq+qqf5eDQq+lXlZffzDVaAkepNRfGRn9E8UNhP5FQ4zKhDuj4CS8G1G8WWByDISvxbZzWr+q2FAGCU5bOa3V8YrQUlFA6P5K9orAGGC5DGJ9wnl8+WgpLSJ0fzlp7D48mmpkEm8qA29KAMloROM5i89FgIlpS9FLZN4qTD4pBSUBM8ymj94JAhKAvM+gU1+bmAMKyC1M5pfOhQAJdKCX2STnyeNSYBwkdH8vv0lgPBph5VRAf89rIC/k1G8p9YPSnxfHW5GBbwjPlDi7UrmGPmemLvZfc3T7+lxNxfrkpvfCwhLquf32t1t3qcbzPddXBIFRrACnstq7Sfdbz2gQPXtw1mLuMG9YFV3/juvuwHDNaP2M3CNoH61578LaDha1M2PeZ0Lotrz3wk0HHNGfmu/YwT1XlD9A7IvOICGvW0rt60edc4bTKoL2M7RCzi+mFwJzbmOccxnS+b+b+Ttc3agYetO5BUPop5XQnL3f/GMDaisWCNUY4FtAvOIST//aazPRaBhvUOzWZtQxzTRJH0lpxzqH5YDqIkTn6GFU3r+z7eMFwOVKWwmcwu21vKYFKR0NzPvtazRK5hbN68XBMscuraepCrLLQvQMC8Km16sWDrQdXdJ6tIHzctmoGEa2DC/z7SErPltriHbkamTXsAMxnV/rk29aMlesk0ZjLMmoGGc/X95Me0yriL740bPdgsQ/rAREnCDEEJIjvAA3XuepEPCYKIKfCMhwlF031QKlx/0W5CEJQFo8B+EPfwssn2NryPpkuE0D3QMP9HtPSSNyuNHE1VAeKNL778ffciwZAD16NP/9kt/XA9q0XWTTEjfp7LAOMnQyxdeO6mDrdC+LiohmZKuQre4VbyukmRS2n2aFS1QeVgokUyrsE7zXgMIH7nWFB88kq4Q4Aa41fXh3Iymo8hHWKqolrvCDXFD3CDXxTUSG8kqq7ToL8JsOYC12dzxAAAAAElFTkSuQmCC" /></td>
+</tr>
+<tr>
+<td>Conversation - Edit dialog node speaker by cast id</td>
+<td>0.2.0</td>
+<td><img class="emoji" alt="heavy_check_mark" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAADY0lEQVRo3u2YS0gUcRzH/+Jz9jWzD3f2/bDZdX3srs4iQRBEYoFkHewQeKlDJQgVRBIIlkIQJHSwoPAg6MUukZ6kNOoQSngoJSzBHtrTcjOwrAx/XQrU+f3X2XX3f9rv5zbz/873+9vdeewQklVWjBQLyW3ysPxOjsvx2KL8qLqRYXg0KPfFfsRgA5PM4uUG+bMMCi4xiq+qqf5eDQq+lXlZffzDVaAkepNRfGRn9E8UNhP5FQ4zKhDuj4CS8G1G8WWByDISvxbZzWr+q2FAGCU5bOa3V8YrQUlFA6P5K9orAGGC5DGJ9wnl8+WgpLSJ0fzlp7D48mmpkEm8qA29KAMloROM5i89FgIlpS9FLZN4qTD4pBSUBM8ymj94JAhKAvM+gU1+bmAMKyC1M5pfOhQAJdKCX2STnyeNSYBwkdH8vv0lgPBph5VRAf89rIC/k1G8p9YPSnxfHW5GBbwjPlDi7UrmGPmemLvZfc3T7+lxNxfrkpvfCwhLquf32t1t3qcbzPddXBIFRrACnstq7Sfdbz2gQPXtw1mLuMG9YFV3/juvuwHDNaP2M3CNoH61578LaDha1M2PeZ0Lotrz3wk0HHNGfmu/YwT1XlD9A7IvOICGvW0rt60edc4bTKoL2M7RCzi+mFwJzbmOccxnS+b+b+Ttc3agYetO5BUPop5XQnL3f/GMDaisWCNUY4FtAvOIST//aazPRaBhvUOzWZtQxzTRJH0lpxzqH5YDqIkTn6GFU3r+z7eMFwOVKWwmcwu21vKYFKR0NzPvtazRK5hbN68XBMscuraepCrLLQvQMC8Km16sWDrQdXdJ6tIHzctmoGEa2DC/z7SErPltriHbkamTXsAMxnV/rk29aMlesk0ZjLMmoGGc/X95Me0yriL740bPdgsQ/rAREnCDEEJIjvAA3XuepEPCYKIKfCMhwlF031QKlx/0W5CEJQFo8B+EPfwssn2NryPpkuE0D3QMP9HtPSSNyuNHE1VAeKNL778ffciwZAD16NP/9kt/XA9q0XWTTEjfp7LAOMnQyxdeO6mDrdC+LiohmZKuQre4VbyukmRS2n2aFS1QeVgokUyrsE7zXgMIH7nWFB88kq4Q4Aa41fXh3Iymo8hHWKqolrvCDXFD3CDXxTUSG8kqq7ToL8JsOYC12dzxAAAAAElFTkSuQmCC" /></td>
+</tr>
+<tr>
+<td>Conversation - Add/Edit comments</td>
+<td>0.2.0</td>
+<td><img class="emoji" alt="heavy_check_mark" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAADY0lEQVRo3u2YS0gUcRzH/+Jz9jWzD3f2/bDZdX3srs4iQRBEYoFkHewQeKlDJQgVRBIIlkIQJHSwoPAg6MUukZ6kNOoQSngoJSzBHtrTcjOwrAx/XQrU+f3X2XX3f9rv5zbz/873+9vdeewQklVWjBQLyW3ysPxOjsvx2KL8qLqRYXg0KPfFfsRgA5PM4uUG+bMMCi4xiq+qqf5eDQq+lXlZffzDVaAkepNRfGRn9E8UNhP5FQ4zKhDuj4CS8G1G8WWByDISvxbZzWr+q2FAGCU5bOa3V8YrQUlFA6P5K9orAGGC5DGJ9wnl8+WgpLSJ0fzlp7D48mmpkEm8qA29KAMloROM5i89FgIlpS9FLZN4qTD4pBSUBM8ymj94JAhKAvM+gU1+bmAMKyC1M5pfOhQAJdKCX2STnyeNSYBwkdH8vv0lgPBph5VRAf89rIC/k1G8p9YPSnxfHW5GBbwjPlDi7UrmGPmemLvZfc3T7+lxNxfrkpvfCwhLquf32t1t3qcbzPddXBIFRrACnstq7Sfdbz2gQPXtw1mLuMG9YFV3/juvuwHDNaP2M3CNoH61578LaDha1M2PeZ0Lotrz3wk0HHNGfmu/YwT1XlD9A7IvOICGvW0rt60edc4bTKoL2M7RCzi+mFwJzbmOccxnS+b+b+Ttc3agYetO5BUPop5XQnL3f/GMDaisWCNUY4FtAvOIST//aazPRaBhvUOzWZtQxzTRJH0lpxzqH5YDqIkTn6GFU3r+z7eMFwOVKWwmcwu21vKYFKR0NzPvtazRK5hbN68XBMscuraepCrLLQvQMC8Km16sWDrQdXdJ6tIHzctmoGEa2DC/z7SErPltriHbkamTXsAMxnV/rk29aMlesk0ZjLMmoGGc/X95Me0yriL740bPdgsQ/rAREnCDEEJIjvAA3XuepEPCYKIKfCMhwlF031QKlx/0W5CEJQFo8B+EPfwssn2NryPpkuE0D3QMP9HtPSSNyuNHE1VAeKNL778ffciwZAD16NP/9kt/XA9q0XWTTEjfp7LAOMnQyxdeO6mDrdC+LiohmZKuQre4VbyukmRS2n2aFS1QeVgokUyrsE7zXgMIH7nWFB88kq4Q4Aa41fXh3Iymo8hHWKqolrvCDXFD3CDXxTUSG8kqq7ToL8JsOYC12dzxAAAAAElFTkSuQmCC" /></td>
+</tr>
+<tr>
+<td>Conversation - Delete node</td>
+<td>0.3.0</td>
+<td><img class="emoji" alt="soon" src="data:image/png;base64,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" /></td>
+</tr>
+<tr>
+<td>Conversation - Add node</td>
+<td>0.3.0</td>
+<td><img class="emoji" alt="soon" src="data:image/png;base64,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" /></td>
+</tr>
+<tr>
+<td>Conversation - Node toggle 'Only Available Once'</td>
+<td>0.3.0</td>
+<td><img class="emoji" alt="soon" src="data:image/png;base64,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" /></td>
+</tr>
+<tr>
+<td>Conversation - Drag node rearrange</td>
+<td>0.4.0</td>
+<td><img class="emoji" alt="heavy_minus_sign" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABABAMAAABYR2ztAAAAJ1BMVEX///81NTUKCgouLi4qKiomJiYhISEcHBwYGBgUFBQRERENDQ0yMjIy6rf9AAAAA3RSTlMAmZnTJt5tAAAANUlEQVRIx2NhIABYRhWMKhhVQCsFgjgk38MU7MahwASmIJ1cK0aaAoIBdW80TY4qGFVAkgIAMC0FJIAVTAYAAAAASUVORK5CYII=" /></td>
+</tr>
+<tr>
+<td>Conversation - Linking</td>
+<td>0.4.0</td>
+<td><img class="emoji" alt="heavy_minus_sign" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABABAMAAABYR2ztAAAAJ1BMVEX///81NTUKCgouLi4qKiomJiYhISEcHBwYGBgUFBQRERENDQ0yMjIy6rf9AAAAA3RSTlMAmZnTJt5tAAAANUlEQVRIx2NhIABYRhWMKhhVQCsFgjgk38MU7MahwASmIJ1cK0aaAoIBdW80TY4qGFVAkgIAMC0FJIAVTAYAAAAASUVORK5CYII=" /></td>
+</tr>
+<tr>
+<td>Conversation - Visual indicators - Actions</td>
+<td>0.5.0</td>
+<td><img class="emoji" alt="heavy_minus_sign" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABABAMAAABYR2ztAAAAJ1BMVEX///81NTUKCgouLi4qKiomJiYhISEcHBwYGBgUFBQRERENDQ0yMjIy6rf9AAAAA3RSTlMAmZnTJt5tAAAANUlEQVRIx2NhIABYRhWMKhhVQCsFgjgk38MU7MahwASmIJ1cK0aaAoIBdW80TY4qGFVAkgIAMC0FJIAVTAYAAAAASUVORK5CYII=" /></td>
+</tr>
+<tr>
+<td>Conversation - Visual indicators - Conditions</td>
+<td>0.5.0</td>
+<td><img class="emoji" alt="heavy_minus_sign" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABABAMAAABYR2ztAAAAJ1BMVEX///81NTUKCgouLi4qKiomJiYhISEcHBwYGBgUFBQRERENDQ0yMjIy6rf9AAAAA3RSTlMAmZnTJt5tAAAANUlEQVRIx2NhIABYRhWMKhhVQCsFgjgk38MU7MahwASmIJ1cK0aaAoIBdW80TY4qGFVAkgIAMC0FJIAVTAYAAAAASUVORK5CYII=" /></td>
+</tr>
+<tr>
+<td>Conversation - Add actions</td>
+<td>0.5.0</td>
+<td><img class="emoji" alt="heavy_minus_sign" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABABAMAAABYR2ztAAAAJ1BMVEX///81NTUKCgouLi4qKiomJiYhISEcHBwYGBgUFBQRERENDQ0yMjIy6rf9AAAAA3RSTlMAmZnTJt5tAAAANUlEQVRIx2NhIABYRhWMKhhVQCsFgjgk38MU7MahwASmIJ1cK0aaAoIBdW80TY4qGFVAkgIAMC0FJIAVTAYAAAAASUVORK5CYII=" /></td>
+</tr>
+<tr>
+<td>Conversation - Remove actions</td>
+<td>0.5.0</td>
+<td><img class="emoji" alt="heavy_minus_sign" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABABAMAAABYR2ztAAAAJ1BMVEX///81NTUKCgouLi4qKiomJiYhISEcHBwYGBgUFBQRERENDQ0yMjIy6rf9AAAAA3RSTlMAmZnTJt5tAAAANUlEQVRIx2NhIABYRhWMKhhVQCsFgjgk38MU7MahwASmIJ1cK0aaAoIBdW80TY4qGFVAkgIAMC0FJIAVTAYAAAAASUVORK5CYII=" /></td>
+</tr>
+<tr>
+<td>Conversation - Add conditions</td>
+<td>0.5.0</td>
+<td><img class="emoji" alt="heavy_minus_sign" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABABAMAAABYR2ztAAAAJ1BMVEX///81NTUKCgouLi4qKiomJiYhISEcHBwYGBgUFBQRERENDQ0yMjIy6rf9AAAAA3RSTlMAmZnTJt5tAAAANUlEQVRIx2NhIABYRhWMKhhVQCsFgjgk38MU7MahwASmIJ1cK0aaAoIBdW80TY4qGFVAkgIAMC0FJIAVTAYAAAAASUVORK5CYII=" /></td>
+</tr>
+<tr>
+<td>Conversation - Remove conditions</td>
+<td>0.5.0</td>
+<td><img class="emoji" alt="heavy_minus_sign" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABABAMAAABYR2ztAAAAJ1BMVEX///81NTUKCgouLi4qKiomJiYhISEcHBwYGBgUFBQRERENDQ0yMjIy6rf9AAAAA3RSTlMAmZnTJt5tAAAANUlEQVRIx2NhIABYRhWMKhhVQCsFgjgk38MU7MahwASmIJ1cK0aaAoIBdW80TY4qGFVAkgIAMC0FJIAVTAYAAAAASUVORK5CYII=" /></td>
+</tr>
+<tr>
+<td>Conversation - Search</td>
+<td>0.6.0</td>
+<td><img class="emoji" alt="heavy_minus_sign" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABABAMAAABYR2ztAAAAJ1BMVEX///81NTUKCgouLi4qKiomJiYhISEcHBwYGBgUFBQRERENDQ0yMjIy6rf9AAAAA3RSTlMAmZnTJt5tAAAANUlEQVRIx2NhIABYRhWMKhhVQCsFgjgk38MU7MahwASmIJ1cK0aaAoIBdW80TY4qGFVAkgIAMC0FJIAVTAYAAAAASUVORK5CYII=" /></td>
+</tr>
+</tbody>
+</table>
+<h2 id="author">Author</h2>
+<p>Richard Griffiths (CWolf)</p>
+<ul>
+<li><a href="https://twitter.com/CWolf">Twitter</a></li>
+<li><a href="https://www.linkedin.com/in/richard-griffiths-436b7a19/">LinkedIn</a></li>
+</ul>
+
+</body>
+</html>
