@@ -1,6 +1,9 @@
 import { observable, action } from 'mobx';
 import defer from 'lodash.defer';
+import remove from 'lodash.remove';
+
 import { getId } from '../../utils/conversation-utils';
+import dataStore from '../dataStore';
 
 /* eslint-disable no-return-assign, no-param-reassign */
 class NodeStore {
@@ -81,6 +84,26 @@ class NodeStore {
       return this.branches.get(nodeId);
     }
     return null;
+  }
+
+  @action deleteNodeCascade(node) {
+    const { activeConversationAsset } = dataStore;
+    const { branches } = node;
+
+    branches.forEach((branch) => {
+      const nextNode = this.nodes.get(branch.nextNodeIndex);
+      const id = getId(branch.idRef);
+      this.deleteNodeCascade(nextNode);
+      this.branches.delete(id);
+    });
+
+    remove(
+      activeConversationAsset.nodes,
+      convNode => getId(convNode.idRef) === getId(node.idRef),
+    );
+
+    this.nodes.delete(node.index);
+    this.setRebuild(true);
   }
 
   buildRoots(roots) {
