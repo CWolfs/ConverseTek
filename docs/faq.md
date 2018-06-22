@@ -1,4 +1,4 @@
-# Frequently Asked Questions - ConverseTek v0.2.0
+# Frequently Asked Questions - ConverseTek v0.2.1
 
 ## Conversation Editor
 
@@ -27,14 +27,14 @@ For group conversations or conversations not initiated from clicking the dropshi
 ![Conversation Empty Node](./images/faq/conversation-empty-node.png)
 
 An empty node is not actually empty, it just has no dialog text associated with it. Battletech uses these mainly as conditional check points, or gateways to larger
-branches of dialog. ConverseTek _v0.2.0_ does not support editing **actions** or **conditions**. In later versions you'll be able to select any node
+branches of dialog. ConverseTek _v0.2.1_ does not support editing **actions** or **conditions**. In later versions you'll be able to select any node
 and add/remove actions and conditions.
 
 Action and condition icons will be added to the dialog nodes to better indicate which nodes have actions and dialogs.
 
 ### "I can drag dialog nodes around but it doesn't seem to do anything at all. When I save and load the conversation everything is reset!"
 
-Dragging dialog nodes around isn't supported in _v0.2.0_. I left in the UI functionality as it'll be a feature **_ComingSoon(tm)_**.
+Dragging dialog nodes around isn't supported in _v0.2.1_. I left in the UI functionality as it'll be a feature **_ComingSoon(tm)_**.
 
 ### "What is an action?"
 
@@ -52,4 +52,4 @@ This is an logic condition with the conversation system in Battletech itself. If
 
 ### "I've created new conversation file with 'New Convesation'. I can't figure out how to add dialog nodes."
 
-You can't yet with _v0.2.0_. This feature will come in _v0.4.0_.
+You can't yet with _v0.2.1_. This feature will come in _v0.3.0_.
