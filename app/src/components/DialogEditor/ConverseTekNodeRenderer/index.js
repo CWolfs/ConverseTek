@@ -43,6 +43,7 @@ const ConverseTekNodeRenderer = observer(({
   const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : null;
   const isActiveNode = (activeNodeId === node.id);
   const storedNode = nodeStore.getNode(node.id, node.type);
+  const { type: nodeType } = node;
 
   const contextMenuId = node.id || Math.random().toString();
 
@@ -149,7 +150,7 @@ const ConverseTekNodeRenderer = observer(({
           >
             {handle}
 
-            <ContextMenuProvider id={contextMenuId} data={{ id: contextMenuId }}>
+            <ContextMenuProvider id={contextMenuId} data={{ id: contextMenuId, type: nodeType }}>
               <div
                 className={classnames(
                   'rst__rowContents',

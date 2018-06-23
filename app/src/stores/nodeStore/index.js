@@ -86,24 +86,41 @@ class NodeStore {
     return null;
   }
 
+  @action deleteNodeCascadeById(id, type) {
+    const node = this.getNode(id, type);
+    if (node) {
+      console.log(`[NodeStore] Deleting id '${id}' of type '${type}'`);
+      this.deleteNodeCascade(node);
+      this.setRebuild(true);
+    }
+  }
+
   @action deleteNodeCascade(node) {
-    const { activeConversationAsset } = dataStore;
+    const { unsavedActiveConversationAsset } = dataStore;
     const { branches } = node;
 
     branches.forEach((branch) => {
-      const nextNode = this.nodes.get(branch.nextNodeIndex);
+      const { auxiliaryLink } = branch;
       const id = getId(branch.idRef);
-      this.deleteNodeCascade(nextNode);
+
+      if (!auxiliaryLink) {
+        const nextNode = this.nodes.get(branch.nextNodeIndex);
+        if (nextNode) this.deleteNodeCascade(nextNode);
+      }
+
       this.branches.delete(id);
     });
 
     remove(
-      activeConversationAsset.nodes,
-      convNode => getId(convNode.idRef) === getId(node.idRef),
+      unsavedActiveConversationAsset.Conversation.nodes,
+      (convNode) => {
+        const toDelete = (getId(convNode.idRef) === getId(node.idRef));
+        return toDelete;
+      },
     );
 
     this.nodes.delete(node.index);
-    this.setRebuild(true);
+    // this.setRebuild(true);
   }
 
   buildRoots(roots) {
