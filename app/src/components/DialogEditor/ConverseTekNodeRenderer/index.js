@@ -2,6 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
+import { ContextMenuProvider } from 'react-contexify';
+
+import DialogEditorContextMenu from '../../DialogEditorContextMenu';
 
 import { isDescendant } from '../../../utils/tree-data-utils';
 
@@ -40,6 +43,8 @@ const ConverseTekNodeRenderer = observer(({
   const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : null;
   const isActiveNode = (activeNodeId === node.id);
   const storedNode = nodeStore.getNode(node.id, node.type);
+
+  const contextMenuId = node.id || Math.random().toString();
 
   let nodeTitle = '';
   if (storedNode === null || storedNode === undefined) {
@@ -87,6 +92,7 @@ const ConverseTekNodeRenderer = observer(({
 
   return (
     <div style={{ height: '100%' }} {...otherProps}>
+      {(node.id) && <DialogEditorContextMenu id={contextMenuId} />}
       {toggleChildrenVisibility &&
         node.children &&
         (node.children.length > 0 || typeof node.children === 'function') && (
@@ -143,57 +149,59 @@ const ConverseTekNodeRenderer = observer(({
           >
             {handle}
 
-            <div
-              className={classnames(
-                'rst__rowContents',
-                'node-renderer__row-contents',
-                !canDrag && 'rst__rowContentsDragDisabled',
-                rowDirectionClass,
-              )}
-              onClick={() => {
-                return nodeStore.setActiveNode(node.id, node.type);
-              }}
-            >
-              <div className={classnames('rst__rowLabel', rowDirectionClass)}>
-                <span
-                  className={classnames(
-                    'rst__rowTitle',
-                    node.subtitle && 'rst__rowTitleWithSubtitle',
-                  )}
-                >
-                  {typeof nodeTitle === 'function'
-                    ? nodeTitle({
-                        node,
-                        path,
-                        treeIndex,
-                      })
-                    : nodeTitle}
-                </span>
-
-                {nodeSubtitle && (
-                  <span className="rst__rowSubtitle">
-                    {typeof nodeSubtitle === 'function'
-                      ? nodeSubtitle({
+            <ContextMenuProvider id={contextMenuId} data={{ id: contextMenuId }}>
+              <div
+                className={classnames(
+                  'rst__rowContents',
+                  'node-renderer__row-contents',
+                  !canDrag && 'rst__rowContentsDragDisabled',
+                  rowDirectionClass,
+                )}
+                onClick={() => {
+                  return nodeStore.setActiveNode(node.id, node.type);
+                }}
+              >
+                <div className={classnames('rst__rowLabel', rowDirectionClass)}>
+                  <span
+                    className={classnames(
+                      'rst__rowTitle',
+                      node.subtitle && 'rst__rowTitleWithSubtitle',
+                    )}
+                  >
+                    {typeof nodeTitle === 'function'
+                      ? nodeTitle({
                           node,
                           path,
                           treeIndex,
                         })
-                      : nodeSubtitle}
+                      : nodeTitle}
                   </span>
-                )}
-              </div>
 
-              <div className="rst__rowToolbar">
-                {buttons.map((btn, index) => (
-                  <div
-                    key={index} // eslint-disable-line react/no-array-index-key
-                    className="rst__toolbarButton"
-                  >
-                    {btn}
-                  </div>
-                ))}
+                  {nodeSubtitle && (
+                    <span className="rst__rowSubtitle">
+                      {typeof nodeSubtitle === 'function'
+                        ? nodeSubtitle({
+                            node,
+                            path,
+                            treeIndex,
+                          })
+                        : nodeSubtitle}
+                    </span>
+                  )}
+                </div>
+
+                <div className="rst__rowToolbar">
+                  {buttons.map((btn, index) => (
+                    <div
+                      key={index} // eslint-disable-line react/no-array-index-key
+                      className="rst__toolbarButton"
+                    >
+                      {btn}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            </ContextMenuProvider>
           </div>
         ))}
       </div>

@@ -15,7 +15,7 @@ class DialogEditor extends Component {
   static buildTreeData(nodeStore, conversationAsset) {
     const data = [{
       title: 'Root',
-      id: 0,
+      id: '0',
       children: nodeStore.getChildrenFromRoots(conversationAsset.Conversation.roots),
       expanded: true,
     }];

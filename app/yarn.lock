@@ -8163,6 +8163,13 @@ rc@^1.1.2, rc@^1.1.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
+react-contexify@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/react-contexify/-/react-contexify-3.0.1.tgz#b6c6d32bb866f030d14ad11d1e697c984277060e"
+  dependencies:
+    classnames "^2.2.5"
+    prop-types "^15.6.0"
+
 react-custom-scroll@^3.2.1:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/react-custom-scroll/-/react-custom-scroll-3.2.1.tgz#e0d727621386297e50ab0fce7f0ed22f2034f3b8"
