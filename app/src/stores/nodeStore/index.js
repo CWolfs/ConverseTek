@@ -226,7 +226,7 @@ class NodeStore {
             id: branchNodeId,
             type: 'response',
             expanded: true,
-            children: (auxiliaryLink) ? [{ title: `[Link to NODE ${branch.nextNodeIndex}]` }] : this.getChildren(branch),
+            children: (auxiliaryLink) ? [{ title: `[Link to NODE ${branch.nextNodeIndex}]`, type: 'link' }] : this.getChildren(branch),
           };
         }),
       },

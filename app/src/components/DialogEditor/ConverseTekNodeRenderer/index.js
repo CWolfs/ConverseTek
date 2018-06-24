@@ -89,6 +89,68 @@ const ConverseTekNodeRenderer = observer(({
     buttonStyle = { right: -0.5 * scaffoldBlockPxWidth };
   }
 
+  const rawRowContents = (
+    <div
+      className={classnames(
+        'rst__rowContents',
+        'node-renderer__row-contents',
+        !canDrag && 'rst__rowContentsDragDisabled',
+        rowDirectionClass,
+      )}
+      onClick={() => {
+        return nodeStore.setActiveNode(node.id, node.type);
+      }}
+    >
+      <div className={classnames('rst__rowLabel', rowDirectionClass)}>
+        <span
+          className={classnames(
+            'rst__rowTitle',
+            node.subtitle && 'rst__rowTitleWithSubtitle',
+          )}
+        >
+          {typeof nodeTitle === 'function'
+            ? nodeTitle({
+                node,
+                path,
+                treeIndex,
+              })
+            : nodeTitle}
+        </span>
+
+        {nodeSubtitle && (
+          <span className="rst__rowSubtitle">
+            {typeof nodeSubtitle === 'function'
+              ? nodeSubtitle({
+                  node,
+                  path,
+                  treeIndex,
+                })
+              : nodeSubtitle}
+          </span>
+        )}
+      </div>
+
+      <div className="rst__rowToolbar">
+        {buttons.map((btn, index) => (
+          <div
+            key={index} // eslint-disable-line react/no-array-index-key
+            className="rst__toolbarButton"
+          >
+            {btn}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const menuWrappedRowContents = (
+    <ContextMenuProvider id="dialog-context-menu" data={{ id: contextMenuId, type: nodeType }}>
+      {rawRowContents}
+    </ContextMenuProvider>
+  );
+
+  const rowContents = (nodeType !== 'link' && node.id !== '0') ? menuWrappedRowContents : rawRowContents;
+
   return (
     <div style={{ height: '100%' }} {...otherProps}>
       {toggleChildrenVisibility &&
@@ -147,59 +209,7 @@ const ConverseTekNodeRenderer = observer(({
           >
             {handle}
 
-            <ContextMenuProvider id="dialog-context-menu" data={{ id: contextMenuId, type: nodeType }}>
-              <div
-                className={classnames(
-                  'rst__rowContents',
-                  'node-renderer__row-contents',
-                  !canDrag && 'rst__rowContentsDragDisabled',
-                  rowDirectionClass,
-                )}
-                onClick={() => {
-                  return nodeStore.setActiveNode(node.id, node.type);
-                }}
-              >
-                <div className={classnames('rst__rowLabel', rowDirectionClass)}>
-                  <span
-                    className={classnames(
-                      'rst__rowTitle',
-                      node.subtitle && 'rst__rowTitleWithSubtitle',
-                    )}
-                  >
-                    {typeof nodeTitle === 'function'
-                      ? nodeTitle({
-                          node,
-                          path,
-                          treeIndex,
-                        })
-                      : nodeTitle}
-                  </span>
-
-                  {nodeSubtitle && (
-                    <span className="rst__rowSubtitle">
-                      {typeof nodeSubtitle === 'function'
-                        ? nodeSubtitle({
-                            node,
-                            path,
-                            treeIndex,
-                          })
-                        : nodeSubtitle}
-                    </span>
-                  )}
-                </div>
-
-                <div className="rst__rowToolbar">
-                  {buttons.map((btn, index) => (
-                    <div
-                      key={index} // eslint-disable-line react/no-array-index-key
-                      className="rst__toolbarButton"
-                    >
-                      {btn}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </ContextMenuProvider>
+            {rowContents}
           </div>
         ))}
       </div>
