@@ -5919,6 +5919,10 @@ lodash.keys@^3.0.0, lodash.keys@^3.1.2:
     lodash.isarguments "^3.0.0"
     lodash.isarray "^3.0.0"
 
+lodash.last@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/lodash.last/-/lodash.last-3.0.0.tgz#242f663112dd4c6e63728c60a3c909d1bdadbd4c"
+
 lodash.map@^3.0.0:
   version "3.1.4"
   resolved "https://registry.yarnpkg.com/lodash.map/-/lodash.map-3.1.4.tgz#b483acd1b786c5c7b492c495f7b5266229bc00c2"

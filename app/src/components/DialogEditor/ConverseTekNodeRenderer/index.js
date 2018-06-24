@@ -44,6 +44,7 @@ const ConverseTekNodeRenderer = observer(({
   const { type: nodeType } = node;
 
   const contextMenuId = node.id || Math.random().toString();
+  const { parentId } = node;
 
   let nodeTitle = '';
   if (storedNode === null || storedNode === undefined) {
@@ -144,7 +145,7 @@ const ConverseTekNodeRenderer = observer(({
   );
 
   const menuWrappedRowContents = (
-    <ContextMenuProvider id="dialog-context-menu" data={{ id: contextMenuId, type: nodeType }}>
+    <ContextMenuProvider id="dialog-context-menu" data={{ id: contextMenuId, type: nodeType, parentId }}>
       {rawRowContents}
     </ContextMenuProvider>
   );

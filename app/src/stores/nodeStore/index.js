@@ -1,8 +1,10 @@
 import { observable, action } from 'mobx';
 import defer from 'lodash.defer';
 import remove from 'lodash.remove';
+import sortBy from 'lodash.sortby';
+import last from 'lodash.last';
 
-import { getId } from '../../utils/conversation-utils';
+import { getId, createNode, createResponse } from '../../utils/conversation-utils';
 import dataStore from '../dataStore';
 
 /* eslint-disable no-return-assign, no-param-reassign */
@@ -16,6 +18,18 @@ class NodeStore {
 
   constructor() {
     this.ownerId = null;
+    this.activeNode = null;
+    this.takenNodeIndexes = [];
+  }
+
+  generateNextNodeIndex() {
+    this.takenNodeIndexes = sortBy(this.takenNodeIndexes, index => index);
+    const nextNodeIndex = last(this.takenNodeIndexes) + 1 || 1;
+    this.takenNodeIndexes.push(nextNodeIndex);
+    return nextNodeIndex;
+  }
+
+  @action unselectActiveNode() {
     this.activeNode = null;
   }
 
@@ -75,7 +89,21 @@ class NodeStore {
     return getId(this.activeNode.idRef);
   }
 
+  /* More optimal to provide node if available */
   getNode(nodeId, nodeType) {
+    if (nodeType === undefined) {
+      let node = this.roots.get(nodeId);
+      if (node !== undefined && node !== null) return node;
+
+      node = this.nodes.values().find(n => nodeId === getId(n));
+      if (node !== undefined && node !== null) return node;
+
+      node = this.branches.get(nodeId);
+      if (node !== undefined && node !== null) return node;
+
+      return null;
+    }
+
     if (nodeType === 'root') {
       return this.roots.get(nodeId);
     } else if (nodeType === 'node') {
@@ -84,6 +112,28 @@ class NodeStore {
       return this.branches.get(nodeId);
     }
     return null;
+  }
+
+  @action addNode(parentId) {
+    const parent = this.getNode(parentId);
+    const { type } = parent;
+
+    if (type === 'root') {
+
+    } else if (type === 'node') {
+      // const nextNodeIndex = this.generateNextNodeIndex();
+      // const newNode = createNode(nextNodeIndex);
+      this.addResponse(parent);
+    } else if (type === 'response') {
+
+    }
+
+    this.setRebuild(true);
+  }
+
+  @action addResponse(parent) {
+    const response = createResponse();
+    parent.branches.push(response);
   }
 
   @action deleteNodeCascadeById(id, type) {
@@ -95,25 +145,40 @@ class NodeStore {
     }
   }
 
+  cleanUpDanglingResponseIndexes(idToClean) {
+    this.branches.forEach((branch) => {
+      const { nextNodeIndex } = branch;
+      if (nextNodeIndex === idToClean) {
+        branch.nextNodeIndex = -1;
+      }
+    });
+  }
+
   @action deleteNodeCascade(node) {
     const { unsavedActiveConversationAsset } = dataStore;
     const { branches } = node;
 
     if (node.type === 'node') {
+      const { index } = node;
       branches.forEach(branch => this.deleteBranchCascade(branch));
 
       remove(
         unsavedActiveConversationAsset.Conversation.nodes,
         (convNode) => {
-          const toDelete = (getId(convNode.idRef) === getId(node.idRef));
+          const toDelete = (getId(convNode) === getId(node));
           return toDelete;
         },
       );
 
       if (this.activeNode && (getId(this.activeNode) === getId(node))) this.unselectActiveNode();
-      this.nodes.delete(node.index);
+      this.nodes.delete(index);
+
+      // Ensure all respones that link to this now deleted node have been cleaned
+      // 'nextNodeId' of -1
+      this.cleanUpDanglingResponseIndexes(index);
     } else if (node.type === 'response') {
       this.deleteBranchCascade(node);
+
     } else if (node.type === 'root') {
       this.deleteBranchCascade(node);
 
@@ -128,10 +193,6 @@ class NodeStore {
       if (this.activeNode && (getId(this.activeNode) === getId(node))) this.unselectActiveNode();
       this.roots.delete(getId(node));
     }
-  }
-
-  @action unselectActiveNode() {
-    this.activeNode = null;
   }
 
   @action deleteBranchCascade(branch) {
@@ -169,6 +230,7 @@ class NodeStore {
   buildNodes(nodes) {
     nodes.forEach((node) => {
       const { index } = node;
+      this.takenNodeIndexes.push(index);
       this.nodes.set(index, node);
       node.type = 'node';
     });
@@ -188,6 +250,7 @@ class NodeStore {
       {
         title: root.responseText,
         id: getId(root.idRef),
+        parentId: null,
         type: 'root',
         expanded: true,
         children: this.getChildren(root),
@@ -209,24 +272,32 @@ class NodeStore {
     }
 
     const childNode = this.nodes.get(nextNodeIndex);
+    const childNodeId = getId(childNode);
     this.buildBranches(childNode, childNode.branches);
 
     return [
       {
         title: childNode.text,
-        id: getId(childNode.idRef),
+        id: childNodeId,
+        parentId: getId(node),
         type: 'node',
         expanded: true,
+
         children: childNode.branches.map((branch) => {
           const { auxiliaryLink } = branch;
-          const branchNodeId = getId(branch.idRef);
+          const branchNodeId = getId(branch);
 
           return {
             title: branch.responseText,
             id: branchNodeId,
+            parentId: childNodeId,
             type: 'response',
             expanded: true,
-            children: (auxiliaryLink) ? [{ title: `[Link to NODE ${branch.nextNodeIndex}]`, type: 'link' }] : this.getChildren(branch),
+            children: (auxiliaryLink) ? [{
+              title: `[Link to NODE ${branch.nextNodeIndex}]`,
+              type: 'link',
+              parentId: branchNodeId,
+            }] : this.getChildren(branch),
           };
         }),
       },
@@ -237,6 +308,7 @@ class NodeStore {
     this.roots.clear();
     this.nodes.clear();
     this.branches.clear();
+    this.takenNodeIndexes = [];
   }
 }
 

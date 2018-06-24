@@ -6,7 +6,8 @@ import 'react-contexify/dist/ReactContexify.min.css';
 
 import nodeStore from '../../stores/nodeStore';
 
-const onAddClicked = ({ dataFromProvider }) => console.log(`clicked add ${dataFromProvider.id}`);
+const onAddClicked = ({ dataFromProvider }) =>
+  nodeStore.addNode(dataFromProvider.id);
 
 const onDeleteClicked = ({ dataFromProvider }) =>
   nodeStore.deleteNodeCascadeById(dataFromProvider.id, dataFromProvider.type);

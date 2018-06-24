@@ -68,6 +68,63 @@ export function createConversation(filePath) {
   return conversation;
 }
 
+export function createRoot() {
+  return {
+    responseText: '',
+    conditions: null,
+    actions: null,
+    nextNodeIndex: -1,
+    hideIfUnavailable: false,
+    onlyOnce: false,
+    idRef: {
+      id: generateId(),
+    },
+    inputBypass: false,
+    auxiliaryLink: false,
+    comment: '',
+  };
+}
+
+export function createNode(index) {
+  return {
+    idRef: {
+      id: generateId(),
+    },
+    index,
+    text: '',
+    branches: [],
+    nodeType: 1,
+    truthValue: false,
+    autoFollowBranchDelay: 1,
+    inputMaxLength: 0,
+    sourceTopicRef: null,
+    subjectTopicRefs: [],
+    sourceInSceneRef: null,
+    sourceWithTagInScene: '',
+    override_speaker: null,
+    speaker_override_id: '',
+    actions: null,
+    comment: '',
+  };
+}
+
+export function createResponse() {
+  return {
+    responseText: '',
+    conditions: null,
+    actions: null,
+    nextNodeIndex: -1,
+    hideIfUnavailable: false,
+    onlyOnce: false,
+    idRef: {
+      id: generateId(),
+    },
+    inputBypass: false,
+    auxiliaryLink: false,
+    comment: '',
+  };
+}
+
 export function consolidateSpeaker(conversationAsset) {
   const { nodes } = conversationAsset.Conversation;
   nodes.forEach((node) => {
