@@ -305,7 +305,7 @@ class NodeStore {
   */
   buildRoots(roots) {
     roots.forEach((root) => {
-      const id = getId(root.idRef);
+      const id = getId(root);
       this.roots.set(id, root);
       root.type = 'root';
     });
@@ -322,7 +322,7 @@ class NodeStore {
 
   buildBranches(parent, branches) {
     branches.forEach((branch) => {
-      const id = getId(branch.idRef);
+      const id = getId(branch);
       this.branches.set(id, branch);
       branch.type = 'response';
       branch.parentId = parent.index;
