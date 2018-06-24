@@ -138,4 +138,26 @@ export function consolidateSpeaker(conversationAsset) {
   });
 }
 
+export function replaceRoot(conversationAsset, root) {
+  const { roots } = conversationAsset.Conversation;
+  const filteredRoots = roots.filter(r => getId(r) !== getId(root));
+  filteredRoots.push(root);
+  conversationAsset.Conversation.roots.replace(filteredRoots);
+}
+
+export function replaceResponse(conversationAsset, parentNode, response) {
+  const { nodes } = conversationAsset.Conversation;
+
+  // filter the node out of the conversation
+  const filteredRoots = nodes.filter(n => getId(n) !== getId(parentNode));
+  filteredRoots.push(parentNode);
+
+  // filter the response out of the parent node
+  const filteredResponses = parentNode.branches.filter(b => getId(b) !== getId(response));
+  filteredResponses.push(response);
+
+  parentNode.branches.replace(filteredResponses);
+  conversationAsset.Conversation.nodes.replace(filteredRoots);
+}
+
 export default {};

@@ -9,6 +9,8 @@ import {
   createNode,
   createResponse,
   createRoot,
+  replaceRoot,
+  replaceResponse,
 } from '../../utils/conversation-utils';
 import dataStore from '../dataStore';
 
@@ -49,7 +51,7 @@ class NodeStore {
   @action build(conversationAsset) {
     const { roots, nodes } = conversationAsset.Conversation;
 
-    const nextOwnerId = getId(conversationAsset.Conversation.idRef);
+    const nextOwnerId = getId(conversationAsset.Conversation);
 
     // save the active node if it's the same conversation
     if (this.ownerId !== nextOwnerId) {
@@ -118,11 +120,11 @@ class NodeStore {
     const { type } = node;
 
     if (type === 'root') {
-      this.activeNode = this.roots.set(getId(node), node);
+      this.roots.set(getId(node), node);
     } else if (type === 'node') {
-      this.activeNode = this.nodes.set(getId(node), node);
+      this.nodes.set(getId(node), node);
     } else if (type === 'response') {
-      this.activeNode = this.branches.set(getId(node), node);
+      this.branches.set(getId(node), node);
     }
   }
 
@@ -173,6 +175,7 @@ class NodeStore {
     const { unsavedActiveConversationAsset } = dataStore;
 
     const root = createRoot();
+    root.parentId = 0;
     unsavedActiveConversationAsset.Conversation.roots.push(root);
 
     this.roots.set(getId(root), root);
@@ -186,7 +189,16 @@ class NodeStore {
 
     const nextNodeIndex = this.generateNextNodeIndex();
     const node = createNode(nextNodeIndex);
+    node.parentId = getId(parent);
     parent.nextNodeIndex = node.index;
+
+    if (parent.type === 'root') {
+      replaceRoot(unsavedActiveConversationAsset, parent);
+    } else if (parent.type === 'response') {
+      const grandParentNode = this.getNode(parent.parentId);
+      replaceResponse(unsavedActiveConversationAsset, grandParentNode, parent);
+    }
+
     unsavedActiveConversationAsset.Conversation.nodes.push(node);
 
     this.nodes.set(node.index, node);
@@ -197,6 +209,7 @@ class NodeStore {
 
   @action addResponse(parent) {
     const response = createResponse();
+    response.parentId = getId(parent);
     parent.branches.push(response);
 
     this.branches.set(getId(response), response);
@@ -276,7 +289,7 @@ class NodeStore {
 
   @action deleteBranchCascade(branch) {
     // const { unsavedActiveConversationAsset } = dataStore;
-    const { auxiliaryLink, parentId } = branch;
+    const { auxiliaryLink, parentIndex } = branch;
     const id = getId(branch.idRef);
 
     if (!auxiliaryLink) {
@@ -286,7 +299,7 @@ class NodeStore {
 
     if (this.activeNode && (getId(this.activeNode) === getId(branch))) this.unselectActiveNode();
     this.branches.delete(id);
-    const parentNode = this.nodes.get(parentId);
+    const parentNode = this.nodes.get(parentIndex);
     if (parentNode) {
       remove(
         parentNode.branches,
@@ -325,7 +338,8 @@ class NodeStore {
       const id = getId(branch);
       this.branches.set(id, branch);
       branch.type = 'response';
-      branch.parentId = parent.index;
+      branch.parentId = getId(parent);
+      branch.parentIndex = parent.index;
     });
   }
 
