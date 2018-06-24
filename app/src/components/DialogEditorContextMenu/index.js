@@ -20,6 +20,7 @@ class DialogEditorContextMenu extends Component {
         addItemLabel = 'Add Node';
         break;
       default:
+        addItemLabel = 'Add Node';
         break;
     }
     return addItemLabel;
