@@ -8,6 +8,7 @@ libs/ShadowrunDTO.dll
 
 # frontend
 dist/
+node_modules/
 app/node_modules
 
 # logs

@@ -1,6 +1,6 @@
 {
   "name": "conversetek",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Conversation editor for Battletech",
   "main": "index.js",
   "scripts": {
@@ -67,6 +67,7 @@
     "mobx-react-intl": "^1.4.0",
     "prop-types": "^15.6.1",
     "react": "^16.2.0",
+    "react-contexify": "^3.0.1",
     "react-custom-scroll": "^3.2.1",
     "react-dom": "^16.2.0",
     "react-hot-loader": "^4.2.0",

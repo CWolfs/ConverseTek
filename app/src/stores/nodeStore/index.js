@@ -1,6 +1,9 @@
 import { observable, action } from 'mobx';
 import defer from 'lodash.defer';
+import remove from 'lodash.remove';
+
 import { getId } from '../../utils/conversation-utils';
+import dataStore from '../dataStore';
 
 /* eslint-disable no-return-assign, no-param-reassign */
 class NodeStore {
@@ -83,6 +86,78 @@ class NodeStore {
     return null;
   }
 
+  @action deleteNodeCascadeById(id, type) {
+    const node = this.getNode(id, type);
+    if (node) {
+      console.log(`[NodeStore] Deleting id '${id}' of type '${type}'`);
+      this.deleteNodeCascade(node);
+      this.setRebuild(true);
+    }
+  }
+
+  @action deleteNodeCascade(node) {
+    const { unsavedActiveConversationAsset } = dataStore;
+    const { branches } = node;
+
+    if (node.type === 'node') {
+      branches.forEach(branch => this.deleteBranchCascade(branch));
+
+      remove(
+        unsavedActiveConversationAsset.Conversation.nodes,
+        (convNode) => {
+          const toDelete = (getId(convNode.idRef) === getId(node.idRef));
+          return toDelete;
+        },
+      );
+
+      if (this.activeNode && (getId(this.activeNode) === getId(node))) this.unselectActiveNode();
+      this.nodes.delete(node.index);
+    } else if (node.type === 'response') {
+      this.deleteBranchCascade(node);
+    } else if (node.type === 'root') {
+      this.deleteBranchCascade(node);
+
+      remove(
+        unsavedActiveConversationAsset.Conversation.roots,
+        (convRoot) => {
+          const toDelete = (getId(convRoot.idRef) === getId(node.idRef));
+          return toDelete;
+        },
+      );
+
+      if (this.activeNode && (getId(this.activeNode) === getId(node))) this.unselectActiveNode();
+      this.roots.delete(getId(node));
+    }
+  }
+
+  @action unselectActiveNode() {
+    this.activeNode = null;
+  }
+
+  @action deleteBranchCascade(branch) {
+    // const { unsavedActiveConversationAsset } = dataStore;
+    const { auxiliaryLink, parentId } = branch;
+    const id = getId(branch.idRef);
+
+    if (!auxiliaryLink) {
+      const nextNode = this.nodes.get(branch.nextNodeIndex);
+      if (nextNode) this.deleteNodeCascade(nextNode);
+    }
+
+    if (this.activeNode && (getId(this.activeNode) === getId(branch))) this.unselectActiveNode();
+    this.branches.delete(id);
+    const parentNode = this.nodes.get(parentId);
+    if (parentNode) {
+      remove(
+        parentNode.branches,
+        (nodeBranch) => {
+          const toDelete = (getId(nodeBranch.idRef) === getId(branch.idRef));
+          return toDelete;
+        },
+      );
+    }
+  }
+
   buildRoots(roots) {
     roots.forEach((root) => {
       const id = getId(root.idRef);
@@ -99,11 +174,12 @@ class NodeStore {
     });
   }
 
-  buildBranches(branches) {
+  buildBranches(parent, branches) {
     branches.forEach((branch) => {
       const id = getId(branch.idRef);
       this.branches.set(id, branch);
       branch.type = 'response';
+      branch.parentId = parent.index;
     });
   }
 
@@ -133,7 +209,7 @@ class NodeStore {
     }
 
     const childNode = this.nodes.get(nextNodeIndex);
-    this.buildBranches(childNode.branches);
+    this.buildBranches(childNode, childNode.branches);
 
     return [
       {

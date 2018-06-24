@@ -6,6 +6,7 @@ import SortableTree from 'react-sortable-tree';
 import 'react-sortable-tree/style.css';
 
 import ConverseTekNodeRenderer from './ConverseTekNodeRenderer';
+import DialogEditorContextMenu from '../DialogEditorContextMenu';
 
 import './DialogEditor.css';
 
@@ -15,7 +16,7 @@ class DialogEditor extends Component {
   static buildTreeData(nodeStore, conversationAsset) {
     const data = [{
       title: 'Root',
-      id: 0,
+      id: '0',
       children: nodeStore.getChildrenFromRoots(conversationAsset.Conversation.roots),
       expanded: true,
     }];
@@ -57,6 +58,7 @@ class DialogEditor extends Component {
     return (
       <div className="dialog-editor">
         <div className="dialog-editor__tree">
+          <DialogEditorContextMenu id="dialog-context-menu" />
           <SortableTree
             treeData={data}
             onChange={treeData => this.setState({ treeData })}
