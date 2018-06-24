@@ -217,6 +217,13 @@ class NodeStore {
   * Ensures that any node that refers to an id specified now points to 'END OF DIALOG' (-1)
   */
   cleanUpDanglingResponseIndexes(idToClean) {
+    this.roots.forEach((root) => {
+      const { nextNodeIndex } = root;
+      if (nextNodeIndex === idToClean) {
+        root.nextNodeIndex = -1;
+      }
+    });
+
     this.branches.forEach((branch) => {
       const { nextNodeIndex } = branch;
       if (nextNodeIndex === idToClean) {
