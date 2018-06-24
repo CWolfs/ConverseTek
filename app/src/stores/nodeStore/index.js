@@ -109,9 +109,9 @@ class NodeStore {
   }
 
   /*
-  * ==========================
-  * || NODE METHODS METHODS ||
-  * ==========================
+  * ==================
+  * || NODE METHODS ||
+  * ==================
   */
 
   @action setNode(node) {
@@ -326,7 +326,7 @@ class NodeStore {
     return roots.map(root => (
       {
         title: root.responseText,
-        id: getId(root.idRef),
+        id: getId(root),
         parentId: null,
         type: 'root',
         expanded: true,
@@ -341,7 +341,7 @@ class NodeStore {
   * =======================================
   */
   getChildren(node) {
-    const { nextNodeIndex } = node;
+    const { nextNodeIndex } = node; // root or response/branch
 
     // GUARD - End of branch so this would be tagged as a DIALOG END node
     if (nextNodeIndex === -1) return null;

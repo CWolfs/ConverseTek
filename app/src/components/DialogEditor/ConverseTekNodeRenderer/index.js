@@ -100,7 +100,6 @@ const ConverseTekNodeRenderer = observer(({
       )}
       onClick={() => nodeStore.setActiveNode(node.id, node.type)}
       onMouseEnter={() => nodeStore.setFocusedNode(node)}
-      // onMouseLeave={() => nodeStore.removeFocusedNode()}
     >
       <div className={classnames('rst__rowLabel', rowDirectionClass)}>
         <span
