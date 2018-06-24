@@ -150,7 +150,7 @@ const ConverseTekNodeRenderer = observer(({
     </ContextMenuProvider>
   );
 
-  const rowContents = (nodeType !== 'link' && node.id !== '0') ? menuWrappedRowContents : rawRowContents;
+  const rowContents = (nodeType !== 'link') ? menuWrappedRowContents : rawRowContents;
 
   return (
     <div style={{ height: '100%' }} {...otherProps}>

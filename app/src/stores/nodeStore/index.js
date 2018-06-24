@@ -4,7 +4,12 @@ import remove from 'lodash.remove';
 import sortBy from 'lodash.sortby';
 import last from 'lodash.last';
 
-import { getId, createNode, createResponse } from '../../utils/conversation-utils';
+import {
+  getId,
+  createNode,
+  createResponse,
+  createRoot,
+} from '../../utils/conversation-utils';
 import dataStore from '../dataStore';
 
 /* eslint-disable no-return-assign, no-param-reassign */
@@ -27,10 +32,6 @@ class NodeStore {
     const nextNodeIndex = last(this.takenNodeIndexes) + 1 || 1;
     this.takenNodeIndexes.push(nextNodeIndex);
     return nextNodeIndex;
-  }
-
-  @action unselectActiveNode() {
-    this.activeNode = null;
   }
 
   @action setRebuild(flag) {
@@ -61,24 +62,24 @@ class NodeStore {
     const { type } = node;
 
     if (type === 'root') {
-      this.activeNode = this.roots.set(getId(node.idRef), node);
+      this.activeNode = this.roots.set(getId(node), node);
     } else if (type === 'node') {
-      this.activeNode = this.nodes.set(getId(node.idRef), node);
+      this.activeNode = this.nodes.set(getId(node), node);
     } else if (type === 'response') {
-      this.activeNode = this.branches.set(getId(node.idRef), node);
+      this.activeNode = this.branches.set(getId(node), node);
     }
   }
 
   @action updateActiveNode(node) {
     this.setNode(node);
-    this.setActiveNode(getId(node.idRef), node.type);
+    this.setActiveNode(getId(node), node.type);
   }
 
   @action setActiveNode(nodeId, nodeType) {
     if (nodeType === 'root') {
       this.activeNode = this.roots.get(nodeId);
     } else if (nodeType === 'node') {
-      this.activeNode = this.nodes.values().find(node => nodeId === getId(node.idRef));
+      this.activeNode = this.nodes.values().find(node => nodeId === getId(node));
     } else if (nodeType === 'response') {
       this.activeNode = this.branches.get(nodeId);
     }
@@ -86,7 +87,11 @@ class NodeStore {
 
   getActiveNodeId() {
     if (!this.activeNode) return null;
-    return getId(this.activeNode.idRef);
+    return getId(this.activeNode);
+  }
+
+  @action unselectActiveNode() {
+    this.activeNode = null;
   }
 
   /* More optimal to provide node if available */
@@ -114,32 +119,63 @@ class NodeStore {
     return null;
   }
 
-  @action addNode(parentId) {
+  @action addNodeByParentId(parentId) {
     const parent = this.getNode(parentId);
-    const { type } = parent;
 
-    if (type === 'root') {
+    if (parent === undefined || parent === null) {
+      if (parentId === '0') {
+        this.addRoot();
+      }
+    } else {
+      const { type } = parent;
 
-    } else if (type === 'node') {
-      // const nextNodeIndex = this.generateNextNodeIndex();
-      // const newNode = createNode(nextNodeIndex);
-      this.addResponse(parent);
-    } else if (type === 'response') {
-
+      if (type === 'node') {
+        this.addResponse(parent);
+      } else if (type === 'root' || type === 'response') {
+        this.addNode(parent);
+      }
     }
+  }
 
+  @action addRoot() {
+    const { unsavedActiveConversationAsset } = dataStore;
+
+    const root = createRoot();
+    unsavedActiveConversationAsset.Conversation.roots.push(root);
+
+    this.roots.set(getId(root), root);
+
+    this.updateActiveNode(root);
+    this.setRebuild(true);
+  }
+
+  @action addNode(parent) {
+    const { unsavedActiveConversationAsset } = dataStore;
+
+    const nextNodeIndex = this.generateNextNodeIndex();
+    const node = createNode(nextNodeIndex);
+    parent.nextNodeIndex = node.index;
+    unsavedActiveConversationAsset.Conversation.nodes.push(node);
+
+    this.nodes.set(node.index, node);
+
+    this.updateActiveNode(node);
     this.setRebuild(true);
   }
 
   @action addResponse(parent) {
     const response = createResponse();
     parent.branches.push(response);
+
+    this.branches.set(getId(response), response);
+
+    this.updateActiveNode(response);
+    this.setRebuild(true);
   }
 
   @action deleteNodeCascadeById(id, type) {
     const node = this.getNode(id, type);
     if (node) {
-      console.log(`[NodeStore] Deleting id '${id}' of type '${type}'`);
       this.deleteNodeCascade(node);
       this.setRebuild(true);
     }
@@ -161,6 +197,8 @@ class NodeStore {
     if (node.type === 'node') {
       const { index } = node;
       branches.forEach(branch => this.deleteBranchCascade(branch));
+
+      remove(this.takenNodeIndexes, i => i === index);
 
       remove(
         unsavedActiveConversationAsset.Conversation.nodes,

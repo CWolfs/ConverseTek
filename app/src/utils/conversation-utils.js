@@ -70,6 +70,7 @@ export function createConversation(filePath) {
 
 export function createRoot() {
   return {
+    type: 'root',
     responseText: '',
     conditions: null,
     actions: null,
@@ -87,6 +88,7 @@ export function createRoot() {
 
 export function createNode(index) {
   return {
+    type: 'node',
     idRef: {
       id: generateId(),
     },
@@ -110,6 +112,7 @@ export function createNode(index) {
 
 export function createResponse() {
   return {
+    type: 'response',
     responseText: '',
     conditions: null,
     actions: null,
