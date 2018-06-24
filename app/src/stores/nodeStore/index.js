@@ -38,7 +38,12 @@ class NodeStore {
 
   @action setRebuild(flag) {
     this.rebuild = flag;
-    if (this.rebuild) defer(() => this.rebuild = false);
+    if (this.rebuild) {
+      defer(() => {
+        this.rebuild = false;
+        if (this.activeNode) this.updateActiveNode(this.activeNode);
+      });
+    }
   }
 
   @action build(conversationAsset) {
@@ -208,6 +213,9 @@ class NodeStore {
     }
   }
 
+  /*
+  * Ensures that any node that refers to an id specified now points to 'END OF DIALOG' (-1)
+  */
   cleanUpDanglingResponseIndexes(idToClean) {
     this.branches.forEach((branch) => {
       const { nextNodeIndex } = branch;
@@ -283,6 +291,11 @@ class NodeStore {
     }
   }
 
+  /*
+  * ===========================
+  * || DATA BUILDING METHODS ||
+  * ===========================
+  */
   buildRoots(roots) {
     roots.forEach((root) => {
       const id = getId(root.idRef);
@@ -322,6 +335,11 @@ class NodeStore {
     ));
   }
 
+  /*
+  * =======================================
+  * || DIALOG TREE DATA BUILDING METHODS ||
+  * =======================================
+  */
   getChildren(node) {
     const { nextNodeIndex } = node;
 
