@@ -24,8 +24,10 @@ export function regenerateConversationId(conversationAsset) {
   These methods display only the latter `id` but maintain the full ids on
   those that use them
 */
-export function getId(idRef) {
-  const { id } = idRef;
+export function getId(idContainer) {
+  let id = null;
+  ({ id } = idContainer);
+  if (id === undefined) ({ id } = idContainer.idRef);
   return id.split(':')[1] || id;
 }
 
