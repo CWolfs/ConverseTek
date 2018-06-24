@@ -119,7 +119,7 @@ class ConversationGeneral extends Component {
 
   handleCommentChange(event) {
     const { node } = this.props;
-    const comment = event.target.value.trim();
+    const comment = event.target.value;
     node.comment = comment;
   }
 
