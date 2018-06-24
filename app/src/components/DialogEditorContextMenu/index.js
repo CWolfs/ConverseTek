@@ -8,7 +8,8 @@ import nodeStore from '../../stores/nodeStore';
 
 const onAddClicked = ({ dataFromProvider }) => console.log(`clicked add ${dataFromProvider.id}`);
 
-const onDeleteClicked = ({ dataFromProvider }) => nodeStore.deleteNodeCascadeById(dataFromProvider.id, dataFromProvider.type);
+const onDeleteClicked = ({ dataFromProvider }) =>
+  nodeStore.deleteNodeCascadeById(dataFromProvider.id, dataFromProvider.type);
 
 const DialogEditorContextMenu = ({ id }) => (
   <ContextMenu id={id} >
