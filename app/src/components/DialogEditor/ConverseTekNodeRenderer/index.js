@@ -4,8 +4,6 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { ContextMenuProvider } from 'react-contexify';
 
-import DialogEditorContextMenu from '../../DialogEditorContextMenu';
-
 import { isDescendant } from '../../../utils/tree-data-utils';
 
 import './ConverseTekNodeRenderer.css';
@@ -93,7 +91,6 @@ const ConverseTekNodeRenderer = observer(({
 
   return (
     <div style={{ height: '100%' }} {...otherProps}>
-      {(node.id) && <DialogEditorContextMenu id={contextMenuId} />}
       {toggleChildrenVisibility &&
         node.children &&
         (node.children.length > 0 || typeof node.children === 'function') && (
@@ -150,7 +147,7 @@ const ConverseTekNodeRenderer = observer(({
           >
             {handle}
 
-            <ContextMenuProvider id={contextMenuId} data={{ id: contextMenuId, type: nodeType }}>
+            <ContextMenuProvider id="dialog-context-menu" data={{ id: contextMenuId, type: nodeType }}>
               <div
                 className={classnames(
                   'rst__rowContents',
