@@ -48,7 +48,7 @@ All feedback is welcome in the [issues section](https://github.com/CWolfs/Conver
 | Conversation - Edit dialog node speaker by speaker id | 0.2.0 | :heavy_check_mark: |
 | Conversation - Edit dialog node speaker by cast id | 0.2.0 | :heavy_check_mark: |
 | Conversation - Add/Edit comments | 0.2.0 | :heavy_check_mark: |
-| Conversation - Delete node | 0.3.0 | :soon: |
+| Conversation - Delete node | 0.3.0 | :heavy_check_mark: |
 | Conversation - Add node | 0.3.0 | :soon: |
 | Conversation - Node toggle 'Only Available Once' | 0.3.0 | :soon: |
 | Conversation - Drag node rearrange | 0.4.0 | :heavy_minus_sign: |
