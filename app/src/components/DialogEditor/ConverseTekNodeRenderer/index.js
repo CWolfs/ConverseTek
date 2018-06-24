@@ -98,9 +98,9 @@ const ConverseTekNodeRenderer = observer(({
         !canDrag && 'rst__rowContentsDragDisabled',
         rowDirectionClass,
       )}
-      onClick={() => {
-        return nodeStore.setActiveNode(node.id, node.type);
-      }}
+      onClick={() => nodeStore.setActiveNode(node.id, node.type)}
+      onMouseEnter={() => nodeStore.setFocusedNode(node)}
+      // onMouseLeave={() => nodeStore.removeFocusedNode()}
     >
       <div className={classnames('rst__rowLabel', rowDirectionClass)}>
         <span

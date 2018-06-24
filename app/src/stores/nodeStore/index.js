@@ -18,12 +18,14 @@ class NodeStore {
   @observable nodes = observable.shallowMap();
   @observable branches = observable.shallowMap();
   @observable activeNode;
+  @observable focusedNode;
   @observable dirtyActiveNode = false;
   @observable rebuild = false;
 
   constructor() {
     this.ownerId = null;
     this.activeNode = null;
+    this.focusedNode = null;
     this.takenNodeIndexes = [];
   }
 
@@ -58,17 +60,11 @@ class NodeStore {
     this.buildNodes(nodes);
   }
 
-  @action setNode(node) {
-    const { type } = node;
-
-    if (type === 'root') {
-      this.activeNode = this.roots.set(getId(node), node);
-    } else if (type === 'node') {
-      this.activeNode = this.nodes.set(getId(node), node);
-    } else if (type === 'response') {
-      this.activeNode = this.branches.set(getId(node), node);
-    }
-  }
+  /*
+  * =========================
+  * || ACTIVE NODE METHODS ||
+  * =========================
+  */
 
   @action updateActiveNode(node) {
     this.setNode(node);
@@ -92,6 +88,37 @@ class NodeStore {
 
   @action unselectActiveNode() {
     this.activeNode = null;
+  }
+
+  /*
+  * ========================
+  * || FOCUS NODE METHODS ||
+  * ========================
+  */
+  @action setFocusedNode(node) {
+    this.focusedNode = node;
+  }
+
+  @action removeFocusedNode() {
+    this.focusedNode = null;
+  }
+
+  /*
+  * ==========================
+  * || NODE METHODS METHODS ||
+  * ==========================
+  */
+
+  @action setNode(node) {
+    const { type } = node;
+
+    if (type === 'root') {
+      this.activeNode = this.roots.set(getId(node), node);
+    } else if (type === 'node') {
+      this.activeNode = this.nodes.set(getId(node), node);
+    } else if (type === 'response') {
+      this.activeNode = this.branches.set(getId(node), node);
+    }
   }
 
   /* More optimal to provide node if available */
@@ -216,14 +243,13 @@ class NodeStore {
       this.cleanUpDanglingResponseIndexes(index);
     } else if (node.type === 'response') {
       this.deleteBranchCascade(node);
-
     } else if (node.type === 'root') {
       this.deleteBranchCascade(node);
 
       remove(
         unsavedActiveConversationAsset.Conversation.roots,
         (convRoot) => {
-          const toDelete = (getId(convRoot.idRef) === getId(node.idRef));
+          const toDelete = (getId(convRoot) === getId(node));
           return toDelete;
         },
       );
@@ -346,6 +372,7 @@ class NodeStore {
     this.roots.clear();
     this.nodes.clear();
     this.branches.clear();
+    this.focusedNode = null;
     this.takenNodeIndexes = [];
   }
 }

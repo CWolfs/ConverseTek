@@ -1,26 +1,68 @@
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { observer, inject } from 'mobx-react';
 import { ContextMenu, Item } from 'react-contexify';
 
 import 'react-contexify/dist/ReactContexify.min.css';
 
-import nodeStore from '../../stores/nodeStore';
+@observer
+class DialogEditorContextMenu extends Component {
+  static getAddLabel(type) {
+    let addItemLabel = 'Add';
+    switch (type) {
+      case 'root':
+        addItemLabel = 'Add Node';
+        break;
+      case 'node':
+        addItemLabel = 'Add Response';
+        break;
+      case 'response':
+        addItemLabel = 'Add Node';
+        break;
+      default:
+        break;
+    }
+    return addItemLabel;
+  }
 
-const onAddClicked = ({ dataFromProvider }) =>
-  nodeStore.addNodeByParentId(dataFromProvider.id);
+  constructor(props) {
+    super(props);
 
-const onDeleteClicked = ({ dataFromProvider }) =>
-  nodeStore.deleteNodeCascadeById(dataFromProvider.id, dataFromProvider.type);
+    this.onAddClicked = this.onAddClicked.bind(this);
+    this.onDeleteClicked = this.onDeleteClicked.bind(this);
+  }
 
-const DialogEditorContextMenu = ({ id }) => (
-  <ContextMenu id={id} >
-    <Item onClick={onAddClicked}>Add</Item>
-    <Item onClick={onDeleteClicked}>Delete</Item>
-  </ContextMenu>
-);
+  onAddClicked({ dataFromProvider }) {
+    const { nodeStore } = this.props;
+    nodeStore.addNodeByParentId(dataFromProvider.id);
+  }
+
+  onDeleteClicked({ dataFromProvider }) {
+    const { nodeStore } = this.props;
+    nodeStore.deleteNodeCascadeById(dataFromProvider.id, dataFromProvider.type);
+  }
+
+  render() {
+    const { nodeStore, id } = this.props;
+    const { focusedNode } = nodeStore;
+
+    // GUARD - no need to render the menu if there's no focused node
+    if (!focusedNode) return null;
+
+    const { type } = focusedNode;
+
+    return (
+      <ContextMenu id={id} >
+        <Item onClick={this.onAddClicked}>{DialogEditorContextMenu.getAddLabel(type)}</Item>
+        {(type === 'root') && <Item onClick={this.onDeleteClicked}>Delete</Item>}
+      </ContextMenu>
+    );
+  }
+}
 
 DialogEditorContextMenu.propTypes = {
+  nodeStore: PropTypes.object.isRequired,
   id: PropTypes.string.isRequired,
 };
 
-export default DialogEditorContextMenu;
+export default inject('nodeStore')(DialogEditorContextMenu);
