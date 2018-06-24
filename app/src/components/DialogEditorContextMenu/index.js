@@ -55,7 +55,7 @@ class DialogEditorContextMenu extends Component {
     return (
       <ContextMenu id={id} >
         <Item onClick={this.onAddClicked}>{DialogEditorContextMenu.getAddLabel(type)}</Item>
-        {(type === 'root') && <Item onClick={this.onDeleteClicked}>Delete</Item>}
+        {(type !== 'root') && <Item onClick={this.onDeleteClicked}>Delete</Item>}
       </ContextMenu>
     );
   }
