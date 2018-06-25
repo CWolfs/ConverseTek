@@ -148,13 +148,27 @@ class NodeStore {
   removeNode(node) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     const { roots, nodes } = conversationAsset.Conversation;
+    const { type } = node;
+    const nodeId = getId(node);
 
-    if (node.type === 'root') {
-      roots.remove(node);
-    } else if (node.type === 'node') {
-      nodes.remove(node);
-    } else if (node.type === 'response') {
-      nodes.forEach(n => n.remove(node));
+    if (type === 'root') {
+      remove(roots, (r) => {
+        return getId(r) === nodeId;
+      });
+    } else if (type === 'node') {
+      remove(nodes, (n) => {
+        const nId = getId(n);
+        const toDelete = getId(n) === nodeId;
+        return toDelete;
+      });
+    } else if (type === 'response') {
+      nodes.forEach((n) => {
+        remove((n.branches), (b) => {
+          const bId = getId(b);
+          const toDelete = bId === nodeId;
+          return toDelete;
+        });
+      });
     }
   }
 
@@ -290,16 +304,17 @@ class NodeStore {
   }
 
   getChildrenFromRoots(roots) {
-    return roots.map(root => (
-      {
+    return roots.map((root) => {
+      root.type = 'root';
+      return {
         title: root.responseText,
         id: getId(root),
         parentId: null,
         type: 'root',
         expanded: true,
         children: this.getChildren(root),
-      }
-    ));
+      };
+    });
   }
 
   /*
@@ -322,6 +337,7 @@ class NodeStore {
     }
 
     const childNodeId = getId(childNode);
+    childNode.type = 'node';
 
     return [
       {
@@ -334,6 +350,7 @@ class NodeStore {
         children: childNode.branches.map((branch) => {
           const { auxiliaryLink } = branch;
           const branchNodeId = getId(branch);
+          branch.type = 'response';
 
           return {
             title: branch.responseText,
