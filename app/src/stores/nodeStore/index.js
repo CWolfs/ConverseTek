@@ -103,7 +103,7 @@ class NodeStore {
   */
 
   @action setNode(node) {
-    const { conversationAsset } = dataStore;
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     const { type } = node;
 
     // Iterate through the correct collection
@@ -119,7 +119,6 @@ class NodeStore {
     }
   }
 
-  /* More optimal to provide node if available */
   getNode(nodeId) {
     const { conversationAsset } = dataStore;
     const { roots, nodes } = conversationAsset.Conversation;
@@ -159,7 +158,7 @@ class NodeStore {
 
     const root = createRoot();
     root.parentId = 0;
-    unsavedActiveConversationAsset.Conversation.roots.push(root);
+    updateRoot(unsavedActiveConversationAsset, root);
 
     this.roots.set(getId(root), root);
 
