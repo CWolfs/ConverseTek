@@ -3,7 +3,7 @@ import { createConversation } from '../../utils/conversation-utils';
 
 class DataStore {
   @observable workingDirectory;
-  @observable conversationAssets = observable.shallowMap();
+  @observable conversationAssets = observable.map(new Map(), { deep: false });
   @observable activeConversationAsset;
   @observable unsavedActiveConversationAsset;
 

@@ -16,9 +16,9 @@ import dataStore from '../dataStore';
 
 /* eslint-disable no-return-assign, no-param-reassign */
 class NodeStore {
-  @observable roots = observable.shallowMap();
-  @observable nodes = observable.shallowMap();
-  @observable branches = observable.shallowMap();
+  @observable roots = observable.map(new Map(), { deep: false });
+  @observable nodes = observable.map(new Map(), { deep: false });
+  @observable branches = observable.map(new Map(), { deep: false });
   @observable activeNode;
   @observable focusedNode;
   @observable dirtyActiveNode = false;
@@ -82,7 +82,7 @@ class NodeStore {
     if (nodeType === 'root') {
       this.activeNode = this.roots.get(nodeId);
     } else if (nodeType === 'node') {
-      this.activeNode = this.nodes.values().find(node => nodeId === getId(node));
+      this.activeNode = Array.from(this.nodes.values()).find(node => nodeId === getId(node));
     } else if (nodeType === 'response') {
       this.activeNode = this.branches.get(nodeId);
     }
@@ -134,7 +134,7 @@ class NodeStore {
       let node = this.roots.get(nodeId);
       if (node !== undefined && node !== null) return node;
 
-      node = this.nodes.values().find(n => nodeId === getId(n));
+      node = Array.from(this.nodes.values()).find(n => nodeId === getId(n));
       if (node !== undefined && node !== null) return node;
 
       node = this.branches.get(nodeId);
@@ -146,7 +146,7 @@ class NodeStore {
     if (nodeType === 'root') {
       return this.roots.get(nodeId);
     } else if (nodeType === 'node') {
-      return this.nodes.values().find(node => nodeId === getId(node.idRef));
+      return Array.from(this.nodes.values()).find(node => nodeId === getId(node.idRef));
     } else if (nodeType === 'response') {
       return this.branches.get(nodeId);
     }
