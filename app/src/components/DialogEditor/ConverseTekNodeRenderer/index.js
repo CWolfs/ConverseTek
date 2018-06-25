@@ -40,7 +40,7 @@ const ConverseTekNodeRenderer = observer(({
   const nodeSubtitle = subtitle || node.subtitle;
   const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : null;
   const isActiveNode = (activeNodeId === node.id);
-  const storedNode = nodeStore.getNode(node.id, node.type);
+  const storedNode = nodeStore.getNode(node.id);
   const { type: nodeType } = node;
 
   const contextMenuId = node.id || Math.random().toString();

@@ -28,7 +28,7 @@ class DialogEditor extends Component {
     super(props);
 
     const { nodeStore, conversationAsset } = this.props;
-    nodeStore.build(conversationAsset);
+    nodeStore.init(conversationAsset);
 
     this.state = {
       conversationAsset,
@@ -43,7 +43,7 @@ class DialogEditor extends Component {
     const newState = { ...this.state };
 
     if (propConversationAsset !== stateConversationAsset || rebuild) {
-      nodeStore.build(propConversationAsset);
+      nodeStore.init(propConversationAsset);
       newState.conversationAsset = propConversationAsset;
       newState.treeData = DialogEditor.buildTreeData(nodeStore, propConversationAsset);
       this.setState(newState);

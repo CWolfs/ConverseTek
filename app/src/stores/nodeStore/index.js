@@ -11,7 +11,7 @@ import {
   createRoot,
   updateRoot,
   updateNode,
-  updateResponse
+  updateResponse,
 } from '../../utils/conversation-utils';
 import dataStore from '../dataStore';
 
@@ -46,7 +46,7 @@ class NodeStore {
     }
   }
 
-  @action build(conversationAsset) {
+  @action init(conversationAsset) {
     const nextOwnerId = getId(conversationAsset.Conversation);
 
     // save the active node if it's the same conversation
@@ -106,33 +106,56 @@ class NodeStore {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     const { type } = node;
 
-    // Iterate through the correct collection
-    // - If it exists, replace it
-    // - If it doesn't exist, append
-
     if (type === 'root') {
       updateRoot(conversationAsset, node);
     } else if (type === 'node') {
       updateNode(conversationAsset, node);
     } else if (type === 'response') {
-      updateResponse(conversationAsset, node);
+      const parentNode = this.getNode(node.parentId);
+      updateResponse(conversationAsset, parentNode, node);
     }
   }
 
   getNode(nodeId) {
-    const { conversationAsset } = dataStore;
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     const { roots, nodes } = conversationAsset.Conversation;
 
     const root = roots.find(r => getId(r) === nodeId);
     if (root) return root;
 
+    let branch = null;
     const node = nodes.find((n) => {
       if (getId(n) === nodeId) return true;
-      return n.branches.find(b => getId(b) === nodeId);
+      branch = n.branches.find(b => getId(b) === nodeId);
+      if (branch) return true;
+      return false;
     });
+    if (branch) return branch;
     if (node) return node;
 
     return null;
+  }
+
+  getNodeByIndex(index) {
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+    const { nodes } = conversationAsset.Conversation;
+
+    const node = nodes.find(n => n.index === index);
+    if (node) return node;
+    return null;
+  }
+
+  removeNode(node) {
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+    const { roots, nodes } = conversationAsset.Conversation;
+
+    if (node.type === 'root') {
+      roots.remove(node);
+    } else if (node.type === 'node') {
+      nodes.remove(node);
+    } else if (node.type === 'response') {
+      nodes.forEach(n => n.remove(node));
+    }
   }
 
   @action addNodeByParentId(parentId) {
@@ -154,20 +177,18 @@ class NodeStore {
   }
 
   @action addRoot() {
-    const { unsavedActiveConversationAsset } = dataStore;
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
 
     const root = createRoot();
     root.parentId = 0;
-    updateRoot(unsavedActiveConversationAsset, root);
-
-    this.roots.set(getId(root), root);
+    updateRoot(conversationAsset, root);
 
     this.updateActiveNode(root);
     this.setRebuild(true);
   }
 
   @action addNode(parent) {
-    const { unsavedActiveConversationAsset } = dataStore;
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
 
     const nextNodeIndex = this.generateNextNodeIndex();
     const node = createNode(nextNodeIndex);
@@ -175,33 +196,31 @@ class NodeStore {
     parent.nextNodeIndex = node.index;
 
     if (parent.type === 'root') {
-      replaceRoot(unsavedActiveConversationAsset, parent);
+      updateRoot(conversationAsset, parent);
     } else if (parent.type === 'response') {
       const grandParentNode = this.getNode(parent.parentId);
-      replaceResponse(unsavedActiveConversationAsset, grandParentNode, parent);
+      updateResponse(conversationAsset, grandParentNode, parent);
     }
 
-    unsavedActiveConversationAsset.Conversation.nodes.push(node);
-
-    this.nodes.set(node.index, node);
+    updateNode(conversationAsset, node);
 
     this.updateActiveNode(node);
     this.setRebuild(true);
   }
 
   @action addResponse(parent) {
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+
     const response = createResponse();
     response.parentId = getId(parent);
-    parent.branches.push(response);
-
-    this.branches.set(getId(response), response);
+    updateResponse(conversationAsset, parent, response);
 
     this.updateActiveNode(response);
     this.setRebuild(true);
   }
 
-  @action deleteNodeCascadeById(id, type) {
-    const node = this.getNode(id, type);
+  @action deleteNodeCascadeById(id) {
+    const node = this.getNode(id);
     if (node) {
       this.deleteNodeCascade(node);
       this.setRebuild(true);
@@ -212,23 +231,31 @@ class NodeStore {
   * Ensures that any node that refers to an id specified now points to 'END OF DIALOG' (-1)
   */
   @action cleanUpDanglingResponseIndexes(idToClean) {
-    this.roots.forEach((root) => {
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+    const { roots, nodes } = conversationAsset.Conversation;
+
+    roots.forEach((root) => {
       const { nextNodeIndex } = root;
       if (nextNodeIndex === idToClean) {
         root.nextNodeIndex = -1;
+        // TODO: Might need to called updateRoot after this
       }
     });
 
-    this.branches.forEach((branch) => {
-      const { nextNodeIndex } = branch;
-      if (nextNodeIndex === idToClean) {
-        branch.nextNodeIndex = -1;
-      }
+    nodes.forEach((node) => {
+      const { branches } = node;
+
+      branches.forEach((branch) => {
+        const { nextNodeIndex } = branch;
+        if (nextNodeIndex === idToClean) {
+          branch.nextNodeIndex = -1;
+          // TODO: Might need to called updateResponse after this
+        }
+      });
     });
   }
 
   @action deleteNodeCascade(node) {
-    const { unsavedActiveConversationAsset } = dataStore;
     const { branches } = node;
 
     if (node.type === 'node') {
@@ -236,91 +263,30 @@ class NodeStore {
       branches.forEach(branch => this.deleteBranchCascade(branch));
 
       remove(this.takenNodeIndexes, i => i === index);
-
-      remove(
-        unsavedActiveConversationAsset.Conversation.nodes,
-        (convNode) => {
-          const toDelete = (getId(convNode) === getId(node));
-          return toDelete;
-        },
-      );
+      this.removeNode(node);
 
       if (this.activeNode && (getId(this.activeNode) === getId(node))) this.unselectActiveNode();
-      this.nodes.delete(index);
 
-      // Ensure all respones that link to this now deleted node have been cleaned
-      // 'nextNodeId' of -1
       this.cleanUpDanglingResponseIndexes(index);
     } else if (node.type === 'response') {
       this.deleteBranchCascade(node);
     } else if (node.type === 'root') {
       this.deleteBranchCascade(node);
-
-      remove(
-        unsavedActiveConversationAsset.Conversation.roots,
-        (convRoot) => {
-          const toDelete = (getId(convRoot) === getId(node));
-          return toDelete;
-        },
-      );
-
+      this.removeNode(node);
       if (this.activeNode && (getId(this.activeNode) === getId(node))) this.unselectActiveNode();
-      this.roots.delete(getId(node));
     }
   }
 
   @action deleteBranchCascade(branch) {
     const { auxiliaryLink } = branch;
-    const id = getId(branch);
 
     if (!auxiliaryLink) {
-      const nextNode = this.nodes.get(branch.nextNodeIndex);
+      const nextNode = this.getNodeByIndex(branch.nextNodeIndex);
       if (nextNode) this.deleteNodeCascade(nextNode);
     }
 
     if (this.activeNode && (getId(this.activeNode) === getId(branch))) this.unselectActiveNode();
-    this.branches.delete(id);
-    const parentNode = this.getNode(getId(branch));
-    if (parentNode) {
-      remove(
-        parentNode.branches,
-        (nodeBranch) => {
-          const toDelete = (getId(nodeBranch) === getId(branch));
-          return toDelete;
-        },
-      );
-    }
-  }
-
-  /*
-  * ===========================
-  * || DATA BUILDING METHODS ||
-  * ===========================
-  */
-  buildRoots(roots) {
-    roots.forEach((root) => {
-      const id = getId(root);
-      this.roots.set(id, root);
-      root.type = 'root';
-    });
-  }
-
-  buildNodes(nodes) {
-    nodes.forEach((node) => {
-      const { index } = node;
-      this.takenNodeIndexes.push(index);
-      this.nodes.set(index, node);
-      node.type = 'node';
-    });
-  }
-
-  buildBranches(parent, branches) {
-    branches.forEach((branch) => {
-      const id = getId(branch);
-      this.branches.set(id, branch);
-      branch.type = 'response';
-      branch.parentId = getId(parent);
-    });
+    this.removeNode(branch);
   }
 
   getChildrenFromRoots(roots) {
@@ -349,14 +315,13 @@ class NodeStore {
 
     // GUARD - Error if there's a mistake in the file and
     //         no node exists of the index being looked for
-    if (!this.nodes.has(nextNodeIndex)) {
+    const childNode = this.getNodeByIndex(nextNodeIndex);
+    if (!childNode) {
       console.error(`[Conversation Editor] Failed trying to find node ${nextNodeIndex}`);
       return null;
     }
 
-    const childNode = this.nodes.get(nextNodeIndex);
     const childNodeId = getId(childNode);
-    this.buildBranches(childNode, childNode.branches);
 
     return [
       {
@@ -388,9 +353,6 @@ class NodeStore {
   }
 
   @action reset = () => {
-    this.roots.clear();
-    this.nodes.clear();
-    this.branches.clear();
     this.focusedNode = null;
     this.takenNodeIndexes = [];
   }
