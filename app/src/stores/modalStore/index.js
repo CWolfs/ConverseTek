@@ -1,69 +1,68 @@
-import { observable, action } from 'mobx';
+import { decorate, observable, action } from 'mobx';
 import defer from 'lodash.defer';
 
 class ModalStore {
-  @observable ModalContent;
-  @observable title = '';
-  @observable isVisible = false;
-  @observable onOk;
-  @observable disableOk = true;
-  @observable okLabel = 'Ok';
-  @observable loadingLabel = 'Loading';
-  @observable onCancel;
-  @observable isLoading = false;
-  @observable width = '70vw';
-  @observable showCancelButton = true;
-
   constructor() {
+    this.ModalContent = null;
+    this.title = '';
+    this.isVisible = false;
+    this.onOk = null;
+    this.disableOk = true;
+    this.okLabel = 'Ok';
+    this.loadingLabel = 'Loading';
+    this.onCancel = null;
+    this.isLoading = false;
+    this.width = '70vw';
+    this.showCancelButton = true;
     this.onCancel = this.closeModal;
   }
 
-  @action setModelContent(component, show = true) {
+  setModelContent(component, show = true) {
     this.ModalContent = component;
     if (show) this.showModal(true);
   }
 
-  @action setTitle(title) {
+  setTitle(title) {
     this.title = title;
   }
 
-  @action setWidth(width) {
+  setWidth(width) {
     this.width = width;
   }
 
-  @action setShowCancelButton(flag) {
+  setShowCancelButton(flag) {
     this.showCancelButton = flag;
   }
 
-  @action setOnOk(onOk) {
+  setOnOk(onOk) {
     this.onOk = onOk;
   }
 
-  @action setDisableOk(flag) {
+  setDisableOk(flag) {
     this.disableOk = flag;
   }
 
-  @action setOkLabel(label) {
+  setOkLabel(label) {
     this.okLabel = label;
   }
 
-  @action setIsLoading(flag) {
+  setIsLoading(flag) {
     this.isLoading = flag;
   }
 
-  @action setLoadingLabel(label) {
+  setLoadingLabel(label) {
     this.loadingLabel = label;
   }
 
-  @action showModal(flag) {
+  showModal(flag) {
     this.isVisible = flag;
   }
 
-  @action closeModal = () => {
+  closeModal = () => {
     this.reset();
   }
 
-  @action reset = () => {
+  reset = () => {
     this.isVisible = false;
     defer(() => {
       this.ModalContent = null;
@@ -78,6 +77,33 @@ class ModalStore {
     });
   }
 }
+
+decorate(ModalStore, {
+  ModalContent: observable,
+  title: observable,
+  isVisible: observable,
+  onOk: observable,
+  disableOk: observable,
+  okLabel: observable,
+  loadingLabel: observable,
+  onCancel: observable,
+  isLoading: observable,
+  width: observable,
+  showCancelButton: observable,
+
+  setModelContent: action,
+  setTitle: action,
+  setWidth: action,
+  setShowCancelButton: action,
+  setOnOk: action,
+  setDisableOk: action,
+  setOkLabel: action,
+  setIsLoading: action,
+  setLoadingLabel: action,
+  showModal: action,
+  closeModal: action,
+  reset: action,
+});
 
 const modalStore = new ModalStore();
 

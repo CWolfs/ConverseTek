@@ -1,4 +1,4 @@
-import { observable, action } from 'mobx';
+import { decorate, observable, action } from 'mobx';
 import defer from 'lodash.defer';
 import remove from 'lodash.remove';
 import sortBy from 'lodash.sortby';
@@ -16,15 +16,14 @@ import dataStore from '../dataStore';
 
 /* eslint-disable no-return-assign, no-param-reassign */
 class NodeStore {
-  @observable roots = observable.shallowMap();
-  @observable nodes = observable.shallowMap();
-  @observable branches = observable.shallowMap();
-  @observable activeNode;
-  @observable focusedNode;
-  @observable dirtyActiveNode = false;
-  @observable rebuild = false;
-
   constructor() {
+    this.roots = observable.map(new Map(), { deep: false });
+    this.nodes = observable.map(new Map(), { deep: false });
+    this.branches = observable.map(new Map(), { deep: false });
+    this.activeNode = null;
+    this.focusedNode = null;
+    this.dirtyActiveNode = false;
+    this.rebuild = false;
     this.ownerId = null;
     this.activeNode = null;
     this.focusedNode = null;
@@ -38,7 +37,7 @@ class NodeStore {
     return nextNodeIndex;
   }
 
-  @action setRebuild(flag) {
+  setRebuild(flag) {
     this.rebuild = flag;
     if (this.rebuild) {
       defer(() => {
@@ -48,7 +47,7 @@ class NodeStore {
     }
   }
 
-  @action build(conversationAsset) {
+  build(conversationAsset) {
     const { roots, nodes } = conversationAsset.Conversation;
 
     const nextOwnerId = getId(conversationAsset.Conversation);
@@ -73,16 +72,16 @@ class NodeStore {
   * =========================
   */
 
-  @action updateActiveNode(node) {
+  updateActiveNode(node) {
     this.setNode(node);
     this.setActiveNode(getId(node), node.type);
   }
 
-  @action setActiveNode(nodeId, nodeType) {
+  setActiveNode(nodeId, nodeType) {
     if (nodeType === 'root') {
       this.activeNode = this.roots.get(nodeId);
     } else if (nodeType === 'node') {
-      this.activeNode = this.nodes.values().find(node => nodeId === getId(node));
+      this.activeNode = Array.from(this.nodes.values()).find(node => nodeId === getId(node));
     } else if (nodeType === 'response') {
       this.activeNode = this.branches.get(nodeId);
     }
@@ -93,7 +92,7 @@ class NodeStore {
     return getId(this.activeNode);
   }
 
-  @action unselectActiveNode() {
+  unselectActiveNode() {
     this.activeNode = null;
   }
 
@@ -102,11 +101,11 @@ class NodeStore {
   * || FOCUS NODE METHODS ||
   * ========================
   */
-  @action setFocusedNode(node) {
+  setFocusedNode(node) {
     this.focusedNode = node;
   }
 
-  @action removeFocusedNode() {
+  removeFocusedNode() {
     this.focusedNode = null;
   }
 
@@ -115,8 +114,7 @@ class NodeStore {
   * || NODE METHODS ||
   * ==================
   */
-
-  @action setNode(node) {
+  setNode(node) {
     const { type } = node;
 
     if (type === 'root') {
@@ -134,7 +132,7 @@ class NodeStore {
       let node = this.roots.get(nodeId);
       if (node !== undefined && node !== null) return node;
 
-      node = this.nodes.values().find(n => nodeId === getId(n));
+      node = Array.from(this.nodes.values()).find(n => nodeId === getId(n));
       if (node !== undefined && node !== null) return node;
 
       node = this.branches.get(nodeId);
@@ -146,14 +144,14 @@ class NodeStore {
     if (nodeType === 'root') {
       return this.roots.get(nodeId);
     } else if (nodeType === 'node') {
-      return this.nodes.values().find(node => nodeId === getId(node.idRef));
+      return Array.from(this.nodes.values()).find(node => nodeId === getId(node.idRef));
     } else if (nodeType === 'response') {
       return this.branches.get(nodeId);
     }
     return null;
   }
 
-  @action addNodeByParentId(parentId) {
+  addNodeByParentId(parentId) {
     const parent = this.getNode(parentId);
 
     if (parent === undefined || parent === null) {
@@ -171,7 +169,7 @@ class NodeStore {
     }
   }
 
-  @action addRoot() {
+  addRoot() {
     const { unsavedActiveConversationAsset } = dataStore;
 
     const root = createRoot();
@@ -184,7 +182,7 @@ class NodeStore {
     this.setRebuild(true);
   }
 
-  @action addNode(parent) {
+  addNode(parent) {
     const { unsavedActiveConversationAsset } = dataStore;
 
     const nextNodeIndex = this.generateNextNodeIndex();
@@ -207,7 +205,7 @@ class NodeStore {
     this.setRebuild(true);
   }
 
-  @action addResponse(parent) {
+  addResponse(parent) {
     const response = createResponse();
     response.parentId = getId(parent);
     parent.branches.push(response);
@@ -218,7 +216,7 @@ class NodeStore {
     this.setRebuild(true);
   }
 
-  @action deleteNodeCascadeById(id, type) {
+  deleteNodeCascadeById(id, type) {
     const node = this.getNode(id, type);
     if (node) {
       this.deleteNodeCascade(node);
@@ -245,7 +243,7 @@ class NodeStore {
     });
   }
 
-  @action deleteNodeCascade(node) {
+  deleteNodeCascade(node) {
     const { unsavedActiveConversationAsset } = dataStore;
     const { branches } = node;
 
@@ -287,8 +285,7 @@ class NodeStore {
     }
   }
 
-  @action deleteBranchCascade(branch) {
-    // const { unsavedActiveConversationAsset } = dataStore;
+  deleteBranchCascade(branch) {
     const { auxiliaryLink, parentIndex } = branch;
     const id = getId(branch.idRef);
 
@@ -407,7 +404,7 @@ class NodeStore {
     ];
   }
 
-  @action reset = () => {
+  reset = () => {
     this.roots.clear();
     this.nodes.clear();
     this.branches.clear();
@@ -415,6 +412,39 @@ class NodeStore {
     this.takenNodeIndexes = [];
   }
 }
+
+decorate(NodeStore, {
+  roots: observable,
+  nodes: observable,
+  branches: observable,
+  activeNode: observable,
+  focusedNode: observable,
+  dirtyActiveNode: observable,
+  rebuild: observable,
+
+  setRebuild: action,
+  build: action,
+  updateActiveNode: action,
+  setActiveNode: action,
+  unselectActiveNode: action,
+  setFocusedNode: action,
+  removeFocusedNode: action,
+  setNode: action,
+  addNodeByParentId: action,
+  addRoot: action,
+  addNode: action,
+  addResponse: action,
+  deleteNodeCascadeById: action,
+  cleanUpDanglingResponseIndexes: action,
+  deleteNodeCascade: action,
+  deleteBranchCascade: action,
+
+  buildRoots: action,
+  buildNodes: action,
+  buildBranches: action,
+
+  reset: action,
+});
 
 const nodeStore = new NodeStore();
 

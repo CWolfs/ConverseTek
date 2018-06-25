@@ -1,63 +1,76 @@
-import { observable, action } from 'mobx';
+import { decorate, observable, action } from 'mobx';
 import { createConversation } from '../../utils/conversation-utils';
 
 class DataStore {
-  @observable workingDirectory;
-  @observable conversationAssets = observable.shallowMap();
-  @observable activeConversationAsset;
-  @observable unsavedActiveConversationAsset;
-
   constructor() {
+    this.conversationAssets = observable.map(new Map(), { deep: false });
     this.activeConversationAsset = null;
     this.unsavedActiveConversationAsset = null;
     this.workingDirectory = null;
   }
 
-  @action setWorkingDirectory(directoryPath) {
+  setWorkingDirectory(directoryPath) {
     this.workingDirectory = directoryPath;
   }
 
-  @action createNewConversation() {
+  createNewConversation() {
     const conversation = createConversation(this.workingDirectory);
     this.updateActiveConversation(conversation);
   }
 
-  @action setConversations(conversationAssets) {
+  setConversations(conversationAssets) {
     this.conversationAssets.clear();
     conversationAssets.forEach(conversationAsset =>
       this.conversationAssets.set(conversationAsset.Conversation.idRef.id, conversationAsset));
   }
 
-  @action setConversation(conversationAsset) {
+  setConversation(conversationAsset) {
     this.conversationAssets.set(conversationAsset.Conversation.idRef.id, conversationAsset);
   }
 
-  @action removeConversation(id) {
+  removeConversation(id) {
     this.conversationAssets.delete(id);
   }
 
-  @action updateActiveConversation(conversationAsset) {
+  updateActiveConversation(conversationAsset) {
     this.setConversation(conversationAsset);
     this.setActiveConversation(conversationAsset.Conversation.idRef.id);
   }
 
-  @action setActiveConversation(id) {
+  setActiveConversation(id) {
     if (this.conversationAssets.has(id)) {
       this.activeConversationAsset = this.conversationAssets.get(id);
     }
   }
 
-  @action setUnsavedActiveConversation(conversationAsset) {
+  setUnsavedActiveConversation(conversationAsset) {
     this.unsavedActiveConversationAsset = conversationAsset;
   }
 
-  @action reset = () => {
+  reset = () => {
     this.conversationAssets.clear();
     this.activeConversationAsset = null;
     this.unsavedActiveConversationAsset = null;
     this.workingDirectory = null;
   }
 }
+
+decorate(DataStore, {
+  workingDirectory: observable,
+  conversationAssets: observable,
+  activeConversationAsset: observable,
+  unsavedActiveConversationAsset: observable,
+
+  setWorkingDirectory: action,
+  createNewConversation: action,
+  setConversations: action,
+  setConversation: action,
+  removeConversation: action,
+  updateActiveConversation: action,
+  setActiveConversation: action,
+  setUnsavedActiveConversation: action,
+  reset: action,
+});
 
 const dataStore = new DataStore();
 

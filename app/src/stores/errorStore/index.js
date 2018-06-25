@@ -1,22 +1,30 @@
 import { decorate, observable, action } from 'mobx';
 
 class ErrorStore {
-  @observable authErrors = observable.map();
+  authErrors = observable.map();
 
-  @action setError = (code, error) => {
+  setError = (code, error) => {
     if ((code >= 100) && (code < 199)) {
       this.authErrors.set(code, error);
     }
   }
 
-  @action resetAll = () => {
+  resetAll = () => {
     this.authErrors.clear();
   }
 
-  @action reset = (codes) => {
+  reset = (codes) => {
     codes.forEach(code => this.authErrors.delete(code));
   }
 }
+
+decorate(ErrorStore, {
+  authErrors: observable,
+
+  setError: action,
+  resetAll: action,
+  reset: action,
+});
 
 const errorStore = new ErrorStore();
 
