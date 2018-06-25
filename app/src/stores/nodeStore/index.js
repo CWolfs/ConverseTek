@@ -9,16 +9,14 @@ import {
   createNode,
   createResponse,
   createRoot,
-  replaceRoot,
-  replaceResponse,
+  updateRoot,
+  updateNode,
+  updateResponse
 } from '../../utils/conversation-utils';
 import dataStore from '../dataStore';
 
-/* eslint-disable no-return-assign, no-param-reassign */
+/* eslint-disable no-return-assign, no-param-reassign, class-methods-use-this */
 class NodeStore {
-  @observable roots = observable.map(new Map(), { deep: false });
-  @observable nodes = observable.map(new Map(), { deep: false });
-  @observable branches = observable.map(new Map(), { deep: false });
   @observable activeNode;
   @observable focusedNode;
   @observable dirtyActiveNode = false;
@@ -49,8 +47,6 @@ class NodeStore {
   }
 
   @action build(conversationAsset) {
-    const { roots, nodes } = conversationAsset.Conversation;
-
     const nextOwnerId = getId(conversationAsset.Conversation);
 
     // save the active node if it's the same conversation
@@ -62,9 +58,6 @@ class NodeStore {
     }
 
     this.reset();
-
-    this.buildRoots(roots);
-    this.buildNodes(nodes);
   }
 
   /*
@@ -73,18 +66,12 @@ class NodeStore {
   * =========================
   */
   @action updateActiveNode(node) {
-    this.setNode(node);
+    // this.addNode(node);
     this.setActiveNode(getId(node), node.type);
   }
 
-  @action setActiveNode(nodeId, nodeType) {
-    if (nodeType === 'root') {
-      this.activeNode = this.roots.get(nodeId);
-    } else if (nodeType === 'node') {
-      this.activeNode = Array.from(this.nodes.values()).find(node => nodeId === getId(node));
-    } else if (nodeType === 'response') {
-      this.activeNode = this.branches.get(nodeId);
-    }
+  @action setActiveNode(nodeId) {
+    this.activeNode = this.getNode(nodeId);
   }
 
   getActiveNodeId() {
@@ -116,39 +103,36 @@ class NodeStore {
   */
 
   @action setNode(node) {
+    const { conversationAsset } = dataStore;
     const { type } = node;
 
+    // Iterate through the correct collection
+    // - If it exists, replace it
+    // - If it doesn't exist, append
+
     if (type === 'root') {
-      this.roots.set(getId(node), node);
+      updateRoot(conversationAsset, node);
     } else if (type === 'node') {
-      this.nodes.set(getId(node), node);
+      updateNode(conversationAsset, node);
     } else if (type === 'response') {
-      this.branches.set(getId(node), node);
+      updateResponse(conversationAsset, node);
     }
   }
 
   /* More optimal to provide node if available */
-  getNode(nodeId, nodeType) {
-    if (nodeType === undefined) {
-      let node = this.roots.get(nodeId);
-      if (node !== undefined && node !== null) return node;
+  getNode(nodeId) {
+    const { conversationAsset } = dataStore;
+    const { roots, nodes } = conversationAsset.Conversation;
 
-      node = Array.from(this.nodes.values()).find(n => nodeId === getId(n));
-      if (node !== undefined && node !== null) return node;
+    const root = roots.find(r => getId(r) === nodeId);
+    if (root) return root;
 
-      node = this.branches.get(nodeId);
-      if (node !== undefined && node !== null) return node;
+    const node = nodes.find((n) => {
+      if (getId(n) === nodeId) return true;
+      return n.branches.find(b => getId(b) === nodeId);
+    });
+    if (node) return node;
 
-      return null;
-    }
-
-    if (nodeType === 'root') {
-      return this.roots.get(nodeId);
-    } else if (nodeType === 'node') {
-      return Array.from(this.nodes.values()).find(node => nodeId === getId(node.idRef));
-    } else if (nodeType === 'response') {
-      return this.branches.get(nodeId);
-    }
     return null;
   }
 

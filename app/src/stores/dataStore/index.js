@@ -48,7 +48,7 @@ class DataStore {
   }
 
   @action setUnsavedActiveConversation(conversationAsset) {
-    this.unsavedActiveConversationAsset = conversationAsset;
+    this.unsavedActiveConversationAsset = observable(conversationAsset);
   }
 
   @action reset = () => {

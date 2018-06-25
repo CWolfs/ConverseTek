@@ -139,20 +139,44 @@ export function consolidateSpeaker(conversationAsset) {
   });
 }
 
-export function replaceRoot(conversationAsset, root) {
+export function updateRoot(conversationAsset, root) {
   const { roots } = conversationAsset.Conversation;
   const index = findIndex(roots, r => getId(r) === getId(root));
-  roots[index] = root;
+
+  if (index === -1) {
+    roots.push(root);
+  } else {
+    roots[index] = root;
+  }
 }
 
-export function replaceResponse(conversationAsset, parentNode, response) {
+export function updateNode(conversationAsset, node) {
+  const { nodes } = conversationAsset.Conversation;
+  const index = findIndex(nodes, n => getId(n) === getId(node));
+
+  if (index === -1) {
+    nodes.push(node);
+  } else {
+    nodes[index] = node;
+  }
+}
+
+export function updateResponse(conversationAsset, parentNode, response) {
   const { nodes } = conversationAsset.Conversation;
 
   const branchIndex = findIndex(parentNode.branches, b => getId(b) === getId(response));
-  parentNode.branches[branchIndex] = response;
+  if (branchIndex === -1) {
+    parentNode.branches.push(response);
+  } else {
+    parentNode.branches[branchIndex] = response;
+  }
 
   const parentNodeIndex = findIndex(nodes, n => getId(n) === getId(parentNode));
-  nodes[parentNodeIndex] = parentNode;
+  if (parentNodeIndex === -1) {
+    nodes.push(parentNode);
+  } else {
+    nodes[parentNodeIndex] = parentNode;
+  }
 }
 
 export default {};
