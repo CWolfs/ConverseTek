@@ -7,7 +7,7 @@ import FileSystemPicker from '../../components/FileSystemPicker';
 import SaveConversationAs from '../../components/SaveConversationAs';
 import About from '../../components/About';
 
-import { updateConversation } from '../../services/api';
+import { updateConversation, exportConversation } from '../../services/api';
 
 import './Header.css';
 
@@ -56,16 +56,26 @@ class Header extends Component {
             )}
 
             {hasActiveConversation && (
-              <MenuItem
-                onClick={() => modalStore.setModelContent(SaveConversationAs)}
-              >
-                Save Conversation As...
-              </MenuItem>
+            <MenuItem
+              onClick={() => modalStore.setModelContent(SaveConversationAs)}
+            >
+              Save Conversation As...
+            </MenuItem>
             )}
 
-            {/*
-            <MenuItem>Export as JSON</MenuItem>
-            */}
+            {hasActiveConversation && (
+            <MenuItem
+              onClick={() => {
+                const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+                exportConversation(conversationAsset.Conversation.idRef.id, conversationAsset)
+                  .then(() => {
+                    message.success('Export successful');
+                  });
+              }}
+            >
+              Export Conversation as JSON
+            </MenuItem>
+            )}
           </SubMenu>
           {/*
           <SubMenu title="Options">

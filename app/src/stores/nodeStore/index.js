@@ -9,8 +9,8 @@ import {
   createNode,
   createResponse,
   createRoot,
-  replaceRoot,
-  replaceResponse,
+  // replaceRoot,
+  // replaceResponse,
 } from '../../utils/conversation-utils';
 import dataStore from '../dataStore';
 
@@ -72,7 +72,6 @@ class NodeStore {
   * || ACTIVE NODE METHODS ||
   * =========================
   */
-
   @action updateActiveNode(node) {
     this.setNode(node);
     this.setActiveNode(getId(node), node.type);
@@ -192,12 +191,14 @@ class NodeStore {
     node.parentId = getId(parent);
     parent.nextNodeIndex = node.index;
 
+    /*
     if (parent.type === 'root') {
       replaceRoot(unsavedActiveConversationAsset, parent);
     } else if (parent.type === 'response') {
       const grandParentNode = this.getNode(parent.parentId);
       replaceResponse(unsavedActiveConversationAsset, grandParentNode, parent);
     }
+    */
 
     unsavedActiveConversationAsset.Conversation.nodes.push(node);
 
@@ -229,7 +230,7 @@ class NodeStore {
   /*
   * Ensures that any node that refers to an id specified now points to 'END OF DIALOG' (-1)
   */
-  cleanUpDanglingResponseIndexes(idToClean) {
+  @action cleanUpDanglingResponseIndexes(idToClean) {
     this.roots.forEach((root) => {
       const { nextNodeIndex } = root;
       if (nextNodeIndex === idToClean) {
@@ -288,9 +289,8 @@ class NodeStore {
   }
 
   @action deleteBranchCascade(branch) {
-    // const { unsavedActiveConversationAsset } = dataStore;
-    const { auxiliaryLink, parentIndex } = branch;
-    const id = getId(branch.idRef);
+    const { auxiliaryLink } = branch;
+    const id = getId(branch);
 
     if (!auxiliaryLink) {
       const nextNode = this.nodes.get(branch.nextNodeIndex);
@@ -299,12 +299,12 @@ class NodeStore {
 
     if (this.activeNode && (getId(this.activeNode) === getId(branch))) this.unselectActiveNode();
     this.branches.delete(id);
-    const parentNode = this.nodes.get(parentIndex);
+    const parentNode = this.getNode(getId(branch));
     if (parentNode) {
       remove(
         parentNode.branches,
         (nodeBranch) => {
-          const toDelete = (getId(nodeBranch.idRef) === getId(branch.idRef));
+          const toDelete = (getId(nodeBranch) === getId(branch));
           return toDelete;
         },
       );
@@ -339,7 +339,6 @@ class NodeStore {
       this.branches.set(id, branch);
       branch.type = 'response';
       branch.parentId = getId(parent);
-      branch.parentIndex = parent.index;
     });
   }
 
