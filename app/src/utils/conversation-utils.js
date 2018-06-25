@@ -1,5 +1,6 @@
 import uuid from 'uuid/v4';
 import md5 from 'md5';
+import findIndex from 'lodash.findindex';
 
 /* eslint-disable no-param-reassign, no-return-assign */
 export function generateId() {
@@ -140,24 +141,18 @@ export function consolidateSpeaker(conversationAsset) {
 
 export function replaceRoot(conversationAsset, root) {
   const { roots } = conversationAsset.Conversation;
-  const filteredRoots = roots.filter(r => getId(r) !== getId(root));
-  filteredRoots.push(root);
-  conversationAsset.Conversation.roots.replace(filteredRoots);
+  const index = findIndex(roots, r => getId(r) === getId(root));
+  roots[index] = root;
 }
 
 export function replaceResponse(conversationAsset, parentNode, response) {
   const { nodes } = conversationAsset.Conversation;
 
-  // filter the node out of the conversation
-  const filteredRoots = nodes.filter(n => getId(n) !== getId(parentNode));
-  filteredRoots.push(parentNode);
+  const branchIndex = findIndex(parentNode.branches, b => getId(b) === getId(response));
+  parentNode.branches[branchIndex] = response;
 
-  // filter the response out of the parent node
-  const filteredResponses = parentNode.branches.filter(b => getId(b) !== getId(response));
-  filteredResponses.push(response);
-
-  parentNode.branches.replace(filteredResponses);
-  conversationAsset.Conversation.nodes.replace(filteredRoots);
+  const parentNodeIndex = findIndex(nodes, n => getId(n) === getId(parentNode));
+  nodes[parentNodeIndex] = parentNode;
 }
 
 export default {};

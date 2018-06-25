@@ -9,8 +9,8 @@ import {
   createNode,
   createResponse,
   createRoot,
-  // replaceRoot,
-  // replaceResponse,
+  replaceRoot,
+  replaceResponse,
 } from '../../utils/conversation-utils';
 import dataStore from '../dataStore';
 
@@ -191,14 +191,12 @@ class NodeStore {
     node.parentId = getId(parent);
     parent.nextNodeIndex = node.index;
 
-    /*
     if (parent.type === 'root') {
       replaceRoot(unsavedActiveConversationAsset, parent);
     } else if (parent.type === 'response') {
       const grandParentNode = this.getNode(parent.parentId);
       replaceResponse(unsavedActiveConversationAsset, grandParentNode, parent);
     }
-    */
 
     unsavedActiveConversationAsset.Conversation.nodes.push(node);
 
