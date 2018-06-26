@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Card, Row, Col, Input, Select, Tooltip, Icon } from 'antd';
+import { Card, Row, Col, Input, Select, Tooltip, Icon, Checkbox } from 'antd';
 import { observer, inject } from 'mobx-react';
 import capitalize from 'lodash.capitalize';
 
@@ -40,6 +40,7 @@ class ConversationGeneral extends Component {
     this.handleCastIdChange = this.handleCastIdChange.bind(this);
     this.handleSpeakerIdChange = this.handleSpeakerIdChange.bind(this);
     this.handleCommentChange = this.handleCommentChange.bind(this);
+    this.handleAvailbleOnceChange = this.handleAvailbleOnceChange.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -123,6 +124,10 @@ class ConversationGeneral extends Component {
     node.comment = comment;
   }
 
+  handleAvailbleOnceChange(event) {
+    console.log(`checked = ${event.target.checked}`);
+  }
+
   render() {
     const { node } = this.props;
     const {
@@ -132,6 +137,7 @@ class ConversationGeneral extends Component {
       speakerId,
     } = this.state;
     const { type } = node;
+    const isRootOrResponse = (type !== 'node');
 
     return (
       <Card className="conversation-general" title={null}>
@@ -198,6 +204,17 @@ class ConversationGeneral extends Component {
                 />
               )}
             </div>
+          </Col>
+        </Row>
+        )}
+
+        {isRootOrResponse && (
+        <Row gutter={16}>
+          <Col {...colOneLayout}>
+            <div className="conversation-general__label">Available Once</div>
+          </Col>
+          <Col {...colTwoLayout}>
+            <Checkbox onChange={this.handleAvailbleOnceChange}>Checkbox</Checkbox>
           </Col>
         </Row>
         )}
