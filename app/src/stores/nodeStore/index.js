@@ -12,7 +12,6 @@ import {
   updateRoot,
   updateNode,
   updateResponse,
-  updateConversation,
 } from '../../utils/conversation-utils';
 import dataStore from '../dataStore';
 
