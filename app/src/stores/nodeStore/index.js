@@ -33,7 +33,7 @@ class NodeStore {
 
   generateNextNodeIndex() {
     this.takenNodeIndexes = sortBy(this.takenNodeIndexes, index => index);
-    const nextNodeIndex = last(this.takenNodeIndexes) + 1 || 1;
+    const nextNodeIndex = last(this.takenNodeIndexes) + 1 || 0;
     this.takenNodeIndexes.push(nextNodeIndex);
     return nextNodeIndex;
   }
@@ -370,6 +370,7 @@ class NodeStore {
     const { index: childIndex } = childNode;
     const childNodeId = getId(childNode);
     childNode.type = 'node';
+    childNode.parentId = getId(node);
     this.takenNodeIndexes.push(childIndex);
 
     return [
@@ -384,6 +385,7 @@ class NodeStore {
           const { auxiliaryLink } = branch;
           const branchNodeId = getId(branch);
           branch.type = 'response';
+          branch.parentId = childNodeId;
 
           return {
             title: branch.responseText,
