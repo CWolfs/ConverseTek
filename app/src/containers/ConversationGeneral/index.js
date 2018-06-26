@@ -125,7 +125,9 @@ class ConversationGeneral extends Component {
   }
 
   handleAvailbleOnceChange(event) {
-    console.log(`checked = ${event.target.checked}`);
+    const { node } = this.props;
+    const availableOnlyOnce = event.target.checked;
+    node.onlyOnce = availableOnlyOnce;
   }
 
   render() {
@@ -214,7 +216,7 @@ class ConversationGeneral extends Component {
             <div className="conversation-general__label">Available Once</div>
           </Col>
           <Col {...colTwoLayout}>
-            <Checkbox onChange={this.handleAvailbleOnceChange}>Checkbox</Checkbox>
+            <Checkbox onChange={this.handleAvailbleOnceChange} checked={node.onlyOnce}>Checkbox</Checkbox>
           </Col>
         </Row>
         )}
