@@ -40,10 +40,11 @@ const ConverseTekNodeRenderer = observer(({
   const nodeSubtitle = subtitle || node.subtitle;
   const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : null;
   const isActiveNode = (activeNodeId === node.id);
-  const storedNode = nodeStore.getNode(node.id, node.type);
+  const storedNode = nodeStore.getNode(node.id);
   const { type: nodeType } = node;
 
   const contextMenuId = node.id || Math.random().toString();
+  const { parentId } = node;
 
   let nodeTitle = '';
   if (storedNode === null || storedNode === undefined) {
@@ -97,9 +98,8 @@ const ConverseTekNodeRenderer = observer(({
         !canDrag && 'rst__rowContentsDragDisabled',
         rowDirectionClass,
       )}
-      onClick={() => {
-        return nodeStore.setActiveNode(node.id, node.type);
-      }}
+      onClick={() => nodeStore.setActiveNode(node.id, node.type)}
+      onMouseEnter={() => nodeStore.setFocusedNode(node)}
     >
       <div className={classnames('rst__rowLabel', rowDirectionClass)}>
         <span
@@ -144,12 +144,12 @@ const ConverseTekNodeRenderer = observer(({
   );
 
   const menuWrappedRowContents = (
-    <ContextMenuProvider id="dialog-context-menu" data={{ id: contextMenuId, type: nodeType }}>
+    <ContextMenuProvider id="dialog-context-menu" data={{ id: contextMenuId, type: nodeType, parentId }}>
       {rawRowContents}
     </ContextMenuProvider>
   );
 
-  const rowContents = (nodeType !== 'link' && node.id !== '0') ? menuWrappedRowContents : rawRowContents;
+  const rowContents = (nodeType !== 'link') ? menuWrappedRowContents : rawRowContents;
 
   return (
     <div style={{ height: '100%' }} {...otherProps}>

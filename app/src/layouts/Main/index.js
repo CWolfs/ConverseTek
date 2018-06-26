@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { injectIntl } from 'react-intl';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { Switch, Route } from 'react-router-dom';
 
 import Conversations from '../../containers/Conversations';
@@ -40,4 +39,4 @@ Layout.propTypes = {
   ]),
 };
 
-export default inject('locale')(injectIntl(observer(Layout)));
+export default observer(Layout);

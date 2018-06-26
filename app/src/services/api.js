@@ -37,6 +37,11 @@ export function updateConversation(id, conversationAsset) {
   });
 }
 
+export function exportConversation(id, conversationAsset) {
+  consolidateSpeaker(conversationAsset);
+  return post('/conversations/export', { id }, { method: 'PUT', conversationAsset });
+}
+
 /*
 ==========================
  || FILE SYSTEM METHODS ||

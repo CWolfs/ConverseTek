@@ -1,4 +1,4 @@
-import { decorate, observable, action } from 'mobx';
+import { observable, action } from 'mobx';
 
 class ErrorStore {
   @observable authErrors = observable.map();
