@@ -229,23 +229,28 @@ class NodeStore {
 
   @action addNode(parent) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+    const { nextNodeIndex: existingNextNodeIndex } = parent;
 
-    const nextNodeIndex = this.generateNextNodeIndex();
-    const node = createNode(nextNodeIndex);
-    node.parentId = getId(parent);
-    parent.nextNodeIndex = node.index;
+    if (existingNextNodeIndex === -1) {
+      const nextNodeIndex = this.generateNextNodeIndex();
+      const node = createNode(nextNodeIndex);
+      node.parentId = getId(parent);
+      parent.nextNodeIndex = node.index;
 
-    if (parent.type === 'root') {
-      updateRoot(conversationAsset, parent);
-    } else if (parent.type === 'response') {
-      const grandParentNode = this.getNode(parent.parentId);
-      updateResponse(conversationAsset, grandParentNode, parent);
+      if (parent.type === 'root') {
+        updateRoot(conversationAsset, parent);
+      } else if (parent.type === 'response') {
+        const grandParentNode = this.getNode(parent.parentId);
+        updateResponse(conversationAsset, grandParentNode, parent);
+      }
+
+      updateNode(conversationAsset, node);
+
+      this.updateActiveNode(node);
+      this.setRebuild(true);
+    } else {
+      console.warn('[Node Store] Will not create new node. Only one node per \'root\' or \'response\' allowed');
     }
-
-    updateNode(conversationAsset, node);
-
-    this.updateActiveNode(node);
-    this.setRebuild(true);
   }
 
   @action addResponse(parent) {
@@ -362,8 +367,10 @@ class NodeStore {
       return null;
     }
 
+    const { index: childIndex } = childNode;
     const childNodeId = getId(childNode);
     childNode.type = 'node';
+    this.takenNodeIndexes.push(childIndex);
 
     return [
       {
