@@ -12,6 +12,7 @@ import {
   updateRoot,
   updateNode,
   updateResponse,
+  updateConversation,
 } from '../../utils/conversation-utils';
 import dataStore from '../dataStore';
 
@@ -27,6 +28,8 @@ class NodeStore {
     this.activeNode = null;
     this.focusedNode = null;
     this.takenNodeIndexes = [];
+
+    this.processDeletes = this.processDeletes.bind(this);
   }
 
   generateNextNodeIndex() {
@@ -145,31 +148,55 @@ class NodeStore {
     return null;
   }
 
-  removeNode(node) {
+  removeNode(node, immediate = false) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     const { roots, nodes } = conversationAsset.Conversation;
     const { type } = node;
     const nodeId = getId(node);
 
+    // Mark for delete
     if (type === 'root') {
-      remove(roots, (r) => {
-        return getId(r) === nodeId;
+      roots.forEach((r) => {
+        const toDelete = getId(r) === nodeId;
+        if (toDelete) r.deleting = true;
       });
     } else if (type === 'node') {
-      remove(nodes, (n) => {
-        const nId = getId(n);
+      nodes.forEach((n) => {
         const toDelete = getId(n) === nodeId;
-        return toDelete;
+        if (toDelete) n.deleting = true;
       });
     } else if (type === 'response') {
       nodes.forEach((n) => {
-        remove((n.branches), (b) => {
-          const bId = getId(b);
-          const toDelete = bId === nodeId;
-          return toDelete;
+        n.branches.forEach((b) => {
+          const toDelete = getId(b) === nodeId;
+          if (toDelete) b.deleting = true;
         });
       });
     }
+
+    if (immediate) {
+      this.processDeletes();
+    } else if (!NodeStore.deleteDeferred) {
+      NodeStore.deleteDeferred = true;
+      defer(this.processDeletes);
+    }
+  }
+
+  @action processDeletes() {
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+    const { roots, nodes } = conversationAsset.Conversation;
+
+    nodes.forEach((n) => {
+      remove(n.branches, b => b.deleting);
+    });
+
+    remove(nodes, n => n.deleting);
+    remove(roots, r => r.deleting);
+
+    defer(() => {
+      NodeStore.deleteDeferred = false;
+      this.setRebuild(true);
+    });
   }
 
   @action addNodeByParentId(parentId) {
@@ -270,18 +297,18 @@ class NodeStore {
   }
 
   @action deleteNodeCascade(node) {
-    const { branches } = node;
-
     if (node.type === 'node') {
-      const { index } = node;
-      branches.forEach(branch => this.deleteBranchCascade(branch));
+      const { index, branches } = node;
+      branches.forEach((branch) => {
+        this.deleteBranchCascade(branch);
+      });
 
       remove(this.takenNodeIndexes, i => i === index);
       this.removeNode(node);
 
       if (this.activeNode && (getId(this.activeNode) === getId(node))) this.unselectActiveNode();
 
-      this.cleanUpDanglingResponseIndexes(index);
+      // this.cleanUpDanglingResponseIndexes(index);
     } else if (node.type === 'response') {
       this.deleteBranchCascade(node);
     } else if (node.type === 'root') {
@@ -374,6 +401,9 @@ class NodeStore {
     this.takenNodeIndexes = [];
   }
 }
+
+/* Statics */
+NodeStore.deleteDeferred = false;
 
 const nodeStore = new NodeStore();
 
