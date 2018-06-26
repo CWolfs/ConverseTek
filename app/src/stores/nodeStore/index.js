@@ -308,7 +308,7 @@ class NodeStore {
 
       if (this.activeNode && (getId(this.activeNode) === getId(node))) this.unselectActiveNode();
 
-      // this.cleanUpDanglingResponseIndexes(index);
+      this.cleanUpDanglingResponseIndexes(index);
     } else if (node.type === 'response') {
       this.deleteBranchCascade(node);
     } else if (node.type === 'root') {
