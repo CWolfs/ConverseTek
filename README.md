@@ -13,10 +13,12 @@ Latest release: **v0.3.0** | [Download](https://github.com/CWolfs/ConverseTek/re
 
 ## Examples
 
+### Screenshots
+
 * [Editor View](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/0.3.0/conversetek-example.png)
 * [In-Game Edited Conversation](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/conversetek-example.png)
 
-## Videos
+### Videos
 
 * [Conversation with Yang](https://www.youtube.com/watch?v=JcjByWyr1lM)
 
