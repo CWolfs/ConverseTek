@@ -56,7 +56,7 @@ class NodeStore {
     if (this.ownerId !== nextOwnerId) {
       this.ownerId = nextOwnerId;
       this.activeNode = null;
-      this.expandMap = new Map();
+      this.expandMap.clear();
     } else {
       this.ownerId = nextOwnerId;
     }
@@ -355,7 +355,9 @@ class NodeStore {
   }
 
   isNodeExpanded(nodeId) {
-    return this.expandMap.get(nodeId) || true;
+    const isNodeExpanded = this.expandMap.get(nodeId);
+    if (isNodeExpanded === undefined) return true;
+    return isNodeExpanded;
   }
 
   /*
