@@ -1,4 +1,4 @@
-# Frequently Asked Questions - ConverseTek v0.2.1
+# Frequently Asked Questions - ConverseTek v0.3.0
 
 ## Conversation Editor
 
@@ -26,15 +26,16 @@ For group conversations or conversations not initiated from clicking the dropshi
 
 ![Conversation Empty Node](./images/faq/conversation-empty-node.png)
 
-An empty node is not actually empty, it just has no dialog text associated with it. Battletech uses these mainly as conditional check points, or gateways to larger
-branches of dialog. ConverseTek _v0.2.1_ does not support editing **actions** or **conditions**. In later versions you'll be able to select any node
-and add/remove actions and conditions.
+An empty node is not actually empty, it just has no dialog text associated with it. Battletech uses these for a few reason:
 
-Action and condition icons will be added to the dialog nodes to better indicate which nodes have actions and dialogs.
+* As a conditional check point
+* As a 'autofollow' conversation branch. This allows for the same character, or a new non-player character, to continue talking
+
+ConverseTek _v0.3.0_ does not support editing **actions** or **conditions**. Support for this will come in _v0.5.0_. Action and condition icons will be added to the dialog nodes to better indicate which nodes have actions and dialogs.
 
 ### "I can drag dialog nodes around but it doesn't seem to do anything at all. When I save and load the conversation everything is reset!"
 
-Dragging dialog nodes around isn't supported in _v0.2.1_. I left in the UI functionality as it'll be a feature **_ComingSoon(tm)_**.
+Dragging dialog nodes around isn't supported in _v0.3.0_. This feature will be in _v0.4.0_.
 
 ### "What is an action?"
 
@@ -52,4 +53,16 @@ This is an logic condition with the conversation system in Battletech itself. If
 
 ### "I've created new conversation file with 'New Convesation'. I can't figure out how to add dialog nodes."
 
-You can't yet with _v0.2.1_. This feature will come in _v0.3.0_.
+You can access the context menu by right-clicking any conversation node. Depending on the type of the node you will be presented with different options. You'll see the 'Add' and 'Delete' options there.
+
+### "I'm trying to create a second node from a response. Why is there no option when I right-click for adding it?"
+
+Responses only ever have _one_ node that follows it. You cannot add a second node to a response. The ability to _insert_ a new node and response in front of an existing response/node link will come in a later version of ConverseTek.
+
+### "I've created a small conversation but Battletech seems to be jumping to the end of my conversation. Why is this?"
+
+This is usually because the conversation is too short and doesn't satisfy the rules in the Battletech conversation system. Ideally, your conversation should be structured as follows:
+
+* An empty root at the start of the conversation (future proofed for actions and conditions to gate the branch)
+* A node after that empty root
+* A response after that node
