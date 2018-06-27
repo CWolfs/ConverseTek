@@ -31,7 +31,7 @@ Latest release: **v0.3.0** | [Download](https://github.com/CWolfs/ConverseTek/re
 
 ## FAQ
 
-Some questions are answered in the [FAQ section](./docs/faq.md).
+Some questions are answered in the [FAQ section](https://github.com/CWolfs/ConverseTek/blob/master/docs/faq.md).
 
 ## Feedback
 
