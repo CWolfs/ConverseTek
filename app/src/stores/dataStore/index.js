@@ -36,6 +36,10 @@ class DataStore {
     this.conversationAssets.delete(id);
   }
 
+  @action clearActiveConversation() {
+    this.activeConversationAsset = null;
+  }
+
   @action updateActiveConversation(conversationAsset) {
     this.setConversation(conversationAsset);
     this.setActiveConversation(conversationAsset.Conversation.idRef.id);
