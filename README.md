@@ -9,11 +9,11 @@ Battletech uses a binary data format for its conversations. It isn't possible to
 
 ## Overview
 
-Latest release: **v0.2.1** | [Download](https://github.com/CWolfs/ConverseTek/releases/tag/v0.2.1)
+Latest release: **v0.3.0** | [Download](https://github.com/CWolfs/ConverseTek/releases/tag/v0.3.0)
 
 ## Example
 
-* [Editor View](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/0.2.0/conversetek-example.png)
+* [Editor View](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/0.3.0/conversetek-example.png)
 * [In-Game Edited Conversation](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/conversetek-example.png)
 
 ## Installation Instructions
@@ -48,11 +48,11 @@ All feedback is welcome in the [issues section](https://github.com/CWolfs/Conver
 | Conversation - Edit dialog node speaker by speaker id | 0.2.0 | :heavy_check_mark: |
 | Conversation - Edit dialog node speaker by cast id | 0.2.0 | :heavy_check_mark: |
 | Conversation - Add/Edit comments | 0.2.0 | :heavy_check_mark: |
-| Conversation - Delete node | 0.3.0 | :soon: |
-| Conversation - Add node | 0.3.0 | :soon: |
-| Conversation - Node toggle 'Only Available Once' | 0.3.0 | :soon: |
-| Conversation - Drag node rearrange | 0.4.0 | :heavy_minus_sign: |
-| Conversation - Linking | 0.4.0 | :heavy_minus_sign: |
+| Conversation - Delete node | 0.3.0 | :heavy_check_mark: |
+| Conversation - Add node | 0.3.0 | :heavy_check_mark: |
+| Conversation - Node toggle 'Only Available Once' | 0.3.0 | :heavy_check_mark: |
+| Conversation - Drag node rearrange | 0.4.0 | :soon: |
+| Conversation - Linking | 0.4.0 | :soon: |
 | Conversation - Visual indicators - Actions | 0.5.0 | :heavy_minus_sign: |
 | Conversation - Visual indicators - Conditions | 0.5.0 | :heavy_minus_sign: |
 | Conversation - Add actions | 0.5.0 | :heavy_minus_sign: |

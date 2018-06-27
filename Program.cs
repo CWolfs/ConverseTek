@@ -72,7 +72,8 @@ namespace ConverseTek {
                                               .UseDefaultResourceSchemeHandler("local", string.Empty)
                                               .UseDefaultHttpSchemeHandler("http", "chromely.com")
                                               .UseDefautJsHandler("boundControllerAsync", true)
-                                              .RegisterCustomHandler(CefHandlerKey.ContextMenuHandler, typeof(ConverseTekContextMenuHandler));
+                                              .RegisterCustomHandler(CefHandlerKey.ContextMenuHandler, typeof(ConverseTekContextMenuHandler))
+                                              .RegisterCustomHandler(CefHandlerKey.KeyboardHandler, typeof(ConverseTekKeyboardHandler));
                                               // .RegisterJsHandler(new ChromelyJsHandler("boundControllerAsync", new ConverseTekBoundObject(), null, true));
 
                                               // Alternate approach for multi-process, is to add a subprocess application

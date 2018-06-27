@@ -9,7 +9,7 @@ import './ConversationTree.css';
 @observer
 class ConversationTree extends Component {
   static remapConversationData(conversationAssets) {
-    return conversationAssets.values().map(asset => ({
+    return Array.from(conversationAssets.values()).map(asset => ({
       key: asset.Conversation.idRef.id,
       label: asset.Conversation.ui_name,
     }));

@@ -37,17 +37,17 @@ namespace ConverseTek.Handlers
         /// </param>
         void IContextMenuHandler.OnBeforeContextMenu(IWebBrowser browserControl, IBrowser browser, IFrame frame, IContextMenuParams parameters, IMenuModel model)
         {
-             // To disable the menu then call clear
-             model.Clear();
+            // To disable the menu then call clear
+            model.Clear();
 
             // Removing existing menu item
             // Remove "View Source" option
-            model.Remove(CefMenuCommand.ViewSource);
+            // model.Remove(CefMenuCommand.ViewSource);
 
 #if (!RELEASE)
             // Add new custom menu items
-            model.AddItem((CefMenuCommand)ShowDevTools, "Show DevTools");
-            model.AddItem((CefMenuCommand)CloseDevTools, "Close DevTools");
+            //model.AddItem((CefMenuCommand)ShowDevTools, "Show DevTools");
+            //model.AddItem((CefMenuCommand)CloseDevTools, "Close DevTools");
 #endif
         }
 
@@ -78,6 +78,7 @@ namespace ConverseTek.Handlers
         bool IContextMenuHandler.OnContextMenuCommand(IWebBrowser browserControl, IBrowser browser, IFrame frame, IContextMenuParams parameters, CefMenuCommand commandId, CefEventFlags eventFlags)
         {
 #if (!RELEASE)
+/*
             if ((int)commandId == ShowDevTools)
             {
                 browser.ShowDevTools();
@@ -87,7 +88,7 @@ namespace ConverseTek.Handlers
             {
                 browser.CloseDevTools();
             }
-
+*/
 #endif
             return false;
         }

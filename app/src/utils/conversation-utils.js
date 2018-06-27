@@ -1,5 +1,6 @@
 import uuid from 'uuid/v4';
 import md5 from 'md5';
+import findIndex from 'lodash.findindex';
 
 /* eslint-disable no-param-reassign, no-return-assign */
 export function generateId() {
@@ -24,8 +25,10 @@ export function regenerateConversationId(conversationAsset) {
   These methods display only the latter `id` but maintain the full ids on
   those that use them
 */
-export function getId(idRef) {
-  const { id } = idRef;
+export function getId(idContainer) {
+  let id = null;
+  ({ id } = idContainer);
+  if (id === undefined) ({ id } = idContainer.idRef);
   return id.split(':')[1] || id;
 }
 
@@ -66,6 +69,66 @@ export function createConversation(filePath) {
   return conversation;
 }
 
+export function createRoot() {
+  return {
+    type: 'root',
+    responseText: '',
+    conditions: null,
+    actions: null,
+    nextNodeIndex: -1,
+    hideIfUnavailable: false,
+    onlyOnce: false,
+    idRef: {
+      id: generateId(),
+    },
+    inputBypass: false,
+    auxiliaryLink: false,
+    comment: '',
+  };
+}
+
+export function createNode(index) {
+  return {
+    type: 'node',
+    idRef: {
+      id: generateId(),
+    },
+    index,
+    text: '',
+    branches: [],
+    nodeType: 1,
+    truthValue: false,
+    autoFollowBranchDelay: 1,
+    inputMaxLength: 0,
+    sourceTopicRef: null,
+    subjectTopicRefs: [],
+    sourceInSceneRef: null,
+    sourceWithTagInScene: '',
+    override_speaker: null,
+    speaker_override_id: '',
+    actions: null,
+    comment: '',
+  };
+}
+
+export function createResponse() {
+  return {
+    type: 'response',
+    responseText: '',
+    conditions: null,
+    actions: null,
+    nextNodeIndex: -1,
+    hideIfUnavailable: false,
+    onlyOnce: false,
+    idRef: {
+      id: generateId(),
+    },
+    inputBypass: false,
+    auxiliaryLink: false,
+    comment: '',
+  };
+}
+
 export function consolidateSpeaker(conversationAsset) {
   const { nodes } = conversationAsset.Conversation;
   nodes.forEach((node) => {
@@ -74,6 +137,46 @@ export function consolidateSpeaker(conversationAsset) {
       node.sourceInSceneRef = null;
     }
   });
+}
+
+export function updateRoot(conversationAsset, root) {
+  const { roots } = conversationAsset.Conversation;
+  const index = findIndex(roots, r => getId(r) === getId(root));
+
+  if (index === -1) {
+    roots.push(root);
+  } else {
+    roots[index] = root;
+  }
+}
+
+export function updateNode(conversationAsset, node) {
+  const { nodes } = conversationAsset.Conversation;
+  const index = findIndex(nodes, n => getId(n) === getId(node));
+
+  if (index === -1) {
+    nodes.push(node);
+  } else {
+    nodes[index] = node;
+  }
+}
+
+export function updateResponse(conversationAsset, parentNode, response) {
+  const { nodes } = conversationAsset.Conversation;
+
+  const branchIndex = findIndex(parentNode.branches, b => getId(b) === getId(response));
+  if (branchIndex === -1) {
+    parentNode.branches.push(response);
+  } else {
+    parentNode.branches[branchIndex] = response;
+  }
+
+  const parentNodeIndex = findIndex(nodes, n => getId(n) === getId(parentNode));
+  if (parentNodeIndex === -1) {
+    nodes.push(parentNode);
+  } else {
+    nodes[parentNodeIndex] = parentNode;
+  }
 }
 
 export default {};
