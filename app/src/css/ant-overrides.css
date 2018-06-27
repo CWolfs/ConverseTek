@@ -174,3 +174,7 @@
   font-style: italic;
   color: #ffffff2e;
 }
+
+.ant-checkbox-inner {
+  background-color: $backgroundTertiary;
+}
