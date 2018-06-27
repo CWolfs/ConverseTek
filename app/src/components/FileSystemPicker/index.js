@@ -51,6 +51,7 @@ class FileSystemPicker extends Component {
     saveWorkingDirectory(selectedItem.Path)
       .then(() => getConversations())
       .then(() => {
+        selectedItem.active = false;
         this.setState({
           selectedItem: null,
           loading: false,
