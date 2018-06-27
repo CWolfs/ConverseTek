@@ -11,10 +11,14 @@ Battletech uses a binary data format for its conversations. It isn't possible to
 
 Latest release: **v0.3.0** | [Download](https://github.com/CWolfs/ConverseTek/releases/tag/v0.3.0)
 
-## Example
+## Examples
 
 * [Editor View](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/0.3.0/conversetek-example.png)
 * [In-Game Edited Conversation](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/conversetek-example.png)
+
+## Videos
+
+* [Conversation with Yang](https://www.youtube.com/watch?v=JcjByWyr1lM)
 
 ## Installation Instructions
 
