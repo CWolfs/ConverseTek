@@ -27,6 +27,7 @@ class NodeStore {
     this.activeNode = null;
     this.focusedNode = null;
     this.takenNodeIndexes = [];
+    this.expandMap = new Map();
 
     this.processDeletes = this.processDeletes.bind(this);
   }
@@ -55,6 +56,7 @@ class NodeStore {
     if (this.ownerId !== nextOwnerId) {
       this.ownerId = nextOwnerId;
       this.activeNode = null;
+      this.expandMap = new Map();
     } else {
       this.ownerId = nextOwnerId;
     }
@@ -282,7 +284,6 @@ class NodeStore {
       const { nextNodeIndex } = root;
       if (nextNodeIndex === idToClean) {
         root.nextNodeIndex = -1;
-        // TODO: Might need to called updateRoot after this
       }
     });
 
@@ -293,7 +294,6 @@ class NodeStore {
         const { nextNodeIndex } = branch;
         if (nextNodeIndex === idToClean) {
           branch.nextNodeIndex = -1;
-          // TODO: Might need to called updateResponse after this
         }
       });
     });
@@ -335,16 +335,27 @@ class NodeStore {
 
   getChildrenFromRoots(roots) {
     return roots.map((root) => {
+      const rootId = getId(root);
+      const isExpanded = this.isNodeExpanded(rootId);
+
       root.type = 'root';
       return {
         title: root.responseText,
         id: getId(root),
         parentId: null,
         type: 'root',
-        expanded: true,
+        expanded: isExpanded,
         children: this.getChildren(root),
       };
     });
+  }
+
+  setNodeExpansion(nodeId, flag) {
+    this.expandMap.set(nodeId, flag);
+  }
+
+  isNodeExpanded(nodeId) {
+    return this.expandMap.get(nodeId) || true;
   }
 
   /*
@@ -368,6 +379,7 @@ class NodeStore {
 
     const { index: childIndex } = childNode;
     const childNodeId = getId(childNode);
+    const isChildExpanded = this.isNodeExpanded(childNodeId);
     childNode.type = 'node';
     childNode.parentId = getId(node);
     this.takenNodeIndexes.push(childIndex);
@@ -378,11 +390,13 @@ class NodeStore {
         id: childNodeId,
         parentId: getId(node),
         type: 'node',
-        expanded: true,
+        expanded: isChildExpanded,
 
         children: childNode.branches.map((branch) => {
           const { auxiliaryLink } = branch;
           const branchNodeId = getId(branch);
+          const isBranchExpanded = this.isNodeExpanded(branchNodeId);
+
           branch.type = 'response';
           branch.parentId = childNodeId;
 
@@ -391,7 +405,7 @@ class NodeStore {
             id: branchNodeId,
             parentId: childNodeId,
             type: 'response',
-            expanded: true,
+            expanded: isBranchExpanded,
             children: (auxiliaryLink) ? [{
               title: `[Link to NODE ${branch.nextNodeIndex}]`,
               type: 'link',

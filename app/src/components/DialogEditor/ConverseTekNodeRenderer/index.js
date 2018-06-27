@@ -165,13 +165,17 @@ const ConverseTekNodeRenderer = observer(({
                 rowDirectionClass,
               )}
               style={buttonStyle}
-              onClick={() =>
+              onClick={() => {
+                const isNodeExpanded = nodeStore.isNodeExpanded(node.id);
+
                 toggleChildrenVisibility({
                   node,
                   path,
                   treeIndex,
-                })
-              }
+                });
+
+                nodeStore.setNodeExpansion(node.id, !isNodeExpanded);
+              }}
             />
 
             {node.expanded &&
