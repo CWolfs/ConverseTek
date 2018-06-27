@@ -27,7 +27,8 @@ For group conversations or conversations not initiated from clicking the dropshi
 ![Conversation Empty Node](./images/faq/conversation-empty-node.png)
 
 An empty node is not actually empty, it just has no dialog text associated with it. Battletech uses these for a few reason:
-* As conditional check point
+
+* As a conditional check point
 * As a 'autofollow' conversation branch. This allows for the same character, or a new non-player character, to continue talking
 
 ConverseTek _v0.3.0_ does not support editing **actions** or **conditions**. Support for this will come in _v0.5.0_. Action and condition icons will be added to the dialog nodes to better indicate which nodes have actions and dialogs.
@@ -52,7 +53,7 @@ This is an logic condition with the conversation system in Battletech itself. If
 
 ### "I've created new conversation file with 'New Convesation'. I can't figure out how to add dialog nodes."
 
-You can access the context menu by right-clicking any conversatio node. Depending on the type of the node you will be presented with different options. You'll see the 'Add' and 'Delete' options there.
+You can access the context menu by right-clicking any conversation node. Depending on the type of the node you will be presented with different options. You'll see the 'Add' and 'Delete' options there.
 
 ### "I'm trying to create a second node from a response. Why is there no option when I right-click for adding it?"
 
