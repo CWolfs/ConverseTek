@@ -68,7 +68,6 @@ class NodeStore {
   * =========================
   */
   @action updateActiveNode(node) {
-    // this.addNode(node);
     this.setActiveNode(getId(node), node.type);
   }
 

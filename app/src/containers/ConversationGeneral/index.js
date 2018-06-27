@@ -213,10 +213,13 @@ class ConversationGeneral extends Component {
         {isRootOrResponse && (
         <Row gutter={16}>
           <Col {...colOneLayout}>
-            <div className="conversation-general__label">Available Once</div>
+            <div className="conversation-general__label">Only Once</div>
           </Col>
           <Col {...colTwoLayout}>
-            <Checkbox onChange={this.handleAvailbleOnceChange} checked={node.onlyOnce}>Checkbox</Checkbox>
+            <Checkbox
+              onChange={this.handleAvailbleOnceChange}
+              checked={node.onlyOnce}
+            />
           </Col>
         </Row>
         )}
