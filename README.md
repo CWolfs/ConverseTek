@@ -13,7 +13,7 @@ Latest release: **v0.3.0** | [Download](https://github.com/CWolfs/ConverseTek/re
 
 ## Example
 
-* [Editor View](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/0.2.0/conversetek-example.png)
+* [Editor View](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/0.3.0/conversetek-example.png)
 * [In-Game Edited Conversation](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/conversetek-example.png)
 
 ## Installation Instructions
@@ -50,7 +50,7 @@ All feedback is welcome in the [issues section](https://github.com/CWolfs/Conver
 | Conversation - Add/Edit comments | 0.2.0 | :heavy_check_mark: |
 | Conversation - Delete node | 0.3.0 | :heavy_check_mark: |
 | Conversation - Add node | 0.3.0 | :heavy_check_mark: |
-| Conversation - Node toggle 'Only Available Once' | 0.3.0 | :soon: |
+| Conversation - Node toggle 'Only Available Once' | 0.3.0 | :heavy_check_mark: |
 | Conversation - Drag node rearrange | 0.4.0 | :heavy_minus_sign: |
 | Conversation - Linking | 0.4.0 | :heavy_minus_sign: |
 | Conversation - Visual indicators - Actions | 0.5.0 | :heavy_minus_sign: |
