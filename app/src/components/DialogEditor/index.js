@@ -19,6 +19,7 @@ class DialogEditor extends Component {
       id: '0',
       children: nodeStore.getChildrenFromRoots(conversationAsset.Conversation.roots),
       expanded: true,
+      canDrag: false,
     }];
 
     return data;

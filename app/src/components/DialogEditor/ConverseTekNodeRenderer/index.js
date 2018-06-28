@@ -42,6 +42,7 @@ const ConverseTekNodeRenderer = observer(({
   const isActiveNode = (activeNodeId === node.id);
   const storedNode = nodeStore.getNode(node.id);
   const { type: nodeType } = node;
+  const canNodeBeDragged = !(node.canDrag === false);
 
   const contextMenuId = node.id || Math.random().toString();
   const { parentId } = node;
@@ -53,8 +54,14 @@ const ConverseTekNodeRenderer = observer(({
     nodeTitle = storedNode.text || storedNode.responseText;
   }
 
+  const moveHandleClasses = classnames('rst__moveHandle', {
+    'node-renderer__root-handle': (nodeType === 'root'),
+    'node-renderer__node-handle': (nodeType === 'node'),
+    'node-renderer__response-handle': (nodeType === 'response'),
+  });
+
   let handle;
-  if (canDrag) {
+  if (canNodeBeDragged) {
     if (typeof node.children === 'function' && node.expanded) {
       // Show a loading symbol on the handle when the children are expanded
       //  and yet still defined by a function (a callback to fetch the children)
@@ -76,7 +83,7 @@ const ConverseTekNodeRenderer = observer(({
       );
     } else {
       // Show the handle used to initiate a drag-and-drop
-      handle = connectDragSource(<div className="rst__moveHandle" />, {
+      handle = connectDragSource(<div className={moveHandleClasses} />, {
         dropEffect: 'copy',
       });
     }
@@ -95,7 +102,7 @@ const ConverseTekNodeRenderer = observer(({
       className={classnames(
         'rst__rowContents',
         'node-renderer__row-contents',
-        !canDrag && 'rst__rowContentsDragDisabled',
+        !canNodeBeDragged && 'rst__rowContentsDragDisabled',
         rowDirectionClass,
       )}
       onClick={() => nodeStore.setActiveNode(node.id, node.type)}
