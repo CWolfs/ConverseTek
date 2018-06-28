@@ -10,7 +10,7 @@ import {
   createResponse,
   createRoot,
   updateRoot,
-  setRoots,
+  setRoots as setRootsUtil,
   updateNode,
   updateResponse,
   setResponses,
@@ -233,7 +233,7 @@ class NodeStore {
   @action setRoots(rootIds) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     const roots = rootIds.map(rootId => this.getNode(rootId));
-    setResponses(conversationAsset, roots);
+    setRootsUtil(conversationAsset, roots);
   }
 
   @action addNode(parent) {
