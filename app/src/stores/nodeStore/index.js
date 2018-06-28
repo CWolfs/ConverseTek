@@ -12,6 +12,7 @@ import {
   updateRoot,
   updateNode,
   updateResponse,
+  setResponses,
 } from '../../utils/conversation-utils';
 import dataStore from '../dataStore';
 
@@ -263,6 +264,13 @@ class NodeStore {
 
     this.updateActiveNode(response);
     this.setRebuild(true);
+  }
+
+  @action setResponses(parentId, responseIds) {
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+    const responses = responseIds.map(responseId => this.getNode(responseId));
+    const parent = this.getNode(parentId);
+    setResponses(conversationAsset, parent, responses);
   }
 
   @action deleteNodeCascadeById(id) {

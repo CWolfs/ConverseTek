@@ -179,4 +179,10 @@ export function updateResponse(conversationAsset, parentNode, response) {
   }
 }
 
+export function setResponses(conversationAsset, parentNode, responses) {
+  const { nodes } = conversationAsset.Conversation;
+  const parentNodeIndex = findIndex(nodes, n => getId(n) === getId(parentNode));
+  nodes[parentNodeIndex].branches.replace(responses);
+}
+
 export default {};

@@ -10,7 +10,7 @@ import DialogEditorContextMenu from '../DialogEditorContextMenu';
 
 import './DialogEditor.css';
 
-/* eslint-disable react/no-unused-state */
+/* eslint-disable react/no-unused-state, no-param-reassign */
 @observer
 class DialogEditor extends Component {
   static buildTreeData(nodeStore, conversationAsset) {
@@ -25,6 +25,29 @@ class DialogEditor extends Component {
     return data;
   }
 
+  static canDrop(nodeContainer) {
+    const { nextParent, node } = nodeContainer;
+
+    // GUARD - Don't allow drop at the very top of the tree
+    if (nextParent === null) return false;
+
+    const { type: nodeType, parentId } = node;
+    const { type: nextParentType, id } = nextParent;
+    const isRoot = nodeType === 'root';
+    let allowDrop = true;
+
+    // Don't allow nodes to be moved under the same type
+    if (nodeType === nextParentType) allowDrop = false;
+
+    // Only allow roots to be moved around under the top level node
+    if (allowDrop) allowDrop = !(!isRoot && nextParent.id === '0');
+
+    // Only allow draggin within the same parent
+    if (allowDrop) allowDrop = (parentId === id);
+
+    return allowDrop;
+  }
+
   constructor(props) {
     super(props);
 
@@ -35,6 +58,8 @@ class DialogEditor extends Component {
       conversationAsset,
       treeData: DialogEditor.buildTreeData(nodeStore, conversationAsset),
     };
+
+    this.onMove = this.onMove.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -51,6 +76,30 @@ class DialogEditor extends Component {
     }
   }
 
+  onMove(nodeContainer) {
+    const {
+      node,
+      nextParentNode,
+      prevTreeIndex,
+      prevPath,
+      nextTreeIndex,
+      nextPath,
+    } = nodeContainer;
+    const { nodeStore } = this.props;
+    const { type: nodeType, children } = node;
+    const { id: parentNodeId, children: parentChildren } = nextParentNode;
+    const isRoot = nodeType === 'root';
+    const isNode = nodeType === 'node';
+    const isResponse = nodeType === 'response';
+
+    if (isResponse) {
+      const responseIds = parentChildren.map(child => child.id);
+      nodeStore.setResponses(parentNodeId, responseIds);
+    }
+
+    console.log(`prev index was ${prevTreeIndex} and next is ${nextTreeIndex} and prev path was ${JSON.stringify(prevPath)} and next path is ${JSON.stringify(nextPath)}`);
+  }
+
   render() {
     const { nodeStore } = this.props;
     const { treeData: data } = this.state;
@@ -65,11 +114,15 @@ class DialogEditor extends Component {
             onChange={treeData => this.setState({ treeData })}
             getNodeKey={({ node, treeIndex }) => {
               if (!node.id) return treeIndex;
+              if (node.treeIndex !== treeIndex) {
+                node.treeIndex = treeIndex;
+              }
               return node.id;
             }}
             rowHeight={40}
             canDrag={nodeContainer => !(nodeContainer.node.id === 0)}
-            canDrop={nodeContainer => !(nodeContainer.nextParent === null)}
+            canDrop={DialogEditor.canDrop}
+            onMoveNode={this.onMove}
             generateNodeProps={() => (
               {
                 nodeStore,
