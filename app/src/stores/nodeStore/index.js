@@ -82,7 +82,7 @@ class NodeStore {
     return getId(this.activeNode);
   }
 
-  @action unselectActiveNode() {
+  @action clearActiveNode() {
     this.activeNode = null;
   }
 
@@ -95,7 +95,7 @@ class NodeStore {
     this.focusedNode = node;
   }
 
-  @action removeFocusedNode() {
+  @action clearFocusedNode() {
     this.focusedNode = null;
   }
 
@@ -309,7 +309,7 @@ class NodeStore {
       remove(this.takenNodeIndexes, i => i === index);
       this.removeNode(node);
 
-      if (this.activeNode && (getId(this.activeNode) === getId(node))) this.unselectActiveNode();
+      if (this.activeNode && (getId(this.activeNode) === getId(node))) this.clearActiveNode();
 
       this.cleanUpDanglingResponseIndexes(index);
     } else if (node.type === 'response') {
@@ -317,7 +317,7 @@ class NodeStore {
     } else if (node.type === 'root') {
       this.deleteBranchCascade(node);
       this.removeNode(node);
-      if (this.activeNode && (getId(this.activeNode) === getId(node))) this.unselectActiveNode();
+      if (this.activeNode && (getId(this.activeNode) === getId(node))) this.clearActiveNode();
     }
   }
 
@@ -329,7 +329,7 @@ class NodeStore {
       if (nextNode) this.deleteNodeCascade(nextNode);
     }
 
-    if (this.activeNode && (getId(this.activeNode) === getId(branch))) this.unselectActiveNode();
+    if (this.activeNode && (getId(this.activeNode) === getId(branch))) this.clearActiveNode();
     this.removeNode(branch);
   }
 
