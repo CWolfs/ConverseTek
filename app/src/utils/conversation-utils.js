@@ -179,6 +179,11 @@ export function updateResponse(conversationAsset, parentNode, response) {
   }
 }
 
+export function setRoots(conversationAsset, roots) {
+  const { roots: conversationRoots } = conversationAsset.Conversation;
+  conversationRoots.replace(roots);
+}
+
 export function setResponses(conversationAsset, parentNode, responses) {
   const { nodes } = conversationAsset.Conversation;
   const parentNodeIndex = findIndex(nodes, n => getId(n) === getId(parentNode));

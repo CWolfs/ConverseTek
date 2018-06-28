@@ -31,8 +31,8 @@ class DialogEditor extends Component {
     // GUARD - Don't allow drop at the very top of the tree
     if (nextParent === null) return false;
 
-    const { type: nodeType, parentId } = node;
-    const { type: nextParentType, id } = nextParent;
+    const { type: nodeType, nodeParentId } = node;
+    const { type: nextParentType, parentId } = nextParent;
     const isRoot = nodeType === 'root';
     let allowDrop = true;
 
@@ -43,7 +43,7 @@ class DialogEditor extends Component {
     if (allowDrop) allowDrop = !(!isRoot && nextParent.id === '0');
 
     // Only allow draggin within the same parent
-    if (allowDrop) allowDrop = (parentId === id);
+    if (allowDrop) allowDrop = (nodeParentId === parentId);
 
     return allowDrop;
   }
@@ -80,24 +80,20 @@ class DialogEditor extends Component {
     const {
       node,
       nextParentNode,
-      prevTreeIndex,
-      prevPath,
-      nextTreeIndex,
-      nextPath,
     } = nodeContainer;
     const { nodeStore } = this.props;
-    const { type: nodeType, children } = node;
+    const { type: nodeType } = node;
     const { id: parentNodeId, children: parentChildren } = nextParentNode;
     const isRoot = nodeType === 'root';
-    const isNode = nodeType === 'node';
     const isResponse = nodeType === 'response';
 
     if (isResponse) {
       const responseIds = parentChildren.map(child => child.id);
       nodeStore.setResponses(parentNodeId, responseIds);
+    } else if (isRoot) {
+      const rootIds = parentChildren.map(child => child.id);
+      nodeStore.setRoots(rootIds);
     }
-
-    console.log(`prev index was ${prevTreeIndex} and next is ${nextTreeIndex} and prev path was ${JSON.stringify(prevPath)} and next path is ${JSON.stringify(nextPath)}`);
   }
 
   render() {
