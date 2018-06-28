@@ -1,6 +1,6 @@
 {
   "name": "conversetek",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Conversation editor for Battletech",
   "main": "index.js",
   "scripts": {
