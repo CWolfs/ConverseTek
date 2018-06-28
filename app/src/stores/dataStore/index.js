@@ -14,6 +14,7 @@ class DataStore {
   }
 
   @action setWorkingDirectory(directoryPath) {
+    if (directoryPath !== this.workingDirectory) this.clearActiveConversation();
     this.workingDirectory = directoryPath;
   }
 
