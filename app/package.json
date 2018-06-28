@@ -10,7 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Richard Griffiths [CWolf] (cwolfs@gmail.com)",
-  "license": "GPL-3.0-or-later",
+  "license": "GPL-3.0",
   "devDependencies": {
     "autoprefixer": "^8.5.2",
     "babel-core": "^6.26.2",
