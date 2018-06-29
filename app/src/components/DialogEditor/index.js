@@ -31,8 +31,8 @@ class DialogEditor extends Component {
     // GUARD - Don't allow drop at the very top of the tree
     if (nextParent === null) return false;
 
-    const { type: nodeType, nodeParentId } = node;
-    const { type: nextParentType, parentId } = nextParent;
+    const { type: nodeType, parentId: nodeParentId } = node;
+    const { type: nextParentType, id: parentId } = nextParent;
     const isRoot = nodeType === 'root';
     let allowDrop = true;
 
