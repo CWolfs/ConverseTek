@@ -1,4 +1,4 @@
-# Frequently Asked Questions - ConverseTek v0.3.0
+# Frequently Asked Questions - ConverseTek v0.4.0
 
 ## Conversation Editor
 

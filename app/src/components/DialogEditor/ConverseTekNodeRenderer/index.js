@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
+import { Icon } from 'antd';
 import { ContextMenuProvider } from 'react-contexify';
 
 import { isDescendant } from '../../../utils/tree-data-utils';
@@ -42,6 +43,14 @@ const ConverseTekNodeRenderer = observer(({
   const isActiveNode = (activeNodeId === node.id);
   const storedNode = nodeStore.getNode(node.id);
   const { type: nodeType } = node;
+  const canNodeBeDragged = !(node.canDrag === false);
+
+  const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node);
+  const isLandingPadActive = !didDrop && isDragging;
+
+  const isRoot = (nodeType === 'root');
+  const isNode = (nodeType === 'node');
+  const isResponse = (nodeType === 'response');
 
   const contextMenuId = node.id || Math.random().toString();
   const { parentId } = node;
@@ -53,8 +62,59 @@ const ConverseTekNodeRenderer = observer(({
     nodeTitle = storedNode.text || storedNode.responseText;
   }
 
+  const moveHandleClasses = classnames('rst__moveHandle', {
+    'node-renderer__root-handle': isRoot,
+    'node-renderer__node-handle': isNode,
+    'node-renderer__response-handle': isResponse,
+  });
+
+  const labelClasses = classnames('rst__rowLabel', rowDirectionClass, {
+    'node-renderer__root-label': isRoot,
+    'node-renderer__node-label': isNode,
+    'node-renderer__response-label': isResponse,
+  });
+
+  const titleClasses = classnames('rst__rowTitle', node.subtitle && 'rst__rowTitleWithSubtitle', {
+    'node-renderer__root-title': isRoot,
+    'node-renderer__node-title': isNode,
+    'node-renderer__response-title': isResponse,
+  });
+
+  const rowContentsClasses = classnames(
+    'rst__rowContents',
+    'node-renderer__row-contents',
+    {
+      'node-renderer__root-row-contents': isRoot,
+      'node-renderer__node-row-contents': isNode,
+      'node-renderer__response-row-contents': isResponse,
+    },
+    !canNodeBeDragged && 'rst__rowContentsDragDisabled',
+    rowDirectionClass,
+  );
+
+  const rowClasses = classnames(
+    'rst__row',
+    'node-renderer__row',
+    {
+      'node-renderer__root-row': isRoot,
+      'node-renderer__node-row': isNode,
+      'node-renderer__response-row': isResponse,
+    },
+    isActiveNode && ({
+      'node-renderer__root-row--active': isRoot,
+      'node-renderer__node-row--active': isNode,
+      'node-renderer__response-row--active': isResponse,
+    }),
+    isLandingPadActive && 'rst__rowLandingPad',
+    isLandingPadActive && !canDrop && 'rst__rowCancelPad',
+    isSearchMatch && 'rst__rowSearchMatch',
+    isSearchFocus && 'rst__rowSearchFocus',
+    rowDirectionClass,
+    className,
+  );
+
   let handle;
-  if (canDrag) {
+  if (canNodeBeDragged) {
     if (typeof node.children === 'function' && node.expanded) {
       // Show a loading symbol on the handle when the children are expanded
       //  and yet still defined by a function (a callback to fetch the children)
@@ -76,14 +136,11 @@ const ConverseTekNodeRenderer = observer(({
       );
     } else {
       // Show the handle used to initiate a drag-and-drop
-      handle = connectDragSource(<div className="rst__moveHandle" />, {
+      handle = connectDragSource(<div className={moveHandleClasses}>{isRoot && <Icon type="ant-design" style={{ color: 'white', fontSize: '20px' }} />}</div>, {
         dropEffect: 'copy',
       });
     }
   }
-
-  const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node);
-  const isLandingPadActive = !didDrop && isDragging;
 
   let buttonStyle = { left: -0.5 * scaffoldBlockPxWidth };
   if (rowDirection === 'rtl') {
@@ -92,22 +149,12 @@ const ConverseTekNodeRenderer = observer(({
 
   const rawRowContents = (
     <div
-      className={classnames(
-        'rst__rowContents',
-        'node-renderer__row-contents',
-        !canDrag && 'rst__rowContentsDragDisabled',
-        rowDirectionClass,
-      )}
+      className={rowContentsClasses}
       onClick={() => nodeStore.setActiveNode(node.id, node.type)}
       onMouseEnter={() => nodeStore.setFocusedNode(node)}
     >
-      <div className={classnames('rst__rowLabel', rowDirectionClass)}>
-        <span
-          className={classnames(
-            'rst__rowTitle',
-            node.subtitle && 'rst__rowTitleWithSubtitle',
-          )}
-        >
+      <div className={labelClasses}>
+        <span className={titleClasses}>
           {typeof nodeTitle === 'function'
             ? nodeTitle({
                 node,
@@ -165,13 +212,17 @@ const ConverseTekNodeRenderer = observer(({
                 rowDirectionClass,
               )}
               style={buttonStyle}
-              onClick={() =>
+              onClick={() => {
+                const isNodeExpanded = nodeStore.isNodeExpanded(node.id);
+
                 toggleChildrenVisibility({
                   node,
                   path,
                   treeIndex,
-                })
-              }
+                });
+
+                nodeStore.setNodeExpansion(node.id, !isNodeExpanded);
+              }}
             />
 
             {node.expanded &&
@@ -191,17 +242,7 @@ const ConverseTekNodeRenderer = observer(({
         {/* Set the row preview to be used during drag and drop */}
         {connectDragPreview((
           <div
-            className={classnames(
-              'rst__row',
-              'node-renderer__row',
-              isActiveNode && 'node-renderer__row--active',
-              isLandingPadActive && 'rst__rowLandingPad',
-              isLandingPadActive && !canDrop && 'rst__rowCancelPad',
-              isSearchMatch && 'rst__rowSearchMatch',
-              isSearchFocus && 'rst__rowSearchFocus',
-              rowDirectionClass,
-              className,
-            )}
+            className={rowClasses}
             style={{
               opacity: isDraggedDescendant ? 0.5 : 1,
               ...style,

@@ -14,6 +14,7 @@ class DataStore {
   }
 
   @action setWorkingDirectory(directoryPath) {
+    if (directoryPath !== this.workingDirectory) this.clearActiveConversation();
     this.workingDirectory = directoryPath;
   }
 
@@ -34,6 +35,10 @@ class DataStore {
 
   @action removeConversation(id) {
     this.conversationAssets.delete(id);
+  }
+
+  @action clearActiveConversation() {
+    this.activeConversationAsset = null;
   }
 
   @action updateActiveConversation(conversationAsset) {

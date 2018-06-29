@@ -10,8 +10,10 @@ import {
   createResponse,
   createRoot,
   updateRoot,
+  setRoots as setRootsUtil,
   updateNode,
   updateResponse,
+  setResponses,
 } from '../../utils/conversation-utils';
 import dataStore from '../dataStore';
 
@@ -27,6 +29,7 @@ class NodeStore {
     this.activeNode = null;
     this.focusedNode = null;
     this.takenNodeIndexes = [];
+    this.expandMap = new Map();
 
     this.processDeletes = this.processDeletes.bind(this);
   }
@@ -55,6 +58,7 @@ class NodeStore {
     if (this.ownerId !== nextOwnerId) {
       this.ownerId = nextOwnerId;
       this.activeNode = null;
+      this.expandMap.clear();
     } else {
       this.ownerId = nextOwnerId;
     }
@@ -80,7 +84,7 @@ class NodeStore {
     return getId(this.activeNode);
   }
 
-  @action unselectActiveNode() {
+  @action clearActiveNode() {
     this.activeNode = null;
   }
 
@@ -93,7 +97,7 @@ class NodeStore {
     this.focusedNode = node;
   }
 
-  @action removeFocusedNode() {
+  @action clearFocusedNode() {
     this.focusedNode = null;
   }
 
@@ -226,6 +230,12 @@ class NodeStore {
     this.setRebuild(true);
   }
 
+  @action setRoots(rootIds) {
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+    const roots = rootIds.map(rootId => this.getNode(rootId));
+    setRootsUtil(conversationAsset, roots);
+  }
+
   @action addNode(parent) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     const { nextNodeIndex: existingNextNodeIndex } = parent;
@@ -263,6 +273,13 @@ class NodeStore {
     this.setRebuild(true);
   }
 
+  @action setResponses(parentId, responseIds) {
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+    const responses = responseIds.map(responseId => this.getNode(responseId));
+    const parent = this.getNode(parentId);
+    setResponses(conversationAsset, parent, responses);
+  }
+
   @action deleteNodeCascadeById(id) {
     const node = this.getNode(id);
     if (node) {
@@ -282,7 +299,6 @@ class NodeStore {
       const { nextNodeIndex } = root;
       if (nextNodeIndex === idToClean) {
         root.nextNodeIndex = -1;
-        // TODO: Might need to called updateRoot after this
       }
     });
 
@@ -293,7 +309,6 @@ class NodeStore {
         const { nextNodeIndex } = branch;
         if (nextNodeIndex === idToClean) {
           branch.nextNodeIndex = -1;
-          // TODO: Might need to called updateResponse after this
         }
       });
     });
@@ -309,7 +324,7 @@ class NodeStore {
       remove(this.takenNodeIndexes, i => i === index);
       this.removeNode(node);
 
-      if (this.activeNode && (getId(this.activeNode) === getId(node))) this.unselectActiveNode();
+      if (this.activeNode && (getId(this.activeNode) === getId(node))) this.clearActiveNode();
 
       this.cleanUpDanglingResponseIndexes(index);
     } else if (node.type === 'response') {
@@ -317,7 +332,7 @@ class NodeStore {
     } else if (node.type === 'root') {
       this.deleteBranchCascade(node);
       this.removeNode(node);
-      if (this.activeNode && (getId(this.activeNode) === getId(node))) this.unselectActiveNode();
+      if (this.activeNode && (getId(this.activeNode) === getId(node))) this.clearActiveNode();
     }
   }
 
@@ -329,22 +344,44 @@ class NodeStore {
       if (nextNode) this.deleteNodeCascade(nextNode);
     }
 
-    if (this.activeNode && (getId(this.activeNode) === getId(branch))) this.unselectActiveNode();
+    if (this.activeNode && (getId(this.activeNode) === getId(branch))) this.clearActiveNode();
     this.removeNode(branch);
   }
 
   getChildrenFromRoots(roots) {
     return roots.map((root) => {
+      const rootId = getId(root);
+      const isExpanded = this.isNodeExpanded(rootId);
+
       root.type = 'root';
       return {
         title: root.responseText,
         id: getId(root),
         parentId: null,
         type: 'root',
-        expanded: true,
+        expanded: isExpanded,
         children: this.getChildren(root),
       };
     });
+  }
+
+  setNodeExpansion(nodeId, flag) {
+    this.expandMap.set(nodeId, flag);
+  }
+
+  isNodeExpanded(nodeId) {
+    const isNodeExpanded = this.expandMap.get(nodeId);
+    if (isNodeExpanded === undefined) return true;
+    return isNodeExpanded;
+  }
+
+  getNodeResponseIdsFromNodeId(nodeId) {
+    const node = this.getNode(nodeId);
+    return this.getNodeResponseIds(node);
+  }
+
+  getNodeResponseIds(node) {
+    return node.branches.map(branch => getId(branch));
   }
 
   /*
@@ -368,6 +405,7 @@ class NodeStore {
 
     const { index: childIndex } = childNode;
     const childNodeId = getId(childNode);
+    const isChildExpanded = this.isNodeExpanded(childNodeId);
     childNode.type = 'node';
     childNode.parentId = getId(node);
     this.takenNodeIndexes.push(childIndex);
@@ -378,11 +416,13 @@ class NodeStore {
         id: childNodeId,
         parentId: getId(node),
         type: 'node',
-        expanded: true,
+        expanded: isChildExpanded,
 
         children: childNode.branches.map((branch) => {
           const { auxiliaryLink } = branch;
           const branchNodeId = getId(branch);
+          const isBranchExpanded = this.isNodeExpanded(branchNodeId);
+
           branch.type = 'response';
           branch.parentId = childNodeId;
 
@@ -391,7 +431,7 @@ class NodeStore {
             id: branchNodeId,
             parentId: childNodeId,
             type: 'response',
-            expanded: true,
+            expanded: isBranchExpanded,
             children: (auxiliaryLink) ? [{
               title: `[Link to NODE ${branch.nextNodeIndex}]`,
               type: 'link',
