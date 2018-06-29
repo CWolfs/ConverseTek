@@ -81,6 +81,11 @@ class DialogEditor extends Component {
       const previousParent = nodeStore.getNode(nodeParentId);
       previousParent.nextNodeIndex = -1;
     } else if (isResponse) {
+      // FIXME: This causes key clash if moving a response to another node
+      // FIXME: Disabled moving responses to another node for now
+      // const previousResponseIds = nodeStore.getNodeResponseIdsFromNodeId(nodeParentId);
+      // nodeStore.setResponses(nodeParentId, previousResponseIds);
+
       const responseIds = parentChildren.map(child => child.id);
       nodeStore.setResponses(parentNodeId, responseIds);
     }

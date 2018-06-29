@@ -375,6 +375,15 @@ class NodeStore {
     return isNodeExpanded;
   }
 
+  getNodeResponseIdsFromNodeId(nodeId) {
+    const node = this.getNode(nodeId);
+    return this.getNodeResponseIds(node);
+  }
+
+  getNodeResponseIds(node) {
+    return node.branches.map(branch => getId(branch));
+  }
+
   /*
   * =======================================
   * || DIALOG TREE DATA BUILDING METHODS ||
