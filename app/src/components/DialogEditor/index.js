@@ -25,29 +25,6 @@ class DialogEditor extends Component {
     return data;
   }
 
-  static canDrop(nodeContainer) {
-    const { nextParent, node } = nodeContainer;
-
-    // GUARD - Don't allow drop at the very top of the tree
-    if (nextParent === null) return false;
-
-    const { type: nodeType, parentId: nodeParentId } = node;
-    const { type: nextParentType, id: parentId } = nextParent;
-    const isRoot = nodeType === 'root';
-    let allowDrop = true;
-
-    // Don't allow nodes to be moved under the same type
-    if (nodeType === nextParentType) allowDrop = false;
-
-    // Only allow roots to be moved around under the top level node
-    if (allowDrop) allowDrop = !(!isRoot && nextParent.id === '0');
-
-    // Only allow draggin within the same parent
-    if (allowDrop) allowDrop = (nodeParentId === parentId);
-
-    return allowDrop;
-  }
-
   constructor(props) {
     super(props);
 
@@ -60,6 +37,7 @@ class DialogEditor extends Component {
     };
 
     this.onMove = this.onMove.bind(this);
+    this.canDrop = this.canDrop.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -82,18 +60,65 @@ class DialogEditor extends Component {
       nextParentNode,
     } = nodeContainer;
     const { nodeStore } = this.props;
-    const { type: nodeType } = node;
+    const { id: nodeId, type: nodeType, parentId: nodeParentId } = node;
     const { id: parentNodeId, children: parentChildren } = nextParentNode;
     const isRoot = nodeType === 'root';
+    const isNode = nodeType === 'node';
     const isResponse = nodeType === 'response';
 
-    if (isResponse) {
-      const responseIds = parentChildren.map(child => child.id);
-      nodeStore.setResponses(parentNodeId, responseIds);
-    } else if (isRoot) {
+    if (isRoot) {
       const rootIds = parentChildren.map(child => child.id);
       nodeStore.setRoots(rootIds);
+    } else if (isNode) {
+      const convoNode = nodeStore.getNode(nodeId);
+      const { index: nodeIndex } = convoNode;
+
+      // Set new root/response parent 'nextNodeIndex' to node 'index'
+      const nextParent = nodeStore.getNode(parentNodeId);
+      nextParent.nextNodeIndex = nodeIndex;
+
+      // Set previous root/response parent 'nextNodeIndex' to -1
+      const previousParent = nodeStore.getNode(nodeParentId);
+      previousParent.nextNodeIndex = -1;
+    } else if (isResponse) {
+      const responseIds = parentChildren.map(child => child.id);
+      nodeStore.setResponses(parentNodeId, responseIds);
     }
+  }
+
+  canDrop(nodeContainer) {
+    const { nodeStore } = this.props;
+    const { nextParent, node } = nodeContainer;
+
+    // GUARD - Don't allow drop at the very top of the tree
+    if (nextParent === null) return false;
+
+    const { type: nodeType, parentId: nodeParentId } = node;
+    const { type: nextParentType, id: parentId } = nextParent;
+    const isRoot = nodeType === 'root';
+    const isNode = nodeType === 'node';
+    const isResponse = nodeType === 'response';
+    let allowDrop = true;
+
+    // Don't allow nodes to be moved under the same type
+    if (nodeType === nextParentType) allowDrop = false;
+
+    // Only allow roots to be moved around under the top level node
+    if (allowDrop) allowDrop = !((isNode || isResponse) && (nextParent.id === '0'));
+
+    // Only allow draggin within the same parent for roots and responses,
+    // for nodes, only allow if the target response is empty
+    if (allowDrop) {
+      if (isRoot || isResponse) {
+        allowDrop = (nodeParentId === parentId);
+      } else if (isNode) {
+        const parent = nodeStore.getNode(parentId);
+        const { nextNodeIndex } = parent;
+        if (nextNodeIndex !== -1) allowDrop = false;
+      }
+    }
+
+    return allowDrop;
   }
 
   render() {
@@ -117,7 +142,7 @@ class DialogEditor extends Component {
             }}
             rowHeight={40}
             canDrag={nodeContainer => !(nodeContainer.node.id === 0)}
-            canDrop={DialogEditor.canDrop}
+            canDrop={this.canDrop}
             onMoveNode={this.onMove}
             generateNodeProps={() => (
               {
