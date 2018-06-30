@@ -78,6 +78,14 @@
     }
   }
 
+  &__link {
+    &-row {
+      &-contents {
+        padding: 2px 5px 0 6px !important;
+      }
+    }
+  }
+
   &__row-contents {
     cursor: pointer;
   }

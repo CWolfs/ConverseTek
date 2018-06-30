@@ -51,6 +51,7 @@ const ConverseTekNodeRenderer = observer(({
   const isRoot = (nodeType === 'root');
   const isNode = (nodeType === 'node');
   const isResponse = (nodeType === 'response');
+  const isLink = (nodeType === 'link');
 
   const contextMenuId = node.id || Math.random().toString();
   const { parentId } = node;
@@ -72,6 +73,7 @@ const ConverseTekNodeRenderer = observer(({
     'node-renderer__root-label': isRoot,
     'node-renderer__node-label': isNode,
     'node-renderer__response-label': isResponse,
+    'node-renderer__link-label': isLink,
   });
 
   const titleClasses = classnames('rst__rowTitle', node.subtitle && 'rst__rowTitleWithSubtitle', {
@@ -87,6 +89,7 @@ const ConverseTekNodeRenderer = observer(({
       'node-renderer__root-row-contents': isRoot,
       'node-renderer__node-row-contents': isNode,
       'node-renderer__response-row-contents': isResponse,
+      'node-renderer__link-row-contents': isLink,
     },
     !canNodeBeDragged && 'rst__rowContentsDragDisabled',
     rowDirectionClass,
@@ -153,40 +156,45 @@ const ConverseTekNodeRenderer = observer(({
       onClick={() => nodeStore.setActiveNode(node.id, node.type)}
       onMouseEnter={() => nodeStore.setFocusedNode(node)}
     >
-      <div className={labelClasses}>
-        <span className={titleClasses}>
-          {typeof nodeTitle === 'function'
-            ? nodeTitle({
-                node,
-                path,
-                treeIndex,
-              })
-            : nodeTitle}
-        </span>
-
-        {nodeSubtitle && (
-          <span className="rst__rowSubtitle">
-            {typeof nodeSubtitle === 'function'
-              ? nodeSubtitle({
+      {isLink && <Icon type="ant-design" style={{ color: 'blue', fontSize: '20px' }} />}
+      {!isLink && (
+      <section>
+        <div className={labelClasses}>
+          <span className={titleClasses}>
+            {typeof nodeTitle === 'function'
+              ? nodeTitle({
                   node,
                   path,
                   treeIndex,
                 })
-              : nodeSubtitle}
+              : nodeTitle}
           </span>
-        )}
-      </div>
 
-      <div className="rst__rowToolbar">
-        {buttons.map((btn, index) => (
-          <div
-            key={index} // eslint-disable-line react/no-array-index-key
-            className="rst__toolbarButton"
-          >
-            {btn}
-          </div>
-        ))}
-      </div>
+          {nodeSubtitle && (
+            <span className="rst__rowSubtitle">
+              {typeof nodeSubtitle === 'function'
+                ? nodeSubtitle({
+                    node,
+                    path,
+                    treeIndex,
+                  })
+                : nodeSubtitle}
+            </span>
+          )}
+        </div>
+
+        <div className="rst__rowToolbar">
+          {buttons.map((btn, index) => (
+            <div
+              key={index} // eslint-disable-line react/no-array-index-key
+              className="rst__toolbarButton"
+            >
+              {btn}
+            </div>
+          ))}
+        </div>
+      </section>
+      )}
     </div>
   );
 

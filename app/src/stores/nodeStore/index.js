@@ -435,6 +435,8 @@ class NodeStore {
             children: (auxiliaryLink) ? [{
               title: `[Link to NODE ${branch.nextNodeIndex}]`,
               type: 'link',
+              linkIndex: branch.nextNodeIndex,
+              canDrag: false,
               parentId: branchNodeId,
             }] : this.getChildren(branch),
           };
