@@ -448,6 +448,13 @@ class NodeStore {
     this.removeNode(branch);
   }
 
+  @action deleteLink(parentId) {
+    const node = this.getNode(parentId);
+    node.nextNodeIndex = -1;
+    node.auxiliaryLink = false;
+    this.setRebuild(true);
+  }
+
   getChildrenFromRoots(roots) {
     return roots.map((root) => {
       const rootId = getId(root);

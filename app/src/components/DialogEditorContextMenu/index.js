@@ -65,7 +65,14 @@ class DialogEditorContextMenu extends Component {
 
   onDeleteClicked({ dataFromProvider }) {
     const { nodeStore } = this.props;
-    nodeStore.deleteNodeCascadeById(dataFromProvider.id, dataFromProvider.type);
+    const { id, type, parentId } = dataFromProvider;
+    const { isLink } = detectType(type);
+
+    if (isLink) {
+      nodeStore.deleteLink(parentId);
+    } else {
+      nodeStore.deleteNodeCascadeById(id, type);
+    }
   }
 
   render() {
