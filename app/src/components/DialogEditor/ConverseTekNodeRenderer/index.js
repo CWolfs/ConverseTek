@@ -7,6 +7,8 @@ import { ContextMenuProvider } from 'react-contexify';
 
 import { isDescendant } from '../../../utils/tree-data-utils';
 
+import { LinkIcon } from '../../Svg';
+
 import './ConverseTekNodeRenderer.css';
 
 /* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
@@ -102,11 +104,13 @@ const ConverseTekNodeRenderer = observer(({
       'node-renderer__root-row': isRoot,
       'node-renderer__node-row': isNode,
       'node-renderer__response-row': isResponse,
+      'node-renderer__link-row': isLink,
     },
     isActiveNode && ({
       'node-renderer__root-row--active': isRoot,
       'node-renderer__node-row--active': isNode,
       'node-renderer__response-row--active': isResponse,
+      'node-renderer__link-row--active': isLink,
     }),
     isLandingPadActive && 'rst__rowLandingPad',
     isLandingPadActive && !canDrop && 'rst__rowCancelPad',
@@ -156,7 +160,7 @@ const ConverseTekNodeRenderer = observer(({
       onClick={() => nodeStore.setActiveNode(node.id, node.type)}
       onMouseEnter={() => nodeStore.setFocusedNode(node)}
     >
-      {isLink && <Icon type="ant-design" style={{ color: 'blue', fontSize: '20px' }} />}
+      {isLink && <div className="node-renderer__link-row-icon"><LinkIcon /></div>}
       {!isLink && (
       <section>
         <div className={labelClasses}>
@@ -204,7 +208,7 @@ const ConverseTekNodeRenderer = observer(({
     </ContextMenuProvider>
   );
 
-  const rowContents = (nodeType !== 'link') ? menuWrappedRowContents : rawRowContents;
+  const rowContents = menuWrappedRowContents; // (!isLink) ? menuWrappedRowContents : rawRowContents;
 
   return (
     <div style={{ height: '100%' }} {...otherProps}>

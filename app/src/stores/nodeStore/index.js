@@ -15,6 +15,7 @@ import {
   updateResponse,
   setResponses,
 } from '../../utils/conversation-utils';
+
 import dataStore from '../dataStore';
 
 /* eslint-disable no-return-assign, no-param-reassign, class-methods-use-this */
@@ -30,6 +31,7 @@ class NodeStore {
     this.focusedNode = null;
     this.takenNodeIndexes = [];
     this.expandMap = new Map();
+    this.clipboardNode = null;
 
     this.processDeletes = this.processDeletes.bind(this);
   }
@@ -99,6 +101,19 @@ class NodeStore {
 
   @action clearFocusedNode() {
     this.focusedNode = null;
+  }
+
+  /*
+  * ============================
+  * || NODE CLIPBOARD METHODS ||
+  * ============================
+  */
+  @action setClipboard(nodeId) {
+    this.clipboardNode = this.getNode(nodeId);
+  }
+
+  @action clearClipboard() {
+    this.clipboardNode = null;
   }
 
   /*
