@@ -1,11 +1,13 @@
-import { observable, action } from 'mobx';
+import { observable, action, toJS } from 'mobx';
 import defer from 'lodash.defer';
 import remove from 'lodash.remove';
 import sortBy from 'lodash.sortby';
 import last from 'lodash.last';
+import flattenDeep from 'lodash.flattendeep';
 
 import {
   getId,
+  generateId,
   createNode,
   createResponse,
   createRoot,
@@ -31,7 +33,10 @@ class NodeStore {
     this.focusedNode = null;
     this.takenNodeIndexes = [];
     this.expandMap = new Map();
-    this.clipboardNode = null;
+    this.clipboard = {
+      node: null,
+      nodes: [],
+    };
 
     this.processDeletes = this.processDeletes.bind(this);
   }
@@ -109,11 +114,42 @@ class NodeStore {
   * ============================
   */
   @action setClipboard(nodeId) {
-    this.clipboardNode = this.getNode(nodeId);
+    const node = toJS(this.getNode(nodeId));
+    node.idRef.id = generateId();
+    this.clipboard.node = node;
+
+    this.clipboard.nodes = flattenDeep(node.branches.map((branch) => {
+      const { nextNodeIndex, auxiliaryLink } = branch;
+      if (nextNodeIndex === -1 || auxiliaryLink) return [];
+
+      branch.idRef.id = generateId();
+      return this.copyNodesRecursive(nextNodeIndex);
+    }));
   }
 
   @action clearClipboard() {
     this.clipboardNode = null;
+  }
+
+  @action pasteNodeFromClipboard(nodeId) {
+
+  }
+
+  copyNodesRecursive(nodeIndex) {
+    const node = toJS(this.getNodeByIndex(nodeIndex));
+    node.idRef.id = generateId();
+
+    const nodes = [
+      node,
+      ...node.branches.map((branch) => {
+        const { nextNodeIndex, auxiliaryLink } = branch;
+        if (nextNodeIndex === -1 || auxiliaryLink) return [];
+
+        branch.idRef.id = generateId();
+        return this.copyNodesRecursive(nextNodeIndex);
+      }),
+    ];
+    return nodes;
   }
 
   /*

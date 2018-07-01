@@ -54,6 +54,7 @@ class DialogEditorContextMenu extends Component {
 
   onPasteAsLink({ dataFromProvider }) {
     const { nodeStore } = this.props;
+    nodeStore.pasteNodeFromClipboard(dataFromProvider.id);
   }
 
   onDeleteClicked({ dataFromProvider }) {
@@ -63,7 +64,7 @@ class DialogEditorContextMenu extends Component {
 
   render() {
     const { nodeStore, id } = this.props;
-    const { focusedNode, clipboardNode } = nodeStore;
+    const { focusedNode, clipboard } = nodeStore;
 
     // GUARD - no need to render the menu if there's no focused node
     if (!focusedNode) return null;
@@ -73,7 +74,7 @@ class DialogEditorContextMenu extends Component {
 
     const allowAdd = isAllowedToCreateNode(focusedNodeId);
     // const allowedToPasteCopy = isAllowedToPasteCopy(focusedNodeId, clipboardNode);
-    const allowedToPasteLink = isAllowedToPasteLink(focusedNodeId, clipboardNode);
+    const allowedToPasteLink = isAllowedToPasteLink(focusedNodeId, clipboard);
 
     return (
       <ContextMenu id={id}>

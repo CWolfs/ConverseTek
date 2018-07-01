@@ -27,11 +27,12 @@ export function isAllowedToCreateNode(nodeId) {
   return false;
 }
 
-export function isAllowedToPasteLink(nodeId, clipboardNode) {
+export function isAllowedToPasteLink(nodeId, clipboard) {
   // GUARD - Don't allow pasting link into a root
   if (nodeId === '0') return false;
 
   const node = nodeStore.getNode(nodeId);
+  const { node: clipboardNode } = clipboard;
 
   // GUARD
   if (!node || !clipboardNode) return false;
@@ -40,13 +41,13 @@ export function isAllowedToPasteLink(nodeId, clipboardNode) {
   const { type: clipboardType } = clipboardNode;
 
   const { isResponse } = detectType(type);
-  const { isRoot: clipboardIsRoot, isNode: clipboardIsNode } = detectType(clipboardType);
+  const { isNode: clipboardIsNode } = detectType(clipboardType);
 
   // GUARD - Only allow pasting links into responses
   if (!isResponse) return false;
 
-  // GUARD - Only allow pasting of roots or nodes
-  if (!clipboardIsNode && !clipboardIsRoot) return false;
+  // GUARD - Only allow pasting of nodes
+  if (!clipboardIsNode) return false;
 
   if (!auxiliaryLink) return true;
 
