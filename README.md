@@ -15,12 +15,14 @@ Latest release: **v0.4.0** | [Download](https://github.com/CWolfs/ConverseTek/re
 
 ### Screenshots
 
-* [Editor View](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/0.3.0/conversetek-example.png)
+* [Editor View](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/0.4.0/conversetek-example.png)
 * [In-Game Edited Conversation](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/conversetek-example.png)
 
 ### Videos
 
 * [Conversation with Yang](https://www.youtube.com/watch?v=JcjByWyr1lM)
+* [Copy & Links Functionality](https://www.youtube.com/watch?v=P9sbtz019ws)
+* [Drag Rearrange Functionality](https://www.youtube.com/watch?v=9Y4xSxJRO_s)
 
 ## Installation Instructions
 
@@ -59,12 +61,12 @@ All feedback is welcome in the [issues section](https://github.com/CWolfs/Conver
 | Conversation - Node toggle 'Only Available Once' | 0.3.0 | :heavy_check_mark: |
 | Conversation - Drag node rearrange | 0.4.0 | :heavy_check_mark: |
 | Conversation - Linking | 0.4.0 | :heavy_minus_sign: |
-| Conversation - Visual indicators - Actions | 0.5.0 | :heavy_minus_sign: |
-| Conversation - Visual indicators - Conditions | 0.5.0 | :heavy_minus_sign: |
-| Conversation - Add actions | 0.5.0 | :heavy_minus_sign: |
-| Conversation - Remove actions | 0.5.0 | :heavy_minus_sign: |
-| Conversation - Add conditions | 0.5.0 | :heavy_minus_sign: |
-| Conversation - Remove conditions | 0.5.0 | :heavy_minus_sign: |
+| Conversation - Visual indicators - Actions | 0.5.0 | :soon: |
+| Conversation - Visual indicators - Conditions | 0.5.0 | :soon: |
+| Conversation - Add actions | 0.5.0 | :soon: |
+| Conversation - Remove actions | 0.5.0 | :soon: |
+| Conversation - Add conditions | 0.5.0 | :soon: |
+| Conversation - Remove conditions | 0.5.0 | :soon: |
 | Conversation - Search | 0.6.0 | :heavy_minus_sign: |
 
 ## Author
