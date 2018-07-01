@@ -161,6 +161,11 @@ export function updateNode(conversationAsset, node) {
   }
 }
 
+export function addNodes(conversationAsset, newNodes) {
+  const { nodes } = conversationAsset.Conversation;
+  newNodes.forEach(node => nodes.push(node));
+}
+
 export function updateResponse(conversationAsset, parentNode, response) {
   const { nodes } = conversationAsset.Conversation;
 

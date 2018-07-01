@@ -16,9 +16,11 @@ import {
   updateNode,
   updateResponse,
   setResponses,
+  addNodes,
 } from '../../utils/conversation-utils';
 
 import dataStore from '../dataStore';
+import { detectType } from '../../utils/node-utils';
 
 /* eslint-disable no-return-assign, no-param-reassign, class-methods-use-this */
 class NodeStore {
@@ -116,19 +118,45 @@ class NodeStore {
   @action setClipboard(nodeId) {
     const node = toJS(this.getNode(nodeId));
     node.idRef.id = generateId();
+    node.index = this.generateNextNodeIndex();
     this.clipboard.node = node;
 
     this.clipboard.nodes = flattenDeep(node.branches.map((branch) => {
       const { nextNodeIndex, auxiliaryLink } = branch;
+      branch.idRef.id = generateId();
+
       if (nextNodeIndex === -1 || auxiliaryLink) return [];
 
-      branch.idRef.id = generateId();
-      return this.copyNodesRecursive(nextNodeIndex);
+      const newNextNodeIndex = this.generateNextNodeIndex();
+      return this.copyNodesRecursive(nextNodeIndex, newNextNodeIndex);
     }));
   }
 
+  copyNodesRecursive(nodeIndex, newNextNodeIndex) {
+    const node = toJS(this.getNodeByIndex(nodeIndex));
+    node.idRef.id = generateId();
+    node.index = newNextNodeIndex;
+
+    const nodes = [
+      node,
+      ...node.branches.map((branch) => {
+        const { nextNodeIndex, auxiliaryLink } = branch;
+        branch.idRef.id = generateId();
+
+        if (nextNodeIndex === -1 || auxiliaryLink) return [];
+
+        const newNodeIndex = this.generateNextNodeIndex();
+        return this.copyNodesRecursive(nextNodeIndex, newNodeIndex);
+      }),
+    ];
+    return nodes;
+  }
+
   @action clearClipboard() {
-    this.clipboardNode = null;
+    this.clipboard = {
+      node: null,
+      nodes: null,
+    };
   }
 
   @action pasteAsLinkFromClipboard(nodeId) {
@@ -137,24 +165,40 @@ class NodeStore {
 
     response.nextNodeIndex = clipboardNode.index;
     response.auxiliaryLink = true;
+
+    this.clearClipboard();
     this.setRebuild(true);
   }
 
-  copyNodesRecursive(nodeIndex) {
-    const node = toJS(this.getNodeByIndex(nodeIndex));
-    node.idRef.id = generateId();
+  @action pasteAsCopyFromClipboard(nodeId) {
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
 
-    const nodes = [
-      node,
-      ...node.branches.map((branch) => {
-        const { nextNodeIndex, auxiliaryLink } = branch;
-        if (nextNodeIndex === -1 || auxiliaryLink) return [];
+    const node = this.getNode(nodeId);
+    const { node: clipboardNode, nodes: clipboardNodes } = this.clipboard;
+    const { isRoot, isNode, isResponse } = detectType(node.type);
+    const {
+      isNode: clipboardIsNode,
+      isResponse: clipboardIsResponse,
+    } = detectType(clipboardNode.type);
 
-        branch.idRef.id = generateId();
-        return this.copyNodesRecursive(nextNodeIndex);
-      }),
-    ];
-    return nodes;
+    if (isRoot || isResponse) { // Only allow nodes to be copied in if target is a root or response
+      if (clipboardIsNode) {
+        node.nextNodeIndex = clipboardNode.index;
+        addNodes(conversationAsset, [clipboardNode, ...clipboardNodes]);
+      } else {
+        console.error('[NodeStore] Cannot copy - wrong node types');
+      }
+    } else if (isNode) { // Only allow response to be copied in
+      if (clipboardIsResponse) {
+        updateResponse(conversationAsset, node, clipboardNode);
+        addNodes(conversationAsset, clipboardNodes);
+      } else {
+        console.error('[NodeStore] Cannot copy - wrong node types');
+      }
+    }
+
+    this.clearClipboard();
+    this.setRebuild(true);
   }
 
   /*

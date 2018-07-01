@@ -8,7 +8,7 @@ import 'react-contexify/dist/ReactContexify.min.css';
 import {
   detectType,
   isAllowedToCreateNode,
-  // isAllowedToPasteCopy,
+  isAllowedToPasteCopy,
   isAllowedToPasteLink,
 } from '../../utils/node-utils';
 
@@ -38,6 +38,7 @@ class DialogEditorContextMenu extends Component {
 
     this.onAddClicked = this.onAddClicked.bind(this);
     this.onCopyClicked = this.onCopyClicked.bind(this);
+    this.onPasteAsCopy = this.onPasteAsCopy.bind(this);
     this.onPasteAsLink = this.onPasteAsLink.bind(this);
     this.onDeleteClicked = this.onDeleteClicked.bind(this);
   }
@@ -50,6 +51,11 @@ class DialogEditorContextMenu extends Component {
   onCopyClicked({ dataFromProvider }) {
     const { nodeStore } = this.props;
     nodeStore.setClipboard(dataFromProvider.id);
+  }
+
+  onPasteAsCopy({ dataFromProvider }) {
+    const { nodeStore } = this.props;
+    nodeStore.pasteAsCopyFromClipboard(dataFromProvider.id);
   }
 
   onPasteAsLink({ dataFromProvider }) {
@@ -73,7 +79,7 @@ class DialogEditorContextMenu extends Component {
     const { isNode, isResponse } = detectType(type);
 
     const allowAdd = isAllowedToCreateNode(focusedNodeId);
-    // const allowedToPasteCopy = isAllowedToPasteCopy(focusedNodeId, clipboardNode);
+    const allowedToPasteCopy = isAllowedToPasteCopy(focusedNodeId, clipboard);
     const allowedToPasteLink = isAllowedToPasteLink(focusedNodeId, clipboard);
 
     return (
@@ -82,6 +88,7 @@ class DialogEditorContextMenu extends Component {
           <Item onClick={this.onAddClicked}>{DialogEditorContextMenu.getAddLabel(type)}</Item>
         }
         {(isNode || isResponse) && <Item onClick={this.onCopyClicked}>Copy</Item>}
+        {(allowedToPasteCopy) && <Item onClick={this.onPasteAsCopy}>Paste as Copy</Item>}
         {(allowedToPasteLink) && <Item onClick={this.onPasteAsLink}>Paste as Link</Item>}
         {(type) && <Item onClick={this.onDeleteClicked}>Delete</Item>}
       </ContextMenu>

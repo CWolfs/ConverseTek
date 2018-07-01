@@ -27,6 +27,28 @@ export function isAllowedToCreateNode(nodeId) {
   return false;
 }
 
+export function isAllowedToPasteCopy(nodeId, clipboard) {
+  const node = nodeStore.getNode(nodeId);
+  const { node: clipboardNode } = clipboard;
+
+  // GUARD
+  if (!node || !clipboardNode) return false;
+
+  const { isRoot, isNode, isResponse } = detectType(node.type);
+  const {
+    isNode: clipboardIsNode,
+    isResponse: clipboardIsResponse,
+  } = detectType(clipboardNode.type);
+
+  if (isRoot || isResponse) { // Only allow nodes to be copied in if target is a root or response
+    if (!clipboardIsNode) return false;
+  } else if (isNode) { // Only allow response to be copied in
+    if (!clipboardIsResponse) return false;
+  }
+
+  return true;
+}
+
 export function isAllowedToPasteLink(nodeId, clipboard) {
   // GUARD - Don't allow pasting link into a root
   if (nodeId === '0') return false;
