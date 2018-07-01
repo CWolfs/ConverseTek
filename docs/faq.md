@@ -31,11 +31,18 @@ An empty node is not actually empty, it just has no dialog text associated with 
 * As a conditional check point
 * As a 'autofollow' conversation branch. This allows for the same character, or a new non-player character, to continue talking
 
-ConverseTek _v0.3.0_ does not support editing **actions** or **conditions**. Support for this will come in _v0.5.0_. Action and condition icons will be added to the dialog nodes to better indicate which nodes have actions and dialogs.
+ConverseTek _v0.4.0_ does not support editing **actions** or **conditions**. Support for this will come in _v0.5.0_. Action and condition icons will be added to the dialog nodes to better indicate which nodes have actions and dialogs.
 
-### "I can drag dialog nodes around but it doesn't seem to do anything at all. When I save and load the conversation everything is reset!"
+### "I can drag dialog nodes around but it doesn't always seem to work!"
 
-Dragging dialog nodes around isn't supported in _v0.3.0_. This feature will be in _v0.4.0_.
+Node dragging will only work in certain situations. These situations are:
+
+* Roots can be dragged up or down within the root level
+
+* Nodes can be dragged into a different empty root
+* Nodes can be dragged into a different empty response
+
+* Responses can be dragged up or down within their node
 
 ### "What is an action?"
 
@@ -66,3 +73,7 @@ This is usually because the conversation is too short and doesn't satisfy the ru
 * An empty root at the start of the conversation (future proofed for actions and conditions to gate the branch)
 * A node after that empty root
 * A response after that node
+
+### "How do I link back to a previous part in a conversation, for example, when returning to a list of questions after one question has been answered?"
+
+You achiveve this with _links_. Right-click the node you wish the conversation to return to, select '_Copy_'. Then right-click the end of the conversation branch just before you loop back to copied section. Now select '_Paste as Link_'.
