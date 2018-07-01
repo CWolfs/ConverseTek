@@ -77,3 +77,5 @@ This is usually because the conversation is too short and doesn't satisfy the ru
 ### "How do I link back to a previous part in a conversation, for example, when returning to a list of questions after one question has been answered?"
 
 You achiveve this with _links_. Right-click the node you wish the conversation to return to, select '_Copy_'. Then right-click the end of the conversation branch just before you loop back to copied section. Now select '_Paste as Link_'.
+
+Remember, you can only link from a _Response_ (yellow) to a _Node_ (blue).
