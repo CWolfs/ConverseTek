@@ -10,7 +10,7 @@ import DialogEditorContextMenu from '../DialogEditorContextMenu';
 
 import './DialogEditor.css';
 
-/* eslint-disable react/no-unused-state */
+/* eslint-disable react/no-unused-state, no-param-reassign */
 @observer
 class DialogEditor extends Component {
   static buildTreeData(nodeStore, conversationAsset) {
@@ -19,6 +19,7 @@ class DialogEditor extends Component {
       id: '0',
       children: nodeStore.getChildrenFromRoots(conversationAsset.Conversation.roots),
       expanded: true,
+      canDrag: false,
     }];
 
     return data;
@@ -34,6 +35,9 @@ class DialogEditor extends Component {
       conversationAsset,
       treeData: DialogEditor.buildTreeData(nodeStore, conversationAsset),
     };
+
+    this.onMove = this.onMove.bind(this);
+    this.canDrop = this.canDrop.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -50,6 +54,78 @@ class DialogEditor extends Component {
     }
   }
 
+  onMove(nodeContainer) {
+    const {
+      node,
+      nextParentNode,
+    } = nodeContainer;
+    const { nodeStore } = this.props;
+    const { id: nodeId, type: nodeType, parentId: nodeParentId } = node;
+    const { id: parentNodeId, children: parentChildren } = nextParentNode;
+    const isRoot = nodeType === 'root';
+    const isNode = nodeType === 'node';
+    const isResponse = nodeType === 'response';
+
+    if (isRoot) {
+      const rootIds = parentChildren.map(child => child.id);
+      nodeStore.setRoots(rootIds);
+    } else if (isNode) {
+      const convoNode = nodeStore.getNode(nodeId);
+      const { index: nodeIndex } = convoNode;
+
+      // Set new root/response parent 'nextNodeIndex' to node 'index'
+      const nextParent = nodeStore.getNode(parentNodeId);
+      nextParent.nextNodeIndex = nodeIndex;
+
+      // Set previous root/response parent 'nextNodeIndex' to -1
+      const previousParent = nodeStore.getNode(nodeParentId);
+      previousParent.nextNodeIndex = -1;
+    } else if (isResponse) {
+      // FIXME: This causes key clash if moving a response to another node
+      // FIXME: Disabled moving responses to another node for now
+      // const previousResponseIds = nodeStore.getNodeResponseIdsFromNodeId(nodeParentId);
+      // nodeStore.setResponses(nodeParentId, previousResponseIds);
+
+      const responseIds = parentChildren.map(child => child.id);
+      nodeStore.setResponses(parentNodeId, responseIds);
+    }
+  }
+
+  canDrop(nodeContainer) {
+    const { nodeStore } = this.props;
+    const { nextParent, node } = nodeContainer;
+
+    // GUARD - Don't allow drop at the very top of the tree
+    if (nextParent === null) return false;
+
+    const { type: nodeType, parentId: nodeParentId } = node;
+    const { type: nextParentType, id: parentId } = nextParent;
+    const isRoot = nodeType === 'root';
+    const isNode = nodeType === 'node';
+    const isResponse = nodeType === 'response';
+    let allowDrop = true;
+
+    // Don't allow nodes to be moved under the same type
+    if (nodeType === nextParentType) allowDrop = false;
+
+    // Only allow roots to be moved around under the top level node
+    if (allowDrop) allowDrop = !((isNode || isResponse) && (nextParent.id === '0'));
+
+    // Only allow draggin within the same parent for roots and responses,
+    // for nodes, only allow if the target response is empty
+    if (allowDrop) {
+      if (isRoot || isResponse) {
+        allowDrop = (nodeParentId === parentId);
+      } else if (isNode) {
+        const parent = nodeStore.getNode(parentId);
+        const { nextNodeIndex } = parent;
+        if (nextNodeIndex !== -1) allowDrop = false;
+      }
+    }
+
+    return allowDrop;
+  }
+
   render() {
     const { nodeStore } = this.props;
     const { treeData: data } = this.state;
@@ -64,11 +140,15 @@ class DialogEditor extends Component {
             onChange={treeData => this.setState({ treeData })}
             getNodeKey={({ node, treeIndex }) => {
               if (!node.id) return treeIndex;
+              if (node.treeIndex !== treeIndex) {
+                node.treeIndex = treeIndex;
+              }
               return node.id;
             }}
             rowHeight={40}
             canDrag={nodeContainer => !(nodeContainer.node.id === 0)}
-            canDrop={nodeContainer => !(nodeContainer.nextParent === null)}
+            canDrop={this.canDrop}
+            onMoveNode={this.onMove}
             generateNodeProps={() => (
               {
                 nodeStore,

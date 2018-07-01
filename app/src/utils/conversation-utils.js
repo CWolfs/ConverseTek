@@ -161,6 +161,11 @@ export function updateNode(conversationAsset, node) {
   }
 }
 
+export function addNodes(conversationAsset, newNodes) {
+  const { nodes } = conversationAsset.Conversation;
+  newNodes.forEach(node => nodes.push(node));
+}
+
 export function updateResponse(conversationAsset, parentNode, response) {
   const { nodes } = conversationAsset.Conversation;
 
@@ -177,6 +182,17 @@ export function updateResponse(conversationAsset, parentNode, response) {
   } else {
     nodes[parentNodeIndex] = parentNode;
   }
+}
+
+export function setRoots(conversationAsset, roots) {
+  const { roots: conversationRoots } = conversationAsset.Conversation;
+  conversationRoots.replace(roots);
+}
+
+export function setResponses(conversationAsset, parentNode, responses) {
+  const { nodes } = conversationAsset.Conversation;
+  const parentNodeIndex = findIndex(nodes, n => getId(n) === getId(parentNode));
+  nodes[parentNodeIndex].branches.replace(responses);
 }
 
 export default {};

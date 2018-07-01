@@ -1,6 +1,6 @@
 {
   "name": "conversetek",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Conversation editor for Battletech",
   "main": "index.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Richard Griffiths [CWolf] (cwolfs@gmail.com)",
-  "license": "GPL v3",
+  "license": "GPL-3.0",
   "devDependencies": {
     "autoprefixer": "^8.5.2",
     "babel-core": "^6.26.2",
@@ -59,6 +59,7 @@
     "lodash.debounce": "^4.0.8",
     "lodash.defer": "^4.1.0",
     "lodash.findindex": "^4.6.0",
+    "lodash.flattendeep": "^4.4.0",
     "lodash.last": "^3.0.0",
     "lodash.remove": "^4.7.0",
     "lodash.sortby": "^4.7.0",
