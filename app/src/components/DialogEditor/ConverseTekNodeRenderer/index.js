@@ -7,6 +7,8 @@ import { ContextMenuProvider } from 'react-contexify';
 
 import { isDescendant } from '../../../utils/tree-data-utils';
 
+import { LinkIcon } from '../../Svg';
+
 import './ConverseTekNodeRenderer.css';
 
 /* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
@@ -51,6 +53,7 @@ const ConverseTekNodeRenderer = observer(({
   const isRoot = (nodeType === 'root');
   const isNode = (nodeType === 'node');
   const isResponse = (nodeType === 'response');
+  const isLink = (nodeType === 'link');
 
   const contextMenuId = node.id || Math.random().toString();
   const { parentId } = node;
@@ -72,6 +75,7 @@ const ConverseTekNodeRenderer = observer(({
     'node-renderer__root-label': isRoot,
     'node-renderer__node-label': isNode,
     'node-renderer__response-label': isResponse,
+    'node-renderer__link-label': isLink,
   });
 
   const titleClasses = classnames('rst__rowTitle', node.subtitle && 'rst__rowTitleWithSubtitle', {
@@ -87,6 +91,7 @@ const ConverseTekNodeRenderer = observer(({
       'node-renderer__root-row-contents': isRoot,
       'node-renderer__node-row-contents': isNode,
       'node-renderer__response-row-contents': isResponse,
+      'node-renderer__link-row-contents': isLink,
     },
     !canNodeBeDragged && 'rst__rowContentsDragDisabled',
     rowDirectionClass,
@@ -99,11 +104,13 @@ const ConverseTekNodeRenderer = observer(({
       'node-renderer__root-row': isRoot,
       'node-renderer__node-row': isNode,
       'node-renderer__response-row': isResponse,
+      'node-renderer__link-row': isLink,
     },
     isActiveNode && ({
       'node-renderer__root-row--active': isRoot,
       'node-renderer__node-row--active': isNode,
       'node-renderer__response-row--active': isResponse,
+      'node-renderer__link-row--active': isLink,
     }),
     isLandingPadActive && 'rst__rowLandingPad',
     isLandingPadActive && !canDrop && 'rst__rowCancelPad',
@@ -153,40 +160,45 @@ const ConverseTekNodeRenderer = observer(({
       onClick={() => nodeStore.setActiveNode(node.id, node.type)}
       onMouseEnter={() => nodeStore.setFocusedNode(node)}
     >
-      <div className={labelClasses}>
-        <span className={titleClasses}>
-          {typeof nodeTitle === 'function'
-            ? nodeTitle({
-                node,
-                path,
-                treeIndex,
-              })
-            : nodeTitle}
-        </span>
-
-        {nodeSubtitle && (
-          <span className="rst__rowSubtitle">
-            {typeof nodeSubtitle === 'function'
-              ? nodeSubtitle({
+      {isLink && <div className="node-renderer__link-row-icon"><LinkIcon /></div>}
+      {!isLink && (
+      <section>
+        <div className={labelClasses}>
+          <span className={titleClasses}>
+            {typeof nodeTitle === 'function'
+              ? nodeTitle({
                   node,
                   path,
                   treeIndex,
                 })
-              : nodeSubtitle}
+              : nodeTitle}
           </span>
-        )}
-      </div>
 
-      <div className="rst__rowToolbar">
-        {buttons.map((btn, index) => (
-          <div
-            key={index} // eslint-disable-line react/no-array-index-key
-            className="rst__toolbarButton"
-          >
-            {btn}
-          </div>
-        ))}
-      </div>
+          {nodeSubtitle && (
+            <span className="rst__rowSubtitle">
+              {typeof nodeSubtitle === 'function'
+                ? nodeSubtitle({
+                    node,
+                    path,
+                    treeIndex,
+                  })
+                : nodeSubtitle}
+            </span>
+          )}
+        </div>
+
+        <div className="rst__rowToolbar">
+          {buttons.map((btn, index) => (
+            <div
+              key={index} // eslint-disable-line react/no-array-index-key
+              className="rst__toolbarButton"
+            >
+              {btn}
+            </div>
+          ))}
+        </div>
+      </section>
+      )}
     </div>
   );
 
@@ -196,7 +208,7 @@ const ConverseTekNodeRenderer = observer(({
     </ContextMenuProvider>
   );
 
-  const rowContents = (nodeType !== 'link') ? menuWrappedRowContents : rawRowContents;
+  const rowContents = menuWrappedRowContents; // (!isLink) ? menuWrappedRowContents : rawRowContents;
 
   return (
     <div style={{ height: '100%' }} {...otherProps}>

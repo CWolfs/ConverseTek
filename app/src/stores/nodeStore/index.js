@@ -1,11 +1,13 @@
-import { observable, action } from 'mobx';
+import { observable, action, toJS } from 'mobx';
 import defer from 'lodash.defer';
 import remove from 'lodash.remove';
 import sortBy from 'lodash.sortby';
 import last from 'lodash.last';
+import flattenDeep from 'lodash.flattendeep';
 
 import {
   getId,
+  generateId,
   createNode,
   createResponse,
   createRoot,
@@ -14,8 +16,11 @@ import {
   updateNode,
   updateResponse,
   setResponses,
+  addNodes,
 } from '../../utils/conversation-utils';
+
 import dataStore from '../dataStore';
+import { detectType } from '../../utils/node-utils';
 
 /* eslint-disable no-return-assign, no-param-reassign, class-methods-use-this */
 class NodeStore {
@@ -30,6 +35,10 @@ class NodeStore {
     this.focusedNode = null;
     this.takenNodeIndexes = [];
     this.expandMap = new Map();
+    this.clipboard = {
+      node: null,
+      nodes: [],
+    };
 
     this.processDeletes = this.processDeletes.bind(this);
   }
@@ -99,6 +108,97 @@ class NodeStore {
 
   @action clearFocusedNode() {
     this.focusedNode = null;
+  }
+
+  /*
+  * ============================
+  * || NODE CLIPBOARD METHODS ||
+  * ============================
+  */
+  @action setClipboard(nodeId) {
+    const node = toJS(this.getNode(nodeId));
+    node.idRef.id = generateId();
+    node.index = this.generateNextNodeIndex();
+    this.clipboard.node = node;
+
+    this.clipboard.nodes = flattenDeep(node.branches.map((branch) => {
+      const { nextNodeIndex, auxiliaryLink } = branch;
+      branch.idRef.id = generateId();
+
+      if (nextNodeIndex === -1 || auxiliaryLink) return [];
+
+      const newNextNodeIndex = this.generateNextNodeIndex();
+      return this.copyNodesRecursive(nextNodeIndex, newNextNodeIndex);
+    }));
+  }
+
+  copyNodesRecursive(nodeIndex, newNextNodeIndex) {
+    const node = toJS(this.getNodeByIndex(nodeIndex));
+    node.idRef.id = generateId();
+    node.index = newNextNodeIndex;
+
+    const nodes = [
+      node,
+      ...node.branches.map((branch) => {
+        const { nextNodeIndex, auxiliaryLink } = branch;
+        branch.idRef.id = generateId();
+
+        if (nextNodeIndex === -1 || auxiliaryLink) return [];
+
+        const newNodeIndex = this.generateNextNodeIndex();
+        return this.copyNodesRecursive(nextNodeIndex, newNodeIndex);
+      }),
+    ];
+    return nodes;
+  }
+
+  @action clearClipboard() {
+    this.clipboard = {
+      node: null,
+      nodes: null,
+    };
+  }
+
+  @action pasteAsLinkFromClipboard(nodeId) {
+    const response = this.getNode(nodeId);
+    const { node: clipboardNode } = this.clipboard;
+
+    response.nextNodeIndex = clipboardNode.index;
+    response.auxiliaryLink = true;
+
+    this.clearClipboard();
+    this.setRebuild(true);
+  }
+
+  @action pasteAsCopyFromClipboard(nodeId) {
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+
+    const node = this.getNode(nodeId);
+    const { node: clipboardNode, nodes: clipboardNodes } = this.clipboard;
+    const { isRoot, isNode, isResponse } = detectType(node.type);
+    const {
+      isNode: clipboardIsNode,
+      isResponse: clipboardIsResponse,
+    } = detectType(clipboardNode.type);
+
+    if (isRoot || isResponse) { // Only allow nodes to be copied in if target is a root or response
+      if (clipboardIsNode) {
+        node.nextNodeIndex = clipboardNode.index;
+        addNodes(conversationAsset, [clipboardNode, ...clipboardNodes]);
+      } else {
+        console.error('[NodeStore] Cannot copy - wrong node types');
+      }
+    } else if (isNode) { // Only allow response to be copied in
+      if (clipboardIsResponse) {
+        updateResponse(conversationAsset, node, clipboardNode);
+        addNodes(conversationAsset, clipboardNodes);
+      } else {
+        console.error('[NodeStore] Cannot copy - wrong node types');
+      }
+    }
+
+    this.clearClipboard();
+    this.setRebuild(true);
   }
 
   /*
@@ -435,6 +535,8 @@ class NodeStore {
             children: (auxiliaryLink) ? [{
               title: `[Link to NODE ${branch.nextNodeIndex}]`,
               type: 'link',
+              linkIndex: branch.nextNodeIndex,
+              canDrag: false,
               parentId: branchNodeId,
             }] : this.getChildren(branch),
           };
