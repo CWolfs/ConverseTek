@@ -54,7 +54,7 @@ class DialogEditorContextMenu extends Component {
 
   onPasteAsLink({ dataFromProvider }) {
     const { nodeStore } = this.props;
-    nodeStore.pasteNodeFromClipboard(dataFromProvider.id);
+    nodeStore.pasteAsLinkFromClipboard(dataFromProvider.id);
   }
 
   onDeleteClicked({ dataFromProvider }) {

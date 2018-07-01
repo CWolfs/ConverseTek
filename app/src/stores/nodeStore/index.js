@@ -131,8 +131,13 @@ class NodeStore {
     this.clipboardNode = null;
   }
 
-  @action pasteNodeFromClipboard(nodeId) {
+  @action pasteAsLinkFromClipboard(nodeId) {
+    const response = this.getNode(nodeId);
+    const { node: clipboardNode } = this.clipboard;
 
+    response.nextNodeIndex = clipboardNode.index;
+    response.auxiliaryLink = true;
+    this.setRebuild(true);
   }
 
   copyNodesRecursive(nodeIndex) {
