@@ -35,7 +35,7 @@ ConverseTek _v0.4.0_ does not support editing **actions** or **conditions**. Sup
 
 ### "I can drag dialog nodes around but it doesn't always seem to work!"
 
-Node dragging will only work in certain situations. These situations are:
+Make sure when dragging nodes that you move the node _directly_ into the highlighted zone. Node dragging will only work in certain situations. These situations are:
 
 * _Roots_ can be dragged up or down within the _Root_ level
 
