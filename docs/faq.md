@@ -37,12 +37,12 @@ ConverseTek _v0.4.0_ does not support editing **actions** or **conditions**. Sup
 
 Node dragging will only work in certain situations. These situations are:
 
-* Roots can be dragged up or down within the root level
+* _Roots_ can be dragged up or down within the _Root_ level
 
-* Nodes can be dragged into a different empty root
-* Nodes can be dragged into a different empty response
+* _Nodes_ can be dragged into a different empty _Root_
+* _Nodes_ can be dragged into a different empty _Response_
 
-* Responses can be dragged up or down within their node
+* _Responses_ can be dragged up or down within their _Node_ level
 
 ### "What is an action?"
 
