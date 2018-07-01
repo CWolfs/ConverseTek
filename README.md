@@ -60,7 +60,7 @@ All feedback is welcome in the [issues section](https://github.com/CWolfs/Conver
 | Conversation - Add node | 0.3.0 | :heavy_check_mark: |
 | Conversation - Node toggle 'Only Available Once' | 0.3.0 | :heavy_check_mark: |
 | Conversation - Drag node rearrange | 0.4.0 | :heavy_check_mark: |
-| Conversation - Linking | 0.4.0 | :heavy_minus_sign: |
+| Conversation - Linking | 0.4.0 | :heavy_check_mark: |
 | Conversation - Visual indicators - Actions | 0.5.0 | :soon: |
 | Conversation - Visual indicators - Conditions | 0.5.0 | :soon: |
 | Conversation - Add actions | 0.5.0 | :soon: |
