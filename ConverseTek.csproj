@@ -58,6 +58,9 @@
   </ItemGroup>
 
   <Target Name="BuildServer" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' ">
+    <Exec Command="xcopy &quot;$(ProjectDir)dist&quot; &quot;$(TargetDir)dist&quot;   /i /s /r /y /c&#xD;&#xA;" />
+    <Exec Command="xcopy &quot;$(ProjectDir)libs&quot; &quot;$(TargetDir)&quot;   /i /s /r /y /c&#xD;&#xA;" />
+    <Exec Command="xcopy &quot;$(ProjectDir)defs&quot; &quot;$(TargetDir)defs&quot;   /i /s /r /y /c&#xD;&#xA;" />
   </Target>
 
   <Target Name="BuildDebug" Condition=" '$(Configuration)' == 'Debug' ">
@@ -70,9 +73,6 @@
     <Exec Command="yarn build" WorkingDirectory="app" ContinueOnError="false" ConsoleToMSBuild="true">
       <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
     </Exec>
-
-    <Exec Command="xcopy &quot;$(ProjectDir)dist&quot; &quot;$(TargetDir)dist&quot;   /i /s /r /y /c&#xD;&#xA;" />
-    <Exec Command="xcopy &quot;$(ProjectDir)libs&quot; &quot;$(TargetDir)&quot;   /i /s /r /y /c&#xD;&#xA;" />
 
     <CallTarget Targets="Build"/>  
   </Target>
@@ -87,9 +87,6 @@
     <Exec Command="yarn prod" WorkingDirectory="app" ContinueOnError="true" ConsoleToMSBuild="false">
       <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
     </Exec>
-
-    <Exec Command="xcopy &quot;$(ProjectDir)dist&quot; &quot;$(TargetDir)dist&quot;   /i /s /r /y /c&#xD;&#xA;" />
-    <Exec Command="xcopy &quot;$(ProjectDir)libs&quot; &quot;$(TargetDir)&quot;   /i /s /r /y /c&#xD;&#xA;" />
 
     <CallTarget Targets="Build" /> 
   </Target>
