@@ -6,14 +6,16 @@ import ConversationTree from '../ConversationTree';
 import ConversationEditor from '../ConversationEditor';
 import SplashScreen from '../SplashScreen';
 
-import { getConversations } from '../../services/api';
+import { getConversations, getDefinitions } from '../../services/api';
 
 import './Conversations.css';
 
-const Conversations = ({ dataStore }) => {
+const Conversations = ({ dataStore, defStore }) => {
   const { conversationAssets, activeConversationAsset } = dataStore;
+  const { definitionCount } = defStore;
 
   if (conversationAssets.size <= 0) getConversations();
+  if (definitionCount <= 0) getDefinitions();
 
   const mainView = (activeConversationAsset) ?
     <ConversationEditor conversationAsset={activeConversationAsset} /> : <SplashScreen />;
@@ -34,4 +36,4 @@ Conversations.propTypes = {
   dataStore: PropTypes.object.isRequired,
 };
 
-export default inject('dataStore')(observer(Conversations));
+export default inject('dataStore', 'defStore')(observer(Conversations));

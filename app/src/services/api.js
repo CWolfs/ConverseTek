@@ -1,6 +1,7 @@
 import { get, post } from './rest';
 
 import dataStore from '../stores/dataStore';
+import defStore from '../stores/defStore';
 
 import { consolidateSpeaker } from '../utils/conversation-utils';
 
@@ -58,4 +59,14 @@ export function getDirectories(path) {
 export function saveWorkingDirectory(path) {
   dataStore.setWorkingDirectory(path);
   return post('/working-directory', { path });
+}
+
+/*
+==========================
+ || DEFINITIONS METHODS ||
+ =========================
+*/
+export function getDefinitions() {
+  return get('/definitions')
+    .then(definitions => defStore.setDefinitions(definitions));
 }

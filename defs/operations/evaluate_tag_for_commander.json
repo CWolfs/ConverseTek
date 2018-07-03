@@ -4,11 +4,11 @@
   "inputs": [
     {
       "label": "Condition",
-      "type": ["bool"]
+      "types": ["bool"]
     },
     {
       "label": "Tag Key",
-      "type": ["string"],
+      "types": ["string"],
       "scope": "commander"
     }
   ]

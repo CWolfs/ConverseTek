@@ -19,8 +19,12 @@ namespace ConverseTek.Services {
 
     public DefinitionService() {}
 
-    public List<ConversationAsset> LoadDefinitions() {
-      return null;
+    public Dictionary<string, List<Definition>> LoadDefinitions() {
+      string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+      Log.Info("[LoadDefinitions] base directory is " + baseDirectory);
+
+      Dictionary<string, List<Definition>> definitions = new Dictionary<string, List<Definition>>();
+      return definitions;
     }
   }
 }

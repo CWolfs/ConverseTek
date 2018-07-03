@@ -4,11 +4,11 @@
   "inputs": [
     {
       "label": "Key",
-      "type": ["string"]
+      "types": ["string"]
     },
     {
       "label": "Value",
-      "type": ["string", "int"]
+      "types": ["string", "int"]
     }
   ]
 }
