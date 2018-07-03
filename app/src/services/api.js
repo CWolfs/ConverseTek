@@ -68,5 +68,8 @@ export function saveWorkingDirectory(path) {
 */
 export function getDefinitions() {
   return get('/definitions')
-    .then(definitions => defStore.setDefinitions(definitions));
+    .then((definitions) => {
+      defStore.setDefinitions(definitions);
+      return definitions;
+    });
 }

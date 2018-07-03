@@ -34,6 +34,7 @@ const Conversations = ({ dataStore, defStore }) => {
 
 Conversations.propTypes = {
   dataStore: PropTypes.object.isRequired,
+  defStore: PropTypes.object.isRequired,
 };
 
 export default inject('dataStore', 'defStore')(observer(Conversations));
