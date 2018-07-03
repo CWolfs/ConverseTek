@@ -1,6 +1,6 @@
 {
   "key": "Evaluate Tag for Commander",
-  "label": "Evaluate Tag for Commander",
+  "label": "If the Commander",
   "inputs": [
     {
       "label": "Condition",
