@@ -8,6 +8,7 @@ namespace ConverseTek.Services {
   using Newtonsoft.Json;
 
   using ConverseTek.Data;
+  using ConverseTek.Json;
 
   public class DefinitionService {
     private static DefinitionService instance;
@@ -41,7 +42,7 @@ namespace ConverseTek.Services {
         List<Definition> presetDefs = new List<Definition>();
 
         foreach (string path in presetPaths) {
-          Definition presetDef = JsonConvert.DeserializeObject<PresetDefinition>(File.ReadAllText(path));
+          Definition presetDef = JsonConvert.DeserializeObject<PresetDefinition>(File.ReadAllText(path), new PresetDefinitionJsonConverter());
           presetDef.Type = "preset";
           presetDefs.Add(presetDef);
         }
