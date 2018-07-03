@@ -27,6 +27,7 @@ namespace ConverseTek.Services {
 
       try {
         string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
         string[] operationPaths = Directory.GetFiles(baseDirectory + OPERATIONS_PATH);
         List<Definition> operationDefs = new List<Definition>();
 
@@ -36,7 +37,17 @@ namespace ConverseTek.Services {
           operationDefs.Add(operationDef);
         }
 
+        string[] presetPaths = Directory.GetFiles(baseDirectory + PRESETS_PATH);
+        List<Definition> presetDefs = new List<Definition>();
+
+        foreach (string path in presetPaths) {
+          Definition presetDef = JsonConvert.DeserializeObject<PresetDefinition>(File.ReadAllText(path));
+          presetDef.Type = "preset";
+          presetDefs.Add(presetDef);
+        }
+
         definitions.Add("operations", operationDefs);
+        definitions.Add("presets", presetDefs);
       } catch (Exception e) {
         Log.Error(e);
       }

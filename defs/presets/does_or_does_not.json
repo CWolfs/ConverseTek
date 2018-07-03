@@ -2,8 +2,8 @@
   "key": "DoesOrDoesNot",
   "label": "Does or does not",
   "type": "int",
-  "values": [
-    "does not",
-    "does"
-  ]
+  "values": {
+    "0": "does not",
+    "1": "does"
+  }
 }
