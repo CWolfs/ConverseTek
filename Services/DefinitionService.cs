@@ -47,8 +47,18 @@ namespace ConverseTek.Services {
           presetDefs.Add(presetDef);
         }
 
+        string[] tagPaths = Directory.GetFiles(baseDirectory + TAGS_PATH);
+        List<Definition> tagDefs = new List<Definition>();
+
+        foreach (string path in tagPaths) {
+          Definition tagDef = JsonConvert.DeserializeObject<TagDefinition>(File.ReadAllText(path));
+          tagDef.Type = "tag";
+          tagDefs.Add(tagDef);
+        }
+
         definitions.Add("operations", operationDefs);
         definitions.Add("presets", presetDefs);
+        definitions.Add("tags", tagDefs);
       } catch (Exception e) {
         Log.Error(e);
       }

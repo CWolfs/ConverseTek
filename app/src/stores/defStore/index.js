@@ -16,7 +16,7 @@ class DefStore {
 
     if (operations) this.operations = operations;
     if (presets) this.presets = presets;
-    if (tags) this.tags = presets;
+    if (tags) this.tags = tags;
 
     this.definitionCount = this.operations.length + this.presets.length + this.tags.length;
   }
