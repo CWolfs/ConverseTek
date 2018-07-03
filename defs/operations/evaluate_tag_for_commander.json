@@ -1,0 +1,15 @@
+{
+  "key": "Evaluate Tag for Commander",
+  "label": "Evaluate Tag for Commander",
+  "inputs": [
+    {
+      "label": "Condition",
+      "type": ["bool"]
+    },
+    {
+      "label": "Tag Key",
+      "type": ["string"],
+      "scope": "commander"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "key": "Get Preset Value (int)",
+  "label": "Get Preset Value (int)",
+  "inputs": [
+    {
+      "label": "Key",
+      "type": ["string"]
+    },
+    {
+      "label": "Value",
+      "type": ["string", "int"]
+    }
+  ]
+}

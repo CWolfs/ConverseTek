@@ -1,0 +1,9 @@
+{
+  "key": "DoesOrDoesNot",
+  "label": "Does or does not",
+  "type": "int",
+  "values": [
+    "does not",
+    "does"
+  ]
+}
