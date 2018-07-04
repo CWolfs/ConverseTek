@@ -1,0 +1,14 @@
+@import '../../css/constants.css';
+
+.toggle-editable {
+  width: 100%;
+
+  &__content {
+    display: inline-block;
+  }
+
+  &__controls {
+    float: right;
+    margin-top: $tinySpace;
+  }
+}

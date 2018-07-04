@@ -1,6 +1,7 @@
 {
   "key": "Get Preset Value (int)",
   "label": "Get Preset Value (int)",
+  "view": ["result"],
   "inputs": [
     {
       "label": "Key",

@@ -1,22 +1,30 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { observer, inject } from 'mobx-react';
-import { Button, Icon, List, Select } from 'antd';
+import { Button, Icon, List } from 'antd';
 import classnames from 'classnames';
 
-const { Option } = Select;
+import ToggleEditable from '../../components/ToggleEditable';
+import ViewableLogic from '../../components/ViewableLogic';
+
+import './ConversationConditions.css';
+
+// const { Option } = Select;
 
 @observer
 class ConversationConditions extends Component {
   constructor(props) {
     super(props);
 
+    this.dataSize = 0;
+
     this.renderListItem = this.renderListItem.bind(this);
-    this.onItemRemoved = this.onItemRemoved.bind(this);
-    this.onSearch = this.onSearch.bind(this);
-    this.onChange = this.onChange.bind(this);
+    // this.onItemRemoved = this.onItemRemoved.bind(this);
+    // this.onSearch = this.onSearch.bind(this);
+    // this.onChange = this.onChange.bind(this);
   }
 
+  /*
   onItemRemoved(index) {
 
   }
@@ -28,16 +36,18 @@ class ConversationConditions extends Component {
   onChange(condition, option) {
     condition.functionName = option.key;
   }
+  */
 
   renderListItem(condition, index) {
-    const { defStore } = this.props;
-    const { operations } = defStore;
     const key = index;
 
-    const classes = classnames({
-      first: index === 0,
-      last: index === (this.dataSize - 1),
-    });
+    const classes = classnames(
+      'conversation-conditions__list-item',
+      {
+        first: index === 0,
+        last: index === (this.dataSize - 1),
+      },
+    );
 
     return (
       <List.Item
@@ -49,12 +59,27 @@ class ConversationConditions extends Component {
           </Button>,
         ]}
       >
+        <ToggleEditable>
+          <ViewableLogic logic={condition} />
+          <div>World 2</div>
+        </ToggleEditable>
+        {/*
         <Select
           mode="combobox"
           showSearch
-          onSearch={value => this.onSearch(condition, value)}
-          onChange={value => this.onChange(condition, value)}
-          value={{ key: condition.functionName, label: 'test' }}
+          // onSearch={value => this.onSearch(condition, value)}
+          // onChange={value => this.onChange(condition, value)}
+          defaultValue={{ key: condition.functionName, label: 'test' }}
+          filterOption={(input, option) => {
+            const { key: optionKey, props: optionProps } = option;
+            const { title: optionTitle } = optionProps;
+
+            if (optionKey.toLowerCase().includes(input.toLowerCase()) ||
+                optionTitle.toLowerCase().includes(input.toLowerCase())) {
+              return true;
+            }
+            return false;
+          }}
           style={{ width: 250 }}
           labelInValue
           optionLabelProp="title"
@@ -68,6 +93,8 @@ class ConversationConditions extends Component {
             </Option>
           ))}
         </Select>
+        */}
+
       </List.Item>
     );
   }
@@ -81,8 +108,10 @@ class ConversationConditions extends Component {
       conditions = conditions.ops;
     }
 
+    this.dataSize = conditions.length;
+
     return (
-      <div>
+      <div className="conversation-conditions">
         <List
           dataSource={conditions}
           renderItem={this.renderListItem}
@@ -93,9 +122,7 @@ class ConversationConditions extends Component {
 }
 
 ConversationConditions.propTypes = {
-  dataStore: PropTypes.object.isRequired,
-  defStore: PropTypes.object.isRequired,
   node: PropTypes.object.isRequired,
 };
 
-export default inject('dataStore', 'defStore')(ConversationConditions);
+export default ConversationConditions;
