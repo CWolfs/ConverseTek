@@ -51,6 +51,37 @@ class ConversationConditions extends Component {
     return (
       <Panel key={key} className={classes} header={header}>
         <p>Here's where you'd edit the condition</p>
+        {/*
+        <Select
+          mode="combobox"
+          showSearch
+          // onSearch={value => this.onSearch(condition, value)}
+          // onChange={value => this.onChange(condition, value)}
+          defaultValue={{ key: condition.functionName, label: 'test' }}
+          filterOption={(input, option) => {
+            const { key: optionKey, props: optionProps } = option;
+            const { title: optionTitle } = optionProps;
+
+            if (optionKey.toLowerCase().includes(input.toLowerCase()) ||
+                optionTitle.toLowerCase().includes(input.toLowerCase())) {
+              return true;
+            }
+            return false;
+          }}
+          style={{ width: 250 }}
+          labelInValue
+          optionLabelProp="title"
+        >
+          {operations.map(operation => (
+            <Option
+              key={operation.Key}
+              title={operation.Label}
+            >
+              {operation.Label}
+            </Option>
+          ))}
+        </Select>
+        */} 
       </Panel>
     );
   }
