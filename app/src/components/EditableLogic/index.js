@@ -3,20 +3,22 @@ import PropTypes from 'prop-types';
 import { observer, inject } from 'mobx-react';
 import { Select } from 'antd';
 
+import './EditableLogic.css';
+
 const { Option } = Select;
 
 @observer
 /* eslint-disable react/no-array-index-key */
 class EditableLogic extends Component {
-  static renderSelect(inputLabel, input, arg, options, index) {
+  static renderSelect(inputLabel, value, options) {
     return (
       <Select
-        key={index}
-        mode="combobox"
-        showSearch
+        // mode="combobox"
+        // showSearch
         // onSearch={value => this.onSearch(condition, value)}
         // onChange={value => this.onChange(condition, value)}
-        defaultValue={(arg) ? arg.functionName : null}
+        defaultValue={(value) ? value.functionName : null}
+        /*
         filterOption={(inputData, option) => {
           const { key: optionKey, props: optionProps } = option;
           const { title: optionTitle } = optionProps;
@@ -27,7 +29,8 @@ class EditableLogic extends Component {
           }
           return false;
         }}
-        style={{ width: 250 }}
+        */
+        style={{ width: 230 }}
       >
         {options.map(operation => (
           <Option
@@ -41,6 +44,24 @@ class EditableLogic extends Component {
     );
   }
 
+  static renderInput(value, options) {
+    const isAutocomplete = !!options;
+
+    if (isAutocomplete) {
+
+    } else {
+
+    }
+  }
+
+  renderLogic(logicDef, logic) {
+    const { defStore } = this.props;
+    const { operations } = defStore;
+
+    const content = EditableLogic.renderSelect(logicDef.Label, logic, operations);
+    return <div><span className="editable-logic__operation-label"> Logic: </span>{content}</div>;
+  }
+
   renderInputsAndArgs(logicDef, logic) {
     const { defStore } = this.props;
     const { operations } = defStore;
@@ -50,15 +71,19 @@ class EditableLogic extends Component {
     return inputs.map((input, index) => {
       const { Label: label, Types: types } = input;
       const arg = args[index];
+      const argValue = defStore.getArgValue(arg);
+      const { type: argType, value: argVal } = argValue;
       let content = null;
 
-      if (label === 'Operation') {
-        content = EditableLogic.renderSelect(logicDef.Label, input, arg, operations, index);
+      if (argType === 'operation' && types.includes('operation')) {
+        content = EditableLogic.renderSelect(logicDef.Label, argVal, operations);
+      } else if (argType === 'operation' && !types.includes('operation')) {
+        console.error(`[EditableLogic] Argument and input type mismatch for ${label}`);
       }
 
-      if (!content) content = <div key={index}>Input: {input.Label}</div>;
+      if (!content) content = <div>Unprocessed Input: {input.Label}</div>;
 
-      return content;
+      return <div className="editable-logic__args-container" key={index}><span className="editable-logic__args-label">Arg {index + 1}:</span> {content}</div>;
     });
   }
 
@@ -72,11 +97,17 @@ class EditableLogic extends Component {
       return null;
     }
 
-    const content = this.renderInputsAndArgs(logicDef, logic);
+    const content = this.renderLogic(logicDef, logic);
+    const argContent = this.renderInputsAndArgs(logicDef, logic);
 
     return (
-      <div>
-        {content}
+      <div className="editable-logic">
+        <div className="editable-logic__operation">
+          {content}
+        </div>
+        <div className="editable-logic__args">
+          {argContent}
+        </div>
       </div>
     );
   }

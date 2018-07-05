@@ -1,0 +1,27 @@
+@import '../../css/constants.css';
+
+.editable-logic {
+
+  &__operation {
+    &-label {
+      margin-right: $tinySpace;
+    }
+  }
+
+  &__args {
+    margin-left: $largeSpace;
+    border: 1px solid white;
+    border-radius: 2px;
+    padding: $smallSpace;
+    margin-top: $smallSpace;
+
+    &-container {
+      margin: $tinySpace 0;
+    }
+
+    &-label {
+      margin-right: $tinySpace;
+    }
+  }
+
+}
