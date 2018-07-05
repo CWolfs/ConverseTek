@@ -7,12 +7,10 @@ import CustomScroll from 'react-custom-scroll';
 
 import 'react-custom-scroll/dist/customScroll.css';
 
-// import ToggleEditable from '../../components/ToggleEditable';
 import ViewableLogic from '../../components/ViewableLogic';
 
 import './ConversationConditions.css';
 
-// const { Option } = Select;
 const { Panel } = Collapse;
 
 @observer
@@ -23,7 +21,6 @@ class ConversationConditions extends Component {
     this.dataSize = 0;
 
     this.renderPanel = this.renderPanel.bind(this);
-    // this.renderListItem = this.renderListItem.bind(this);
   }
 
   renderPanel(condition, index) {
@@ -57,37 +54,6 @@ class ConversationConditions extends Component {
       </Panel>
     );
   }
-
-  /*
-  renderListItem(condition, index) {
-    const key = index;
-
-    const classes = classnames(
-      'conversation-conditions__list-item',
-      {
-        first: index === 0,
-        last: index === (this.dataSize - 1),
-      },
-    );
-
-    return (
-      <List.Item
-        key={key}
-        className={classes}
-        actions={[
-          <Button className="icon-button" onClick={() => this.onItemRemove(key)}>
-            <Icon type="delete" />
-          </Button>,
-        ]}
-      >
-        <ToggleEditable>
-          <ViewableLogic logic={condition} />
-          <div>World 2</div>
-        </ToggleEditable>
-      </List.Item>
-    );
-  }
-  */
 
   render() {
     const { node } = this.props;
