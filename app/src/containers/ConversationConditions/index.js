@@ -1,15 +1,17 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { observer, inject } from 'mobx-react';
-import { Button, Icon, List } from 'antd';
+import { observer } from 'mobx-react';
+import { Button, Icon, List, Collapse } from 'antd';
 import classnames from 'classnames';
+import CustomScroll from 'react-custom-scroll';
 
-import ToggleEditable from '../../components/ToggleEditable';
+import 'react-custom-scroll/dist/customScroll.css';
+
 import ViewableLogic from '../../components/ViewableLogic';
 
 import './ConversationConditions.css';
 
-// const { Option } = Select;
+const { Panel } = Collapse;
 
 @observer
 class ConversationConditions extends Component {
@@ -18,51 +20,37 @@ class ConversationConditions extends Component {
 
     this.dataSize = 0;
 
-    this.renderListItem = this.renderListItem.bind(this);
-    // this.onItemRemoved = this.onItemRemoved.bind(this);
-    // this.onSearch = this.onSearch.bind(this);
-    // this.onChange = this.onChange.bind(this);
+    this.renderPanel = this.renderPanel.bind(this);
   }
 
-  /*
-  onItemRemoved(index) {
-
-  }
-
-  onSearch(condition, value) {
-    condition.functionName = value;
-  }
-
-  onChange(condition, option) {
-    condition.functionName = option.key;
-  }
-  */
-
-  renderListItem(condition, index) {
+  renderPanel(condition, index) {
     const key = index;
 
     const classes = classnames(
-      'conversation-conditions__list-item',
+      'conversation-conditions__panel',
       {
         first: index === 0,
         last: index === (this.dataSize - 1),
       },
     );
 
-    return (
-      <List.Item
-        key={key}
-        className={classes}
-        actions={[
-          <Button className="icon-button" onClick={() => this.onItemRemove(key)}>
-            <Icon type="delete" />
-          </Button>,
-        ]}
-      >
-        <ToggleEditable>
+    const header = (
+      <div className="conversation-conditions__panel-header">
+        <div className="conversation-conditions__panel-header-logic">
           <ViewableLogic logic={condition} />
-          <div>World 2</div>
-        </ToggleEditable>
+        </div>
+        <Button
+          size="small"
+          type="caution"
+          className="conversation-conditions__panel-header-delete-button"
+        >
+          <Icon type="delete" />
+        </Button>
+      </div>);
+
+    return (
+      <Panel key={key} className={classes} header={header}>
+        <p>Here's where you'd edit the condition</p>
         {/*
         <Select
           mode="combobox"
@@ -93,9 +81,8 @@ class ConversationConditions extends Component {
             </Option>
           ))}
         </Select>
-        */}
-
-      </List.Item>
+        */} 
+      </Panel>
     );
   }
 
@@ -112,10 +99,19 @@ class ConversationConditions extends Component {
 
     return (
       <div className="conversation-conditions">
-        <List
-          dataSource={conditions}
-          renderItem={this.renderListItem}
-        />
+        <CustomScroll heightRelativeToParent="calc(100% - 1px)">
+          <Collapse>
+            {conditions.map((condition, index) => this.renderPanel(condition, index))}
+          </Collapse>
+        </CustomScroll>
+        <div className="conversation-conditions__buttons">
+          <Button
+            type="secondary"
+            size="small"
+          >
+            <Icon type="plus" />
+          </Button>
+        </div>
       </div>
     );
   }

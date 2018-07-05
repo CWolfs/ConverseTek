@@ -1,12 +1,24 @@
 @import '../../css/constants.css';
 
 .conversation-conditions {
-  &__list-item {
-    background-color: $backgroundTertiary;
-    border: 1px solid $borderTertiary !important;
-    margin: $tinySpace 0 $tinySpace 0;
-    border-radius: 2px;
-    padding: 0 $tinySpace;
+  &__panel-header {
+    display: flex;
+
+    &-logic {
+      flex: 1;
+      display: inline-block;
+    }
+
+    &-delete-button {
+      flex: 0 0 $largeSpace;
+      margin-left: $mediumLargeSpace;
+      margin-right: $tinySpace;
+    }
+  }
+
+  &__buttons {
+    margin-top: $tinySpace;
+    text-align: right;
   }
 
   .first {
@@ -23,15 +35,37 @@
     }
   }
 
-  .ant-list {
-    color: $textColourPrimary;
+  .ant-collapse {
+    background-color: $backgroundTertiary;
+    border-radius: 0 0 $tinySpace $tinySpace !important;
+    border: 1px solid $borderTertiary !important;
 
-    &-item-content {
-      width: 100%;
+    &-item.last {
+      border-bottom: none !important;
     }
 
-    &-item-action {
-      margin-left: $tinySpace;
+    &-item-active.last {
+      border-bottom: 1px solid $borderTertiary;
+    }
+
+    &-item {
+      border-bottom: 1px solid $borderTertiary !important;
+    }
+
+    &-content {
+      background-color: #3d3d3e !important;
+      color: white !important;
+    }
+
+    &-header {
+      padding-top: $tinySpace !important;
+      padding-bottom: $tinySpace !important;
+      color: $textColourPrimary !important;
+
+      .arrow {
+        line-height: $lineHeightLargest !important;
+        color: gold;
+      }
     }
   }
 }
