@@ -1,6 +1,21 @@
 @import '../../css/constants.css';
 
 .conversation-conditions {
+  &__panel-header {
+    display: flex;
+
+    &-logic {
+      flex: 1;
+      display: inline-block;
+    }
+
+    &-delete-button {
+      flex: 0 0 $largeSpace;
+      margin-left: $mediumLargeSpace;
+      margin-right: $tinySpace;
+    }
+  }
+
   &__buttons {
     margin-top: $tinySpace;
     text-align: right;
@@ -49,6 +64,7 @@
 
       .arrow {
         line-height: $lineHeightLargest !important;
+        color: gold;
       }
     }
   }

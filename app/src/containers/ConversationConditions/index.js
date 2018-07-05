@@ -37,11 +37,23 @@ class ConversationConditions extends Component {
       },
     );
 
-    const header = (<ViewableLogic logic={condition} />);
+    const header = (
+      <div className="conversation-conditions__panel-header">
+        <div className="conversation-conditions__panel-header-logic">
+          <ViewableLogic logic={condition} />
+        </div>
+        <Button
+          size="small"
+          type="caution"
+          className="conversation-conditions__panel-header-delete-button"
+        >
+          <Icon type="delete" />
+        </Button>
+      </div>);
 
     return (
       <Panel key={key} className={classes} header={header}>
-        <p>1</p>
+        <p>Here's where you'd edit the condition</p>
       </Panel>
     );
   }
