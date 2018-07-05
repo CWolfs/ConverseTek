@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
-import { Button, Icon, List, Collapse } from 'antd';
+import { Button, Icon, Collapse } from 'antd';
 import classnames from 'classnames';
-import CustomScroll from 'react-custom-scroll';
+// import CustomScroll from 'react-custom-scroll';
 
 import 'react-custom-scroll/dist/customScroll.css';
 
@@ -21,6 +21,19 @@ class ConversationConditions extends Component {
     this.dataSize = 0;
 
     this.renderPanel = this.renderPanel.bind(this);
+    this.resize = this.resize.bind(this);
+  }
+
+  componentDidMount() {
+    window.addEventListener('resize', this.resize);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.resize);
+  }
+
+  resize() {
+    this.forceUpdate();
   }
 
   renderPanel(condition, index) {
@@ -96,14 +109,17 @@ class ConversationConditions extends Component {
     }
 
     this.dataSize = conditions.length;
+    const height = window.document.getElementsByClassName('conversation-editor__details')[0].clientHeight - 22;
 
     return (
-      <div className="conversation-conditions">
-        <CustomScroll heightRelativeToParent="calc(100% - 1px)">
-          <Collapse>
-            {conditions.map((condition, index) => this.renderPanel(condition, index))}
-          </Collapse>
+      <div className="conversation-conditions" style={{ height }}>
+        {/*
+        <CustomScroll heightRelativeToParent={`${height}px`}>
         </CustomScroll>
+        */}
+        <Collapse>
+          {conditions.map((condition, index) => this.renderPanel(condition, index))}
+        </Collapse>
         <div className="conversation-conditions__buttons">
           <Button
             type="secondary"

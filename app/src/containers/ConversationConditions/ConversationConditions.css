@@ -1,6 +1,9 @@
 @import '../../css/constants.css';
 
 .conversation-conditions {
+  overflow-y: auto;
+  overflow-x: hidden;
+
   &__panel-header {
     display: flex;
 
@@ -18,6 +21,8 @@
 
   &__buttons {
     margin-top: $tinySpace;
+    margin-bottom: 1px;
+    margin-right: 1px;
     text-align: right;
   }
 
@@ -67,5 +72,9 @@
         color: gold;
       }
     }
+  }
+
+  ::-webkit-scrollbar {
+    margin-right: $tinySpace;
   }
 }
