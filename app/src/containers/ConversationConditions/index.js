@@ -91,27 +91,18 @@ class ConversationConditions extends Component {
     return (
       <div className="conversation-conditions">
         <CustomScroll heightRelativeToParent="calc(100% - 1px)">
-          <Collapse defaultActiveKey={['1']}>
+          <Collapse>
             {conditions.map((condition, index) => this.renderPanel(condition, index))}
-            {/*
-            <Panel header="This is panel header 1" key="1">
-              <p>1</p>
-            </Panel>
-            <Panel header="This is panel header 2" key="2">
-              <p>2</p>
-            </Panel>
-            <Panel className="last" header="This is panel header 3" key="3">
-              <p>3</p>
-            </Panel>
-            */}
           </Collapse>
         </CustomScroll>
-        {/*
-          <List
-            dataSource={conditions}
-            renderItem={this.renderListItem}
-          />
-        */}
+        <div className="conversation-conditions__buttons">
+          <Button
+            type="secondary"
+            size="small"
+          >
+            <Icon type="plus" />
+          </Button>
+        </div>
       </div>
     );
   }

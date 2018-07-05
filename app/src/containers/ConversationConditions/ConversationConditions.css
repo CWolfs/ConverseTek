@@ -1,12 +1,9 @@
 @import '../../css/constants.css';
 
 .conversation-conditions {
-  &__list-item {
-    background-color: $backgroundTertiary;
-    border: 1px solid $borderTertiary !important;
-    margin: $tinySpace 0 $tinySpace 0;
-    border-radius: 2px;
-    padding: 0 $tinySpace;
+  &__buttons {
+    margin-top: $tinySpace;
+    text-align: right;
   }
 
   .first {
@@ -20,18 +17,6 @@
   .first, .last {
     .ant-list-item-meta-title  {
       margin-bottom: 0;
-    }
-  }
-
-  .ant-list {
-    color: $textColourPrimary;
-
-    &-item-content {
-      width: 100%;
-    }
-
-    &-item-action {
-      margin-left: $tinySpace;
     }
   }
 
@@ -52,7 +37,12 @@
       border-bottom: 1px solid $borderTertiary !important;
     }
 
-    .ant-collapse-header {
+    &-content {
+      background-color: #3d3d3e !important;
+      color: white !important;
+    }
+
+    &-header {
       padding-top: $tinySpace !important;
       padding-bottom: $tinySpace !important;
       color: $textColourPrimary !important;
