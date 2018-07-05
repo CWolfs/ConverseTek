@@ -1,15 +1,19 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { observer, inject } from 'mobx-react';
-import { Button, Icon, List } from 'antd';
+import { observer } from 'mobx-react';
+import { Button, Icon, List, Collapse } from 'antd';
 import classnames from 'classnames';
+import CustomScroll from 'react-custom-scroll';
 
-import ToggleEditable from '../../components/ToggleEditable';
+import 'react-custom-scroll/dist/customScroll.css';
+
+// import ToggleEditable from '../../components/ToggleEditable';
 import ViewableLogic from '../../components/ViewableLogic';
 
 import './ConversationConditions.css';
 
 // const { Option } = Select;
+const { Panel } = Collapse;
 
 @observer
 class ConversationConditions extends Component {
@@ -18,26 +22,31 @@ class ConversationConditions extends Component {
 
     this.dataSize = 0;
 
-    this.renderListItem = this.renderListItem.bind(this);
-    // this.onItemRemoved = this.onItemRemoved.bind(this);
-    // this.onSearch = this.onSearch.bind(this);
-    // this.onChange = this.onChange.bind(this);
+    this.renderPanel = this.renderPanel.bind(this);
+    // this.renderListItem = this.renderListItem.bind(this);
+  }
+
+  renderPanel(condition, index) {
+    const key = index;
+
+    const classes = classnames(
+      'conversation-conditions__panel',
+      {
+        first: index === 0,
+        last: index === (this.dataSize - 1),
+      },
+    );
+
+    const header = (<ViewableLogic logic={condition} />);
+
+    return (
+      <Panel key={key} className={classes} header={header}>
+        <p>1</p>
+      </Panel>
+    );
   }
 
   /*
-  onItemRemoved(index) {
-
-  }
-
-  onSearch(condition, value) {
-    condition.functionName = value;
-  }
-
-  onChange(condition, option) {
-    condition.functionName = option.key;
-  }
-  */
-
   renderListItem(condition, index) {
     const key = index;
 
@@ -63,41 +72,10 @@ class ConversationConditions extends Component {
           <ViewableLogic logic={condition} />
           <div>World 2</div>
         </ToggleEditable>
-        {/*
-        <Select
-          mode="combobox"
-          showSearch
-          // onSearch={value => this.onSearch(condition, value)}
-          // onChange={value => this.onChange(condition, value)}
-          defaultValue={{ key: condition.functionName, label: 'test' }}
-          filterOption={(input, option) => {
-            const { key: optionKey, props: optionProps } = option;
-            const { title: optionTitle } = optionProps;
-
-            if (optionKey.toLowerCase().includes(input.toLowerCase()) ||
-                optionTitle.toLowerCase().includes(input.toLowerCase())) {
-              return true;
-            }
-            return false;
-          }}
-          style={{ width: 250 }}
-          labelInValue
-          optionLabelProp="title"
-        >
-          {operations.map(operation => (
-            <Option
-              key={operation.Key}
-              title={operation.Label}
-            >
-              {operation.Label}
-            </Option>
-          ))}
-        </Select>
-        */}
-
       </List.Item>
     );
   }
+  */
 
   render() {
     const { node } = this.props;
@@ -112,10 +90,28 @@ class ConversationConditions extends Component {
 
     return (
       <div className="conversation-conditions">
-        <List
-          dataSource={conditions}
-          renderItem={this.renderListItem}
-        />
+        <CustomScroll heightRelativeToParent="calc(100% - 1px)">
+          <Collapse defaultActiveKey={['1']}>
+            {conditions.map((condition, index) => this.renderPanel(condition, index))}
+            {/*
+            <Panel header="This is panel header 1" key="1">
+              <p>1</p>
+            </Panel>
+            <Panel header="This is panel header 2" key="2">
+              <p>2</p>
+            </Panel>
+            <Panel className="last" header="This is panel header 3" key="3">
+              <p>3</p>
+            </Panel>
+            */}
+          </Collapse>
+        </CustomScroll>
+        {/*
+          <List
+            dataSource={conditions}
+            renderItem={this.renderListItem}
+          />
+        */}
       </div>
     );
   }

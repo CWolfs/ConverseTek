@@ -1,14 +1,15 @@
 @import '../../css/constants.css';
 
 .toggle-editable {
+  display: flex;
   width: 100%;
 
   &__content {
-    display: inline-block;
+    flex: 1;
   }
 
   &__controls {
-    float: right;
     margin-top: $tinySpace;
+    flex: 0 0 $largeSpace;
   }
 }

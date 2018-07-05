@@ -34,4 +34,32 @@
       margin-left: $tinySpace;
     }
   }
+
+  .ant-collapse {
+    background-color: $backgroundTertiary;
+    border-radius: 0 0 $tinySpace $tinySpace !important;
+    border: 1px solid $borderTertiary !important;
+
+    &-item.last {
+      border-bottom: none !important;
+    }
+
+    &-item-active.last {
+      border-bottom: 1px solid $borderTertiary;
+    }
+
+    &-item {
+      border-bottom: 1px solid $borderTertiary !important;
+    }
+
+    .ant-collapse-header {
+      padding-top: $tinySpace !important;
+      padding-bottom: $tinySpace !important;
+      color: $textColourPrimary !important;
+
+      .arrow {
+        line-height: $lineHeightLargest !important;
+      }
+    }
+  }
 }
