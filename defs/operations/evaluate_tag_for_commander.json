@@ -4,7 +4,7 @@
   "view": ["label", "inputs"],
   "inputs": [
     {
-      "label": "Condition",
+      "label": "Operation",
       "types": ["bool"]
     },
     {
