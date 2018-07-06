@@ -1,6 +1,9 @@
 @import '../../css/constants.css';
 
 .editable-logic {
+  &__logic-type {
+    margin-right: $tinySpace;
+  }
 
   &__operation {
     margin-left: $largeSpace;

@@ -11,18 +11,18 @@ const { Option } = Select;
 @observer
 /* eslint-disable react/no-array-index-key */
 class EditableLogic extends Component {
-  static renderSelect(inputLabel, value, options) {
+  static renderSelect(value, options, placeholder, style) {
     return (
       <Select
-        defaultValue={(value) ? value.functionName : null}
-        style={{ width: 230 }}
+        defaultValue={value}
+        style={style || { width: 230 }}
+        placeholder={placeholder}
       >
-        {options.map(operation => (
+        {options.map(option => (
           <Option
-            key={operation.Key}
-            title={operation.Label}
+            key={option.Key || option}
           >
-            {operation.Key}
+            {option.Key || option}
           </Option>
         ))}
       </Select>
@@ -30,7 +30,7 @@ class EditableLogic extends Component {
   }
 
   static renderInput(argValue, options) {
-    const { key, value } = argValue;
+    const { value } = argValue;
     const isAutocomplete = !!options;
 
     const style = {
@@ -58,11 +58,24 @@ class EditableLogic extends Component {
   }
 
   renderLogic(logicDef, logic) {
-    const { defStore, category } = this.props;
+    const {
+      defStore,
+      category,
+      parentInput,
+      parentArg,
+    } = this.props;
     const operations = defStore.getOperations(category);
+    const { functionName } = logic;
 
-    const content = EditableLogic.renderSelect(logicDef.Label, logic, operations);
-    return <div>{content}</div>;
+    const typeSelector = (parentInput && parentArg) ?
+      EditableLogic.renderSelect(parentArg.type, parentInput.Types, 'Select a type', { width: 120 }) : null;
+    const content = EditableLogic.renderSelect(functionName, operations, 'Select an operation');
+    return (
+      <div>
+        {typeSelector && <span className="editable-logic__logic-type">{typeSelector}</span>}
+        {content}
+      </div>
+    );
   }
 
   renderInputsAndArgs(logicDef, logic) {
@@ -83,7 +96,7 @@ class EditableLogic extends Component {
         argsContainerClasses = classnames(argsContainerClasses, {
           'first-operation': index === 0,
         });
-        content = <EditableLogic defStore={defStore} logic={argVal} category="secondary" isEven={!isEven} />;
+        content = <EditableLogic defStore={defStore} logic={argVal} category="secondary" isEven={!isEven} parentInput={input} parentArg={argValue} />;
       } else if (argType === 'operation' && !types.includes('operation')) {
         console.error(`[EditableLogic] Argument and input type mismatch for ${label}`);
       } else if ((argType === 'string') && types.includes('string')) {
@@ -139,10 +152,14 @@ class EditableLogic extends Component {
 
 EditableLogic.defaultProps = {
   isEven: false,
+  parentInput: null,
+  parentArg: null,
 };
 
 EditableLogic.propTypes = {
   defStore: PropTypes.object.isRequired,
+  parentInput: PropTypes.object,
+  parentArg: PropTypes.object,
   logic: PropTypes.object.isRequired,
   category: PropTypes.string.isRequired,
   isEven: PropTypes.bool,
