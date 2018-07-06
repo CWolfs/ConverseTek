@@ -1,7 +1,8 @@
 @import '../../css/constants.css';
 
 .editable-logic {
-  &__logic-type {
+  &__logic-type,
+  &__arg-type {
     margin-right: $tinySpace;
   }
 

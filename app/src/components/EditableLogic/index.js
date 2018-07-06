@@ -79,7 +79,10 @@ class EditableLogic extends Component {
   }
 
   renderInputsAndArgs(logicDef, logic) {
-    const { defStore, isEven } = this.props;
+    const {
+      defStore,
+      isEven,
+    } = this.props;
     const { args } = logic;
     const { Key: logicDefKey, Inputs: inputs } = logicDef;
 
@@ -92,6 +95,9 @@ class EditableLogic extends Component {
 
       let argsContainerClasses = classnames('editable-logic__args-container');
 
+      const typeSelector = (input && argValue) ?
+        EditableLogic.renderSelect(argValue.type, input.Types, 'Select a type', { width: 120 }) : null;
+
       if (argType === 'operation' && types.includes('operation')) {
         argsContainerClasses = classnames(argsContainerClasses, {
           'first-operation': index === 0,
@@ -101,13 +107,23 @@ class EditableLogic extends Component {
         console.error(`[EditableLogic] Argument and input type mismatch for ${label}`);
       } else if ((argType === 'string') && types.includes('string')) {
         if (logicDefKey.includes('Preset')) {
-          content = EditableLogic.renderInput(argValue, defStore.getPresetKeys());
+          content = (
+            <div>
+              {typeSelector && <span className="editable-logic__arg-type">{typeSelector}</span>}
+              {EditableLogic.renderInput(argValue, defStore.getPresetKeys())}
+            </div>
+          );
         } else {
           content = EditableLogic.renderInput(argValue);
         }
       } else if ((argType === 'float' && types.includes('float')) ||
         (argType === 'int' && types.includes('int'))) {
-        content = EditableLogic.renderInput(argValue);
+        content = (
+          <div>
+            {typeSelector && <span className="editable-logic__arg-type">{typeSelector}</span>}
+            {EditableLogic.renderInput(argValue)}
+          </div>
+        );
       } else {
         console.error(`[EditableLogic] Argument and input type mismatch for ${label}`);
       }
