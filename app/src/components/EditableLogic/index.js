@@ -34,7 +34,7 @@ class EditableLogic extends Component {
     const isAutocomplete = !!options;
 
     const style = {
-      width: '300px',
+      width: '275px',
     };
 
     if (isAutocomplete) {
@@ -54,6 +54,15 @@ class EditableLogic extends Component {
         placeholder="Basic usage"
         value={value}
       />
+    );
+  }
+
+  static wrapWithTypeSelector(typeSelector, node) {
+    return (
+      <section>
+        {typeSelector && <span className="editable-logic__arg-type">{typeSelector}</span>}
+        {node}
+      </section>
     );
   }
 
@@ -107,22 +116,21 @@ class EditableLogic extends Component {
         console.error(`[EditableLogic] Argument and input type mismatch for ${label}`);
       } else if ((argType === 'string') && types.includes('string')) {
         if (logicDefKey.includes('Preset')) {
-          content = (
-            <div>
-              {typeSelector && <span className="editable-logic__arg-type">{typeSelector}</span>}
-              {EditableLogic.renderInput(argValue, defStore.getPresetKeys())}
-            </div>
+          content = EditableLogic.wrapWithTypeSelector(
+            typeSelector,
+            EditableLogic.renderInput(argValue, defStore.getPresetKeys()),
           );
         } else {
-          content = EditableLogic.renderInput(argValue);
+          content = EditableLogic.wrapWithTypeSelector(
+            typeSelector,
+            EditableLogic.renderInput(argValue),
+          );
         }
       } else if ((argType === 'float' && types.includes('float')) ||
         (argType === 'int' && types.includes('int'))) {
-        content = (
-          <div>
-            {typeSelector && <span className="editable-logic__arg-type">{typeSelector}</span>}
-            {EditableLogic.renderInput(argValue)}
-          </div>
+        content = EditableLogic.wrapWithTypeSelector(
+          typeSelector,
+          EditableLogic.renderInput(argValue),
         );
       } else {
         console.error(`[EditableLogic] Argument and input type mismatch for ${label}`);
