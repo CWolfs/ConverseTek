@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { observer, inject } from 'mobx-react';
 import { Select, Input } from 'antd';
+import classnames from 'classnames';
 
 import './EditableLogic.css';
 
@@ -48,11 +49,16 @@ class EditableLogic extends Component {
     const { key, value } = argValue;
     const isAutocomplete = !!options;
 
+    const style = {
+      width: '300px',
+    };
+
     if (isAutocomplete) {
 
     } else {
       return (
         <Input
+          style={style}
           placeholder="Basic usage"
           value={value}
         />
@@ -69,7 +75,7 @@ class EditableLogic extends Component {
   }
 
   renderInputsAndArgs(logicDef, logic) {
-    const { defStore } = this.props;
+    const { defStore, isEven } = this.props;
     const { args } = logic;
     const { Inputs: inputs } = logicDef;
 
@@ -81,7 +87,7 @@ class EditableLogic extends Component {
       let content = null;
 
       if (argType === 'operation' && types.includes('operation')) {
-        content = <EditableLogic defStore={defStore} logic={argVal} category="secondary" />;
+        content = <EditableLogic defStore={defStore} logic={argVal} category="secondary" isEven={!isEven} />;
       } else if (argType === 'operation' && !types.includes('operation')) {
         console.error(`[EditableLogic] Argument and input type mismatch for ${label}`);
       }
@@ -96,13 +102,19 @@ class EditableLogic extends Component {
 
       if (!content) content = <div>Unprocessed Input: {input.Label}</div>;
 
-      return <div className="editable-logic__args-container" key={index}><span className="editable-logic__args-label">Arg {index + 1}:</span> {content}</div>;
+      return <div className="editable-logic__args-container" key={index}><span className="editable-logic__args-label">Argument {index + 1}</span> {content}</div>;
     });
   }
 
   render() {
-    const { defStore, logic } = this.props;
+    const { defStore, logic, isEven } = this.props;
     const logicDef = defStore.getDefinition(logic);
+    const operationClasses = classnames('editable-logic__operation', {
+      'editable-logic__operation--even': isEven,
+    })
+    const argClasses = classnames('editable-logic__args', {
+      'editable-logic__args--even': isEven,
+    });
 
     // GUARD
     if (!logicDef) {
@@ -115,10 +127,10 @@ class EditableLogic extends Component {
 
     return (
       <div className="editable-logic">
-        <div className="editable-logic__operation">
+        <div className={operationClasses}>
           {content}
         </div>
-        <div className="editable-logic__args">
+        <div className={argClasses}>
           {argContent}
         </div>
       </div>
@@ -126,10 +138,15 @@ class EditableLogic extends Component {
   }
 }
 
+EditableLogic.defaultProps = {
+  isEven: false,
+};
+
 EditableLogic.propTypes = {
   defStore: PropTypes.object.isRequired,
   logic: PropTypes.object.isRequired,
   category: PropTypes.string.isRequired,
+  isEven: PropTypes.bool,
 };
 
 export default inject('defStore')(EditableLogic);
