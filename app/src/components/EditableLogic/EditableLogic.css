@@ -3,6 +3,10 @@
 .editable-logic {
 
   &__operation {
+    &--even {
+      background-color: $backgroundTertiary;
+    }
+  
     &-label {
       margin-right: $tinySpace;
     }
@@ -14,6 +18,11 @@
     border-radius: 2px;
     padding: $smallSpace;
     margin-top: $smallSpace;
+    background-color: #3d3d3e;
+
+    &--even {
+      background-color: $backgroundTertiary;
+    }
 
     &-container {
       margin: $tinySpace 0;
@@ -21,6 +30,7 @@
 
     &-label {
       margin-right: $tinySpace;
+      margin-bottom: $tinySpace;
     }
   }
 

@@ -1,6 +1,6 @@
 import { observable, action } from 'mobx';
 
-/* eslint-disable class-methods-use-this */
+/* eslint-disable class-methods-use-this, no-param-reassign */
 class DefStore {
   @observable operations = [];
   @observable presets = [];
@@ -46,6 +46,16 @@ class DefStore {
     if (stringValue !== '') return { type: 'string', value: stringValue };
     if (floatValue !== 0 && intValue !== 0) return { type: 'float', value: floatValue };
     return { type: 'int', value: intValue };
+  }
+
+  @action setArgValue(arg, value) {
+    const argValue = this.getArgValue(arg);
+    const { type } = argValue;
+
+    if (type === 'operation') arg.call_value = value;
+    if (type === 'string') arg.string_value = value;
+    if (type === 'float') arg.float_value = value;
+    if (type === 'int') arg.int_value = value;
   }
 
   @action getPresetValue(key, value) {
