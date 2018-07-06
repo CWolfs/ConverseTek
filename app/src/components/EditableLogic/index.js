@@ -14,23 +14,7 @@ class EditableLogic extends Component {
   static renderSelect(inputLabel, value, options) {
     return (
       <Select
-        // mode="combobox"
-        // showSearch
-        // onSearch={value => this.onSearch(condition, value)}
-        // onChange={value => this.onChange(condition, value)}
         defaultValue={(value) ? value.functionName : null}
-        /*
-        filterOption={(inputData, option) => {
-          const { key: optionKey, props: optionProps } = option;
-          const { title: optionTitle } = optionProps;
-
-          if (optionKey.toLowerCase().includes(inputData.toLowerCase()) ||
-              optionTitle.toLowerCase().includes(inputData.toLowerCase())) {
-            return true;
-          }
-          return false;
-        }}
-        */
         style={{ width: 230 }}
       >
         {options.map(operation => (
@@ -78,7 +62,7 @@ class EditableLogic extends Component {
     const operations = defStore.getOperations(category);
 
     const content = EditableLogic.renderSelect(logicDef.Label, logic, operations);
-    return <div>{/* <span className="editable-logic__operation-label"> Logic: </span> */}{content}</div>;
+    return <div>{content}</div>;
   }
 
   renderInputsAndArgs(logicDef, logic) {
