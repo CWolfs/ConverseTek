@@ -9,7 +9,7 @@
   }
 
   &__args {
-    margin-left: $largeSpace;
+    margin-left: 44px;
     border: 1px solid white;
     border-radius: 2px;
     padding: $smallSpace;

@@ -56,7 +56,7 @@ class EditableLogic extends Component {
 
   renderLogic(logicDef, logic) {
     const { defStore } = this.props;
-    const { operations } = defStore;
+    const operations = defStore.getOperations('primary');
 
     const content = EditableLogic.renderSelect(logicDef.Label, logic, operations);
     return <div><span className="editable-logic__operation-label"> Logic: </span>{content}</div>;
@@ -64,7 +64,6 @@ class EditableLogic extends Component {
 
   renderInputsAndArgs(logicDef, logic) {
     const { defStore } = this.props;
-    const { operations } = defStore;
     const { args } = logic;
     const { Inputs: inputs } = logicDef;
 
@@ -76,7 +75,7 @@ class EditableLogic extends Component {
       let content = null;
 
       if (argType === 'operation' && types.includes('operation')) {
-        content = EditableLogic.renderSelect(logicDef.Label, argVal, operations);
+        content = <EditableLogic defStore={defStore} logic={argVal} />;
       } else if (argType === 'operation' && !types.includes('operation')) {
         console.error(`[EditableLogic] Argument and input type mismatch for ${label}`);
       }

@@ -27,6 +27,10 @@ class DefStore {
     return this.operations.find(operation => operation.Key === functionName);
   }
 
+  @action getOperations(category) {
+    return this.operations.filter(operation => operation.Category === category);
+  }
+
   @action getArgValue(arg) {
     const {
       int_value: intValue,
