@@ -63,6 +63,10 @@ class DefStore {
     return preset.Values[value.toString()];
   }
 
+  @action getPresetKeys() {
+    return this.presets.map(p => p.Key);
+  }
+
   @action reset = () => {
     this.operations.clear();
     this.presets.clear();

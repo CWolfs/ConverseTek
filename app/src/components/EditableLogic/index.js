@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { observer, inject } from 'mobx-react';
-import { Select, Input } from 'antd';
+import { Select, Input, AutoComplete } from 'antd';
 import classnames from 'classnames';
 
 import './EditableLogic.css';
@@ -54,16 +54,23 @@ class EditableLogic extends Component {
     };
 
     if (isAutocomplete) {
-
-    } else {
       return (
-        <Input
+        <AutoComplete
           style={style}
-          placeholder="Basic usage"
-          value={value}
+          defaultValue={value}
+          dataSource={options}
+          filterOption={(inputValue, option) =>
+            option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
         />
       );
     }
+    return (
+      <Input
+        style={style}
+        placeholder="Basic usage"
+        value={value}
+      />
+    );
   }
 
   renderLogic(logicDef, logic) {
@@ -77,7 +84,7 @@ class EditableLogic extends Component {
   renderInputsAndArgs(logicDef, logic) {
     const { defStore, isEven } = this.props;
     const { args } = logic;
-    const { Inputs: inputs } = logicDef;
+    const { Key: logicDefKey, Inputs: inputs } = logicDef;
 
     return inputs.map((input, index) => {
       const { Label: label, Types: types } = input;
@@ -95,8 +102,13 @@ class EditableLogic extends Component {
         content = <EditableLogic defStore={defStore} logic={argVal} category="secondary" isEven={!isEven} />;
       } else if (argType === 'operation' && !types.includes('operation')) {
         console.error(`[EditableLogic] Argument and input type mismatch for ${label}`);
-      } else if ((argType === 'string' && types.includes('string')) ||
-        (argType === 'float' && types.includes('float')) ||
+      } else if ((argType === 'string') && types.includes('string')) {
+        if (logicDefKey.includes('Preset')) {
+          content = EditableLogic.renderInput(argValue, defStore.getPresetKeys());
+        } else {
+          content = EditableLogic.renderInput(argValue);
+        }
+      } else if ((argType === 'float' && types.includes('float')) ||
         (argType === 'int' && types.includes('int'))) {
         content = EditableLogic.renderInput(argValue);
       } else {
