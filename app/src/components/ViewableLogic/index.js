@@ -37,6 +37,7 @@ class ViewableLogic extends Component {
           if (type === 'operation') return <ViewableLogic key={index} defStore={defStore} logic={value} />;
           return <span key={index}>{argValue.value} </span>;
         })}
+        {(args.length <= 0) && <span>...</span>}
         {(view.includes('result')) && this.renderResult(args)}
       </span>
     );

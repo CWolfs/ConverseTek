@@ -12,9 +12,12 @@ const { Option } = Select;
 /* eslint-disable react/no-array-index-key */
 class EditableLogic extends Component {
   static renderSelect(value, options, placeholder, style) {
+    const conditionalProps = {};
+    if (value) conditionalProps.defaultValue = value;
+
     return (
       <Select
-        defaultValue={value}
+        {...conditionalProps}
         style={style || { width: 230 }}
         placeholder={placeholder}
       >
@@ -32,22 +35,28 @@ class EditableLogic extends Component {
   static renderInput(argValue, options) {
     const { value } = argValue;
     const isAutocomplete = !!options;
+    const conditionalProps = {};
 
     const style = {
       width: '275px',
     };
 
     if (isAutocomplete) {
+      if (argValue) conditionalProps.defaultValue = argValue;
+
       return (
         <AutoComplete
+          {...conditionalProps}
           style={style}
-          defaultValue={value}
           dataSource={options}
           filterOption={(inputValue, option) =>
             option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
         />
       );
     }
+
+    if (argValue) conditionalProps.value = argValue;
+
     return (
       <Input
         style={style}
@@ -97,14 +106,14 @@ class EditableLogic extends Component {
 
     return inputs.map((input, index) => {
       const { Label: label, Types: types } = input;
-      const arg = args[index];
+      const arg = (args.length > 0) ? args[index] : null;
       const argValue = defStore.getArgValue(arg);
       const { type: argType, value: argVal } = argValue;
       let content = null;
 
       let argsContainerClasses = classnames('editable-logic__args-container');
 
-      const typeSelector = (input && argValue) ?
+      const typeSelector = (input) ?
         EditableLogic.renderSelect(argValue.type, input.Types, 'Select a type', { width: 120 }) : null;
 
       if (argType === 'operation' && types.includes('operation')) {
@@ -114,26 +123,23 @@ class EditableLogic extends Component {
         content = <EditableLogic defStore={defStore} logic={argVal} category="secondary" isEven={!isEven} parentInput={input} parentArg={argValue} />;
       } else if (argType === 'operation' && !types.includes('operation')) {
         console.error(`[EditableLogic] Argument and input type mismatch for ${label}`);
-      } else if ((argType === 'string') && types.includes('string')) {
-        if (logicDefKey.includes('Preset')) {
-          content = EditableLogic.wrapWithTypeSelector(
-            typeSelector,
-            EditableLogic.renderInput(argValue, defStore.getPresetKeys()),
-          );
-        } else {
-          content = EditableLogic.wrapWithTypeSelector(
-            typeSelector,
-            EditableLogic.renderInput(argValue),
-          );
-        }
-      } else if ((argType === 'float' && types.includes('float')) ||
-        (argType === 'int' && types.includes('int'))) {
-        content = EditableLogic.wrapWithTypeSelector(
-          typeSelector,
-          EditableLogic.renderInput(argValue),
-        );
       } else {
-        console.error(`[EditableLogic] Argument and input type mismatch for ${label}`);
+        if (typeSelector) content = <span className="editable-logic__logic-type">{typeSelector}</span>;
+
+        if (argVal !== null) {
+          if ((argType === 'string') && types.includes('string')) {
+            if (logicDefKey.includes('Preset')) {
+              content += EditableLogic.renderInput(argValue, defStore.getPresetKeys());
+            } else {
+              content += EditableLogic.renderInput(argValue);
+            }
+          } else if ((argType === 'float' && types.includes('float')) ||
+            (argType === 'int' && types.includes('int'))) {
+            content = EditableLogic.renderInput(argValue);
+          } else {
+            console.error(`[EditableLogic] Argument and input type mismatch for ${label}`);
+          }
+        }
       }
 
       if (!content) content = <div>Unprocessed Input: {input.Label}</div>;

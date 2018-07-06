@@ -23,7 +23,8 @@ class ConversationConditions extends Component {
 
     this.renderPanel = this.renderPanel.bind(this);
     this.resize = this.resize.bind(this);
-    this.onDelete = this.onDelete.bind(this);
+    this.onAddCondition = this.onAddCondition.bind(this);
+    this.onDeleteCondition = this.onDeleteCondition.bind(this);
   }
 
   componentDidMount() {
@@ -34,7 +35,25 @@ class ConversationConditions extends Component {
     window.removeEventListener('resize', this.resize);
   }
 
-  onDelete(event, index) {
+  onAddCondition() {
+    const { node } = this.props;
+    const { conditions } = node;
+
+    const newCondition = {
+      functionName: 'Evaluate Tag for Commander',
+      args: [],
+    };
+
+    if (conditions) {
+      conditions.ops.push(newCondition);
+    } else {
+      node.conditions = {
+        ops: [newCondition],
+      };
+    }
+  }
+
+  onDeleteCondition(event, index) {
     const { nodeStore, node } = this.props;
     const { conditions } = node;
     remove(conditions.ops, (value, i) => i === index);
@@ -68,7 +87,7 @@ class ConversationConditions extends Component {
         <Popconfirm
           title="Are you sure you want to delete this condition?"
           placement="topLeft"
-          onConfirm={event => this.onDelete(event, index)}
+          onConfirm={event => this.onDeleteCondition(event, index)}
           okText="Yes"
           cancelText="No"
         >
@@ -111,6 +130,7 @@ class ConversationConditions extends Component {
           <Button
             type="secondary"
             size="small"
+            onClick={this.onAddCondition}
           >
             <Icon type="plus" />
           </Button>

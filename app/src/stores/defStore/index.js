@@ -32,6 +32,8 @@ class DefStore {
   }
 
   @action getArgValue(arg) {
+    if (arg === null) return { type: null, value: null };
+
     const {
       int_value: intValue,
       // bool_value: boolValue,
