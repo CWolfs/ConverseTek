@@ -71,7 +71,7 @@ class EditableLogic extends Component {
     const operations = defStore.getOperations(category);
 
     const content = EditableLogic.renderSelect(logicDef.Label, logic, operations);
-    return <div><span className="editable-logic__operation-label"> Logic: </span>{content}</div>;
+    return <div>{/* <span className="editable-logic__operation-label"> Logic: </span> */}{content}</div>;
   }
 
   renderInputsAndArgs(logicDef, logic) {
@@ -86,7 +86,12 @@ class EditableLogic extends Component {
       const { type: argType, value: argVal } = argValue;
       let content = null;
 
+      let argsContainerClasses = classnames('editable-logic__args-container');
+
       if (argType === 'operation' && types.includes('operation')) {
+        argsContainerClasses = classnames(argsContainerClasses, {
+          'first-operation': index === 0,
+        });
         content = <EditableLogic defStore={defStore} logic={argVal} category="secondary" isEven={!isEven} />;
       } else if (argType === 'operation' && !types.includes('operation')) {
         console.error(`[EditableLogic] Argument and input type mismatch for ${label}`);
@@ -102,7 +107,7 @@ class EditableLogic extends Component {
 
       if (!content) content = <div>Unprocessed Input: {input.Label}</div>;
 
-      return <div className="editable-logic__args-container" key={index}><span className="editable-logic__args-label">Argument {index + 1}</span> {content}</div>;
+      return <div className={argsContainerClasses} key={index}><span className="editable-logic__args-label">Argument {index + 1}</span> {content}</div>;
     });
   }
 
@@ -111,7 +116,7 @@ class EditableLogic extends Component {
     const logicDef = defStore.getDefinition(logic);
     const operationClasses = classnames('editable-logic__operation', {
       'editable-logic__operation--even': isEven,
-    })
+    });
     const argClasses = classnames('editable-logic__args', {
       'editable-logic__args--even': isEven,
     });

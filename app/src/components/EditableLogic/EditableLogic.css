@@ -3,6 +3,8 @@
 .editable-logic {
 
   &__operation {
+    margin-left: $largeSpace;
+
     &--even {
       background-color: $backgroundTertiary;
     }
@@ -13,24 +15,29 @@
   }
 
   &__args {
-    margin-left: 44px;
+    margin-left: $largeSpace;
     border: 1px solid white;
     border-radius: 2px;
     padding: $smallSpace;
     margin-top: $smallSpace;
-    background-color: #3d3d3e;
+    background-color: $backgroundTertiary;
 
     &--even {
-      background-color: $backgroundTertiary;
+      background-color: #3d3d3e;
     }
 
     &-container {
       margin: $tinySpace 0;
+
+      &.first-operation {
+        margin-top: -8px;
+      }
     }
 
     &-label {
       margin-right: $tinySpace;
       margin-bottom: $tinySpace;
+      line-height: $promoLineHeightLargest;
     }
   }
 
