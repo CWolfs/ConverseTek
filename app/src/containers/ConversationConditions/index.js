@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { observer } from 'mobx-react';
-import { Button, Icon, Collapse } from 'antd';
+import { observer, inject } from 'mobx-react';
+import { Button, Icon, Collapse, Popconfirm } from 'antd';
 import classnames from 'classnames';
+import remove from 'lodash.remove';
 
 import 'react-custom-scroll/dist/customScroll.css';
 
@@ -22,6 +23,7 @@ class ConversationConditions extends Component {
 
     this.renderPanel = this.renderPanel.bind(this);
     this.resize = this.resize.bind(this);
+    this.onDelete = this.onDelete.bind(this);
   }
 
   componentDidMount() {
@@ -30,6 +32,17 @@ class ConversationConditions extends Component {
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.resize);
+  }
+
+  onDelete(event, index) {
+    const { nodeStore, node } = this.props;
+    const { conditions } = node;
+    remove(conditions.ops, (value, i) => i === index);
+    if (conditions.ops.length <= 0) node.conditions = null;
+
+    nodeStore.setRebuild(true);
+
+    event.stopPropagation();
   }
 
   resize() {
@@ -52,13 +65,22 @@ class ConversationConditions extends Component {
         <div className="conversation-conditions__panel-header-logic">
           <ViewableLogic logic={condition} />
         </div>
-        <Button
-          size="small"
-          type="caution"
-          className="conversation-conditions__panel-header-delete-button"
+        <Popconfirm
+          title="Are you sure you want to delete this condition?"
+          placement="topLeft"
+          onConfirm={event => this.onDelete(event, index)}
+          okText="Yes"
+          cancelText="No"
         >
-          <Icon type="delete" />
-        </Button>
+          <Button
+            size="small"
+            type="caution"
+            className="conversation-conditions__panel-header-delete-button"
+            onClick={event => event.stopPropagation()}
+          >
+            <Icon type="delete" />
+          </Button>
+        </Popconfirm>
       </div>);
 
     return (
@@ -99,7 +121,8 @@ class ConversationConditions extends Component {
 }
 
 ConversationConditions.propTypes = {
+  nodeStore: PropTypes.object.isRequired,
   node: PropTypes.object.isRequired,
 };
 
-export default ConversationConditions;
+export default inject('nodeStore')(ConversationConditions);
