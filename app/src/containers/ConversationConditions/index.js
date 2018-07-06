@@ -63,7 +63,7 @@ class ConversationConditions extends Component {
 
     return (
       <Panel key={key} className={classes} header={header}>
-        <EditableLogic logic={condition} />
+        <EditableLogic logic={condition} category="primary" />
       </Panel>
     );
   }

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { observer, inject } from 'mobx-react';
-import { Select } from 'antd';
+import { Select, Input } from 'antd';
 
 import './EditableLogic.css';
 
@@ -44,19 +44,25 @@ class EditableLogic extends Component {
     );
   }
 
-  static renderInput(value, options) {
+  static renderInput(argValue, options) {
+    const { key, value } = argValue;
     const isAutocomplete = !!options;
 
     if (isAutocomplete) {
 
     } else {
-
+      return (
+        <Input
+          placeholder="Basic usage"
+          value={value}
+        />
+      );
     }
   }
 
   renderLogic(logicDef, logic) {
-    const { defStore } = this.props;
-    const operations = defStore.getOperations('primary');
+    const { defStore, category } = this.props;
+    const operations = defStore.getOperations(category);
 
     const content = EditableLogic.renderSelect(logicDef.Label, logic, operations);
     return <div><span className="editable-logic__operation-label"> Logic: </span>{content}</div>;
@@ -75,8 +81,16 @@ class EditableLogic extends Component {
       let content = null;
 
       if (argType === 'operation' && types.includes('operation')) {
-        content = <EditableLogic defStore={defStore} logic={argVal} />;
+        content = <EditableLogic defStore={defStore} logic={argVal} category="secondary" />;
       } else if (argType === 'operation' && !types.includes('operation')) {
+        console.error(`[EditableLogic] Argument and input type mismatch for ${label}`);
+      }
+
+      if ((argType === 'string' && types.includes('string')) ||
+        (argType === 'float' && types.includes('float')) ||
+        (argType === 'int' && types.includes('int'))) {
+        content = EditableLogic.renderInput(argValue);
+      } else {
         console.error(`[EditableLogic] Argument and input type mismatch for ${label}`);
       }
 
@@ -115,6 +129,7 @@ class EditableLogic extends Component {
 EditableLogic.propTypes = {
   defStore: PropTypes.object.isRequired,
   logic: PropTypes.object.isRequired,
+  category: PropTypes.string.isRequired,
 };
 
 export default inject('defStore')(EditableLogic);
