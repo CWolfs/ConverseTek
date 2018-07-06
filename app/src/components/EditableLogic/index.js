@@ -95,9 +95,7 @@ class EditableLogic extends Component {
         content = <EditableLogic defStore={defStore} logic={argVal} category="secondary" isEven={!isEven} />;
       } else if (argType === 'operation' && !types.includes('operation')) {
         console.error(`[EditableLogic] Argument and input type mismatch for ${label}`);
-      }
-
-      if ((argType === 'string' && types.includes('string')) ||
+      } else if ((argType === 'string' && types.includes('string')) ||
         (argType === 'float' && types.includes('float')) ||
         (argType === 'int' && types.includes('int'))) {
         content = EditableLogic.renderInput(argValue);
