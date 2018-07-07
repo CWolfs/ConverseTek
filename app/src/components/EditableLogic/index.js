@@ -1,58 +1,16 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { observer, inject } from 'mobx-react';
-import { Input, AutoComplete } from 'antd';
 import classnames from 'classnames';
 
 import EditableSelect from '../EditableSelect';
+import EditableInput from '../EditbleInput';
 
 import './EditableLogic.css';
 
 @observer
 /* eslint-disable react/no-array-index-key */
 class EditableLogic extends Component {
-  static renderInput(value, options) {
-    const isAutocomplete = !!options;
-    const conditionalProps = {};
-
-    const style = {
-      width: '275px',
-    };
-
-    if (isAutocomplete) {
-      if (value) conditionalProps.defaultValue = value;
-
-      return (
-        <AutoComplete
-          {...conditionalProps}
-          style={style}
-          dataSource={options}
-          filterOption={(inputValue, option) =>
-            option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
-        />
-      );
-    }
-
-    if (value) conditionalProps.value = value;
-
-    return (
-      <Input
-        style={style}
-        placeholder="Basic usage"
-        value={value}
-      />
-    );
-  }
-
-  static wrapWithTypeSelector(typeSelector, node) {
-    return (
-      <section>
-        {typeSelector && <span className="editable-logic__arg-type">{typeSelector}</span>}
-        {node}
-      </section>
-    );
-  }
-
   renderLogic(logicDef, logic) {
     const {
       defStore,
@@ -130,14 +88,14 @@ class EditableLogic extends Component {
               content = (
                 <section>
                   {content}
-                  {EditableLogic.renderInput(argValue.value, defStore.getPresetKeys())}
+                  <EditableInput value={argValue.value} options={defStore.getPresetKeys()} />
                 </section>
               );
             } else {
               content = (
                 <section>
                   {content}
-                  {EditableLogic.renderInput(argValue.value)}
+                  <EditableInput value={argValue.value} />
                 </section>
               );
             }
@@ -146,7 +104,7 @@ class EditableLogic extends Component {
             content = (
               <section>
                 {content}
-                {EditableLogic.renderInput(argValue.value)}
+                <EditableInput value={argValue.value} />
               </section>
             );
           } else {
