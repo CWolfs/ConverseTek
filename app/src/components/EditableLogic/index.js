@@ -32,8 +32,7 @@ class EditableLogic extends Component {
     );
   }
 
-  static renderInput(argValue, options) {
-    const { value } = argValue;
+  static renderInput(value, options) {
     const isAutocomplete = !!options;
     const conditionalProps = {};
 
@@ -42,7 +41,7 @@ class EditableLogic extends Component {
     };
 
     if (isAutocomplete) {
-      if (argValue) conditionalProps.defaultValue = argValue;
+      if (value) conditionalProps.defaultValue = value;
 
       return (
         <AutoComplete
@@ -55,7 +54,7 @@ class EditableLogic extends Component {
       );
     }
 
-    if (argValue) conditionalProps.value = argValue;
+    if (value) conditionalProps.value = value;
 
     return (
       <Input
@@ -129,13 +128,28 @@ class EditableLogic extends Component {
         if (argVal !== null) {
           if ((argType === 'string') && types.includes('string')) {
             if (logicDefKey.includes('Preset')) {
-              content += EditableLogic.renderInput(argValue, defStore.getPresetKeys());
+              content = (
+                <section>
+                  {content}
+                  {EditableLogic.renderInput(argValue.value, defStore.getPresetKeys())}
+                </section>
+              );
             } else {
-              content += EditableLogic.renderInput(argValue);
+              content = (
+                <section>
+                  {content}
+                  {EditableLogic.renderInput(argValue.value)}
+                </section>
+              );
             }
           } else if ((argType === 'float' && types.includes('float')) ||
             (argType === 'int' && types.includes('int'))) {
-            content = EditableLogic.renderInput(argValue);
+            content = (
+              <section>
+                {content}
+                {EditableLogic.renderInput(argValue.value)}
+              </section>
+            );
           } else {
             console.error(`[EditableLogic] Argument and input type mismatch for ${label}`);
           }
