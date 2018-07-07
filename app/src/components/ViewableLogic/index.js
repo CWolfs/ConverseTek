@@ -8,8 +8,8 @@ class ViewableLogic extends Component {
   renderResult(args) {
     const { defStore } = this.props;
 
-    const { value: key } = defStore.getArgValue(args[0]);
-    const { value } = defStore.getArgValue(args[1]);
+    const { value: key } = defStore.getArgValue((args.length > 0) ? args[0] : null);
+    const { value } = defStore.getArgValue((args.length > 1) ? args[1] : null);
     const presetValue = defStore.getPresetValue(key, value);
     return <span>{presetValue} </span>;
   }

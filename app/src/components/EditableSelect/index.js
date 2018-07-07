@@ -13,6 +13,7 @@ class EditableSelect extends Component {
       options,
       placeholder,
       style,
+      onChange,
     } = this.props;
 
     const conditionalProps = {};
@@ -23,6 +24,7 @@ class EditableSelect extends Component {
         {...conditionalProps}
         style={style || { width: 230 }}
         placeholder={placeholder}
+        onChange={onChange}
       >
         {options.map(option => (
           <Option
@@ -47,6 +49,7 @@ EditableSelect.propTypes = {
   options: PropTypes.array,
   placeholder: PropTypes.string.isRequired,
   style: PropTypes.object,
+  onChange: PropTypes.func.isRequired,
 };
 
 export default EditableSelect;

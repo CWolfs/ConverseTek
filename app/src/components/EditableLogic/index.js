@@ -9,7 +9,7 @@ import EditableInput from '../EditbleInput';
 import './EditableLogic.css';
 
 @observer
-/* eslint-disable react/no-array-index-key */
+/* eslint-disable react/no-array-index-key, no-param-reassign */
 class EditableLogic extends Component {
   renderLogic(logicDef, logic) {
     const {
@@ -27,6 +27,7 @@ class EditableLogic extends Component {
         options={parentInput.Types}
         placeholder="Select a type"
         style={{ width: 120 }}
+        // onChange={(value) => { parentArg.type = value; }}
       />
     ) : null;
 
@@ -35,6 +36,7 @@ class EditableLogic extends Component {
         value={functionName}
         options={operations}
         placeholder="Select an operation"
+        onChange={(value) => { logic.functionName = value; }}
       />
     );
 
@@ -56,7 +58,7 @@ class EditableLogic extends Component {
 
     return inputs.map((input, index) => {
       const { Label: label, Types: types } = input;
-      const arg = (args.length > 0) ? args[index] : null;
+      const arg = (args.length > index) ? args[index] : null;
       const argValue = defStore.getArgValue(arg);
       const { type: argType, value: argVal } = argValue;
       let content = null;
@@ -69,6 +71,7 @@ class EditableLogic extends Component {
           options={input.Types}
           placeholder="Select a type"
           style={{ width: 120 }}
+          onChange={(value) => { defStore.setArgValue(arg, value); }}
         />
       ) : null;
 
@@ -110,6 +113,12 @@ class EditableLogic extends Component {
           } else {
             console.error(`[EditableLogic] Argument and input type mismatch for ${label}`);
           }
+        } else {
+          content = (
+            <section>
+              {content}
+            </section>
+          );
         }
       }
 

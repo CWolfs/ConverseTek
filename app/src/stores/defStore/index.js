@@ -32,7 +32,7 @@ class DefStore {
   }
 
   @action getArgValue(arg) {
-    if (arg === null) return { type: null, value: null };
+    if (arg === null || arg === undefined) return { type: null, value: null };
 
     const {
       int_value: intValue,
@@ -62,6 +62,7 @@ class DefStore {
 
   @action getPresetValue(key, value) {
     const preset = this.presets.find(p => p.Key === key);
+    if (preset === undefined) return '[BAD PRESET VALUE]';
     return preset.Values[value.toString()];
   }
 
