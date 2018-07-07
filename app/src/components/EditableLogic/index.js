@@ -1,37 +1,16 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { observer, inject } from 'mobx-react';
-import { Select, Input, AutoComplete } from 'antd';
+import { Input, AutoComplete } from 'antd';
 import classnames from 'classnames';
 
-import './EditableLogic.css';
+import EditableSelect from '../EditableSelect';
 
-const { Option } = Select;
+import './EditableLogic.css';
 
 @observer
 /* eslint-disable react/no-array-index-key */
 class EditableLogic extends Component {
-  static renderSelect(value, options, placeholder, style) {
-    const conditionalProps = {};
-    if (value) conditionalProps.defaultValue = value;
-
-    return (
-      <Select
-        {...conditionalProps}
-        style={style || { width: 230 }}
-        placeholder={placeholder}
-      >
-        {options.map(option => (
-          <Option
-            key={option.Key || option}
-          >
-            {option.Key || option}
-          </Option>
-        ))}
-      </Select>
-    );
-  }
-
   static renderInput(value, options) {
     const isAutocomplete = !!options;
     const conditionalProps = {};
@@ -84,9 +63,23 @@ class EditableLogic extends Component {
     const operations = defStore.getOperations(category);
     const { functionName } = logic;
 
-    const typeSelector = (parentInput && parentArg) ?
-      EditableLogic.renderSelect(parentArg.type, parentInput.Types, 'Select a type', { width: 120 }) : null;
-    const content = EditableLogic.renderSelect(functionName, operations, 'Select an operation');
+    const typeSelector = (parentInput && parentArg) ? (
+      <EditableSelect
+        value={parentArg.type}
+        options={parentInput.Types}
+        placeholder="Select a type"
+        style={{ width: 120 }}
+      />
+    ) : null;
+
+    const content = (
+      <EditableSelect
+        value={functionName}
+        options={operations}
+        placeholder="Select an operation"
+      />
+    );
+
     return (
       <div>
         {typeSelector && <span className="editable-logic__logic-type">{typeSelector}</span>}
@@ -112,8 +105,14 @@ class EditableLogic extends Component {
 
       let argsContainerClasses = classnames('editable-logic__args-container');
 
-      const typeSelector = (input) ?
-        EditableLogic.renderSelect(argValue.type, input.Types, 'Select a type', { width: 120 }) : null;
+      const typeSelector = (input) ? (
+        <EditableSelect
+          value={argValue.type}
+          options={input.Types}
+          placeholder="Select a type"
+          style={{ width: 120 }}
+        />
+      ) : null;
 
       if (argType === 'operation' && types.includes('operation')) {
         argsContainerClasses = classnames(argsContainerClasses, {
