@@ -73,7 +73,7 @@ class DefStore {
         this.setOperation(arg.call_value, arg.call_value.functionName);
       }
 
-      if (type === 'string') arg.string_value = (previousValue) ? previousValue.toString() : '';
+      if (type === 'string') arg.string_value = (previousValue && !previousValue.functionName) ? previousValue.toString() : '';
 
       if (previousType === 'float' || previousType === 'int' || previousType === 'string') {
         if (type === 'float') arg.float_value = tryParseFloat(previousValue);
