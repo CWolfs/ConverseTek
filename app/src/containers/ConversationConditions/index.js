@@ -36,13 +36,14 @@ class ConversationConditions extends Component {
   }
 
   onAddCondition() {
-    const { node } = this.props;
+    const { node, defStore } = this.props;
     const { conditions } = node;
 
     const newCondition = {
       functionName: 'Evaluate Tag for Commander',
       args: [],
     };
+    defStore.setOperation(newCondition, newCondition.functionName);
 
     if (conditions) {
       conditions.ops.push(newCondition);
@@ -143,6 +144,7 @@ class ConversationConditions extends Component {
 ConversationConditions.propTypes = {
   nodeStore: PropTypes.object.isRequired,
   node: PropTypes.object.isRequired,
+  defStore: PropTypes.object.isRequired,
 };
 
-export default inject('nodeStore')(ConversationConditions);
+export default inject('nodeStore', 'defStore')(ConversationConditions);
