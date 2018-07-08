@@ -1,5 +1,7 @@
 import { observable, action } from 'mobx';
 
+import { createArg } from '../../utils/def-utils';
+
 /* eslint-disable class-methods-use-this, no-param-reassign */
 class DefStore {
   @observable operations = [];
@@ -24,6 +26,10 @@ class DefStore {
 
   @action getDefinition(condition) {
     const { functionName } = condition;
+    return this.getDefinitionByName(functionName);
+  }
+
+  @action getDefinitionByName(functionName) {
     return this.operations.find(operation => operation.Key === functionName);
   }
 
@@ -48,6 +54,25 @@ class DefStore {
     if (stringValue !== '') return { type: 'string', value: stringValue };
     if (floatValue !== 0 && intValue !== 0) return { type: 'float', value: floatValue };
     return { type: 'int', value: intValue };
+  }
+
+  @action setOperation(logic, value) {
+    const { args } = logic;
+    const logicDef = this.getDefinitionByName(value);
+    const { Inputs: inputs } = logicDef;
+
+    logic.functionName = value;
+
+    if (args.length > inputs.length) {
+      logic.args = args.splice(inputs.length - 1);
+    } else if (args.length < inputs.length) {
+      inputs.forEach((input, index) => {
+        if (args.length <= index) {
+          const newArg = createArg();
+          logic.args.push(newArg);
+        }
+      });
+    }
   }
 
   @action setArgValue(arg, value) {

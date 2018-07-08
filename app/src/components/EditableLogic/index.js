@@ -36,7 +36,7 @@ class EditableLogic extends Component {
         value={functionName}
         options={operations}
         placeholder="Select an operation"
-        onChange={(value) => { logic.functionName = value; }}
+        onChange={(value) => { defStore.setOperation(logic, value); }}
       />
     );
 
