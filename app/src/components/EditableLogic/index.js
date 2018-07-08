@@ -87,6 +87,9 @@ class EditableLogic extends Component {
       const { type: argType, value: argVal } = argValue;
 
       let argsContainerClasses = classnames('editable-logic__args-container');
+      argsContainerClasses = classnames(argsContainerClasses, {
+        'first-arg': index === 0,
+      });
 
       const typeSelector = (input) ? (
         <EditableSelect
@@ -99,9 +102,6 @@ class EditableLogic extends Component {
       ) : null;
 
       if (argType === 'operation' && types.includes('operation')) {
-        argsContainerClasses = classnames(argsContainerClasses, {
-          'first-operation': index === 0,
-        });
         content = (
           <EditableLogic
             defStore={defStore}
@@ -122,7 +122,7 @@ class EditableLogic extends Component {
           if ((argType === 'string') && types.includes('string')) {
             if (logicDefKey.includes('Preset')) {
               content = (
-                <section>
+                <section className="editable-logic__arg">
                   {content}
                   <EditableInput
                     value={argVal}
@@ -133,7 +133,7 @@ class EditableLogic extends Component {
               );
             } else {
               content = (
-                <section>
+                <section className="editable-logic__arg">
                   {content}
                   <EditableInput
                     value={argVal}
@@ -145,7 +145,7 @@ class EditableLogic extends Component {
           } else if ((argType === 'float' && types.includes('float')) ||
             (argType === 'int' && types.includes('int'))) {
             content = (
-              <section>
+              <section className="editable-logic__arg">
                 {content}
                 <EditableInput
                   value={argVal}
@@ -158,7 +158,7 @@ class EditableLogic extends Component {
           }
         } else {
           content = (
-            <section>
+            <section className="editable-logic__arg">
               {content}
             </section>
           );

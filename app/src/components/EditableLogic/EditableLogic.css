@@ -7,7 +7,7 @@
   }
 
   &__operation {
-    margin-left: $largeSpace;
+    margin-left: $mediumSpace;
 
     &--even {
       background-color: $backgroundTertiary;
@@ -18,8 +18,12 @@
     }
   }
 
+  &__arg {
+    margin-left: $mediumSpace;
+  }
+
   &__args {
-    margin-left: $largeSpace;
+    margin-left: $mediumSpace;
     border: 1px solid white;
     border-radius: 2px;
     padding: $smallSpace;
@@ -33,7 +37,7 @@
     &-container {
       margin: $tinySpace 0;
 
-      &.first-operation {
+      &.first-arg {
         margin-top: -8px;
       }
     }
