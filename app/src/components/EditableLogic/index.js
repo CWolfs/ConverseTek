@@ -11,6 +11,25 @@ import './EditableLogic.css';
 @observer
 /* eslint-disable react/no-array-index-key, no-param-reassign */
 class EditableLogic extends Component {
+  static fixBadInputTypes(argValue, input) {
+    const { Types: types } = input;
+    const { type: argType } = argValue;
+
+    if (!types.includes(argType)) {
+      if (types.includes('int')) { // favour: int, float, string, operation
+        return { ...argValue, type: 'int' };
+      } else if (types.includes('float')) {
+        return { ...argValue, type: 'float' };
+      } else if (types.includes('string')) {
+        return { ...argValue, type: 'string' };
+      } else if (types.includes('operation')) {
+        return { ...argValue, type: 'operation' }
+      }
+    }
+
+    return argValue;
+  }
+
   renderLogic(logicDef, logic) {
     const {
       defStore,
@@ -61,9 +80,11 @@ class EditableLogic extends Component {
     return inputs.map((input, index) => {
       const { Label: label, Types: types } = input;
       const arg = (args.length > index) ? args[index] : null;
-      const argValue = defStore.getArgValue(arg);
-      const { type: argType, value: argVal } = argValue;
+      let argValue = defStore.getArgValue(arg);
       let content = null;
+
+      argValue = EditableLogic.fixBadInputTypes(argValue, input);
+      const { type: argType, value: argVal } = argValue;
 
       let argsContainerClasses = classnames('editable-logic__args-container');
 
