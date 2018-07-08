@@ -15,19 +15,21 @@ class EditableLogic extends Component {
     const {
       defStore,
       category,
+      parentLogic,
       parentInput,
       parentArg,
     } = this.props;
     const operations = defStore.getOperations(category);
     const { functionName } = logic;
+    const parentArgValue = defStore.getArgValue(parentArg);
 
     const typeSelector = (parentInput && parentArg) ? (
       <EditableSelect
-        value={parentArg.type}
+        value={parentArgValue.type}
         options={parentInput.Types}
         placeholder="Select a type"
         style={{ width: 120 }}
-        // onChange={(value) => { parentArg.type = value; }}
+        onChange={(value) => { defStore.setArgType(parentLogic, parentArg, value); }}
       />
     ) : null;
 
@@ -79,7 +81,17 @@ class EditableLogic extends Component {
         argsContainerClasses = classnames(argsContainerClasses, {
           'first-operation': index === 0,
         });
-        content = <EditableLogic defStore={defStore} logic={argVal} category="secondary" isEven={!isEven} parentInput={input} parentArg={argValue} />;
+        content = (
+          <EditableLogic
+            defStore={defStore}
+            logic={argVal}
+            category="secondary"
+            isEven={!isEven}
+            parentLogic={logic}
+            parentInput={input}
+            parentArg={arg}
+          />
+        );
       } else if (argType === 'operation' && !types.includes('operation')) {
         console.error(`[EditableLogic] Argument and input type mismatch for ${label}`);
       } else {
@@ -172,12 +184,14 @@ class EditableLogic extends Component {
 
 EditableLogic.defaultProps = {
   isEven: false,
+  parentLogic: null,
   parentInput: null,
   parentArg: null,
 };
 
 EditableLogic.propTypes = {
   defStore: PropTypes.object.isRequired,
+  parentLogic: PropTypes.object,
   parentInput: PropTypes.object,
   parentArg: PropTypes.object,
   logic: PropTypes.object.isRequired,

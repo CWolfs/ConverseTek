@@ -68,7 +68,7 @@ class DefStore {
       if (previousType === 'float') arg.float_value = 0.0;
       if (previousType === 'int') arg.int_value = 0;
 
-      if (type === 'operation') arg.call_value = { function: null, args: null };
+      if (type === 'operation') arg.call_value = { functionName: 'Get Preset Value (int)', args: [] };
       if (type === 'string') arg.string_value = previousValue.toString();
 
       if (previousType === 'float' || previousType === 'int' || previousType === 'string') {
