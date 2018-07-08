@@ -64,7 +64,7 @@ class DefStore {
     logic.functionName = value;
 
     if (args.length > inputs.length) {
-      logic.args = args.splice(inputs.length - 1);
+      logic.args = args.splice(0, inputs.length);
     } else if (args.length < inputs.length) {
       inputs.forEach((input, index) => {
         if (args.length <= index) {
