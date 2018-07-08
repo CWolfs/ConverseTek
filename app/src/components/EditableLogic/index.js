@@ -71,7 +71,7 @@ class EditableLogic extends Component {
           options={input.Types}
           placeholder="Select a type"
           style={{ width: 120 }}
-          onChange={(value) => { defStore.setArgValue(arg, value); }}
+          onChange={(value) => { defStore.setArgType(logic, arg, value); }}
         />
       ) : null;
 
@@ -91,14 +91,21 @@ class EditableLogic extends Component {
               content = (
                 <section>
                   {content}
-                  <EditableInput value={argValue.value} options={defStore.getPresetKeys()} />
+                  <EditableInput
+                    value={argVal}
+                    options={defStore.getPresetKeys()}
+                    onChange={(value) => { defStore.setArgValue(logic, arg, value); }}
+                  />
                 </section>
               );
             } else {
               content = (
                 <section>
                   {content}
-                  <EditableInput value={argValue.value} />
+                  <EditableInput
+                    value={argVal}
+                    onChange={(value) => { defStore.setArgValue(logic, arg, value); }}
+                  />
                 </section>
               );
             }
@@ -107,7 +114,10 @@ class EditableLogic extends Component {
             content = (
               <section>
                 {content}
-                <EditableInput value={argValue.value} />
+                <EditableInput
+                  value={argVal}
+                  onChange={(value) => { defStore.setArgValue(logic, arg, value); }}
+                />
               </section>
             );
           } else {

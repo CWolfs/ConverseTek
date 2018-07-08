@@ -6,7 +6,7 @@ import { Input, AutoComplete } from 'antd';
 @observer
 class EditableInput extends Component {
   render() {
-    const { value, options } = this.props;
+    const { value, options, onChange } = this.props;
 
     const isAutocomplete = !!options;
     const conditionalProps = {};
@@ -25,6 +25,7 @@ class EditableInput extends Component {
           dataSource={options}
           filterOption={(inputValue, option) =>
             option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
+          onChange={onChange}
         />
       );
     }
@@ -36,6 +37,7 @@ class EditableInput extends Component {
         style={style}
         placeholder="Basic usage"
         value={value}
+        onChange={onChange}
       />
     );
   }
@@ -49,6 +51,7 @@ EditableInput.defaultProps = {
 EditableInput.propTypes = {
   value: PropTypes.any,
   options: PropTypes.array,
+  onChange: PropTypes.func.isRequired,
 };
 
 export default EditableInput;

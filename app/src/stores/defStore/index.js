@@ -1,6 +1,7 @@
 import { observable, action } from 'mobx';
 
 import { createArg } from '../../utils/def-utils';
+import { tryParseInt, tryParseFloat } from '../../utils/number-utils';
 
 /* eslint-disable class-methods-use-this, no-param-reassign */
 class DefStore {
@@ -56,6 +57,42 @@ class DefStore {
     return { type: 'int', value: intValue };
   }
 
+  @action setArgType(logic, arg, type) {
+    const { args } = logic;
+    const argValue = this.getArgValue(arg);
+    const { type: previousType, value: previousValue } = argValue;
+
+    if (previousType !== type) {
+      if (previousType === 'operation') arg.call_value = null;
+      if (previousType === 'string') arg.string_value = '';
+      if (previousType === 'float') arg.float_value = 0.0;
+      if (previousType === 'int') arg.int_value = 0;
+
+      if (type === 'operation') arg.call_value = { function: null, args: null };
+      if (type === 'string') arg.string_value = previousValue.toString();
+
+      if (previousType === 'float' || previousType === 'int' || previousType === 'string') {
+        if (type === 'float') arg.float_value = tryParseFloat(previousValue);
+        if (type === 'int') arg.int_value = tryParseInt(previousValue);
+      }
+
+      logic.args.replace(args);
+    }
+  }
+
+  @action setArgValue(logic, arg, value) {
+    const { args } = logic;
+    const argValue = this.getArgValue(arg);
+    const { type } = argValue;
+
+    if (type === 'operation') arg.call_value = value;
+    if (type === 'string') arg.string_value = value;
+    if (type === 'float') arg.float_value = value;
+    if (type === 'int') arg.int_value = value;
+
+    logic.args.replace(args);
+  }
+
   @action setOperation(logic, value) {
     const { args } = logic;
     const logicDef = this.getDefinitionByName(value);
@@ -73,16 +110,6 @@ class DefStore {
         }
       });
     }
-  }
-
-  @action setArgValue(arg, value) {
-    const argValue = this.getArgValue(arg);
-    const { type } = argValue;
-
-    if (type === 'operation') arg.call_value = value;
-    if (type === 'string') arg.string_value = value;
-    if (type === 'float') arg.float_value = value;
-    if (type === 'int') arg.int_value = value;
   }
 
   @action getPresetValue(key, value) {
