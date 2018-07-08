@@ -1,0 +1,32 @@
+{
+  "scope": "commander",
+  "tags": [
+    "commander_ancestry_davion",
+    "commander_ancestry_deepPeriphery",
+    "commander_ancestry_kurita",
+    "commander_ancestry_liao",
+    "commander_ancestry_magistracy",
+    "commander_ancestry_marik",
+    "commander_ancestry_periphery",
+    "commander_ancestry_steiner",
+    "commander_ancestry_taurian",
+
+    "commander_family_noble",
+
+    "commander_youth_accident",
+    "commander_youth_bankrupt",
+    "commander_youth_betrayed",
+    "commander_youth_exile",
+    "commander_youth_loner",
+
+    "commander_career_soldier",
+    "commander_career_pirate",
+    "commander_career_gladiator",
+    "commander_career_mercenary",
+    "commander_career_freelancer",
+    "commander_career_merchantGuard",
+    
+    "commander_underworldFriends",
+    "commander_underworldEnemies"
+  ]
+}

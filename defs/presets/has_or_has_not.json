@@ -1,0 +1,9 @@
+{
+  "key": "HasOrHasNot",
+  "label": "Has or has not",
+  "type": "int",
+  "values": {
+    "0": "doesn't have",
+    "1": "has"
+  }
+}

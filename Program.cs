@@ -64,7 +64,7 @@ namespace ConverseTek {
                 ChromelyConfiguration config = ChromelyConfiguration
                                               .Create()
                                               .WithAppArgs(args)
-                                              .WithHostSize(1200, 900)
+                                              .WithHostSize(1480, 900)
                                               .WithLogFile("logs\\conversetek-interface.log")
                                               .WithStartUrl(startUrl)
                                               .WithLogSeverity(LogSeverity.Info)

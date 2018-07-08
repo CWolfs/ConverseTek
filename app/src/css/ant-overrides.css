@@ -66,6 +66,28 @@
   } 
 }
 
+.ant-btn-caution {
+  color: white;
+  background-color: #f5222d;
+  border-color: #f5222d;
+
+  &:active {
+    color: #f5222d;
+    background-color: white;
+    border-color: white;
+  }
+
+  &:focus, &:hover {
+    color: #f5222d;
+    background-color: white;
+    border-color: white;
+  }
+
+  &.ant-btn-clicked:after {
+    border: 0 solid #f5222d;
+  } 
+}
+
 .ant-tree,
 .ant-tree li .ant-tree-node-content-wrapper {
   color: $textColourPrimary;
