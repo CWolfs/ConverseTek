@@ -23,7 +23,7 @@ class EditableLogic extends Component {
       } else if (types.includes('string')) {
         return { ...argValue, type: 'string' };
       } else if (types.includes('operation')) {
-        return { ...argValue, type: 'operation' }
+        return { ...argValue, type: 'operation' };
       }
     }
 
