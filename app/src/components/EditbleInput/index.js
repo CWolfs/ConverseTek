@@ -35,7 +35,6 @@ class EditableInput extends Component {
     return (
       <Input
         style={style}
-        placeholder="Basic usage"
         value={value}
         onChange={(event) => { onChange(event.target.value); }}
       />
