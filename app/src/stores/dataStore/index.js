@@ -1,5 +1,6 @@
 import { observable, action } from 'mobx';
 import { createConversation } from '../../utils/conversation-utils';
+import defStore from '../defStore';
 
 class DataStore {
   @observable workingDirectory;
@@ -25,8 +26,10 @@ class DataStore {
 
   @action setConversations(conversationAssets) {
     this.conversationAssets.clear();
-    conversationAssets.forEach(conversationAsset =>
-      this.conversationAssets.set(conversationAsset.Conversation.idRef.id, conversationAsset));
+    conversationAssets.forEach((conversationAsset) => {
+      this.conversationAssets.set(conversationAsset.Conversation.idRef.id, conversationAsset);
+      defStore.setLogicTypeByConversation(conversationAsset);
+    });
   }
 
   @action setConversation(conversationAsset) {

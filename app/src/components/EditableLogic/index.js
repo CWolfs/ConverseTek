@@ -11,26 +11,6 @@ import './EditableLogic.css';
 @observer
 /* eslint-disable react/no-array-index-key, no-param-reassign */
 class EditableLogic extends Component {
-  /*
-  fixBadInputTypes(logic, arg, input) {
-    const { defStore } = this.props;
-    const { Types: types } = input;
-    const { type: argType } = defStore.getArgValue(arg);
-
-    if (!types.includes(argType)) {
-      if (types.includes('int')) { // favour: int, float, string, operation
-        defStore.setArgType(logic, arg, input, 'int');
-      } else if (types.includes('float')) {
-        defStore.setArgType(logic, arg, input, 'float');
-      } else if (types.includes('string')) {
-        defStore.setArgType(logic, arg, input, 'string');
-      } else if (types.includes('operation')) {
-        defStore.setArgType(logic, arg, input, 'operation');
-      }
-    }
-  }
-  */
-
   renderLogic(logicDef, logic) {
     const {
       defStore,
@@ -41,7 +21,7 @@ class EditableLogic extends Component {
     } = this.props;
     const operations = defStore.getOperations(category);
     const { functionName } = logic;
-    const parentArgValue = defStore.getArgValue(parentInput, parentArg);
+    const parentArgValue = defStore.getArgValue(parentArg);
 
     const typeSelector = (parentInput && parentArg) ? (
       <EditableSelect
@@ -81,8 +61,7 @@ class EditableLogic extends Component {
     return inputs.map((input, index) => {
       const { Label: label, Types: types } = input;
       const arg = (args.length > index) ? args[index] : null;
-      // this.fixBadInputTypes(logic, arg, input);
-      const argValue = defStore.getArgValue(input, arg);
+      const argValue = defStore.getArgValue(arg);
       let content = null;
 
       const { type: argType, value: argVal } = argValue;

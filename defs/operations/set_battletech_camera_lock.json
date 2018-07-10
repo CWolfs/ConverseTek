@@ -1,6 +1,6 @@
 {
-  "key": "Play BattleTech Audio Event",
-  "label": "Play Audio",
+  "key": "Set BattleTech Camera Lock",
+  "label": "Lock the camera to",
   "view": ["label", "inputs"],
   "scope": "action",
   "category": "primary",

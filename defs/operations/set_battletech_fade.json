@@ -1,5 +1,5 @@
 {
-  "key": "Set Battletech Fade",
+  "key": "Set BattleTech Fade",
   "label": "Fade the screen",
   "view": ["label", "inputs"],
   "scope": "action",

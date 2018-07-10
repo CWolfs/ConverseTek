@@ -1,6 +1,6 @@
 {
-  "key": "Play BattleTech Audio Event",
-  "label": "Play Audio",
+  "key": "Set BattleTech Viewscreen Image",
+  "label": "Set viewscreen image to",
   "view": ["label", "inputs"],
   "scope": "action",
   "category": "primary",
