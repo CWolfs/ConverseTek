@@ -27,6 +27,7 @@ class NodeStore {
   @observable activeNode;
   @observable focusedNode;
   @observable scrollToTreeIndex;
+  @observable activeTreeIndex;
   @observable dirtyActiveNode = false;
   @observable rebuild = false;
 
@@ -91,6 +92,7 @@ class NodeStore {
 
   @action setActiveNodeByIndex(nodeIndex) {
     this.activeNode = this.getNodeByIndex(nodeIndex);
+    defer(() => this.scrollToNode(this.activeTreeIndex));
   }
 
   getActiveNodeId() {
@@ -109,6 +111,11 @@ class NodeStore {
   */
   @action scrollToNode(nodeTreeIndex) {
     this.scrollToTreeIndex = nodeTreeIndex;
+    defer(() => this.scrollToTreeIndex = -1);
+  }
+
+  @action setActiveTreeIndex(nodeTreeIndex) {
+    this.activeTreeIndex = nodeTreeIndex;
   }
 
   /*

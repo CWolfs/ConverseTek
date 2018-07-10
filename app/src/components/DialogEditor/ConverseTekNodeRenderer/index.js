@@ -56,6 +56,8 @@ const ConverseTekNodeRenderer = observer(({
   const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node);
   const isLandingPadActive = !didDrop && isDragging;
 
+  if (isActiveNode) nodeStore.setActiveTreeIndex(treeIndex);
+
   const {
     isRoot,
     isNode,
@@ -186,7 +188,6 @@ const ConverseTekNodeRenderer = observer(({
         const { type } = node;
         if (type === 'link') {
           nodeStore.setActiveNodeByIndex(node.linkIndex);
-          nodeStore.scrollToNode(treeIndex);
         } else {
           nodeStore.setActiveNode(node.id, node.type);
         }
