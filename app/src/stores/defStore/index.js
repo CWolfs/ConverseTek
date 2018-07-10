@@ -48,16 +48,31 @@ class DefStore {
       string_value: stringValue,
       call_value: callValue,
       // variableref_value: variableRefValue,
+      type,
     } = arg;
 
+    if (type) {
+      if (type === 'operation') return { type, value: callValue };
+      if (type === 'string') return { type, value: stringValue };
+      if (type === 'float') return { type, value: floatValue };
+      if (type === 'int') return { type, value: intValue };
+    } else {
+      let calculatedType = 'int';
+      if (callValue) calculatedType = 'operation';
+      if (stringValue !== '') calculatedType = 'string';
+      if (floatValue !== 0 && intValue !== 0) calculatedType = 'float';
+    }
+
     // Use same logic BT uses
+    /*
     if (callValue) return { type: 'operation', value: callValue };
     if (stringValue !== '') return { type: 'string', value: stringValue };
     if (floatValue !== 0 && intValue !== 0) return { type: 'float', value: floatValue };
     return { type: 'int', value: intValue };
+    */
   }
 
-  @action setArgType(logic, arg, type) {
+  @action setArgType(logic, arg, input, type) {
     const { args } = logic;
     const argValue = this.getArgValue(arg);
     const { type: previousType, value: previousValue } = argValue;
@@ -80,6 +95,8 @@ class DefStore {
         if (type === 'int') arg.int_value = tryParseInt(previousValue);
       }
 
+      arg.type = type;
+
       logic.args.replace(args);
     }
   }
@@ -93,6 +110,8 @@ class DefStore {
     if (type === 'string') arg.string_value = value;
     if (type === 'float') arg.float_value = value;
     if (type === 'int') arg.int_value = value;
+
+    arg.type = type;
 
     logic.args.replace(args);
   }
@@ -110,6 +129,22 @@ class DefStore {
       inputs.forEach((input, index) => {
         if (args.length <= index) {
           const newArg = createArg();
+
+          const { Types: types } = input;
+          const { type: argType } = newArg;
+
+          if (!types.includes(argType)) {
+            if (types.includes('int')) { // favour: int, float, string, operation
+              newArg.type = 'int';
+            } else if (types.includes('float')) {
+              newArg.type = 'float';
+            } else if (types.includes('string')) {
+              newArg.type = 'string';
+            } else if (types.includes('operation')) {
+              newArg.type = 'operation';
+            }
+          }
+
           logic.args.push(newArg);
         }
       });

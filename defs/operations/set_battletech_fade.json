@@ -1,0 +1,13 @@
+{
+  "key": "Set Battletech Fade",
+  "label": "Fade the screen",
+  "view": ["label", "inputs"],
+  "scope": "action",
+  "category": "primary",
+  "inputs": [
+    {
+      "label": "Conditional",
+      "types": ["operation", "int"]
+    }
+  ]
+}

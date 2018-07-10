@@ -11,24 +11,25 @@ import './EditableLogic.css';
 @observer
 /* eslint-disable react/no-array-index-key, no-param-reassign */
 class EditableLogic extends Component {
-  static fixBadInputTypes(argValue, input) {
+  /*
+  fixBadInputTypes(logic, arg, input) {
+    const { defStore } = this.props;
     const { Types: types } = input;
-    const { type: argType } = argValue;
+    const { type: argType } = defStore.getArgValue(arg);
 
     if (!types.includes(argType)) {
       if (types.includes('int')) { // favour: int, float, string, operation
-        return { ...argValue, type: 'int' };
+        defStore.setArgType(logic, arg, input, 'int');
       } else if (types.includes('float')) {
-        return { ...argValue, type: 'float' };
+        defStore.setArgType(logic, arg, input, 'float');
       } else if (types.includes('string')) {
-        return { ...argValue, type: 'string' };
+        defStore.setArgType(logic, arg, input, 'string');
       } else if (types.includes('operation')) {
-        return { ...argValue, type: 'operation' };
+        defStore.setArgType(logic, arg, input, 'operation');
       }
     }
-
-    return argValue;
   }
+  */
 
   renderLogic(logicDef, logic) {
     const {
@@ -40,7 +41,7 @@ class EditableLogic extends Component {
     } = this.props;
     const operations = defStore.getOperations(category);
     const { functionName } = logic;
-    const parentArgValue = defStore.getArgValue(parentArg);
+    const parentArgValue = defStore.getArgValue(parentInput, parentArg);
 
     const typeSelector = (parentInput && parentArg) ? (
       <EditableSelect
@@ -80,10 +81,10 @@ class EditableLogic extends Component {
     return inputs.map((input, index) => {
       const { Label: label, Types: types } = input;
       const arg = (args.length > index) ? args[index] : null;
-      let argValue = defStore.getArgValue(arg);
+      // this.fixBadInputTypes(logic, arg, input);
+      const argValue = defStore.getArgValue(input, arg);
       let content = null;
 
-      argValue = EditableLogic.fixBadInputTypes(argValue, input);
       const { type: argType, value: argVal } = argValue;
 
       let argsContainerClasses = classnames('editable-logic__args-container');

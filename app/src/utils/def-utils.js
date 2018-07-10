@@ -6,6 +6,7 @@ export function createArg() {
     string_value: '',
     call_value: null,
     variableref_value: null,
+    type: 'int',
   };
 }
 
