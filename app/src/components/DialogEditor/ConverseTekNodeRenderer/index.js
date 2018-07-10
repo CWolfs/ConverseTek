@@ -167,12 +167,23 @@ const ConverseTekNodeRenderer = observer(({
     fontSize: '18px',
   };
 
-  const conditionsIconStyle = {
+  if (nodeTitle && nodeTitle.length > 0) { 
+    logicStyle.paddingRight = '8px';
+  }
+
+  const actionsIconStyle = {
     ...logicStyle,
-    marginRight: (hasActions) ? '8px' : undefined,
   };
 
-  if (nodeTitle && nodeTitle.length > 0) logicStyle.paddingRight = '8px';
+  if ((!nodeTitle || (nodeTitle.length <= 0)) && hasActions) {
+    logicStyle.paddingRight = '8px';
+  }
+
+  /*
+  if ((nodeTitle === '') && !hasActions) {
+    conditionsIconStyle.marginLeft = '8px';
+  }
+  */
 
   const rawRowContents = (
     <div
@@ -184,8 +195,8 @@ const ConverseTekNodeRenderer = observer(({
       {!isLink && (
       <section>
         <div className="node-renderer__row-contents-logic">
-          {hasConditions && <Icon type="question-circle" style={conditionsIconStyle} />}
-          {hasActions && <Icon type="right-circle" style={logicStyle} />}
+          {hasConditions && <Icon type="question-circle" style={logicStyle} />}
+          {hasActions && <Icon type="right-circle" style={actionsIconStyle} />}
         </div>
 
         <div className={labelClasses}>
