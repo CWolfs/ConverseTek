@@ -66,9 +66,9 @@ All feedback is welcome in the [issues section](https://github.com/CWolfs/Conver
 | Conversation - Add conditions | 1.0.0 | :heavy_check_mark: |
 | Conversation - Remove conditions | 1.0.0 | :heavy_check_mark: |
 | Conversation - Edit conditions | 1.0.0 | :heavy_check_mark: |
-| Conversation - Add actions | 1.0.0 | :soon: |
-| Conversation - Remove actions | 1.0.0 | :soon: |
-| Conversation - Edit actions | 1.0.0 | :soon: |
+| Conversation - Add actions | 1.0.0 | :heavy_check_mark: |
+| Conversation - Remove actions | 1.0.0 | :heavy_check_mark: |
+| Conversation - Edit actions | 1.0.0 | :heavy_check_mark: |
 | Conversation - Search | TBD | :heavy_minus_sign: |
 
 ## Author
