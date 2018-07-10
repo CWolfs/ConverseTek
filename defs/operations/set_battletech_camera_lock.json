@@ -1,0 +1,13 @@
+{
+  "key": "Set BattleTech Camera Lock",
+  "label": "Lock the camera to",
+  "view": ["label", "inputs"],
+  "scope": "action",
+  "category": "primary",
+  "inputs": [
+    {
+      "label": "Key",
+      "types": ["string"]
+    }
+  ]
+}

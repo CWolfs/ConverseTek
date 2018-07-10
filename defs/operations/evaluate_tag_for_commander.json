@@ -2,6 +2,7 @@
   "key": "Evaluate Tag for Commander",
   "label": "If the Commander",
   "view": ["label", "inputs"],
+  "scope": "condition",
   "category": "primary",
   "inputs": [
     {

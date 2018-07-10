@@ -162,8 +162,22 @@ const ConverseTekNodeRenderer = observer(({
     buttonStyle = { right: -0.5 * scaffoldBlockPxWidth };
   }
 
-  const logicStyle = { color: (isResponse) ? 'white' : '#2f71d4', fontSize: '18px' };
-  if (nodeTitle && nodeTitle.length > 0) logicStyle.paddingRight = '8px';
+  const logicStyle = {
+    color: (isResponse) ? 'white' : '#2f71d4',
+    fontSize: '18px',
+  };
+
+  if (nodeTitle && nodeTitle.length > 0) { 
+    logicStyle.paddingRight = '8px';
+  }
+
+  const actionsIconStyle = {
+    ...logicStyle,
+  };
+
+  if ((!nodeTitle || (nodeTitle.length <= 0)) && hasActions) {
+    logicStyle.paddingRight = '8px';
+  }
 
   const rawRowContents = (
     <div
@@ -176,7 +190,7 @@ const ConverseTekNodeRenderer = observer(({
       <section>
         <div className="node-renderer__row-contents-logic">
           {hasConditions && <Icon type="question-circle" style={logicStyle} />}
-          {hasActions && <Icon type="right-circle" style={logicStyle} />}
+          {hasActions && <Icon type="right-circle" style={actionsIconStyle} />}
         </div>
 
         <div className={labelClasses}>

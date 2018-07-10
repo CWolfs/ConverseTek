@@ -1,0 +1,13 @@
+{
+  "key": "Play BattleTech Audio Event",
+  "label": "Play Audio",
+  "view": ["label", "inputs"],
+  "scope": "action",
+  "category": "primary",
+  "inputs": [
+    {
+      "label": "Key",
+      "types": ["string"]
+    }
+  ]
+}

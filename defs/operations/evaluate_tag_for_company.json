@@ -2,6 +2,7 @@
   "key": "Evaluate Tag for Company",
   "label": "If the Company",
   "view": ["label", "inputs"],
+  "scope": "condition",
   "category": "primary",
   "inputs": [
     {

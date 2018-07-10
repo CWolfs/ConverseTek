@@ -1,0 +1,13 @@
+{
+  "key": "Set BattleTech Viewscreen Image",
+  "label": "Set viewscreen image to",
+  "view": ["label", "inputs"],
+  "scope": "action",
+  "category": "primary",
+  "inputs": [
+    {
+      "label": "Key",
+      "types": ["string"]
+    }
+  ]
+}

@@ -8,6 +8,7 @@ import DialogEditor from '../../components/DialogEditor';
 import DialogTextArea from '../../components/DialogTextArea';
 import ConversationGeneral from '../ConversationGeneral';
 import ConversationConditions from '../ConversationConditions';
+import ConversationActions from '../ConversationActions';
 
 import { updateConversation } from '../../services/api';
 import { regenerateNodeIds, regenerateConversationId } from '../../utils/conversation-utils';
@@ -97,7 +98,7 @@ class ConversationEditor extends Component {
     const conversationId = Conversation.idRef.id;
     const { activeNode, rebuild } = nodeStore;
     const { type } = activeNode || { type: null };
-    const { isResponse } = detectType(type);
+    const { isRoot, isResponse } = detectType(type);
 
     const formItemLayout = {
       labelCol: {
@@ -193,8 +194,8 @@ class ConversationEditor extends Component {
             <Col md={24} lg={12} className="conversation-editor__details-right">
               <Tabs defaultActiveKey="1">
                 <TabPane tab="General" key="1"><ConversationGeneral node={activeNode} /></TabPane>
-                {isResponse && <TabPane tab="Conditions" key="2"><ConversationConditions node={activeNode} /></TabPane>}
-                <TabPane tab="Actions" key="3">Actions</TabPane>
+                {(isRoot || isResponse) && <TabPane tab="Conditions" key="2"><ConversationConditions node={activeNode} /></TabPane>}
+                <TabPane tab="Actions" key="3"><ConversationActions node={activeNode} /></TabPane>
               </Tabs>
             </Col>
           </Row>

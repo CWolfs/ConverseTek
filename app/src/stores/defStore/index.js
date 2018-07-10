@@ -13,6 +13,89 @@ class DefStore {
     this.definitionCount = 0;
   }
 
+  @action setLogicTypeByConversation(conversationAsset) {
+    const { Conversation: conversation } = conversationAsset;
+    const { roots, nodes } = conversation;
+
+    roots.forEach((root) => {
+      // Root Operations
+      if (root.conditions && root.conditions.ops) {
+        const operations = root.conditions.ops;
+        operations.forEach((operation) => {
+          this.setLogicTypeByOperation(operation);
+        });
+      }
+
+      // Root Actions
+      if (root.actions && root.actions.ops) {
+        const operations = root.actions.ops;
+        operations.forEach((operation) => {
+          this.setLogicTypeByOperation(operation);
+        });
+      }
+    });
+
+    nodes.forEach((node) => {
+      // Node Actions
+      if (node.actions && node.actions.ops) {
+        const operations = node.actions.ops;
+        operations.forEach((operation) => {
+          this.setLogicTypeByOperation(operation);
+        });
+      }
+
+      if (node.branches) {
+        const responses = node.branches;
+
+        responses.forEach((response) => {
+          // Branch Conditions
+          if (response.conditions && response.conditions.ops) {
+            const operations = response.conditions.ops;
+            operations.forEach((operation) => {
+              this.setLogicTypeByOperation(operation);
+            });
+          }
+
+          // Branch Actions
+          if (response.actions && response.actions.ops) {
+            const operations = response.actions.ops;
+            operations.forEach((operation) => {
+              this.setLogicTypeByOperation(operation);
+            });
+          }
+        });
+      }
+    });
+  }
+
+  @action setLogicTypeByOperation(operation) {
+    const { args } = operation;
+    const logicDef = this.getDefinition(operation);
+    const { Inputs: inputs } = logicDef;
+
+    args.forEach((arg, index) => {
+      let rawType = this.getRawArgType(arg);
+      const input = inputs[index];
+      const { Types: types } = input;
+
+      if (!types.includes(rawType)) {
+        if (types.includes('int')) { // favour: int, float, string, operation
+          rawType = 'int';
+        } else if (types.includes('float')) {
+          rawType = 'float';
+        } else if (types.includes('string')) {
+          rawType = 'string';
+        } else if (types.includes('operation')) {
+          rawType = 'operation';
+        }
+      }
+
+      arg.type = rawType;
+
+      if (rawType === 'operation') this.setLogicTypeByOperation(arg.call_value);
+    });
+  }
+
   @action setDefinitions(definitions) {
     const { operations, presets, tags } = definitions;
 
@@ -31,16 +114,19 @@ class DefStore {
   }
 
   @action getDefinitionByName(functionName) {
-    return this.operations.find(operation => operation.Key === functionName);
+    const definition = this.operations.find(operation => operation.Key === functionName);
+    if (!definition) {
+      console.error(`No operation definition found with functionName '${functionName}'`);
+    }
+    return definition;
   }
 
-  @action getOperations(category) {
-    return this.operations.filter(operation => operation.Category === category);
+  @action getOperations(category, scope = 'all') {
+    return this.operations.filter(operation =>
+      (operation.Category === category) && ((operation.Scope === scope) || (scope === 'all')));
   }
 
-  @action getArgValue(arg) {
-    if (arg === null || arg === undefined) return { type: null, value: null };
-
+  getRawArgType(arg) {
     const {
       int_value: intValue,
       // bool_value: boolValue,
@@ -51,10 +137,33 @@ class DefStore {
     } = arg;
 
     // Use same logic BT uses
-    if (callValue) return { type: 'operation', value: callValue };
-    if (stringValue !== '') return { type: 'string', value: stringValue };
-    if (floatValue !== 0 && intValue !== 0) return { type: 'float', value: floatValue };
-    return { type: 'int', value: intValue };
+    if (callValue) return 'operation';
+    if (stringValue !== '') return 'string';
+    if (floatValue !== 0 && intValue !== 0) return 'float';
+    return 'int';
+  }
+
+  getArgValue(arg) {
+    if (arg === null || arg === undefined) return { type: null, value: null };
+
+    const {
+      int_value: intValue,
+      // bool_value: boolValue,
+      float_value: floatValue,
+      string_value: stringValue,
+      call_value: callValue,
+      // variableref_value: variableRefValue,
+      type,
+    } = arg;
+
+    if (type) {
+      if (type === 'operation') return { type, value: callValue };
+      if (type === 'string') return { type, value: stringValue };
+      if (type === 'float') return { type, value: floatValue };
+      if (type === 'int') return { type, value: intValue };
+    }
+
+    return null;
   }
 
   @action setArgType(logic, arg, type) {
@@ -80,6 +189,8 @@ class DefStore {
         if (type === 'int') arg.int_value = tryParseInt(previousValue);
       }
 
+      arg.type = type;
+
       logic.args.replace(args);
     }
   }
@@ -93,6 +204,8 @@ class DefStore {
     if (type === 'string') arg.string_value = value;
     if (type === 'float') arg.float_value = value;
     if (type === 'int') arg.int_value = value;
+
+    arg.type = type;
 
     logic.args.replace(args);
   }
@@ -110,6 +223,22 @@ class DefStore {
       inputs.forEach((input, index) => {
         if (args.length <= index) {
           const newArg = createArg();
+
+          const { Types: types } = input;
+          const { type: argType } = newArg;
+
+          if (!types.includes(argType)) {
+            if (types.includes('int')) { // favour: int, float, string, operation
+              newArg.type = 'int';
+            } else if (types.includes('float')) {
+              newArg.type = 'float';
+            } else if (types.includes('string')) {
+              newArg.type = 'string';
+            } else if (types.includes('operation')) {
+              newArg.type = 'operation';
+            }
+          }
+
           logic.args.push(newArg);
         }
       });
