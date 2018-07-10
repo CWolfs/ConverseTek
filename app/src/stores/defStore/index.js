@@ -56,11 +56,6 @@ class DefStore {
       if (type === 'string') return { type, value: stringValue };
       if (type === 'float') return { type, value: floatValue };
       if (type === 'int') return { type, value: intValue };
-    } else {
-      let calculatedType = 'int';
-      if (callValue) calculatedType = 'operation';
-      if (stringValue !== '') calculatedType = 'string';
-      if (floatValue !== 0 && intValue !== 0) calculatedType = 'float';
     }
 
     // Use same logic BT uses
