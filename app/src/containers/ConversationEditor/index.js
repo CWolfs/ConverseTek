@@ -8,6 +8,7 @@ import DialogEditor from '../../components/DialogEditor';
 import DialogTextArea from '../../components/DialogTextArea';
 import ConversationGeneral from '../ConversationGeneral';
 import ConversationConditions from '../ConversationConditions';
+import ConversationActions from '../ConversationActions';
 
 import { updateConversation } from '../../services/api';
 import { regenerateNodeIds, regenerateConversationId } from '../../utils/conversation-utils';
@@ -194,7 +195,7 @@ class ConversationEditor extends Component {
               <Tabs defaultActiveKey="1">
                 <TabPane tab="General" key="1"><ConversationGeneral node={activeNode} /></TabPane>
                 {isResponse && <TabPane tab="Conditions" key="2"><ConversationConditions node={activeNode} /></TabPane>}
-                <TabPane tab="Actions" key="3">Actions</TabPane>
+                <TabPane tab="Actions" key="3"><ConversationActions node={activeNode} /></TabPane>
               </Tabs>
             </Col>
           </Row>

@@ -14,12 +14,13 @@ class EditableLogic extends Component {
   renderLogic(logicDef, logic) {
     const {
       defStore,
+      scope,
       category,
       parentLogic,
       parentInput,
       parentArg,
     } = this.props;
-    const operations = defStore.getOperations(category);
+    const operations = defStore.getOperations(category, scope);
     const { functionName } = logic;
     const parentArgValue = defStore.getArgValue(parentArg);
 
@@ -147,7 +148,7 @@ class EditableLogic extends Component {
 
       if (!content) content = <div>Unprocessed Input: {input.Label}</div>;
 
-      return <div className={argsContainerClasses} key={index}><span className="editable-logic__args-label">Argument {index + 1}</span> {content}</div>;
+      return <div className={argsContainerClasses} key={index}><span className="editable-logic__args-label">{label}</span> {content}</div>;
     });
   }
 
@@ -184,6 +185,7 @@ class EditableLogic extends Component {
 }
 
 EditableLogic.defaultProps = {
+  scope: 'all',
   isEven: false,
   parentLogic: null,
   parentInput: null,
@@ -196,6 +198,7 @@ EditableLogic.propTypes = {
   parentInput: PropTypes.object,
   parentArg: PropTypes.object,
   logic: PropTypes.object.isRequired,
+  scope: PropTypes.string,
   category: PropTypes.string.isRequired,
   isEven: PropTypes.bool,
 };

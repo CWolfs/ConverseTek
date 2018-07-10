@@ -121,8 +121,9 @@ class DefStore {
     return definition;
   }
 
-  @action getOperations(category) {
-    return this.operations.filter(operation => operation.Category === category);
+  @action getOperations(category, scope = 'all') {
+    return this.operations.filter(operation =>
+      (operation.Category === category) && ((operation.Scope === scope) || (scope === 'all')));
   }
 
   getRawArgType(arg) {

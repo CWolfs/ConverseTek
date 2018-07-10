@@ -10,12 +10,12 @@ import 'react-custom-scroll/dist/customScroll.css';
 import ViewableLogic from '../../components/ViewableLogic';
 import EditableLogic from '../../components/EditableLogic';
 
-import './ConversationConditions.css';
+import './ConversationActions.css';
 
 const { Panel } = Collapse;
 
 @observer
-class ConversationConditions extends Component {
+class ConversationActions extends Component {
   constructor(props) {
     super(props);
 
@@ -23,8 +23,8 @@ class ConversationConditions extends Component {
 
     this.renderPanel = this.renderPanel.bind(this);
     this.resize = this.resize.bind(this);
-    this.onAddCondition = this.onAddCondition.bind(this);
-    this.onDeleteCondition = this.onDeleteCondition.bind(this);
+    this.onAddAction = this.onAddAction.bind(this);
+    this.onDeleteAction = this.onDeleteAction.bind(this);
   }
 
   componentDidMount() {
@@ -35,30 +35,30 @@ class ConversationConditions extends Component {
     window.removeEventListener('resize', this.resize);
   }
 
-  onAddCondition() {
+  onAddAction() {
     const { node, defStore } = this.props;
-    const { conditions } = node;
+    const { actions } = node;
 
     const newCondition = {
-      functionName: 'Evaluate Tag for Commander',
+      functionName: 'Play BattleTech Audio Event',
       args: [],
     };
     defStore.setOperation(newCondition, newCondition.functionName);
 
-    if (conditions) {
-      conditions.ops.push(newCondition);
+    if (actions) {
+      actions.ops.push(newCondition);
     } else {
-      node.conditions = {
+      node.actions = {
         ops: [newCondition],
       };
     }
   }
 
-  onDeleteCondition(event, index) {
+  onDeleteAction(event, index) {
     const { nodeStore, node } = this.props;
-    const { conditions } = node;
-    remove(conditions.ops, (value, i) => i === index);
-    if (conditions.ops.length <= 0) node.conditions = null;
+    const { actions } = node;
+    remove(actions.ops, (value, i) => i === index);
+    if (actions.ops.length <= 0) node.actions = null;
 
     nodeStore.setRebuild(true);
 
@@ -73,7 +73,7 @@ class ConversationConditions extends Component {
     const key = index;
 
     const classes = classnames(
-      'conversation-conditions__panel',
+      'conversation-actions__panel',
       {
         first: index === 0,
         last: index === (this.dataSize - 1),
@@ -81,21 +81,21 @@ class ConversationConditions extends Component {
     );
 
     const header = (
-      <div className="conversation-conditions__panel-header">
-        <div className="conversation-conditions__panel-header-logic">
+      <div className="conversation-actions__panel-header">
+        <div className="conversation-actions__panel-header-logic">
           <ViewableLogic logic={condition} />
         </div>
         <Popconfirm
           title="Are you sure you want to delete this condition?"
           placement="topLeft"
-          onConfirm={event => this.onDeleteCondition(event, index)}
+          onConfirm={event => this.onDeleteAction(event, index)}
           okText="Yes"
           cancelText="No"
         >
           <Button
             size="small"
             type="caution"
-            className="conversation-conditions__panel-header-delete-button"
+            className="conversation-actions__panel-header-delete-button"
             onClick={event => event.stopPropagation()}
           >
             <Icon type="delete" />
@@ -105,33 +105,33 @@ class ConversationConditions extends Component {
 
     return (
       <Panel key={key} className={classes} header={header}>
-        <EditableLogic logic={condition} category="primary" scope="condition" />
+        <EditableLogic logic={condition} category="primary" scope="action" />
       </Panel>
     );
   }
 
   render() {
     const { node } = this.props;
-    let { conditions } = node;
-    if (conditions === null) {
-      conditions = [];
+    let { actions } = node;
+    if (actions === null) {
+      actions = [];
     } else {
-      conditions = conditions.ops;
+      actions = actions.ops;
     }
 
-    this.dataSize = conditions.length;
+    this.dataSize = actions.length;
     const height = window.document.getElementsByClassName('conversation-editor__details')[0].clientHeight - 22;
 
     return (
-      <div className="conversation-conditions" style={{ height }}>
+      <div className="conversation-actions" style={{ height }}>
         <Collapse>
-          {conditions.map((condition, index) => this.renderPanel(condition, index))}
+          {actions.map((condition, index) => this.renderPanel(condition, index))}
         </Collapse>
-        <div className="conversation-conditions__buttons">
+        <div className="conversation-actions__buttons">
           <Button
             type="secondary"
             size="small"
-            onClick={this.onAddCondition}
+            onClick={this.onAddAction}
           >
             <Icon type="plus" />
           </Button>
@@ -141,10 +141,10 @@ class ConversationConditions extends Component {
   }
 }
 
-ConversationConditions.propTypes = {
+ConversationActions.propTypes = {
   nodeStore: PropTypes.object.isRequired,
   node: PropTypes.object.isRequired,
   defStore: PropTypes.object.isRequired,
 };
 
-export default inject('nodeStore', 'defStore')(ConversationConditions);
+export default inject('nodeStore', 'defStore')(ConversationActions);
