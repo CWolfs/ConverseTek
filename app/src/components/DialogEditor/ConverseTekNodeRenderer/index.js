@@ -167,7 +167,7 @@ const ConverseTekNodeRenderer = observer(({
     fontSize: '18px',
   };
 
-  if (nodeTitle && nodeTitle.length > 0) { 
+  if (nodeTitle && nodeTitle.length > 0) {
     logicStyle.paddingRight = '8px';
   }
 
@@ -182,7 +182,15 @@ const ConverseTekNodeRenderer = observer(({
   const rawRowContents = (
     <div
       className={rowContentsClasses}
-      onClick={() => nodeStore.setActiveNode(node.id, node.type)}
+      onClick={() => {
+        const { type } = node;
+        if (type === 'link') {
+          nodeStore.setActiveNodeByIndex(node.linkIndex);
+          nodeStore.scrollToNode(treeIndex);
+        } else {
+          nodeStore.setActiveNode(node.id, node.type);
+        }
+      }}
       onMouseEnter={() => nodeStore.setFocusedNode(node)}
     >
       {isLink && <div className="node-renderer__link-row-icon"><LinkIcon /></div>}

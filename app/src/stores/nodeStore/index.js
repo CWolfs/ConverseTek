@@ -26,6 +26,7 @@ import { detectType } from '../../utils/node-utils';
 class NodeStore {
   @observable activeNode;
   @observable focusedNode;
+  @observable scrollToTreeIndex;
   @observable dirtyActiveNode = false;
   @observable rebuild = false;
 
@@ -88,6 +89,10 @@ class NodeStore {
     this.activeNode = this.getNode(nodeId);
   }
 
+  @action setActiveNodeByIndex(nodeIndex) {
+    this.activeNode = this.getNodeByIndex(nodeIndex);
+  }
+
   getActiveNodeId() {
     if (!this.activeNode) return null;
     return getId(this.activeNode);
@@ -95,6 +100,15 @@ class NodeStore {
 
   @action clearActiveNode() {
     this.activeNode = null;
+  }
+
+  /*
+  * =============================
+  * || SCROLL TO  NODE METHODS ||
+  * =============================
+  */
+  @action scrollToNode(nodeTreeIndex) {
+    this.scrollToTreeIndex = nodeTreeIndex;
   }
 
   /*
