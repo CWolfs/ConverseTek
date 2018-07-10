@@ -179,12 +179,6 @@ const ConverseTekNodeRenderer = observer(({
     logicStyle.paddingRight = '8px';
   }
 
-  /*
-  if ((nodeTitle === '') && !hasActions) {
-    conditionsIconStyle.marginLeft = '8px';
-  }
-  */
-
   const rawRowContents = (
     <div
       className={rowContentsClasses}
