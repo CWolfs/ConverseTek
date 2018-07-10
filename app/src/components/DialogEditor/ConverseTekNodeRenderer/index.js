@@ -169,7 +169,7 @@ const ConverseTekNodeRenderer = observer(({
 
   const conditionsIconStyle = {
     ...logicStyle,
-    marginRight: (hasActions) ? '8px': undefined,
+    marginRight: (hasActions) ? '8px' : undefined,
   };
 
   if (nodeTitle && nodeTitle.length > 0) logicStyle.paddingRight = '8px';
