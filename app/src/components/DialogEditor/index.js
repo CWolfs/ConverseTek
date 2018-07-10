@@ -158,7 +158,6 @@ class DialogEditor extends Component {
             )}
             nodeContentRenderer={ConverseTekNodeRenderer}
             reactVirtualizedListProps={{
-              /* overscanRowCount: 10, */
               scrollToIndex: scrollToTreeIndex,
             }}
           />

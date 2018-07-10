@@ -251,7 +251,7 @@ const ConverseTekNodeRenderer = observer(({
   const rowContents = menuWrappedRowContents;
 
   return (
-    <div style={{ height: '100%' }} {...otherProps}>
+    <div style={{ height: '100%' }} data-node-index={treeIndex} {...otherProps}>
       {toggleChildrenVisibility &&
         node.children &&
         (node.children.length > 0 || typeof node.children === 'function') && (

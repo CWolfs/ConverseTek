@@ -92,7 +92,15 @@ class NodeStore {
 
   @action setActiveNodeByIndex(nodeIndex) {
     this.activeNode = this.getNodeByIndex(nodeIndex);
-    defer(() => this.scrollToNode(this.activeTreeIndex));
+    defer(() => {
+      this.scrollToNode(this.activeTreeIndex);
+      defer(() => {
+        // Ugly I know but can't find another way
+        const element = window.document.querySelector(`[data-node-index="${this.activeTreeIndex}"]`);
+        const tree = window.document.querySelector('.ReactVirtualized__Grid');
+        tree.scrollLeft = element.offsetParent.offsetLeft - 50;
+      });
+    });
   }
 
   getActiveNodeId() {
