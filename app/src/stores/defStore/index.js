@@ -185,8 +185,8 @@ class DefStore {
       if (type === 'string') arg.string_value = (previousValue && !previousValue.functionName) ? previousValue.toString() : '';
 
       if (previousType === 'float' || previousType === 'int' || previousType === 'string') {
-        if (type === 'float') arg.float_value = tryParseFloat(previousValue);
-        if (type === 'int') arg.int_value = tryParseInt(previousValue);
+        if (type === 'float') arg.float_value = tryParseFloat(previousValue, 0.0);
+        if (type === 'int') arg.int_value = tryParseInt(previousValue, 0);
       }
 
       arg.type = type;
