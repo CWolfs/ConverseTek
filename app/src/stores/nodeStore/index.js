@@ -26,6 +26,8 @@ import { detectType } from '../../utils/node-utils';
 class NodeStore {
   @observable activeNode;
   @observable focusedNode;
+  @observable scrollToTreeIndex;
+  @observable activeTreeIndex;
   @observable dirtyActiveNode = false;
   @observable rebuild = false;
 
@@ -88,6 +90,19 @@ class NodeStore {
     this.activeNode = this.getNode(nodeId);
   }
 
+  @action setActiveNodeByIndex(nodeIndex) {
+    this.activeNode = this.getNodeByIndex(nodeIndex);
+    defer(() => {
+      this.scrollToNode(this.activeTreeIndex);
+      defer(() => {
+        // Ugly I know but can't find another way
+        const element = window.document.querySelector(`[data-node-index="${this.activeTreeIndex}"]`);
+        const tree = window.document.querySelector('.ReactVirtualized__Grid');
+        tree.scrollLeft = element.offsetParent.offsetLeft - 50;
+      });
+    });
+  }
+
   getActiveNodeId() {
     if (!this.activeNode) return null;
     return getId(this.activeNode);
@@ -95,6 +110,20 @@ class NodeStore {
 
   @action clearActiveNode() {
     this.activeNode = null;
+  }
+
+  /*
+  * =============================
+  * || SCROLL TO  NODE METHODS ||
+  * =============================
+  */
+  @action scrollToNode(nodeTreeIndex) {
+    this.scrollToTreeIndex = nodeTreeIndex;
+    defer(() => this.scrollToTreeIndex = -1);
+  }
+
+  @action setActiveTreeIndex(nodeTreeIndex) {
+    this.activeTreeIndex = nodeTreeIndex;
   }
 
   /*
