@@ -129,7 +129,7 @@ class DialogEditor extends Component {
   render() {
     const { nodeStore } = this.props;
     const { treeData: data } = this.state;
-    const { scrollToTreeIndex } = nodeStore;
+    const { scrollToNodeId } = nodeStore;
     const activeNodeId = nodeStore.getActiveNodeId();
 
     return (
@@ -158,7 +158,8 @@ class DialogEditor extends Component {
             )}
             nodeContentRenderer={ConverseTekNodeRenderer}
             reactVirtualizedListProps={{
-              scrollToIndex: scrollToTreeIndex,
+              // overscanRowCount: (scrollToNodeId === null) ? 0 : 999999,
+              overscanRowCount: 99999,
             }}
           />
         </div>

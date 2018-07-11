@@ -26,8 +26,7 @@ import { detectType } from '../../utils/node-utils';
 class NodeStore {
   @observable activeNode;
   @observable focusedNode;
-  @observable scrollToTreeIndex;
-  @observable activeTreeIndex;
+  @observable scrollToNodeId;
   @observable dirtyActiveNode = false;
   @observable rebuild = false;
 
@@ -92,15 +91,6 @@ class NodeStore {
 
   @action setActiveNodeByIndex(nodeIndex) {
     this.activeNode = this.getNodeByIndex(nodeIndex);
-    defer(() => {
-      this.scrollToNode(this.activeTreeIndex);
-      defer(() => {
-        // Ugly I know but can't find another way
-        const element = window.document.querySelector(`[data-node-index="${this.activeTreeIndex}"]`);
-        const tree = window.document.querySelector('.ReactVirtualized__Grid');
-        tree.scrollLeft = element.offsetParent.offsetLeft - 50;
-      });
-    });
   }
 
   getActiveNodeId() {
@@ -117,13 +107,29 @@ class NodeStore {
   * || SCROLL TO  NODE METHODS ||
   * =============================
   */
-  @action scrollToNode(nodeTreeIndex) {
-    this.scrollToTreeIndex = nodeTreeIndex;
-    defer(() => this.scrollToTreeIndex = -1);
+  @action scrollToNode(nodeId) {
+    this.scrollToNodeId = nodeId;
+
+    defer(() => {
+      // Ugly I know but can't find another way
+      const element = window.document.querySelector(`[data-node-id="${nodeId}"]`);
+      const tree = window.document.querySelector('.ReactVirtualized__Grid');
+
+      if (element) {
+        tree.scrollLeft = element.offsetParent.offsetLeft - 50;
+        tree.scrollTop = element.offsetParent.offsetParent.offsetTop;
+
+        defer(() => {
+          this.resetScroll();
+        });
+      } else {
+        defer(() => this.scrollToNode(nodeId));
+      }
+    });
   }
 
-  @action setActiveTreeIndex(nodeTreeIndex) {
-    this.activeTreeIndex = nodeTreeIndex;
+  @action resetScroll() {
+    this.scrollToNodeId = null;
   }
 
   /*
@@ -571,6 +577,7 @@ class NodeStore {
             children: (auxiliaryLink) ? [{
               title: `[Link to NODE ${branch.nextNodeIndex}]`,
               type: 'link',
+              linkId: getId(this.getNodeByIndex(branch.nextNodeIndex)),
               linkIndex: branch.nextNodeIndex,
               canDrag: false,
               parentId: branchNodeId,
