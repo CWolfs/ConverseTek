@@ -132,11 +132,15 @@ class DialogEditor extends Component {
     const { scrollToNodeId } = nodeStore;
     const activeNodeId = nodeStore.getActiveNodeId();
 
+    const treeClass = (scrollToNodeId) ? 'non-virtual__tree' : undefined;
+    // const treeClass = 'non-virtual__tree';
+
     return (
       <div className="dialog-editor">
         <div className="dialog-editor__tree">
           <DialogEditorContextMenu id="dialog-context-menu" />
           <SortableTree
+            className={treeClass}
             treeData={data}
             onChange={treeData => this.setState({ treeData })}
             getNodeKey={({ node, treeIndex }) => {
@@ -157,9 +161,10 @@ class DialogEditor extends Component {
               }
             )}
             nodeContentRenderer={ConverseTekNodeRenderer}
+            isVirtualized={!scrollToNodeId}
+            // isVirtualized={false}
             reactVirtualizedListProps={{
-              // overscanRowCount: (scrollToNodeId === null) ? 0 : 999999,
-              overscanRowCount: 99999,
+              overscanRowCount: (!scrollToNodeId) ? 0 : 999999,
             }}
           />
         </div>

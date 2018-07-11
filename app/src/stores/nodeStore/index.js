@@ -113,23 +113,29 @@ class NodeStore {
     defer(() => {
       // Ugly I know but can't find another way
       const element = window.document.querySelector(`[data-node-id="${nodeId}"]`);
-      const tree = window.document.querySelector('.ReactVirtualized__Grid');
+      // const tree = window.document.querySelector('.ReactVirtualized__Grid');
+      // const tree = window.document.querySelector('.dialog-editor__tree');
 
       if (element) {
-        tree.scrollLeft = element.offsetParent.offsetLeft - 50;
-        tree.scrollTop = element.offsetParent.offsetParent.offsetTop;
+        const scrollLeft = element.offsetParent.offsetLeft - 50;
+        const scrollTop = element.offsetParent.offsetParent.offsetTop;
+        // tree.scrollLeft = element.offsetParent.offsetLeft - 50;
+        // tree.scrollTop = element.offsetParent.offsetParent.offsetTop - 150;
 
         defer(() => {
-          this.resetScroll();
+          this.resetScroll(scrollLeft, scrollTop);
         });
-      } else {
-        defer(() => this.scrollToNode(nodeId));
       }
     });
   }
 
-  @action resetScroll() {
+  @action resetScroll(scrollLeft, scrollTop) {
     this.scrollToNodeId = null;
+    defer(() => {
+      const tree = window.document.querySelector('.ReactVirtualized__Grid');
+      tree.scrollTop = scrollTop;
+      tree.scrollLeft = scrollLeft;
+    });
   }
 
   /*
