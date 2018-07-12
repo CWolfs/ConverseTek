@@ -56,8 +56,6 @@ const ConverseTekNodeRenderer = observer(({
   const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node);
   const isLandingPadActive = !didDrop && isDragging;
 
-  if (isActiveNode) nodeStore.setActiveTreeIndex(treeIndex);
-
   const {
     isRoot,
     isNode,
@@ -187,7 +185,10 @@ const ConverseTekNodeRenderer = observer(({
       onClick={() => {
         const { type } = node;
         if (type === 'link') {
-          nodeStore.setActiveNodeByIndex(node.linkIndex);
+          const linkTreeIndex = nodeStore.getTreeIndex(node.linkId);
+          const direction = (linkTreeIndex < treeIndex) ? 'up' : 'down';
+          nodeStore.setActiveNode(node.linkId);
+          nodeStore.scrollToNode(node.linkId, direction);
         } else {
           nodeStore.setActiveNode(node.id, node.type);
         }
@@ -251,7 +252,7 @@ const ConverseTekNodeRenderer = observer(({
   const rowContents = menuWrappedRowContents;
 
   return (
-    <div style={{ height: '100%' }} data-node-index={treeIndex} {...otherProps}>
+    <div style={{ height: '100%' }} data-node-id={node.id} {...otherProps}>
       {toggleChildrenVisibility &&
         node.children &&
         (node.children.length > 0 || typeof node.children === 'function') && (

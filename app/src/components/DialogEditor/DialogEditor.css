@@ -21,6 +21,14 @@
   .rst__virtualScrollOverride * {
     color: black;
   }
+
+  .rst__nodeContent {
+    color: black;
+  }
+
+  .non-virtual__tree {
+    width: auto;
+  }
   
   .rst__moveHandle {
     background-color: #2f71d4;
