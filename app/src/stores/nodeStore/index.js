@@ -38,6 +38,7 @@ class NodeStore {
     this.clipboard = {
       node: null,
       nodes: [],
+      nodeIdMap: new Map(),
     };
     this.nodeIdToTreeIndexMap = new Map();
 
@@ -161,7 +162,10 @@ class NodeStore {
     const node = toJS(this.getNode(nodeId));
     const newNodeId = generateId();
     node.idRef.id = newNodeId;
-    node.index = this.generateNextNodeIndex();
+
+    const newNodeIndex = this.generateNextNodeIndex();
+    this.clipboard.nodeIdMap.set(node.index, newNodeIndex);
+    node.index = newNodeIndex;
     this.clipboard.node = node;
 
     this.clipboard.nodes = flattenDeep(node.branches.map((branch) => {
@@ -169,6 +173,11 @@ class NodeStore {
       const newBranchId = generateId();
       branch.idRef.id = newBranchId;
       branch.parentId = newNodeId;
+
+      // Change link indexes
+      if (nextNodeIndex !== -1 && auxiliaryLink) {
+        branch.nextNodeIndex = this.clipboard.nodeIdMap.get(branch.nextNodeIndex);
+      }
 
       if (nextNodeIndex === -1 || auxiliaryLink) return [];
 
@@ -182,6 +191,8 @@ class NodeStore {
     const node = toJS(this.getNodeByIndex(nodeIndex));
     const newNodeId = generateId();
     node.idRef.id = newNodeId;
+
+    this.clipboard.nodeIdMap.set(node.index, newNextNodeIndex);
     node.index = newNextNodeIndex;
     node.parentId = newNodeParentId;
 
@@ -192,6 +203,11 @@ class NodeStore {
         const newBranchId = generateId();
         branch.idRef.id = newBranchId;
         branch.parentId = newNodeId;
+
+        // Change link indexes
+        if (nextNodeIndex !== -1 && auxiliaryLink) {
+          branch.nextNodeIndex = this.clipboard.nodeIdMap.get(branch.nextNodeIndex);
+        }
 
         if (nextNodeIndex === -1 || auxiliaryLink) return [];
 
@@ -207,6 +223,7 @@ class NodeStore {
     this.clipboard = {
       node: null,
       nodes: null,
+      nodeIdMap: new Map(),
     };
   }
 
