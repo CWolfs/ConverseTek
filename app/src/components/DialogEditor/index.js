@@ -10,7 +10,7 @@ import DialogEditorContextMenu from '../DialogEditorContextMenu';
 
 import './DialogEditor.css';
 
-/* eslint-disable react/no-unused-state, no-param-reassign */
+/* eslint-disable react/no-unused-state, no-param-reassign, react/no-did-mount-set-state */
 @observer
 class DialogEditor extends Component {
   static buildTreeData(nodeStore, conversationAsset) {
@@ -34,10 +34,20 @@ class DialogEditor extends Component {
     this.state = {
       conversationAsset,
       treeData: DialogEditor.buildTreeData(nodeStore, conversationAsset),
+      treeWidth: 0,
     };
 
     this.onMove = this.onMove.bind(this);
     this.canDrop = this.canDrop.bind(this);
+  }
+
+  componentDidMount() {
+    window.addEventListener('resize', this.resize);
+
+    const treeWidth = this.treeElement.clientWidth;
+    this.setState({
+      treeWidth,
+    });
   }
 
   componentWillReceiveProps(nextProps) {
@@ -52,6 +62,10 @@ class DialogEditor extends Component {
       newState.treeData = DialogEditor.buildTreeData(nodeStore, propConversationAsset);
       this.setState(newState);
     }
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.resize);
   }
 
   onMove(nodeContainer) {
@@ -91,6 +105,10 @@ class DialogEditor extends Component {
     }
   }
 
+  resize() {
+    this.forceUpdate();
+  }
+
   canDrop(nodeContainer) {
     const { nodeStore } = this.props;
     const { nextParent, node } = nodeContainer;
@@ -128,26 +146,23 @@ class DialogEditor extends Component {
 
   render() {
     const { nodeStore } = this.props;
-    const { treeData: data } = this.state;
-    const { scrollToNodeId } = nodeStore;
+    const { treeData: data, treeWidth } = this.state;
     const activeNodeId = nodeStore.getActiveNodeId();
-
-    const treeClass = (scrollToNodeId) ? 'non-virtual__tree' : undefined;
-    // const treeClass = 'non-virtual__tree';
 
     return (
       <div className="dialog-editor">
-        <div className="dialog-editor__tree">
+        <div className="dialog-editor__tree" ref={(ref) => { this.treeElement = ref; }}>
           <DialogEditorContextMenu id="dialog-context-menu" />
           <SortableTree
-            className={treeClass}
             treeData={data}
             onChange={treeData => this.setState({ treeData })}
             getNodeKey={({ node, treeIndex }) => {
-              if (!node.id) return treeIndex;
               if (node.treeIndex !== treeIndex) {
                 node.treeIndex = treeIndex;
               }
+              if (!node.id) return treeIndex;
+
+              nodeStore.addNodeIdAndTreeIndexPair(node.id, treeIndex);
               return node.id;
             }}
             rowHeight={40}
@@ -161,10 +176,8 @@ class DialogEditor extends Component {
               }
             )}
             nodeContentRenderer={ConverseTekNodeRenderer}
-            isVirtualized={!scrollToNodeId}
-            // isVirtualized={false}
             reactVirtualizedListProps={{
-              overscanRowCount: (!scrollToNodeId) ? 0 : 999999,
+              width: treeWidth,
             }}
           />
         </div>

@@ -26,7 +26,6 @@ import { detectType } from '../../utils/node-utils';
 class NodeStore {
   @observable activeNode;
   @observable focusedNode;
-  @observable scrollToNodeId;
   @observable dirtyActiveNode = false;
   @observable rebuild = false;
 
@@ -40,6 +39,7 @@ class NodeStore {
       node: null,
       nodes: [],
     };
+    this.nodeIdToTreeIndexMap = new Map();
 
     this.processDeletes = this.processDeletes.bind(this);
   }
@@ -49,6 +49,17 @@ class NodeStore {
     const nextNodeIndex = last(this.takenNodeIndexes) + 1 || 0;
     this.takenNodeIndexes.push(nextNodeIndex);
     return nextNodeIndex;
+  }
+
+  addNodeIdAndTreeIndexPair(nodeId, index) {
+    this.nodeIdToTreeIndexMap.set(nodeId, index);
+  }
+
+  getTreeIndex(nodeId) {
+    if (this.nodeIdToTreeIndexMap.has(nodeId)) {
+      return this.nodeIdToTreeIndexMap.get(nodeId);
+    }
+    return null;
   }
 
   @action setRebuild(flag) {
@@ -107,35 +118,25 @@ class NodeStore {
   * || SCROLL TO  NODE METHODS ||
   * =============================
   */
-  @action scrollToNode(nodeId) {
-    this.scrollToNodeId = nodeId;
+  @action scrollToNode(nodeId, direction, cachedTree) {
+    // Quickly scroll in the given direction to force the virtual tree to load
+    // At the same time check for the required node
+    const tree = cachedTree || window.document.querySelector('.ReactVirtualized__Grid');
+    const element = window.document.querySelector(`[data-node-id="${nodeId}"]`);
 
-    defer(() => {
-      // Ugly I know but can't find another way
-      const element = window.document.querySelector(`[data-node-id="${nodeId}"]`);
-      // const tree = window.document.querySelector('.ReactVirtualized__Grid');
-      // const tree = window.document.querySelector('.dialog-editor__tree');
-
-      if (element) {
-        const scrollLeft = element.offsetParent.offsetLeft - 50;
-        const scrollTop = element.offsetParent.offsetParent.offsetTop;
-        // tree.scrollLeft = element.offsetParent.offsetLeft - 50;
-        // tree.scrollTop = element.offsetParent.offsetParent.offsetTop - 150;
-
-        defer(() => {
-          this.resetScroll(scrollLeft, scrollTop);
-        });
-      }
-    });
-  }
-
-  @action resetScroll(scrollLeft, scrollTop) {
-    this.scrollToNodeId = null;
-    defer(() => {
-      const tree = window.document.querySelector('.ReactVirtualized__Grid');
+    if (element) {
+      const scrollTop = element.offsetParent.offsetParent.offsetTop;
+      const scrollLeft = element.offsetParent.offsetLeft - 50;
       tree.scrollTop = scrollTop;
       tree.scrollLeft = scrollLeft;
-    });
+    } else if (!element) {
+      if (direction === 'up') {
+        tree.scrollTop -= 200;
+      } else if (direction === 'down') {
+        tree.scrollTop += 200;
+      }
+      defer(() => this.scrollToNode(nodeId, direction, tree));
+    }
   }
 
   /*
@@ -597,6 +598,7 @@ class NodeStore {
   @action reset = () => {
     this.focusedNode = null;
     this.takenNodeIndexes = [];
+    this.nodeIdToTreeIndexMap.clear();
   }
 }
 

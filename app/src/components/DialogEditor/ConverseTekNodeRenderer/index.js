@@ -185,8 +185,10 @@ const ConverseTekNodeRenderer = observer(({
       onClick={() => {
         const { type } = node;
         if (type === 'link') {
+          const linkTreeIndex = nodeStore.getTreeIndex(node.linkId);
+          const direction = (linkTreeIndex < treeIndex) ? 'up' : 'down';
           nodeStore.setActiveNode(node.linkId);
-          nodeStore.scrollToNode(node.linkId);
+          nodeStore.scrollToNode(node.linkId, direction);
         } else {
           nodeStore.setActiveNode(node.id, node.type);
         }
