@@ -37,6 +37,7 @@ class DialogEditor extends Component {
       treeWidth: 0,
     };
 
+    this.resize = this.resize.bind(this);
     this.onMove = this.onMove.bind(this);
     this.canDrop = this.canDrop.bind(this);
   }
@@ -106,7 +107,10 @@ class DialogEditor extends Component {
   }
 
   resize() {
-    this.forceUpdate();
+    const treeWidth = this.treeElement.clientWidth;
+    this.setState({
+      treeWidth,
+    });
   }
 
   canDrop(nodeContainer) {
