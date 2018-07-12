@@ -159,36 +159,45 @@ class NodeStore {
   */
   @action setClipboard(nodeId) {
     const node = toJS(this.getNode(nodeId));
-    node.idRef.id = generateId();
+    const newNodeId = generateId();
+    node.idRef.id = newNodeId;
     node.index = this.generateNextNodeIndex();
     this.clipboard.node = node;
 
     this.clipboard.nodes = flattenDeep(node.branches.map((branch) => {
       const { nextNodeIndex, auxiliaryLink } = branch;
-      branch.idRef.id = generateId();
+      const newBranchId = generateId();
+      branch.idRef.id = newBranchId;
+      branch.parentId = newNodeId;
 
       if (nextNodeIndex === -1 || auxiliaryLink) return [];
 
       const newNextNodeIndex = this.generateNextNodeIndex();
-      return this.copyNodesRecursive(nextNodeIndex, newNextNodeIndex);
+      branch.nextNodeIndex = newNextNodeIndex;
+      return this.copyNodesRecursive(nextNodeIndex, newNextNodeIndex, newBranchId);
     }));
   }
 
-  copyNodesRecursive(nodeIndex, newNextNodeIndex) {
+  copyNodesRecursive(nodeIndex, newNextNodeIndex, newNodeParentId) {
     const node = toJS(this.getNodeByIndex(nodeIndex));
-    node.idRef.id = generateId();
+    const newNodeId = generateId();
+    node.idRef.id = newNodeId;
     node.index = newNextNodeIndex;
+    node.parentId = newNodeParentId;
 
     const nodes = [
       node,
       ...node.branches.map((branch) => {
         const { nextNodeIndex, auxiliaryLink } = branch;
-        branch.idRef.id = generateId();
+        const newBranchId = generateId();
+        branch.idRef.id = newBranchId;
+        branch.parentId = newNodeId;
 
         if (nextNodeIndex === -1 || auxiliaryLink) return [];
 
         const newNodeIndex = this.generateNextNodeIndex();
-        return this.copyNodesRecursive(nextNodeIndex, newNodeIndex);
+        branch.nextNodeIndex = newNodeIndex;
+        return this.copyNodesRecursive(nextNodeIndex, newNodeIndex, newBranchId);
       }),
     ];
     return nodes;
@@ -226,12 +235,14 @@ class NodeStore {
     if (isRoot || isResponse) { // Only allow nodes to be copied in if target is a root or response
       if (clipboardIsNode) {
         node.nextNodeIndex = clipboardNode.index;
+        clipboardNode.parentId = nodeId;
         addNodes(conversationAsset, [clipboardNode, ...clipboardNodes]);
       } else {
         console.error('[NodeStore] Cannot copy - wrong node types');
       }
     } else if (isNode) { // Only allow response to be copied in
       if (clipboardIsResponse) {
+        clipboardNode.parentId = nodeId;
         updateResponse(conversationAsset, node, clipboardNode);
         addNodes(conversationAsset, clipboardNodes);
       } else {
@@ -575,20 +586,31 @@ class NodeStore {
           branch.type = 'response';
           branch.parentId = childNodeId;
 
+          const isValidLink = auxiliaryLink && (branch.nextNodeIndex !== -1);
+          let branchChildren = [];
+
+          if (auxiliaryLink) {
+            if (isValidLink) {
+              branchChildren = [{
+                title: `[Link to NODE ${branch.nextNodeIndex}]`,
+                type: 'link',
+                linkId: getId(this.getNodeByIndex(branch.nextNodeIndex)),
+                linkIndex: branch.nextNodeIndex,
+                canDrag: false,
+                parentId: branchNodeId,
+              }];
+            }
+          } else {
+            branchChildren = this.getChildren(branch);
+          }
+
           return {
             title: branch.responseText,
             id: branchNodeId,
             parentId: childNodeId,
             type: 'response',
             expanded: isBranchExpanded,
-            children: (auxiliaryLink) ? [{
-              title: `[Link to NODE ${branch.nextNodeIndex}]`,
-              type: 'link',
-              linkId: getId(this.getNodeByIndex(branch.nextNodeIndex)),
-              linkIndex: branch.nextNodeIndex,
-              canDrag: false,
-              parentId: branchNodeId,
-            }] : this.getChildren(branch),
+            children: branchChildren,
           };
         }),
       },
