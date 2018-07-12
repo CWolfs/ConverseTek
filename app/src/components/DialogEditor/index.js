@@ -8,6 +8,8 @@ import 'react-sortable-tree/style.css';
 import ConverseTekNodeRenderer from './ConverseTekNodeRenderer';
 import DialogEditorContextMenu from '../DialogEditorContextMenu';
 
+import { detectType } from '../../utils/node-utils';
+
 import './DialogEditor.css';
 
 /* eslint-disable react/no-unused-state, no-param-reassign, react/no-did-mount-set-state */
@@ -77,9 +79,7 @@ class DialogEditor extends Component {
     const { nodeStore } = this.props;
     const { id: nodeId, type: nodeType, parentId: nodeParentId } = node;
     const { id: parentNodeId, children: parentChildren } = nextParentNode;
-    const isRoot = nodeType === 'root';
-    const isNode = nodeType === 'node';
-    const isResponse = nodeType === 'response';
+    const { isRoot, isNode, isResponse } = detectType(nodeType);
 
     if (isRoot) {
       const rootIds = parentChildren.map(child => child.id);
@@ -122,9 +122,7 @@ class DialogEditor extends Component {
 
     const { type: nodeType, parentId: nodeParentId } = node;
     const { type: nextParentType, id: parentId } = nextParent;
-    const isRoot = nodeType === 'root';
-    const isNode = nodeType === 'node';
-    const isResponse = nodeType === 'response';
+    const { isRoot, isNode, isResponse } = detectType(nodeType);
     let allowDrop = true;
 
     // Don't allow nodes to be moved under the same type
