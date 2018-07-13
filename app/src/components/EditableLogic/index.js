@@ -128,15 +128,37 @@ class EditableLogic extends Component {
             }
           } else if ((argType === 'float' && types.includes('float')) ||
             (argType === 'int' && types.includes('int'))) {
-            content = (
-              <section className="editable-logic__arg">
-                {content}
-                <EditableInput
-                  value={argVal}
-                  onChange={(value) => { defStore.setArgValue(logic, arg, value); }}
-                />
-              </section>
-            );
+
+            if (logicDefKey.includes('Preset')) {
+              const presetArg = args[0];
+              const presetArgValue = defStore.getArgValue(presetArg);
+              const { value: presetValue } = presetArgValue;
+
+              content = (
+                <section className="editable-logic__arg">
+                  {content}
+                  <EditableInput
+                    value={(typeof argVal === 'number') ? argVal.toString() : argVal}
+                    options={defStore.getPresetValuesForOptions(presetValue)}
+                    onChange={(value) => {
+                      defStore.setArgValue(logic, arg, value);
+                    }}
+                    optionLabelProp="value"
+                    valueLabel={defStore.getPresetValue(presetValue, argVal)}
+                  />
+                </section>
+              );
+            } else {
+              content = (
+                <section className="editable-logic__arg">
+                  {content}
+                  <EditableInput
+                    value={argVal}
+                    onChange={(value) => { defStore.setArgValue(logic, arg, value); }}
+                  />
+                </section>
+              );
+            }
           } else {
             console.error(`[EditableLogic] Argument and input type mismatch for ${label}`);
           }
