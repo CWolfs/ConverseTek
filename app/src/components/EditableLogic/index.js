@@ -139,9 +139,12 @@ class EditableLogic extends Component {
                   {content}
                   <EditableInput
                     value={argVal}
-                    // FIXME: Fix this so autocomplete can show labels but set values
-                    // options={defStore.getPresetValuesForOptions(presetValue)}
-                    onChange={(value) => { defStore.setArgValue(logic, arg, value); }}
+                    options={defStore.getPresetValuesForOptions(presetValue)}
+                    onChange={(value) => {
+                      defStore.setArgValue(logic, arg, value);
+                    }}
+                    optionLabelProp="value"
+                    valueLabel={defStore.getPresetValue(presetValue, argVal)}
                   />
                 </section>
               );
