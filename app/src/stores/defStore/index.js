@@ -236,12 +236,48 @@ class DefStore {
               newArg.type = 'string';
             } else if (types.includes('operation')) {
               newArg.type = 'operation';
+              const opLogic = { functionName: 'Get Preset Value (int)', args: [] };
+              newArg.call_value = this.setOperation(opLogic, opLogic.functionName);
             }
           }
 
           logic.args.push(newArg);
         }
       });
+    }
+
+    // Reset all args
+    logic.args.forEach((arg, index) => {
+      this.resetArg(inputs[index], arg);
+    });
+
+    return logic;
+  }
+
+  resetArg(input, arg) {
+    const { Types: types } = input;
+    const { type: argType } = arg;
+
+    arg.call_value = null;
+    arg.string_value = '';
+    arg.float_value = 0.0;
+    arg.int_value = 0;
+
+    if (!types.includes(argType)) { // favour: operation, string, float, int
+      if (types.includes('operation')) {
+        arg.type = 'operation';
+        const opLogic = { functionName: 'Get Preset Value (int)', args: [] };
+        arg.call_value = this.setOperation(opLogic, opLogic.functionName);
+      } else if (types.includes('string')) {
+        arg.type = 'string';
+      } else if (types.includes('float')) {
+        arg.type = 'float';
+      } else if (types.includes('int')) {
+        arg.type = 'int';
+      }
+    } else if (types.includes('operation')) {
+      const opLogic = { functionName: 'Get Preset Value (int)', args: [] };
+      arg.call_value = this.setOperation(opLogic, opLogic.functionName);
     }
   }
 

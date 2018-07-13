@@ -55,8 +55,9 @@ class EditableLogic extends Component {
     const {
       defStore,
       isEven,
+      parentLogic,
     } = this.props;
-    const { args } = logic;
+    const { functionName, args } = logic;
     const { Key: logicDefKey, Inputs: inputs } = logicDef;
 
     return inputs.map((input, index) => {
@@ -102,10 +103,12 @@ class EditableLogic extends Component {
         if (argVal !== null) {
           if ((argType === 'string') && types.includes('string')) {
             if (logicDefKey.includes('Preset')) {
+              const key = `${parentLogic.functionName}-${functionName}`.replace(/\s/g, '');
               content = (
                 <section className="editable-logic__arg">
                   {content}
                   <EditableInput
+                    key={key}
                     value={argVal}
                     options={defStore.getPresetKeys()}
                     onChange={(value) => { defStore.setArgValue(logic, arg, value); }}
