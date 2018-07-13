@@ -6,7 +6,13 @@ import { Input, AutoComplete } from 'antd';
 @observer
 class EditableInput extends Component {
   render() {
-    const { value, options, onChange, optionLabelProp, valueLabel } = this.props;
+    const {
+      value,
+      options,
+      onChange,
+      optionLabelProp,
+      valueLabel,
+    } = this.props;
 
     const isAutocomplete = !!options;
     const conditionalProps = {};

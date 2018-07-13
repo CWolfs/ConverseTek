@@ -138,7 +138,7 @@ class EditableLogic extends Component {
                 <section className="editable-logic__arg">
                   {content}
                   <EditableInput
-                    value={argVal}
+                    value={(typeof argVal === 'number') ? argVal.toString() : argVal}
                     options={defStore.getPresetValuesForOptions(presetValue)}
                     onChange={(value) => {
                       defStore.setArgValue(logic, arg, value);
