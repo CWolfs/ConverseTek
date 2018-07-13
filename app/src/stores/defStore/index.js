@@ -225,22 +225,18 @@ class DefStore {
       inputs.forEach((input, index) => {
         if (args.length <= index) {
           const newArg = createArg();
-
           const { Types: types } = input;
-          const { type: argType } = newArg;
 
-          if (!types.includes(argType)) {
-            if (types.includes('operation')) { // favour: operation, string, float, int
-              newArg.type = 'operation';
-              const opLogic = { functionName: 'Get Preset Value (int)', args: [] };
-              newArg.call_value = this.setOperation(opLogic, opLogic.functionName);
-            } else if (types.includes('string')) {
-              newArg.type = 'string';
-            } else if (types.includes('float')) {
-              newArg.type = 'float';
-            } else if (types.includes('int')) { 
-              newArg.type = 'int';
-            }
+          if (types.includes('operation')) { // favour: operation, string, float, int
+            newArg.type = 'operation';
+            const opLogic = { functionName: 'Get Preset Value (int)', args: [] };
+            newArg.call_value = this.setOperation(opLogic, opLogic.functionName);
+          } else if (types.includes('string')) {
+            newArg.type = 'string';
+          } else if (types.includes('float')) {
+            newArg.type = 'float';
+          } else if (types.includes('int')) {
+            newArg.type = 'int';
           }
 
           logic.args.push(newArg);
@@ -258,28 +254,22 @@ class DefStore {
 
   resetArg(input, arg) {
     const { Types: types } = input;
-    const { type: argType } = arg;
 
     arg.call_value = null;
     arg.string_value = '';
     arg.float_value = 0.0;
     arg.int_value = 0;
 
-    if (!types.includes(argType)) { // favour: operation, string, float, int
-      if (types.includes('operation')) {
-        arg.type = 'operation';
-        const opLogic = { functionName: 'Get Preset Value (int)', args: [] };
-        arg.call_value = this.setOperation(opLogic, opLogic.functionName);
-      } else if (types.includes('string')) {
-        arg.type = 'string';
-      } else if (types.includes('float')) {
-        arg.type = 'float';
-      } else if (types.includes('int')) {
-        arg.type = 'int';
-      }
-    } else if (types.includes('operation')) {
+    if (types.includes('operation')) {
+      arg.type = 'operation';
       const opLogic = { functionName: 'Get Preset Value (int)', args: [] };
       arg.call_value = this.setOperation(opLogic, opLogic.functionName);
+    } else if (types.includes('string')) {
+      arg.type = 'string';
+    } else if (types.includes('float')) {
+      arg.type = 'float';
+    } else if (types.includes('int')) {
+      arg.type = 'int';
     }
   }
 
