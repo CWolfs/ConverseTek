@@ -1,4 +1,6 @@
 import { observable, action } from 'mobx';
+import keys from 'lodash.keys';
+import values from 'lodash.values';
 
 import { createArg } from '../../utils/def-utils';
 import { tryParseInt, tryParseFloat } from '../../utils/number-utils';
@@ -79,14 +81,14 @@ class DefStore {
       const { Types: types } = input;
 
       if (!types.includes(rawType)) {
-        if (types.includes('int')) { // favour: int, float, string, operation
-          rawType = 'int';
-        } else if (types.includes('float')) {
-          rawType = 'float';
+        if (types.includes('operation')) { // favour: operation, string, float, int
+          rawType = 'operation';
         } else if (types.includes('string')) {
           rawType = 'string';
-        } else if (types.includes('operation')) {
-          rawType = 'operation';
+        } else if (types.includes('float')) {
+          rawType = 'float';
+        } else if (types.includes('int')) {
+          rawType = 'int';
         }
       }
 
@@ -228,16 +230,16 @@ class DefStore {
           const { type: argType } = newArg;
 
           if (!types.includes(argType)) {
-            if (types.includes('int')) { // favour: int, float, string, operation
-              newArg.type = 'int';
-            } else if (types.includes('float')) {
-              newArg.type = 'float';
-            } else if (types.includes('string')) {
-              newArg.type = 'string';
-            } else if (types.includes('operation')) {
+            if (types.includes('operation')) { // favour: operation, string, float, int
               newArg.type = 'operation';
               const opLogic = { functionName: 'Get Preset Value (int)', args: [] };
               newArg.call_value = this.setOperation(opLogic, opLogic.functionName);
+            } else if (types.includes('string')) {
+              newArg.type = 'string';
+            } else if (types.includes('float')) {
+              newArg.type = 'float';
+            } else if (types.includes('int')) { 
+              newArg.type = 'int';
             }
           }
 
@@ -285,6 +287,32 @@ class DefStore {
     const preset = this.presets.find(p => p.Key === key);
     if (preset === undefined) return '[BAD PRESET VALUE]';
     return preset.Values[value.toString()];
+  }
+
+  getPresetValuePairs(key) {
+    const preset = this.presets.find(p => p.Key === key);
+    if (preset === undefined) return null;
+    return preset.Values;
+  }
+
+  getPresetValues(key) {
+    const preset = this.presets.find(p => p.Key === key);
+    if (preset === undefined) return null;
+    return values(preset.Values);
+  }
+
+  getPresetValuesForOptions(key) {
+    const preset = this.presets.find(p => p.Key === key);
+    if (preset === undefined) return null;
+
+    const presetKeys = keys(preset.Values);
+    const presetValues = values(preset.Values);
+
+    const options = presetKeys.map((k, index) => (
+      { text: presetValues[index], value: k }
+    ));
+
+    return options;
   }
 
   @action getPresetKeys() {
