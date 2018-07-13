@@ -25,6 +25,7 @@ class EditableSelect extends Component {
         style={style || { width: 230 }}
         placeholder={placeholder}
         onChange={onChange}
+        dropdownMatchSelectWidth={false}
       >
         {options.map(option => (
           <Option
