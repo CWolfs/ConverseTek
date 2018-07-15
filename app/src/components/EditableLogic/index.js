@@ -74,8 +74,11 @@ class EditableLogic extends Component {
         'first-arg': index === 0,
       });
 
+      const key = `${functionName}-${index}-type`.replace(/\s/g, '');
+
       const typeSelector = (input) ? (
         <EditableSelect
+          key={key}
           value={argValue.type}
           options={input.Types}
           placeholder="Select a type"
