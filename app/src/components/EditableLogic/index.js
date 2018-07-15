@@ -107,12 +107,12 @@ class EditableLogic extends Component {
         if (argVal !== null) {
           if ((argType === 'string') && types.includes('string')) {
             if (logicDefKey.includes('Preset')) {
-              const key = `${parentLogic.functionName}-${functionName}`.replace(/\s/g, '');
+              const presetKey = `${parentLogic.functionName}-${functionName}`.replace(/\s/g, '');
               content = (
                 <section className="editable-logic__arg">
                   {content}
                   <EditableInput
-                    key={key}
+                    key={presetKey}
                     value={argVal}
                     options={defStore.getPresetKeys()}
                     onChange={(value) => { defStore.setArgValue(logic, arg, value); }}
