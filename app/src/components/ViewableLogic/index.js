@@ -25,7 +25,7 @@ class ViewableLogic extends Component {
     }
 
     const { args } = logic;
-    const { View: view } = logicDef;
+    const { View: view, Inputs: inputs } = logicDef;
 
     return (
       <span>
@@ -33,9 +33,35 @@ class ViewableLogic extends Component {
         {(view.includes('inputs')) && args.map((arg, index) => {
           const argValue = defStore.getArgValue(arg);
           const { type, value } = argValue;
+          const input = inputs[index];
+          const { Viewlabel: viewLabel, Values: inputValues } = input;
 
           if (type === 'operation') return <ViewableLogic key={index} defStore={defStore} logic={value} />;
-          return <span key={index}>{argValue.value} </span>;
+
+          const { value: valueFromArg } = argValue;
+          let displayValue = valueFromArg;
+          if (viewLabel) {
+            if (viewLabel.includes('{value}')) {
+              displayValue = viewLabel.replace('{value}', displayValue);
+            } else {
+              displayValue = viewLabel;
+            }
+          }
+
+          if (inputValues) {
+            const inputVal = inputValues[valueFromArg];
+            if (inputVal) displayValue = inputVal.Text;
+            if (inputVal.Viewlabel) {
+              const inputValueViewLabel = inputVal.Viewlabel;
+              if (inputValueViewLabel.includes('{value}')) {
+                displayValue = inputValueViewLabel.replace('{value}', displayValue);
+              } else {
+                displayValue = inputVal.Viewlabel;
+              }
+            }
+          }
+
+          return <span key={index}>{displayValue} </span>;
         })}
         {(args.length <= 0) && <span>...</span>}
         {(view.includes('result')) && this.renderResult(args)}
