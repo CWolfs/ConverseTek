@@ -49,14 +49,20 @@ class ViewableLogic extends Component {
           }
 
           if (inputValues) {
-            const inputVal = inputValues[valueFromArg];
-            if (inputVal) displayValue = inputVal.Text;
-            if (inputVal.Viewlabel) {
-              const inputValueViewLabel = inputVal.Viewlabel;
-              if (inputValueViewLabel.includes('{value}')) {
-                displayValue = inputValueViewLabel.replace('{value}', displayValue);
-              } else {
-                displayValue = inputVal.Viewlabel;
+            const inputVal = inputValues.find((inputValue) => {
+              if (inputValue.Value === valueFromArg) return true;
+              if (Number(inputValue.Value) === valueFromArg) return true;
+              return false;
+            });
+            if (inputVal) {
+              displayValue = inputVal.Text;
+              if (inputVal.Viewlabel) {
+                const inputValueViewLabel = inputVal.Viewlabel;
+                if (inputValueViewLabel.includes('{value}')) {
+                  displayValue = inputValueViewLabel.replace('{value}', displayValue);
+                } else {
+                  displayValue = inputVal.Viewlabel;
+                }
               }
             }
           }
