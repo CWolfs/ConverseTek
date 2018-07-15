@@ -10,7 +10,7 @@
     },
     {
       "label": "Value",
-      "types": ["string", "int"]
+      "types": ["int"]
     }
   ]
 }

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { toJS } from 'mobx';
 import { observer, inject } from 'mobx-react';
 import classnames from 'classnames';
 
@@ -61,7 +62,7 @@ class EditableLogic extends Component {
     const { Key: logicDefKey, Inputs: inputs } = logicDef;
 
     return inputs.map((input, index) => {
-      const { Label: label, Types: types } = input;
+      const { Label: label, Types: types, Values: values } = input;
       const arg = (args.length > index) ? args[index] : null;
       const argValue = defStore.getArgValue(arg);
       let content = null;
@@ -128,7 +129,6 @@ class EditableLogic extends Component {
             }
           } else if ((argType === 'float' && types.includes('float')) ||
             (argType === 'int' && types.includes('int'))) {
-
             if (logicDefKey.includes('Preset')) {
               const presetArg = args[0];
               const presetArgValue = defStore.getArgValue(presetArg);
@@ -149,12 +149,21 @@ class EditableLogic extends Component {
                 </section>
               );
             } else {
+              const valueProps = {};
+
+              if (values) {
+                valueProps.optionLabelProp = 'value';
+                valueProps.options = values.map(value =>
+                  ({ text: value.Text, value: value.Value }));
+              }
+
               content = (
                 <section className="editable-logic__arg">
                   {content}
                   <EditableInput
                     value={argVal}
                     onChange={(value) => { defStore.setArgValue(logic, arg, value); }}
+                    {...valueProps}
                   />
                 </section>
               );

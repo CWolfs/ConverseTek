@@ -1,0 +1,30 @@
+{
+  "key": "Set BattleTech Tag",
+  "label": "Set a tag on the",
+  "view": ["label", "inputs"],
+  "scope": "action",
+  "category": "primary",
+  "inputs": [
+    {
+      "label": "Action",
+      "types": ["int"],
+      "values": [
+        { "text": "Add", "value": 1 },
+        { "text": "Remove", "value": 0 }
+      ]
+    },
+    {
+      "label": "Type",
+      "types": ["int"],
+      "values": [
+        { "text": "Company", "value": 1 },
+        { "text": "Commander", "value": 2 },
+        { "text": "Current System", "value": 3 }
+      ]
+    },
+    {
+      "label": "Tag Key",
+      "types": ["string"]
+    }
+  ]
+}

@@ -17,11 +17,11 @@ namespace ConverseTek.Data {
     }
 
     public void AddInput(string label, string[] types) {
-      AddInput(label, types, null);
+      AddInput(label, types, null, null);
     }
 
-    public void AddInput(string label, string[] types, string scope) {
-      Inputs.Add(new OperationInput(label, types, scope));
+    public void AddInput(string label, string[] types, string scope, OperationInputValue[] values) {
+      Inputs.Add(new OperationInput(label, types, scope, values));
     }
   }
 }

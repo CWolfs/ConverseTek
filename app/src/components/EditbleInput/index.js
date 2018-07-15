@@ -16,6 +16,7 @@ class EditableInput extends Component {
 
     const isAutocomplete = !!options;
     const conditionalProps = {};
+    let displayValueLabel = valueLabel;
 
     const style = {
       width: '275px',
@@ -31,11 +32,21 @@ class EditableInput extends Component {
       top: '5px',
     };
 
-    if (valueLabel === null) valueLabelStyle.color = '#ff6666';
-
     if (isAutocomplete) {
-      if (value) conditionalProps.defaultValue = value;
+      if (value !== null && value !== undefined) conditionalProps.defaultValue = value;
       if (optionLabelProp) conditionalProps.optionLabelProp = optionLabelProp;
+
+      if (!displayValueLabel) {
+        displayValueLabel = options.find((option) => {
+          if (option.value === value) return true;
+          if (Number(option.value) === value) return true;
+          return false;
+        });
+        if (displayValueLabel && displayValueLabel.text) displayValueLabel = displayValueLabel.text;
+        if (!displayValueLabel) {
+          valueLabelStyle.color = '#ff6666';
+        }
+      }
 
       return (
         <section style={style}>
@@ -54,13 +65,11 @@ class EditableInput extends Component {
             onChange={onChange}
           />
           {optionLabelProp && (
-            <span style={valueLabelStyle}>{(valueLabel) ? `(${valueLabel})` : 'Invalid'}</span>
+            <span style={valueLabelStyle}>{(displayValueLabel) ? `(${displayValueLabel})` : 'Invalid'}</span>
           )}
         </section>
       );
     }
-
-    if (value) conditionalProps.value = value;
 
     return (
       <Input
