@@ -105,7 +105,12 @@ class ConversationConditions extends Component {
 
     return (
       <Panel key={key} className={classes} header={header}>
-        <EditableLogic logic={condition} category="primary" scope="condition" />
+        <EditableLogic
+          key={condition.functionName}
+          logic={condition}
+          category="primary"
+          scope="condition"
+        />
       </Panel>
     );
   }

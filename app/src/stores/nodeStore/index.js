@@ -160,15 +160,22 @@ class NodeStore {
   */
   @action setClipboard(nodeId) {
     const node = toJS(this.getNode(nodeId));
+    const { type } = node;
     const newNodeId = generateId();
     node.idRef.id = newNodeId;
 
-    const newNodeIndex = this.generateNextNodeIndex();
-    this.clipboard.nodeIdMap.set(node.index, newNodeIndex);
-    node.index = newNodeIndex;
-    this.clipboard.node = node;
+    const { isNode } = detectType(type);
 
-    this.clipboard.nodes = flattenDeep(node.branches.map((branch) => {
+    if (isNode) {
+      const newNodeIndex = this.generateNextNodeIndex();
+      this.clipboard.nodeIdMap.set(node.index, newNodeIndex);
+      node.index = newNodeIndex;
+    }
+
+    this.clipboard.node = node;
+    const branches = (isNode) ? node.branches : [node];
+
+    this.clipboard.nodes = flattenDeep(branches.map((branch) => {
       const { nextNodeIndex, auxiliaryLink } = branch;
       const newBranchId = generateId();
       branch.idRef.id = newBranchId;
