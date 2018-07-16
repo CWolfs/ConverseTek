@@ -1,6 +1,7 @@
 {
   "key": "Play BattleTech Audio Event",
   "label": "Play Audio",
+  "tooltip": "Sim conversation audio is scoped to the id 'audioeventdef_GroupConvos' located in 'data/audioevents'",
   "view": ["label", "inputs"],
   "scope": "action",
   "category": "primary",
