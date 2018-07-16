@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { toJS } from 'mobx';
 import { observer, inject } from 'mobx-react';
 import classnames from 'classnames';
+import { Icon, Tooltip } from 'antd';
 
 import EditableSelect from '../EditableSelect';
 import EditableInput from '../EditbleInput';
@@ -24,6 +24,13 @@ class EditableLogic extends Component {
     const operations = defStore.getOperations(category, scope);
     const { functionName } = logic;
     const parentArgValue = defStore.getArgValue(parentArg);
+    const { Tooltip: tooltip } = logicDef;
+
+    const tooltipContent = (tooltip) ? (
+      <Tooltip title={tooltip}>
+        <Icon type="exclamation-circle-o" />
+      </Tooltip>
+    ) : undefined;
 
     const typeSelector = (parentInput && parentArg) ? (
       <EditableSelect
@@ -48,6 +55,7 @@ class EditableLogic extends Component {
       <div>
         {typeSelector && <span className="editable-logic__logic-type">{typeSelector}</span>}
         {content}
+        {tooltipContent}
       </div>
     );
   }
@@ -62,7 +70,12 @@ class EditableLogic extends Component {
     const { Key: logicDefKey, Inputs: inputs } = logicDef;
 
     return inputs.map((input, index) => {
-      const { Label: label, Types: types, Values: values } = input;
+      const {
+        Label: label,
+        Types: types,
+        Values: values,
+        Tooltip: tooltip,
+      } = input;
       const arg = (args.length > index) ? args[index] : null;
       const argValue = defStore.getArgValue(arg);
       let content = null;
@@ -73,6 +86,12 @@ class EditableLogic extends Component {
       argsContainerClasses = classnames(argsContainerClasses, {
         'first-arg': index === 0,
       });
+
+      const tooltipContent = (tooltip) ? (
+        <Tooltip title={tooltip}>
+          <Icon type="exclamation-circle-o" />
+        </Tooltip>
+      ) : undefined;
 
       const key = `${functionName}-${index}-type`.replace(/\s/g, '');
 
@@ -194,7 +213,11 @@ class EditableLogic extends Component {
 
       if (!content) content = <div>Unprocessed Input: {input.Label}</div>;
 
-      return <div className={argsContainerClasses} key={index}><span className="editable-logic__args-label">{label}</span> {content}</div>;
+      return (
+        <div className={argsContainerClasses} key={index}>
+          <span className="editable-logic__args-label">{label}{tooltipContent}</span> {content}
+        </div>
+      );
     });
   }
 
