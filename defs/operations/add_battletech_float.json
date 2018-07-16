@@ -1,0 +1,28 @@
+{
+  "key": "Add BattleTech Float",
+  "label": "Add a stat float",
+  "view": ["inputs"],
+  "scope": "action",
+  "category": "primary",
+  "inputs": [
+    {
+      "label": "Type",
+      "types": ["int"],
+      "values": [
+        { "viewlabel": "Add company stat", "text": "Company Stats", "value": 1 },
+        { "viewlabel": "Add commander stat", "text": "Commander Stats", "value": 2 },
+        { "viewlabel": "Add current system stat", "text": "Current System Stats", "value": 3 }
+      ]
+    },
+    {
+      "label": "Stat Key",
+      "types": ["string"],
+      "viewlabel": "'{value}'"
+    },
+    {
+      "label": "Stat Value",
+      "types": ["float"],
+      "viewlabel": "with the value '{value}'"
+    }
+  ]
+}
