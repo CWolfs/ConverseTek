@@ -41,6 +41,7 @@ class ConversationGeneral extends Component {
     this.handleSpeakerIdChange = this.handleSpeakerIdChange.bind(this);
     this.handleCommentChange = this.handleCommentChange.bind(this);
     this.handleAvailbleOnceChange = this.handleAvailbleOnceChange.bind(this);
+    this.handleHideIfUnavailableChange = this.handleHideIfUnavailableChange.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -128,6 +129,12 @@ class ConversationGeneral extends Component {
     const { node } = this.props;
     const availableOnlyOnce = event.target.checked;
     node.onlyOnce = availableOnlyOnce;
+  }
+
+  handleHideIfUnavailableChange(event) {
+    const { node } = this.props;
+    const alwaysShow = event.target.checked;
+    node.hideIfUnavailable = !alwaysShow;
   }
 
   render() {
@@ -219,6 +226,20 @@ class ConversationGeneral extends Component {
             <Checkbox
               onChange={this.handleAvailbleOnceChange}
               checked={node.onlyOnce}
+            />
+          </Col>
+        </Row>
+        )}
+
+        {isRootOrResponse && (
+        <Row gutter={16}>
+          <Col {...colOneLayout}>
+            <div className="conversation-general__label">Always Show</div>
+          </Col>
+          <Col {...colTwoLayout}>
+            <Checkbox
+              onChange={this.handleHideIfUnavailableChange}
+              checked={!node.hideIfUnavailable}
             />
           </Col>
         </Row>

@@ -125,6 +125,8 @@ class NodeStore {
     const tree = cachedTree || window.document.querySelector('.ReactVirtualized__Grid');
     const element = window.document.querySelector(`[data-node-id="${nodeId}"]`);
 
+    // TODO: Stop the scrolling it the top or bottom has been reached
+
     if (element) {
       const scrollTop = element.offsetParent.offsetParent.offsetTop;
       const scrollLeft = element.offsetParent.offsetLeft - 50;
