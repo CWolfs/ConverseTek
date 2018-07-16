@@ -120,12 +120,21 @@ class EditableLogic extends Component {
                 </section>
               );
             } else {
+              const valueProps = {};
+
+              if (values) {
+                valueProps.optionLabelProp = 'value';
+                valueProps.options = values.map(value =>
+                  ({ text: value.Text, value: value.Value }));
+              }
+
               content = (
                 <section className="editable-logic__arg">
                   {content}
                   <EditableInput
                     value={argVal}
                     onChange={(value) => { defStore.setArgValue(logic, arg, value); }}
+                    {...valueProps}
                   />
                 </section>
               );
