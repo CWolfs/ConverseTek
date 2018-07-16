@@ -3,7 +3,7 @@
   "label": "Sim Game Fade Values",
   "type": "int",
   "values": {
-    "-1": "from black",
-    "1": "to black"
+    "1": "from black",
+    "0": "to black"
   }
 }
