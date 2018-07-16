@@ -7,7 +7,8 @@
   "inputs": [
     {
       "label": "Key",
-      "types": ["string"]
+      "types": ["string"],
+      "tooltip": "Texture name without 'uixTxrConv_'"
     }
   ]
 }
