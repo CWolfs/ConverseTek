@@ -215,7 +215,13 @@ class NodeStore {
 
         // Change link indexes
         if (nextNodeIndex !== -1 && auxiliaryLink) {
-          branch.nextNodeIndex = this.clipboard.nodeIdMap.get(branch.nextNodeIndex);
+          const linkedNextNodeIndex = this.clipboard.nodeIdMap.get(branch.nextNodeIndex);
+
+          // If the index exists in the copied branch then link to the new node,
+          // otherwise keep the existing link
+          if (linkedNextNodeIndex) {
+            branch.nextNodeIndex = linkedNextNodeIndex;
+          }
         }
 
         if (nextNodeIndex === -1 || auxiliaryLink) return [];
