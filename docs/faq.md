@@ -16,7 +16,7 @@ Check out the [Roadmap](https://github.com/CWolfs/ConverseTek/#roadmap) for a fu
 
 Yes. Conversation files created or edited with ConverseTek work with [ModTek](https://github.com/Mpstark/ModTek) since the conversation files are loaded from the manifest file.
 
-### "Why does my new dialog not work? I've copyed it from an existing one."
+### "Why does my new dialog not work? I've copied it from an existing one."
 
 Conversations that are initiated must have specific ids per dropship crew member. These ids are found in the `SimGameConstants.json` file under `CrewConversationNames` and `CrewConversationList`. Ensure the conversation id is set to one of these ids if you wish to use your conversation for a one-on-one conversation.
 
@@ -33,15 +33,15 @@ An empty node is not actually empty, it just has no dialog text associated with 
 
 You can add conditions to a node by selecting the node you wish to add a condition to, select the 'Conditions' tab on the bottom right of ConverseTek - then select the blue '+' button. If you have mulitple conditions you may need to scroll to the bottom to see the add button.
 
-### "I've added an empty response node with other responses. When I test it in-game, the conversation skips the entire branch level and follows down the path of the empty response. Why is this? ###
+### "I've added an empty response node with other responses. When I test it in-game, the conversation skips the entire branch level and follows down the path of the empty response. Why is this?"
 
 This is how the BattleTech conversation system has been designed. If the system encounters any empty code, it will follow it to the next level. This feature can be useful in certain situations, for example, if you want a branch to follow to a single-use dialog branch. After that offshoot branch has been used by the player then the dialog will only show the other responses if you have a condition to prevent it from following down that path.
 
-### I've set 'Only Once' on a response but it still shows up when I return to the character to talk to them ###
+### I've set 'Only Once' on a response but it still shows up when I return to the character to talk to them."
 
 Make sure you don't have 'Always Show' selected in the node general options. This will override 'Only Once'.
 
-### What does 'Always Show' do? ###
+### "What does 'Always Show' do?"
 
 Always show does what it says. This means that even if 'Only Once' is selected, or the response fails any/all its conditions, the response will still be displayed.
 
@@ -65,7 +65,7 @@ An **action** is what Battletech uses to trigger something from a dialog node. T
 A **condition** is what Battletech uses to control which dialog branches to display to the player, and which ones to hide. It can check against various things like
 your player's history so, for instance, if you selected your back story to include having an accident when you were young you'd check against `commander_youth_accident`. It can also check against game milestone tags like `oc04_post_argo`.
 
-### "How did I add a condition, or an action?" ###
+### "How did I add a condition, or an action?"
 
 Select the root, node or response you wish to add to, then select the appropriate tab (`Conditions` or `Actions`) on the bottom right of ConverseTek. Select the blue '+' button to add a new item. 
 
