@@ -37,7 +37,7 @@ You can add conditions to a node by selecting the node you wish to add a conditi
 
 This is how the BattleTech conversation system has been designed. If the system encounters any empty code, it will follow it to the next level. This feature can be useful in certain situations, for example, if you want a branch to follow to a single-use dialog branch. After that offshoot branch has been used by the player then the dialog will only show the other responses if you have a condition to prevent it from following down that path.
 
-### I've set 'Only Once' on a response but it still shows up when I return to the character to talk to them."
+### "I've set 'Only Once' on a response but it still shows up when I return to the character to talk to them."
 
 Make sure you don't have 'Always Show' selected in the node general options. This will override 'Only Once'.
 
