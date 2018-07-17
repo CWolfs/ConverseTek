@@ -1,0 +1,12 @@
+{
+  "key": "Tag From String",
+  "label": "a tag of",
+  "view": ["label", "inputs"],
+  "category": "secondary",
+  "inputs": [
+    {
+      "label": "Tag Key",
+      "types": ["string"]
+    }
+  ]
+}

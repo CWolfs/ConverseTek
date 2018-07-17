@@ -5,6 +5,15 @@
     border: 1px transparent solid;
   }
 
+  &__row-contents {
+    cursor: pointer;
+    
+    &-logic {
+      display: inline-block;
+      vertical-align: middle;
+    }
+  }
+
   &__root {
     &-row {
       &:focus, &:hover, &--active {
@@ -102,10 +111,6 @@
         }
       }
     }
-  }
-
-  &__row-contents {
-    cursor: pointer;
   }
 }
 

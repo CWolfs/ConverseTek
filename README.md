@@ -9,13 +9,13 @@ Battletech uses a binary data format for its conversations. It isn't possible to
 
 ## Overview
 
-Latest release: **v0.4.0** | [Download](https://github.com/CWolfs/ConverseTek/releases/tag/v0.4.0)
+Latest release: **v1.0.0** | [Download](https://github.com/CWolfs/ConverseTek/releases/tag/v1.0.0)
 
 ## Examples
 
 ### Screenshots
 
-* [Editor View](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/0.4.0/conversetek-example.png)
+* [Editor View](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/1.0.0/conversetek-example.png)
 * [In-Game Edited Conversation](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/conversetek-example.png)
 
 ### Videos
@@ -61,13 +61,15 @@ All feedback is welcome in the [issues section](https://github.com/CWolfs/Conver
 | Conversation - Node toggle 'Only Available Once' | 0.3.0 | :heavy_check_mark: |
 | Conversation - Drag node rearrange | 0.4.0 | :heavy_check_mark: |
 | Conversation - Linking | 0.4.0 | :heavy_check_mark: |
-| Conversation - Visual indicators - Actions | 0.5.0 | :soon: |
-| Conversation - Visual indicators - Conditions | 0.5.0 | :soon: |
-| Conversation - Add actions | 0.5.0 | :soon: |
-| Conversation - Remove actions | 0.5.0 | :soon: |
-| Conversation - Add conditions | 0.5.0 | :soon: |
-| Conversation - Remove conditions | 0.5.0 | :soon: |
-| Conversation - Search | 0.6.0 | :heavy_minus_sign: |
+| Conversation - Visual indicators - Actions | 1.0.0 | :heavy_check_mark: |
+| Conversation - Visual indicators - Conditions | 1.0.0 | :heavy_check_mark: |
+| Conversation - Add conditions | 1.0.0 | :heavy_check_mark: |
+| Conversation - Remove conditions | 1.0.0 | :heavy_check_mark: |
+| Conversation - Edit conditions | 1.0.0 | :heavy_check_mark: |
+| Conversation - Add actions | 1.0.0 | :heavy_check_mark: |
+| Conversation - Remove actions | 1.0.0 | :heavy_check_mark: |
+| Conversation - Edit actions | 1.0.0 | :heavy_check_mark: |
+| Conversation - Search | TBD | :heavy_minus_sign: |
 
 ## Author
 

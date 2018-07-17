@@ -1,4 +1,4 @@
-# Frequently Asked Questions - ConverseTek v0.4.0
+# Frequently Asked Questions - ConverseTek v1.0.0
 
 ## Conversation Editor
 
@@ -31,7 +31,19 @@ An empty node is not actually empty, it just has no dialog text associated with 
 * As a conditional check point
 * As a 'autofollow' conversation branch. This allows for the same character, or a new non-player character, to continue talking
 
-ConverseTek _v0.4.0_ does not support editing **actions** or **conditions**. Support for this will come in _v0.5.0_. Action and condition icons will be added to the dialog nodes to better indicate which nodes have actions and dialogs.
+You can add conditions to a node by selecting the node you wish to add a condition to, select the 'Conditions' tab on the bottom right of ConverseTek - then select the blue '+' button. If you have mulitple conditions you may need to scroll to the bottom to see the add button.
+
+### "I've added an empty response node with other responses. When I test it in-game, the conversation skips the entire branch level and follows down the path of the empty response. Why is this? ###
+
+This is how the BattleTech conversation system has been designed. If the system encounters any empty code, it will follow it to the next level. This feature can be useful in certain situations, for example, if you want a branch to follow to a single-use dialog branch. After that offshoot branch has been used by the player then the dialog will only show the other responses if you have a condition to prevent it from following down that path.
+
+### I've set 'Only Once' on a response but it still shows up when I return to the character to talk to them ###
+
+Make sure you don't have 'Always Show' selected in the node general options. This will override 'Only Once'.
+
+### What does 'Always Show' do? ###
+
+Always show does what it says. This means that even if 'Only Once' is selected, or the response fails any/all its conditions, the response will still be displayed.
 
 ### "I can drag dialog nodes around but it doesn't always seem to work!"
 
@@ -46,13 +58,16 @@ Make sure when dragging nodes that you move the node _directly_ into the highlig
 
 ### "What is an action?"
 
-An **action** is what Battletech uses to trigger something from a dialog node. These may be playing music, with `Play BattleTech Audio Event` for example, or triggering a
-game screen fade with `Set BattleTech Fade`.
+An **action** is what Battletech uses to trigger something from a dialog node. These may be playing music, with `Play BattleTech Audio Event` for example, or triggering a game screen fade with `Set BattleTech Fade`.
 
 ### "What is a condition?"
 
 A **condition** is what Battletech uses to control which dialog branches to display to the player, and which ones to hide. It can check against various things like
 your player's history so, for instance, if you selected your back story to include having an accident when you were young you'd check against `commander_youth_accident`. It can also check against game milestone tags like `oc04_post_argo`.
+
+### "How did I add a condition, or an action?" ###
+
+Select the root, node or response you wish to add to, then select the appropriate tab (`Conditions` or `Actions`) on the bottom right of ConverseTek. Select the blue '+' button to add a new item. 
 
 ### "When I enter in a 'Cast Id' into the node 'General' details, but then decide to use 'Speaker Id' and save the conversation - the 'Cast Id' is lost. Why?"
 
@@ -71,8 +86,8 @@ Responses only ever have _one_ node that follows it. You cannot add a second nod
 This is usually because the conversation is too short and doesn't satisfy the rules in the Battletech conversation system. Ideally, your conversation should be structured as follows:
 
 * An empty root at the start of the conversation (future proofed for actions and conditions to gate the branch)
-* A node after that empty root
-* A response after that node
+* A non-empty node after that empty root
+* A non-empty response after that node
 
 ### "How do I link back to a previous part in a conversation, for example, when returning to a list of questions after one question has been answered?"
 

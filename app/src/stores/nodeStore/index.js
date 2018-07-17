@@ -38,7 +38,9 @@ class NodeStore {
     this.clipboard = {
       node: null,
       nodes: [],
+      nodeIdMap: new Map(),
     };
+    this.nodeIdToTreeIndexMap = new Map();
 
     this.processDeletes = this.processDeletes.bind(this);
   }
@@ -48,6 +50,17 @@ class NodeStore {
     const nextNodeIndex = last(this.takenNodeIndexes) + 1 || 0;
     this.takenNodeIndexes.push(nextNodeIndex);
     return nextNodeIndex;
+  }
+
+  addNodeIdAndTreeIndexPair(nodeId, index) {
+    this.nodeIdToTreeIndexMap.set(nodeId, index);
+  }
+
+  getTreeIndex(nodeId) {
+    if (this.nodeIdToTreeIndexMap.has(nodeId)) {
+      return this.nodeIdToTreeIndexMap.get(nodeId);
+    }
+    return null;
   }
 
   @action setRebuild(flag) {
@@ -88,6 +101,10 @@ class NodeStore {
     this.activeNode = this.getNode(nodeId);
   }
 
+  @action setActiveNodeByIndex(nodeIndex) {
+    this.activeNode = this.getNodeByIndex(nodeIndex);
+  }
+
   getActiveNodeId() {
     if (!this.activeNode) return null;
     return getId(this.activeNode);
@@ -95,6 +112,34 @@ class NodeStore {
 
   @action clearActiveNode() {
     this.activeNode = null;
+  }
+
+  /*
+  * =============================
+  * || SCROLL TO  NODE METHODS ||
+  * =============================
+  */
+  @action scrollToNode(nodeId, direction, cachedTree) {
+    // Quickly scroll in the given direction to force the virtual tree to load
+    // At the same time check for the required node
+    const tree = cachedTree || window.document.querySelector('.ReactVirtualized__Grid');
+    const element = window.document.querySelector(`[data-node-id="${nodeId}"]`);
+
+    // TODO: Stop the scrolling it the top or bottom has been reached
+
+    if (element) {
+      const scrollTop = element.offsetParent.offsetParent.offsetTop;
+      const scrollLeft = element.offsetParent.offsetLeft - 50;
+      tree.scrollTop = scrollTop;
+      tree.scrollLeft = scrollLeft;
+    } else if (!element) {
+      if (direction === 'up') {
+        tree.scrollTop -= 200;
+      } else if (direction === 'down') {
+        tree.scrollTop += 200;
+      }
+      defer(() => this.scrollToNode(nodeId, direction, tree));
+    }
   }
 
   /*
@@ -117,36 +162,73 @@ class NodeStore {
   */
   @action setClipboard(nodeId) {
     const node = toJS(this.getNode(nodeId));
-    node.idRef.id = generateId();
-    node.index = this.generateNextNodeIndex();
-    this.clipboard.node = node;
+    const { type } = node;
+    const newNodeId = generateId();
+    node.idRef.id = newNodeId;
 
-    this.clipboard.nodes = flattenDeep(node.branches.map((branch) => {
+    const { isNode } = detectType(type);
+
+    if (isNode) {
+      const newNodeIndex = this.generateNextNodeIndex();
+      this.clipboard.nodeIdMap.set(node.index, newNodeIndex);
+      node.index = newNodeIndex;
+    }
+
+    this.clipboard.node = node;
+    const branches = (isNode) ? node.branches : [node];
+
+    this.clipboard.nodes = flattenDeep(branches.map((branch) => {
       const { nextNodeIndex, auxiliaryLink } = branch;
-      branch.idRef.id = generateId();
+      const newBranchId = generateId();
+      branch.idRef.id = newBranchId;
+      branch.parentId = newNodeId;
+
+      // Change link indexes
+      if (nextNodeIndex !== -1 && auxiliaryLink) {
+        branch.nextNodeIndex = this.clipboard.nodeIdMap.get(branch.nextNodeIndex);
+      }
 
       if (nextNodeIndex === -1 || auxiliaryLink) return [];
 
       const newNextNodeIndex = this.generateNextNodeIndex();
-      return this.copyNodesRecursive(nextNodeIndex, newNextNodeIndex);
+      branch.nextNodeIndex = newNextNodeIndex;
+      return this.copyNodesRecursive(nextNodeIndex, newNextNodeIndex, newBranchId);
     }));
   }
 
-  copyNodesRecursive(nodeIndex, newNextNodeIndex) {
+  copyNodesRecursive(nodeIndex, newNextNodeIndex, newNodeParentId) {
     const node = toJS(this.getNodeByIndex(nodeIndex));
-    node.idRef.id = generateId();
+    const newNodeId = generateId();
+    node.idRef.id = newNodeId;
+
+    this.clipboard.nodeIdMap.set(node.index, newNextNodeIndex);
     node.index = newNextNodeIndex;
+    node.parentId = newNodeParentId;
 
     const nodes = [
       node,
       ...node.branches.map((branch) => {
         const { nextNodeIndex, auxiliaryLink } = branch;
-        branch.idRef.id = generateId();
+        const newBranchId = generateId();
+        branch.idRef.id = newBranchId;
+        branch.parentId = newNodeId;
+
+        // Change link indexes
+        if (nextNodeIndex !== -1 && auxiliaryLink) {
+          const linkedNextNodeIndex = this.clipboard.nodeIdMap.get(branch.nextNodeIndex);
+
+          // If the index exists in the copied branch then link to the new node,
+          // otherwise keep the existing link
+          if (linkedNextNodeIndex) {
+            branch.nextNodeIndex = linkedNextNodeIndex;
+          }
+        }
 
         if (nextNodeIndex === -1 || auxiliaryLink) return [];
 
         const newNodeIndex = this.generateNextNodeIndex();
-        return this.copyNodesRecursive(nextNodeIndex, newNodeIndex);
+        branch.nextNodeIndex = newNodeIndex;
+        return this.copyNodesRecursive(nextNodeIndex, newNodeIndex, newBranchId);
       }),
     ];
     return nodes;
@@ -156,6 +238,7 @@ class NodeStore {
     this.clipboard = {
       node: null,
       nodes: null,
+      nodeIdMap: new Map(),
     };
   }
 
@@ -184,12 +267,14 @@ class NodeStore {
     if (isRoot || isResponse) { // Only allow nodes to be copied in if target is a root or response
       if (clipboardIsNode) {
         node.nextNodeIndex = clipboardNode.index;
+        clipboardNode.parentId = nodeId;
         addNodes(conversationAsset, [clipboardNode, ...clipboardNodes]);
       } else {
         console.error('[NodeStore] Cannot copy - wrong node types');
       }
     } else if (isNode) { // Only allow response to be copied in
       if (clipboardIsResponse) {
+        clipboardNode.parentId = nodeId;
         updateResponse(conversationAsset, node, clipboardNode);
         addNodes(conversationAsset, clipboardNodes);
       } else {
@@ -533,19 +618,31 @@ class NodeStore {
           branch.type = 'response';
           branch.parentId = childNodeId;
 
+          const isValidLink = auxiliaryLink && (branch.nextNodeIndex !== -1);
+          let branchChildren = [];
+
+          if (auxiliaryLink) {
+            if (isValidLink) {
+              branchChildren = [{
+                title: `[Link to NODE ${branch.nextNodeIndex}]`,
+                type: 'link',
+                linkId: getId(this.getNodeByIndex(branch.nextNodeIndex)),
+                linkIndex: branch.nextNodeIndex,
+                canDrag: false,
+                parentId: branchNodeId,
+              }];
+            }
+          } else {
+            branchChildren = this.getChildren(branch);
+          }
+
           return {
             title: branch.responseText,
             id: branchNodeId,
             parentId: childNodeId,
             type: 'response',
             expanded: isBranchExpanded,
-            children: (auxiliaryLink) ? [{
-              title: `[Link to NODE ${branch.nextNodeIndex}]`,
-              type: 'link',
-              linkIndex: branch.nextNodeIndex,
-              canDrag: false,
-              parentId: branchNodeId,
-            }] : this.getChildren(branch),
+            children: branchChildren,
           };
         }),
       },
@@ -555,6 +652,7 @@ class NodeStore {
   @action reset = () => {
     this.focusedNode = null;
     this.takenNodeIndexes = [];
+    this.nodeIdToTreeIndexMap.clear();
   }
 }
 

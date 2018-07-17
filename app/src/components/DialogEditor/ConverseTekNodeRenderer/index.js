@@ -6,6 +6,7 @@ import { Icon } from 'antd';
 import { ContextMenuProvider } from 'react-contexify';
 
 import { isDescendant } from '../../../utils/tree-data-utils';
+import { detectType } from '../../../utils/node-utils';
 
 import { LinkIcon } from '../../Svg';
 
@@ -45,15 +46,22 @@ const ConverseTekNodeRenderer = observer(({
   const isActiveNode = (activeNodeId === node.id);
   const storedNode = nodeStore.getNode(node.id);
   const { type: nodeType } = node;
+
   const canNodeBeDragged = !(node.canDrag === false);
+
+  const { actions, conditions } = storedNode || { actions: null, conditions: null };
+  const hasActions = !!actions;
+  const hasConditions = !!conditions;
 
   const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node);
   const isLandingPadActive = !didDrop && isDragging;
 
-  const isRoot = (nodeType === 'root');
-  const isNode = (nodeType === 'node');
-  const isResponse = (nodeType === 'response');
-  const isLink = (nodeType === 'link');
+  const {
+    isRoot,
+    isNode,
+    isResponse,
+    isLink,
+  } = detectType(nodeType);
 
   const contextMenuId = node.id || Math.random().toString();
   const { parentId } = node;
@@ -154,15 +162,47 @@ const ConverseTekNodeRenderer = observer(({
     buttonStyle = { right: -0.5 * scaffoldBlockPxWidth };
   }
 
+  const logicStyle = {
+    color: (isResponse) ? 'white' : '#2f71d4',
+    fontSize: '18px',
+  };
+
+  if (nodeTitle && nodeTitle.length > 0) {
+    logicStyle.paddingRight = '8px';
+  }
+
+  const actionsIconStyle = {
+    ...logicStyle,
+  };
+
+  if ((!nodeTitle || (nodeTitle.length <= 0)) && hasActions) {
+    logicStyle.paddingRight = '8px';
+  }
+
   const rawRowContents = (
     <div
       className={rowContentsClasses}
-      onClick={() => nodeStore.setActiveNode(node.id, node.type)}
+      onClick={() => {
+        const { type } = node;
+        if (type === 'link') {
+          const linkTreeIndex = nodeStore.getTreeIndex(node.linkId);
+          const direction = (linkTreeIndex < treeIndex) ? 'up' : 'down';
+          nodeStore.setActiveNode(node.linkId);
+          nodeStore.scrollToNode(node.linkId, direction);
+        } else {
+          nodeStore.setActiveNode(node.id, node.type);
+        }
+      }}
       onMouseEnter={() => nodeStore.setFocusedNode(node)}
     >
       {isLink && <div className="node-renderer__link-row-icon"><LinkIcon /></div>}
       {!isLink && (
       <section>
+        <div className="node-renderer__row-contents-logic">
+          {hasConditions && <Icon type="question-circle" style={logicStyle} />}
+          {hasActions && <Icon type="right-circle" style={actionsIconStyle} />}
+        </div>
+
         <div className={labelClasses}>
           <span className={titleClasses}>
             {typeof nodeTitle === 'function'
@@ -212,7 +252,7 @@ const ConverseTekNodeRenderer = observer(({
   const rowContents = menuWrappedRowContents;
 
   return (
-    <div style={{ height: '100%' }} {...otherProps}>
+    <div style={{ height: '100%' }} data-node-id={node.id} {...otherProps}>
       {toggleChildrenVisibility &&
         node.children &&
         (node.children.length > 0 || typeof node.children === 'function') && (

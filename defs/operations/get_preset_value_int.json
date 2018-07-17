@@ -1,0 +1,16 @@
+{
+  "key": "Get Preset Value (int)",
+  "label": "Get Preset Value (int)",
+  "view": ["result"],
+  "category": "secondary",
+  "inputs": [
+    {
+      "label": "Key",
+      "types": ["string"]
+    },
+    {
+      "label": "Value",
+      "types": ["int"]
+    }
+  ]
+}

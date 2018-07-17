@@ -1,0 +1,18 @@
+{
+  "key": "Evaluate Tag for Company",
+  "label": "If the Company",
+  "view": ["label", "inputs"],
+  "scope": "condition",
+  "category": "primary",
+  "inputs": [
+    {
+      "label": "Conditional",
+      "types": ["operation", "int"]
+    },
+    {
+      "label": "Tag Key",
+      "types": ["operation", "string"],
+      "scope": "commander"
+    }
+  ]
+}

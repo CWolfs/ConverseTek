@@ -64,7 +64,7 @@ namespace ConverseTek {
                 ChromelyConfiguration config = ChromelyConfiguration
                                               .Create()
                                               .WithAppArgs(args)
-                                              .WithHostSize(1200, 900)
+                                              .WithHostSize(1480, 900)
                                               .WithLogFile("logs\\conversetek-interface.log")
                                               .WithStartUrl(startUrl)
                                               .WithLogSeverity(LogSeverity.Info)
@@ -79,7 +79,7 @@ namespace ConverseTek {
                                               // Alternate approach for multi-process, is to add a subprocess application
                                               // .WithCustomSetting(CefSettingKeys.SingleProcess, true);
 
-                var factory = WinapiHostFactory.Init("chromely.ico");
+                var factory = WinapiHostFactory.Init("conversetek.ico");
                 using (var window = factory.CreateWindow(
                     () => new CefSharpBrowserHost(config),
                     "ConverseTek",

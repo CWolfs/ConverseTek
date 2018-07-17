@@ -1,0 +1,56 @@
+@import '../../css/constants.css';
+
+.editable-logic {
+  &__logic-type,
+  &__arg-type {
+    margin-right: $tinySpace;
+  }
+
+  &__operation {
+    margin-left: $mediumSpace;
+
+    &--even {
+      background-color: $backgroundTertiary;
+    }
+  
+    &-label {
+      margin-right: $tinySpace;
+    }
+  }
+
+  &__arg {
+    margin-left: $mediumSpace;
+  }
+
+  &__args {
+    margin-left: $mediumSpace;
+    border: 1px solid white;
+    border-radius: 2px;
+    padding: $smallSpace;
+    margin-top: $smallSpace;
+    background-color: $backgroundTertiary;
+
+    &--even {
+      background-color: #3d3d3e;
+    }
+
+    &-container {
+      margin: $tinySpace 0;
+
+      &.first-arg {
+        margin-top: -8px;
+      }
+    }
+
+    &-label {
+      margin-right: $tinySpace;
+      margin-bottom: $tinySpace;
+      line-height: $promoLineHeightLargest;
+    }
+  }
+
+  .anticon {
+    margin-left: $smallSpace;
+    color: gold;
+  }
+}
