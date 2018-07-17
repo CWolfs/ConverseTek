@@ -55,12 +55,10 @@ class ConversationConditions extends Component {
   }
 
   onDeleteCondition(event, index) {
-    const { nodeStore, node } = this.props;
+    const { node } = this.props;
     const { conditions } = node;
     remove(conditions.ops, (value, i) => i === index);
     if (conditions.ops.length <= 0) node.conditions = null;
-
-    nodeStore.setRebuild(true);
 
     event.stopPropagation();
   }

@@ -55,12 +55,10 @@ class ConversationActions extends Component {
   }
 
   onDeleteAction(event, index) {
-    const { nodeStore, node } = this.props;
+    const { node } = this.props;
     const { actions } = node;
     remove(actions.ops, (value, i) => i === index);
     if (actions.ops.length <= 0) node.actions = null;
-
-    nodeStore.setRebuild(true);
 
     event.stopPropagation();
   }

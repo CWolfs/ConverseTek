@@ -52,6 +52,7 @@ class DataStore {
   @action setActiveConversation(id) {
     if (this.conversationAssets.has(id)) {
       this.activeConversationAsset = this.conversationAssets.get(id);
+      this.setUnsavedActiveConversation(this.activeConversationAsset);
     }
   }
 

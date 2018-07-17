@@ -60,7 +60,7 @@
     </None>
   </ItemGroup>
 
-  <Target Name="BuildServer" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' ">
+  <Target Name="BuildServer" BeforeTargets="Build">
     <Exec Command="xcopy &quot;$(ProjectDir)dist&quot; &quot;$(TargetDir)dist&quot;   /i /s /r /y /c&#xD;&#xA;" />
     <Exec Command="xcopy &quot;$(ProjectDir)libs&quot; &quot;$(TargetDir)&quot;   /i /s /r /y /c&#xD;&#xA;" />
     <Exec Command="xcopy &quot;$(ProjectDir)defs&quot; &quot;$(TargetDir)defs&quot;   /i /s /r /y /c&#xD;&#xA;" />
