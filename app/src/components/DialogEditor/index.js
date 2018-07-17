@@ -131,10 +131,12 @@ class DialogEditor extends Component {
     // Only allow roots to be moved around under the top level node
     if (allowDrop) allowDrop = !((isNode || isResponse) && (nextParent.id === '0'));
 
-    // Only allow draggin within the same parent for roots and responses,
+    // Only allow dragging within the same parent for roots and responses,
     // for nodes, only allow if the target response is empty
     if (allowDrop) {
-      if (isRoot || isResponse) {
+      if (isRoot) {
+        allowDrop = (parentId === null || parentId === '0');
+      } else if (isResponse) {
         allowDrop = (nodeParentId === parentId);
       } else if (isNode) {
         const parent = nodeStore.getNode(parentId);
