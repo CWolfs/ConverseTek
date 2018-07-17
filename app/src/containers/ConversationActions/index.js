@@ -83,7 +83,7 @@ class ConversationActions extends Component {
     const header = (
       <div className="conversation-actions__panel-header">
         <div className="conversation-actions__panel-header-logic">
-          <ViewableLogic logic={condition} />
+          <ViewableLogic key={condition.functionName} logic={condition} />
         </div>
         <Popconfirm
           title="Are you sure you want to delete this condition?"
