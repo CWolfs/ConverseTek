@@ -79,7 +79,7 @@ namespace ConverseTek {
                                               // Alternate approach for multi-process, is to add a subprocess application
                                               // .WithCustomSetting(CefSettingKeys.SingleProcess, true);
 
-                var factory = WinapiHostFactory.Init("chromely.ico");
+                var factory = WinapiHostFactory.Init("conversetek.ico");
                 using (var window = factory.CreateWindow(
                     () => new CefSharpBrowserHost(config),
                     "ConverseTek",
