@@ -118,7 +118,7 @@ export function createResponse() {
     conditions: null,
     actions: null,
     nextNodeIndex: -1,
-    hideIfUnavailable: false,
+    hideIfUnavailable: true,
     onlyOnce: false,
     idRef: {
       id: generateId(),
