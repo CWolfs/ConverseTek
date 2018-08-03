@@ -37,6 +37,8 @@ class NodeStore {
     this.expandMap = new Map();
     this.clipboard = {
       node: null,
+      originalNodeId: null,
+      originalNodeIndex: null,
       nodes: [],
       nodeIdMap: new Map(),
     };
@@ -163,6 +165,9 @@ class NodeStore {
   @action setClipboard(nodeId) {
     const node = toJS(this.getNode(nodeId));
     const { type } = node;
+    this.clipboard.originalNodeId = nodeId;
+    this.clipboard.originalNodeIndex = node.index;
+
     const newNodeId = generateId();
     node.idRef.id = newNodeId;
 
@@ -237,6 +242,8 @@ class NodeStore {
   @action clearClipboard() {
     this.clipboard = {
       node: null,
+      originalNodeId: null,
+      originalNodeIndex: null,
       nodes: null,
       nodeIdMap: new Map(),
     };
@@ -244,9 +251,9 @@ class NodeStore {
 
   @action pasteAsLinkFromClipboard(nodeId) {
     const response = this.getNode(nodeId);
-    const { node: clipboardNode } = this.clipboard;
+    const { originalNodeIndex } = this.clipboard;
 
-    response.nextNodeIndex = clipboardNode.index;
+    response.nextNodeIndex = originalNodeIndex;
     response.auxiliaryLink = true;
 
     this.clearClipboard();
