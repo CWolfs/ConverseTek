@@ -1,0 +1,16 @@
+{
+  "key": "Set Current System",
+  "label": "Set Current System to",
+  "view": ["label", "inputs"],
+  "scope": "action",
+  "category": "primary",
+  "tooltip": "This will instantly teleport to you the system.",
+  "inputs": [
+    {
+      "label": "System Name",
+      "types": ["string"],
+      "tooltip": "Should be in the format of 'starsystemdef_Smithon'",
+      "viewlabel": "'{value}'"
+    }
+  ]
+}
