@@ -11,6 +11,15 @@
       "types": ["string"],
       "tooltip": "Should be in the format of 'starsystemdef_Smithon'",
       "viewlabel": "'{value}'"
+    },
+    {
+      "label": "Include Travel Cost",
+      "types": ["int"],
+      "tooltip": "If this is true, then the jump time will be calculated and added to the current time",
+      "values": [
+        { "viewlabel": "and travel time will be ignored", "text": "False", "value": 0 },
+        { "viewlabel": "and travel time will be used", "text": "True", "value": 1 }
+      ]
     }
   ]
 }
