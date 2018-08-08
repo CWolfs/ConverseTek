@@ -9,7 +9,7 @@ Battletech uses a binary data format for its conversations. It isn't possible to
 
 ## Overview
 
-Latest release: **v1.0.0** | [Download](https://github.com/CWolfs/ConverseTek/releases/tag/v1.0.0)
+Latest release: **v1.1.0** | [Download](https://github.com/CWolfs/ConverseTek/releases/tag/v1.1.0)
 
 ## Examples
 
@@ -69,6 +69,7 @@ All feedback is welcome in the [issues section](https://github.com/CWolfs/Conver
 | Conversation - Add actions | 1.0.0 | :heavy_check_mark: |
 | Conversation - Remove actions | 1.0.0 | :heavy_check_mark: |
 | Conversation - Edit actions | 1.0.0 | :heavy_check_mark: |
+| Conversation - Custom actions and conditions | 1.1.0 | :heavy_check_mark: |
 | Conversation - Search | TBD | :heavy_minus_sign: |
 
 ## Author
