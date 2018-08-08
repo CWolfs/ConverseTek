@@ -13,7 +13,7 @@
       "viewlabel": "'{value}'"
     },
     {
-      "label": "Include Travel Cost",
+      "label": "Include Travel Time",
       "types": ["int"],
       "tooltip": "If this is true, then the jump time will be calculated and added to the current time",
       "values": [
