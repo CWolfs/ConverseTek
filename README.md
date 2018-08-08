@@ -23,6 +23,8 @@ Latest release: **v1.1.0** | [Download](https://github.com/CWolfs/ConverseTek/re
 * [Conversation with Yang](https://www.youtube.com/watch?v=JcjByWyr1lM)
 * [Copy & Links Functionality](https://www.youtube.com/watch?v=P9sbtz019ws)
 * [Drag Rearrange Functionality](https://www.youtube.com/watch?v=9Y4xSxJRO_s)
+* [Time Skip Action](https://www.youtube.com/watch?v=Y7Wzd2NElTE) [__ONLY WITH EXTENDEDCONVERSATIONS MOD__](https://github.com/CWolfs/ExtendedConversations)
+* [Set Current System Action](https://www.youtube.com/watch?v=3za9qaGPwO4) [__ONLY WITH EXTENDEDCONVERSATIONS MOD__](https://github.com/CWolfs/ExtendedConversations)
 
 ## Installation Instructions
 
