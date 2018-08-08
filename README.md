@@ -11,6 +11,10 @@ Battletech uses a binary data format for its conversations. It isn't possible to
 
 Latest release: **v1.1.0** | [Download](https://github.com/CWolfs/ConverseTek/releases/tag/v1.1.0)
 
+### Complimentary Mods
+
+* ExtendedConversations: **v0.2.0** | Adds more actions, conditions and features | [Download](https://github.com/CWolfs/ExtendedConversations/releases/tag/v0.2.0)
+
 ## Examples
 
 ### Screenshots
@@ -23,6 +27,8 @@ Latest release: **v1.1.0** | [Download](https://github.com/CWolfs/ConverseTek/re
 * [Conversation with Yang](https://www.youtube.com/watch?v=JcjByWyr1lM)
 * [Copy & Links Functionality](https://www.youtube.com/watch?v=P9sbtz019ws)
 * [Drag Rearrange Functionality](https://www.youtube.com/watch?v=9Y4xSxJRO_s)
+* [Time Skip Action](https://www.youtube.com/watch?v=Y7Wzd2NElTE) ([__Requires ExtendedConversations__](https://github.com/CWolfs/ExtendedConversations))
+* [Set Current System Action](https://www.youtube.com/watch?v=3za9qaGPwO4) ([__Requires ExtendedConversations__](https://github.com/CWolfs/ExtendedConversations))
 
 ## Installation Instructions
 
