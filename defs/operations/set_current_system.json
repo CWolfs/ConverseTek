@@ -8,7 +8,7 @@
   "inputs": [
     {
       "label": "System Name",
-      "types": ["string"],
+      "types": ["operation", "string"],
       "tooltip": "Should be in the format of 'starsystemdef_Smithon'",
       "viewlabel": "'{value}'"
     },
