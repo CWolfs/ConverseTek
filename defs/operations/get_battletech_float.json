@@ -6,7 +6,7 @@
   "inputs": [
     {
       "label": "Type",
-      "types": ["float"],
+      "types": ["int"],
       "values": [
         { "text": "Company Stats", "value": 1 },
         { "text": "Commander Stats", "value": 2 },
