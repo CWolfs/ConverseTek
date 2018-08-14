@@ -1,0 +1,23 @@
+{
+  "key": "Start Conversation Custom",
+  "label": "Start conversation",
+  "view": ["label", "inputs"],
+  "scope": "action",
+  "category": "primary",
+  "tooltip": "This will immediately trigger a group conversation",
+  "inputs": [
+    {
+      "label": "Conversation Id",
+      "types": ["string"],
+      "viewLabel": "for conversation id {value}"
+    },
+    {
+      "label": "Conversation Header",
+      "types": ["string"]
+    },
+    {
+      "label": "Conversation Sub Header",
+      "types": ["string"]
+    }
+  ]
+}
