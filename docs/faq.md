@@ -1,4 +1,4 @@
-# Frequently Asked Questions - ConverseTek v1.1.0
+# Frequently Asked Questions - ConverseTek v1.1.1
 
 ## Conversation Editor
 
@@ -94,3 +94,7 @@ This is usually because the conversation is too short and doesn't satisfy the ru
 You achiveve this with _links_. Right-click the node you wish the conversation to return to, select '_Copy_'. Then right-click the end of the conversation branch just before you loop back to copied section. Now select '_Paste as Link_'.
 
 Remember, you can only link from a _Response_ (yellow) to a _Node_ (blue).
+
+### "I've copied some dialog from another mod but the tool won't open it. Why?"
+
+They are probably using `ExtendedConversations` mod which adds many more dialog tags, conditions, actions and features. If a conversation is using one of those features then you will need to use the mod and install the ConverseTek definitions that come with it.

@@ -9,11 +9,11 @@ Battletech uses a binary data format for its conversations. It isn't possible to
 
 ## Overview
 
-Latest release: **v1.1.0** | [Download](https://github.com/CWolfs/ConverseTek/releases/tag/v1.1.0)
+Latest release: **v1.1.1** | [Download](https://github.com/CWolfs/ConverseTek/releases/tag/v1.1.1)
 
 ### Complimentary Mods
 
-* ExtendedConversations: **v0.2.0** | Adds more actions, conditions and features | [Download](https://github.com/CWolfs/ExtendedConversations/releases/tag/v0.2.0)
+* `ExtendedConversations` mod | Adds more dialog tags, actions, conditions and features | [Download](https://github.com/CWolfs/ExtendedConversations/releases/)
 
 ## Examples
 
