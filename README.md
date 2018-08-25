@@ -9,11 +9,11 @@ Battletech uses a binary data format for its conversations. It isn't possible to
 
 ## Overview
 
-Latest release: **v1.1.0** | [Download](https://github.com/CWolfs/ConverseTek/releases/tag/v1.1.0)
+Latest release: **v1.1.1** | [Download](https://github.com/CWolfs/ConverseTek/releases/tag/v1.1.1)
 
 ### Complimentary Mods
 
-* ExtendedConversations: **v0.2.0** | Adds more actions, conditions and features | [Download](https://github.com/CWolfs/ExtendedConversations/releases/tag/v0.2.0)
+* `ExtendedConversations` mod | Adds more dialog tags, actions, conditions and features | [Download](https://github.com/CWolfs/ExtendedConversations/releases/)
 
 ## Examples
 
@@ -45,38 +45,39 @@ Some questions are answered in the [FAQ section](https://github.com/CWolfs/Conve
 
 All feedback is welcome in the [issues section](https://github.com/CWolfs/ConverseTek/issues).
 
-## Roadmap
+## Features
 
-| Feature | Expected Version | Status  |
-| ------- | ---------------- | ------- |
-| Directory selection | 0.1.0 | :heavy_check_mark: |
-| Conversation - Loading | 0.1.0 | :heavy_check_mark: |
-| Conversation - Edit id | 0.1.0 | :heavy_check_mark: |
-| Conversation - Edit name | 0.1.0 | :heavy_check_mark: |
-| Conversation - Edit dialog text | 0.1.0 | :heavy_check_mark: |
-| Conversation - Save | 0.1.0 | :heavy_check_mark: |
-| Conversation - Edit node id | 0.2.0 | :heavy_check_mark: |
-| Conversation - Id regeneration | 0.2.0 | :heavy_check_mark: |
-| Conversation - Save as... | 0.2.0 | :heavy_check_mark: |
-| Conversation - New | 0.2.0 | :heavy_check_mark: |
-| Conversation - Edit dialog node speaker by speaker id | 0.2.0 | :heavy_check_mark: |
-| Conversation - Edit dialog node speaker by cast id | 0.2.0 | :heavy_check_mark: |
-| Conversation - Add/Edit comments | 0.2.0 | :heavy_check_mark: |
-| Conversation - Delete node | 0.3.0 | :heavy_check_mark: |
-| Conversation - Add node | 0.3.0 | :heavy_check_mark: |
-| Conversation - Node toggle 'Only Available Once' | 0.3.0 | :heavy_check_mark: |
-| Conversation - Drag node rearrange | 0.4.0 | :heavy_check_mark: |
-| Conversation - Linking | 0.4.0 | :heavy_check_mark: |
-| Conversation - Visual indicators - Actions | 1.0.0 | :heavy_check_mark: |
-| Conversation - Visual indicators - Conditions | 1.0.0 | :heavy_check_mark: |
-| Conversation - Add conditions | 1.0.0 | :heavy_check_mark: |
-| Conversation - Remove conditions | 1.0.0 | :heavy_check_mark: |
-| Conversation - Edit conditions | 1.0.0 | :heavy_check_mark: |
-| Conversation - Add actions | 1.0.0 | :heavy_check_mark: |
-| Conversation - Remove actions | 1.0.0 | :heavy_check_mark: |
-| Conversation - Edit actions | 1.0.0 | :heavy_check_mark: |
-| Conversation - Custom actions and conditions | 1.1.0 | :heavy_check_mark: |
-| Conversation - Search | TBD | :heavy_minus_sign: |
+* Load and Save sim game conversations
+  * One-on-one conversations
+  * Group conversations
+* Edit existing dialog
+* Create new conversations
+* Add actions and conditions to dialog nodes
+* Link dialog nodes for conversations that loop back on themselves
+* Flexible support for future conditions, actions and value getters
+  * JSON definition extension support
+* Full support for `ExtendedConversations` mod
+
+
+## Dialog Tags
+
+BattleTech uses dialog tags which are replaced at runtime with the appropriate text. To access it use the following in your dialog text.
+
+### Tooltips
+
+Square brackets will show a short yellow hover-over enabled tooltip. Once mouse overed, the tooltip will display the full text. In this case the full tooltip text is taken from the base descriptions definition file. It checks the `DataManager` and allows you to select information. For example,
+
+* `[[DM.BaseDescriptionDefs[LoreThomasCalderon],Protector Calderon's]]` 
+* `[[DM.Factions[faction_MagistracyOfCanopus],Canopian]]`
+* `[[DM.CastDefs[...and so on`
+
+### Replacements
+
+Curly braces enable reflection on the game object registered to the handler. You can access the game variables and properties with this approach. For example,
+
+* `{COMPANY.DaysPassed}` - Gets how many days have passed since the start of the game
+* `{COMMANDER.FirstName}` - Gets the commander's first name
+* `{TGT_SYSTEM.Habitable}` - Checks if the current star system is habitable
 
 ## Author
 
