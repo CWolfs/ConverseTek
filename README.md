@@ -65,16 +65,19 @@ BattleTech uses dialog tags which are replaced at runtime with the appropriate t
 
 ### Tooltips
 
-Square brackets will show a short yellow hover-over enabled tooltip. Once mouse overed, the tooltip will display the full text. In this case the full tooltip text is taken from the base descriptions definition file. For example,
+Square brackets will show a short yellow hover-over enabled tooltip. Once mouse overed, the tooltip will display the full text. In this case the full tooltip text is taken from the base descriptions definition file. It checks the `DataManager` and allows you to select information. For example,
 
-* `[[DM.BaseDescriptionDefs[LoreThomasCalderon],Protector Calderon's]]`
+* `[[DM.BaseDescriptionDefs[LoreThomasCalderon],Protector Calderon's]]` 
+* `[[DM.Factions[faction_MagistracyOfCanopus],Canopian]]`
+* `[[DM.CastDefs[...and so on`
 
 ### Replacements
 
 Curly braces enable reflection on the game object registered to the handler. You can access the game variables and properties with this approach. For example,
 
-* `{COMPANY.DaysPassed}`
-* `{COMMANDER.FirstName}`
+* `{COMPANY.DaysPassed}` - Gets how many days have passed since the start of the game
+* `{COMMANDER.FirstName}` - Gets the commander's first name
+* `{TGT_SYSTEM.Habitable}` - Checks if the current star system is habitable
 
 ## Author
 
