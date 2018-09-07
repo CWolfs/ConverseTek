@@ -36,7 +36,7 @@ class ViewableLogic extends Component {
           const input = inputs[index];
           const { Viewlabel: viewLabel, Values: inputValues } = input;
 
-          if (type === 'operation') return <ViewableLogic key={index} defStore={defStore} logic={value} />;
+          if (type === 'operation' && value !== null) return <ViewableLogic key={index} defStore={defStore} logic={value} />;
 
           const { value: valueFromArg } = argValue;
           let displayValue = valueFromArg;
