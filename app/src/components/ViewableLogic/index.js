@@ -42,6 +42,9 @@ class ViewableLogic extends Component {
           let displayValue = valueFromArg;
           if (viewLabel) {
             if (viewLabel.includes('{value}')) {
+              if (!displayValue) {
+                return displayValue;
+              }
               displayValue = viewLabel.replace('{value}', displayValue);
             } else {
               displayValue = viewLabel;
