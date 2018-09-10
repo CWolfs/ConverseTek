@@ -43,3 +43,5 @@ defs/operations/set_current_system\.json
 defs/operations/start_conversation\.json
 
 defs/operations/time_skip\.json
+
+defs/operations/add_contract\.json

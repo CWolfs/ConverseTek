@@ -80,9 +80,54 @@ class DefStore {
       const input = inputs[index];
       const { Types: types } = input;
 
+      types.some((type) => {
+        if (type === 'operation') { // favour: operation, string, float, int
+          rawType = 'operation';
+          if (arg.call_value === null && types.length > 1) {
+            return false; // favour another field if no operation is set but is a valid input type
+          } else if (arg.call_value === null) {
+            arg.call_value = {
+              functionName: 'Get Preset Value (int)',
+              args: [
+                {
+                  int_value: 0,
+                  bool_value: false,
+                  float_value: 0.0,
+                  string_value: 'HasOrHasNot',
+                  call_value: null,
+                  variableref_value: null,
+                },
+                {
+                  int_value: 1,
+                  bool_value: false,
+                  float_value: 0.0,
+                  string_value: '',
+                  call_value: null,
+                  variableref_value: null,
+                },
+              ],
+            }; // if not other valid input type - populate
+          }
+          return true;
+        } else if (type === 'string') {
+          rawType = 'string';
+          return true;
+        } else if (type === 'float') {
+          rawType = 'float';
+          return true;
+        } else if (type === 'int') {
+          rawType = 'int';
+          return true;
+        }
+        return false;
+      });
+
+      /*
       if (!types.includes(rawType)) {
         if (types.includes('operation')) { // favour: operation, string, float, int
           rawType = 'operation';
+          arg.call_value = { functionName: 'Get Preset Value (int)', args: [] };
+          // this.setOperation(arg.call_value, arg.call_value.functionName);
         } else if (types.includes('string')) {
           rawType = 'string';
         } else if (types.includes('float')) {
@@ -91,10 +136,13 @@ class DefStore {
           rawType = 'int';
         }
       }
+      */
 
       arg.type = rawType;
 
-      if (rawType === 'operation') this.setLogicTypeByOperation(arg.call_value);
+      if ((rawType === 'operation') && (arg.call_value !== null)) {
+        this.setLogicTypeByOperation(arg.call_value);
+      }
     });
   }
 
