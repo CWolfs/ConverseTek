@@ -19,7 +19,8 @@
       "values": [
         { "viewlabel": "the company scope", "text": "Company", "value": 1 },
         { "viewlabel": "the commander scope", "text": "Commander", "value": 2 },
-        { "viewlabel": "the current system scope", "text": "Current System", "value": 3 }
+        { "viewlabel": "the current system scope", "text": "Current System", "value": 3 },
+        { "viewlabel": "the current flashpoint scope", "text": "Flashpoint", "value": 4 }
       ]
     },
     {
