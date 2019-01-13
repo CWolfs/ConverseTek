@@ -15,7 +15,7 @@
     },
     {
       "label": "Type",
-      "types": ["int"],
+      "types": ["operation", "int"],
       "values": [
         { "viewlabel": "the company scope", "text": "Company", "value": 1 },
         { "viewlabel": "the commander scope", "text": "Commander", "value": 2 },
