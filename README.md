@@ -9,7 +9,7 @@ Battletech uses a binary data format for its conversations. It isn't possible to
 
 ## Overview
 
-Latest release: **v1.1.2** | [Download](https://github.com/CWolfs/ConverseTek/releases/tag/v1.1.2)
+Latest release: **v1.2** | [Download](https://github.com/CWolfs/ConverseTek/releases/tag/v1.2)
 
 ### Complimentary Mods
 
