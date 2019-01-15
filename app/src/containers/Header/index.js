@@ -7,7 +7,7 @@ import FileSystemPicker from '../../components/FileSystemPicker';
 import SaveConversationAs from '../../components/SaveConversationAs';
 import About from '../../components/About';
 
-import { updateConversation, exportConversation } from '../../services/api';
+import { updateConversation, exportConversation, exportAllConversations } from '../../services/api';
 
 import './Header.css';
 
@@ -75,6 +75,23 @@ class Header extends Component {
             >
               Export Conversation as JSON
             </MenuItem>
+            )}
+
+            {workingDirectory && (
+              <MenuItem
+                onClick={() => {
+                  const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+                  exportAllConversations(
+                    conversationAsset ? conversationAsset.Conversation.idRef.id : -1,
+                    conversationAsset,
+                  )
+                    .then(() => {
+                      message.success('Export successful');
+                    });
+                }}
+              >
+                Export All Conversations as JSON
+              </MenuItem>
             )}
           </SubMenu>
           {/*

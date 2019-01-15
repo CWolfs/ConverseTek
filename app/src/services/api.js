@@ -43,6 +43,11 @@ export function exportConversation(id, conversationAsset) {
   return post('/conversations/export', { id }, { method: 'PUT', conversationAsset });
 }
 
+export function exportAllConversations(id, conversationAsset) {
+  if (conversationAsset) consolidateSpeaker(conversationAsset);
+  return post('/conversations/export-all', { id }, { method: 'PUT', conversationAsset });
+}
+
 /*
 ==========================
  || FILE SYSTEM METHODS ||
