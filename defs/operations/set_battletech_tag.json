@@ -7,7 +7,7 @@
   "inputs": [
     {
       "label": "Action",
-      "types": ["int"],
+      "types": ["operation", "int"],
       "values": [
         { "viewlabel": "Add a tag to", "text": "Add", "value": 1 },
         { "viewlabel": "Remove a tag from", "text": "Remove", "value": 0 }
