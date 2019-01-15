@@ -4,6 +4,7 @@
   "view": ["inputs"],
   "scope": "action",
   "category": "primary",
+  "tooltip": "WARNING: This vanilla method is bugged. It truncates it to an 'int' so floats DON'T WORK",
   "inputs": [
     {
       "label": "Type",
