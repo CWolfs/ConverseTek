@@ -1,0 +1,24 @@
+{
+  "key": "Evaluate User Owns DLC",
+  "label": "If the user owns the dlc",
+  "view": ["inputs"],
+  "scope": "condition",
+  "category": "primary",
+  "inputs": [
+    {
+      "label": "Conditional",
+      "types": ["int"],
+      "values": [
+        { "viewlabel": "If the player owns the ", "text": "Owns", "value": 1 },
+        { "viewlabel": "If the player does not own the ", "text": "Does not own", "value": 0 }
+      ]
+    },
+    {
+      "label": "DLC",
+      "types": ["string"],
+      "values": [
+        { "viewlabel": "'{value}' DLC", "text": "flashpoint", "value": "flashpoint" }
+      ]
+    }
+  ]
+}
