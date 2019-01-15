@@ -11,8 +11,7 @@
       "values": [
         { "viewlabel": "Set company stat", "text": "Company Stats", "value": 1 },
         { "viewlabel": "Set commander stat", "text": "Commander Stats", "value": 2 },
-        { "viewlabel": "Set current system stat", "text": "Current System Stats", "value": 3 },
-        { "viewlabel": "Set flashpoint stat", "text": "Flashpoint Stats", "value": 4 }
+        { "viewlabel": "Set current system stat", "text": "Current System Stats", "value": 3 }
       ]
     },
     {
