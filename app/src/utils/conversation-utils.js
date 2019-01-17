@@ -1,6 +1,9 @@
 import uuid from 'uuid/v4';
 import md5 from 'md5';
 import findIndex from 'lodash.findindex';
+import sortBy from 'lodash.sortby';
+import range from 'lodash.range';
+import difference from 'lodash.difference';
 
 /* eslint-disable no-param-reassign, no-return-assign */
 export function generateId() {
@@ -28,7 +31,13 @@ export function regenerateConversationId(conversationAsset) {
 export function getId(idContainer) {
   let id = null;
   ({ id } = idContainer);
-  if (id === undefined) ({ id } = idContainer.idRef);
+  if (id === undefined) {
+    if (!idContainer.idRef) {
+      id = '-1';
+    } else {
+      ({ id } = idContainer.idRef);
+    }
+  }
   return id.split(':')[1] || id;
 }
 
@@ -136,6 +145,24 @@ export function consolidateSpeaker(conversationAsset) {
     if (speakerType === 'speakerId') {
       node.sourceInSceneRef = null;
     }
+  });
+}
+
+export function fillIndexGaps(conversationAsset) {
+  const { nodes } = conversationAsset.Conversation;
+  const usedIndexes = [];
+
+  nodes.forEach((node) => {
+    const { index } = node;
+    usedIndexes.push(index);
+  });
+
+  const sortedIndexes = sortBy(usedIndexes);
+  const rangeIndexes = range(sortedIndexes[sortedIndexes.length - 1]);
+  const indexGaps = difference(rangeIndexes, sortedIndexes);
+
+  indexGaps.forEach((index) => {
+    nodes.splice(index, 0, createNode(-1));
   });
 }
 
