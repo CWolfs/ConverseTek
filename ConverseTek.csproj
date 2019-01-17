@@ -52,6 +52,10 @@
     <Reference Include="ShadowrunSerializer">
       <HintPath>..\libs\ShadowrunSerializer.dll</HintPath>
     </Reference>
+
+    <Reference Include="System.Windows.Forms">
+      <HintPath>..\libs\System.Windows.Forms.dll</HintPath>
+    </Reference>
   </ItemGroup>
   
   <ItemGroup>
