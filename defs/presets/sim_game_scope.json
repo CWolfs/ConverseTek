@@ -1,0 +1,11 @@
+{
+  "key": "SimGameScope",
+  "label": "Sim Game Scope",
+  "type": "int",
+  "values": {
+    "1": "Company",
+    "2": "Commander",
+    "3": "System",
+    "4": "Flashpoint"
+  }
+}
