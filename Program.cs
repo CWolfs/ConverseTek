@@ -32,6 +32,7 @@ namespace ConverseTek {
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Reflection;
+    using System.Windows.Forms;
     using Chromely.CefSharp.Winapi;
     using Chromely.CefSharp.Winapi.ChromeHost;
     using Chromely.Core;
@@ -61,10 +62,19 @@ namespace ConverseTek {
 
                 string startUrl = "local://dist/index.html";
 
+                int defaultScreenWidth = 1480;
+                int defaultScreenHeight = 900;
+
+                int screenWidth = Screen.PrimaryScreen.Bounds.Width;
+                int screenHeight = Screen.PrimaryScreen.Bounds.Height;
+
+                if (screenWidth < defaultScreenWidth) defaultScreenWidth = screenWidth;
+                if (screenHeight < defaultScreenHeight) defaultScreenHeight = screenHeight;
+
                 ChromelyConfiguration config = ChromelyConfiguration
                                               .Create()
                                               .WithAppArgs(args)
-                                              .WithHostSize(1480, 900)
+                                              .WithHostSize(defaultScreenWidth, defaultScreenHeight)
                                               .WithLogFile("logs\\conversetek-interface.log")
                                               .WithStartUrl(startUrl)
                                               .WithLogSeverity(LogSeverity.Info)
