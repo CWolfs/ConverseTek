@@ -65,8 +65,8 @@ namespace ConverseTek {
                 int defaultScreenWidth = 1480;
                 int defaultScreenHeight = 900;
 
-                int screenWidth = Screen.PrimaryScreen.Bounds.Width;
-                int screenHeight = Screen.PrimaryScreen.Bounds.Height;
+                int screenWidth = Screen.PrimaryScreen.Bounds.Width - 100;
+                int screenHeight = Screen.PrimaryScreen.Bounds.Height - 100;
 
                 if (screenWidth < defaultScreenWidth) defaultScreenWidth = screenWidth;
                 if (screenHeight < defaultScreenHeight) defaultScreenHeight = screenHeight;
