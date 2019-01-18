@@ -15,10 +15,10 @@
 
   @media screen 
     and (min-height: 740px) 
-    and (max-height: 840px) {
+    and (max-height: 870px) {
     
     &__tree {
-      height: 50vh;
+      height: 48vh;
     }  
   }
 
@@ -27,7 +27,7 @@
     and (max-height: 749px) {
     
     &__tree {
-      height: 45vh;
+      height: 43vh;
     }
   }
 
@@ -36,7 +36,7 @@
     and (max-height: 680px) {
     
     &__tree {
-      height: 40vh;
+      height: 37vh;
     } 
   }
 
@@ -45,7 +45,7 @@
     and (max-height: 624px) {
     
     &__tree {
-      height: 35vh;
+      height: 33vh;
     } 
   }
 
