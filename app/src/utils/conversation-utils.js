@@ -4,6 +4,7 @@ import findIndex from 'lodash.findindex';
 import sortBy from 'lodash.sortby';
 import range from 'lodash.range';
 import difference from 'lodash.difference';
+import forEachRight from 'lodash.foreachright';
 
 /* eslint-disable no-param-reassign, no-return-assign */
 export function generateId() {
@@ -151,7 +152,20 @@ export function consolidateSpeaker(conversationAsset) {
 export function fillIndexGaps(conversationAsset) {
   const { nodes } = conversationAsset.Conversation;
   const usedIndexes = [];
+  const nodesToRemove = [];
 
+  // Remove all padding nodes first
+  nodes.forEach((node, position) => {
+    const { index } = node;
+    if (index === -1) nodesToRemove.push(position);
+  });
+
+
+  forEachRight(nodesToRemove, (position) => {
+    nodes.splice(position, 1);
+  });
+
+  // Fill gaps as reqiured with new padding
   nodes.forEach((node) => {
     const { index } = node;
     usedIndexes.push(index);
