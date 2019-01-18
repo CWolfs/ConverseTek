@@ -99,7 +99,11 @@ namespace ConverseTek.Controllers {
                 Log.Error(e);
             }
 
-            return null;
+            List<ConversationAsset> updatedConversations = conversationService.LoadConversations();
+            string conversationsJson = JsonConvert.SerializeObject(updatedConversations);
+            ChromelyResponse response = new ChromelyResponse();
+            response.Data = conversationsJson;
+            return response;
         }
     }
 }
