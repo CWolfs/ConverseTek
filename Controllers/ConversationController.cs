@@ -20,6 +20,7 @@ namespace ConverseTek.Controllers {
             this.RegisterGetRequest("/conversations", this.GetConversations);
             this.RegisterPostRequest("/conversations/put", this.UpdateConversations);
             this.RegisterPostRequest("/conversations/export", this.ExportConversations);
+            this.RegisterPostRequest("/conversations/export-all", this.ExportAllConversations);
         }
 
         private ChromelyResponse GetConversations(ChromelyRequest request) {
@@ -70,6 +71,36 @@ namespace ConverseTek.Controllers {
 
             List<ConversationAsset> conversations = conversationService.LoadConversations();
             string conversationsJson = JsonConvert.SerializeObject(conversations);
+            ChromelyResponse response = new ChromelyResponse();
+            response.Data = conversationsJson;
+            return response;
+        }
+
+        private ChromelyResponse ExportAllConversations(ChromelyRequest request) {
+            IDictionary<string, object> parameters = request.Parameters;
+            string postDataJson = (string)request.PostData.EnsureJson();
+            JObject data = JObject.Parse(postDataJson);
+
+            ConversationService conversationService = ConversationService.getInstance();
+
+            List<ConversationAsset> conversations = conversationService.LoadConversations();
+            foreach (ConversationAsset conversationAsset in conversations) {
+                conversationService.SaveConversation(conversationAsset, FileFormat.JSON);
+            }
+
+            try {
+                string conversationAssetString = data["conversationAsset"].ToString();
+     
+                if (conversationAssetString != "") {
+                    ConversationAsset conversationAsset = JsonConvert.DeserializeObject<ConversationAsset>(conversationAssetString);
+                    conversationService.SaveConversation(conversationAsset, FileFormat.JSON);
+                }
+            } catch (Exception e) {
+                Log.Error(e);
+            }
+
+            List<ConversationAsset> updatedConversations = conversationService.LoadConversations();
+            string conversationsJson = JsonConvert.SerializeObject(updatedConversations);
             ChromelyResponse response = new ChromelyResponse();
             response.Data = conversationsJson;
             return response;

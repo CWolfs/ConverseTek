@@ -188,10 +188,10 @@ class ConversationEditor extends Component {
         {activeNode && (
         <div className="conversation-editor__details">
           <Row gutter={16}>
-            <Col md={24} lg={12} className="conversation-editor__details-left">
+            <Col md={12} className="conversation-editor__details-left">
               <DialogTextArea node={activeNode} />
             </Col>
-            <Col md={24} lg={12} className="conversation-editor__details-right">
+            <Col md={12} className="conversation-editor__details-right">
               <Tabs defaultActiveKey="1">
                 <TabPane tab="General" key="1"><ConversationGeneral node={activeNode} /></TabPane>
                 {(isRoot || isResponse) && <TabPane tab="Conditions" key="2"><ConversationConditions node={activeNode} /></TabPane>}

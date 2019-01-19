@@ -1,0 +1,9 @@
+{
+  "key": "SimGameAddRemove",
+  "label": "Sim Game Add Remove",
+  "type": "int",
+  "values": {
+    "0": "Add to",
+    "1": "Remove from"
+  }
+}

@@ -7,7 +7,7 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <AssemblyName>ConverseTek</AssemblyName>
     <ApplicationIcon>conversetek.ico</ApplicationIcon>
-    <Version>1.1.2</Version>
+    <Version>1.2</Version>
     <Authors>Richard Griffiths</Authors>
     <Copyright>Richard Griffiths</Copyright>
     <StartupObject />
@@ -51,6 +51,10 @@
 
     <Reference Include="ShadowrunSerializer">
       <HintPath>..\libs\ShadowrunSerializer.dll</HintPath>
+    </Reference>
+
+    <Reference Include="System.Windows.Forms">
+      <HintPath>..\libs\System.Windows.Forms.dll</HintPath>
     </Reference>
   </ItemGroup>
   

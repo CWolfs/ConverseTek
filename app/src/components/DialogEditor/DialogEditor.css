@@ -13,6 +13,42 @@
     overflow: auto;
   }
 
+  @media screen 
+    and (min-height: 740px) 
+    and (max-height: 870px) {
+    
+    &__tree {
+      height: 48vh;
+    }  
+  }
+
+  @media screen 
+    and (min-height: 681px) 
+    and (max-height: 749px) {
+    
+    &__tree {
+      height: 43vh;
+    }
+  }
+
+  @media screen 
+    and (min-height: 625px) 
+    and (max-height: 680px) {
+    
+    &__tree {
+      height: 37vh;
+    } 
+  }
+
+  @media screen 
+    and (min-height: 1px) 
+    and (max-height: 624px) {
+    
+    &__tree {
+      height: 33vh;
+    } 
+  }
+
   .rst__lineHalfHorizontalRight::before, .rst__lineFullVertical::after, .rst__lineHalfVerticalTop::after, .rst__lineHalfVerticalBottom::after,
   .rst__lineChildren::after {
     background-color: gold;

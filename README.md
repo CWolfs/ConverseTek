@@ -9,7 +9,7 @@ Battletech uses a binary data format for its conversations. It isn't possible to
 
 ## Overview
 
-Latest release: **v1.1.2** | [Download](https://github.com/CWolfs/ConverseTek/releases/tag/v1.1.2)
+Latest release: **v1.2** | [Download](https://github.com/CWolfs/ConverseTek/releases/tag/v1.2)
 
 ### Complimentary Mods
 
@@ -57,6 +57,7 @@ All feedback is welcome in the [issues section](https://github.com/CWolfs/Conver
 * Flexible support for future conditions, actions and value getters
   * JSON definition extension support
 * Full support for `ExtendedConversations` mod
+* Flashpoint compatibility
 
 
 ## Dialog Tags

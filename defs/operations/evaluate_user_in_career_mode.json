@@ -1,0 +1,17 @@
+{
+  "key": "Evaluate User In Career Mode",
+  "label": "If the user is in Career Mode",
+  "view": ["inputs"],
+  "scope": "condition",
+  "category": "primary",
+  "inputs": [
+    {
+      "label": "Conditional",
+      "types": ["int"],
+      "values": [
+        { "viewlabel": "If the player is in Career Mode", "text": "In Career Mode", "value": 1 },
+        { "viewlabel": "If the player is not in Career Mode", "text": "Not In Career Mode", "value": 0 }
+      ]
+    }
+  ]
+}

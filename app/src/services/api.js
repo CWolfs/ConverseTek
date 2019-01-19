@@ -3,7 +3,7 @@ import { get, post } from './rest';
 import dataStore from '../stores/dataStore';
 import defStore from '../stores/defStore';
 
-import { consolidateSpeaker } from '../utils/conversation-utils';
+import { consolidateSpeaker, fillIndexGaps } from '../utils/conversation-utils';
 
 /*
 * CHROMELY DOESN'T SUPPORT PUTS SO PUTS AND DELETES ARE CURRENTLY POSTS WITH method DATA
@@ -32,6 +32,7 @@ export function getConversations() {
 
 export function updateConversation(id, conversationAsset) {
   consolidateSpeaker(conversationAsset);
+  fillIndexGaps(conversationAsset);
   return post('/conversations/put', { id }, { method: 'PUT', conversationAsset }).then((conversations) => {
     dataStore.setConversations(conversations);
     return conversations;
@@ -41,6 +42,11 @@ export function updateConversation(id, conversationAsset) {
 export function exportConversation(id, conversationAsset) {
   consolidateSpeaker(conversationAsset);
   return post('/conversations/export', { id }, { method: 'PUT', conversationAsset });
+}
+
+export function exportAllConversations(id, conversationAsset) {
+  if (conversationAsset) consolidateSpeaker(conversationAsset);
+  return post('/conversations/export-all', { id }, { method: 'PUT', conversationAsset });
 }
 
 /*

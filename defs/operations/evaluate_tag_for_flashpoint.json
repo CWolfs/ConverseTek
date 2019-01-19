@@ -1,0 +1,17 @@
+{
+  "key": "Evaluate Tag for Flashpoint",
+  "label": "If the Flashpoint",
+  "view": ["label", "inputs"],
+  "scope": "condition",
+  "category": "primary",
+  "inputs": [
+    {
+      "label": "Conditional",
+      "types": ["operation", "int"]
+    },
+    {
+      "label": "Tag Key",
+      "types": ["operation", "string"]
+    }
+  ]
+}
