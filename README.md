@@ -57,6 +57,7 @@ All feedback is welcome in the [issues section](https://github.com/CWolfs/Conver
 * Flexible support for future conditions, actions and value getters
   * JSON definition extension support
 * Full support for `ExtendedConversations` mod
+* Flashpoint compatibility
 
 
 ## Dialog Tags
