@@ -43,7 +43,6 @@
     "postcss-nested-ancestors": "^2.0.0",
     "postcss-simple-vars": "^4.1.0",
     "postcss-smart-import": "^0.7.6",
-    "postcss-sprites": "^4.2.1",
     "speed-measure-webpack-plugin": "^1.2.2",
     "style-loader": "^0.21.0",
     "uglifyjs-webpack-plugin": "^1.2.5",
