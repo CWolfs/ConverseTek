@@ -58,8 +58,8 @@ export function getRootDrives() {
   return get('/filesystem');
 }
 
-export function getDirectories(path) {
-  return get('/directories', { path });
+export function getDirectories(path, includeFiles = false) {
+  return get('/directories', { path, includeFiles });
 }
 
 export function saveWorkingDirectory(path) {

@@ -38,13 +38,24 @@ namespace ConverseTek.Controllers {
             try {
                 IDictionary<string, object> requestParams = request.Parameters;
                 string path = (string)requestParams["path"];
+                bool includeFiles = (bool)requestParams["includeFiles"];
 
                 FileSystemService fileSystemService = FileSystemService.getInstance();
                 List<FsDirectory> directories = fileSystemService.GetDirectories(path);
-                string directoryJson = JsonConvert.SerializeObject(directories);
+                List<FsFile> files = new List<FsFile>();
+
+                if (includeFiles) {
+                    files = fileSystemService.GetFiles(path);
+                }
+
+                FsView fsView = new FsView();
+                fsView.directories = directories;
+                fsView.files = files;
+
+                string fsJson = JsonConvert.SerializeObject(fsView);
 
                 ChromelyResponse response = new ChromelyResponse();
-                response.Data = directoryJson;
+                response.Data = fsJson;
                 return response;
             } catch (Exception e) {
                 Log.Error(e);

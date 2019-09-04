@@ -32,6 +32,7 @@ namespace ConverseTek.Services {
             FsDirectory directory = new FsDirectory();
             directory.Name = drive.Name;
             directory.Path = drive.Name;
+            directory.IsDirectory = true;
             directory.HasChildren = Directory.GetDirectories(drive.Name).Length > 0;
             rootDrives.Add(directory);
           }
@@ -56,6 +57,7 @@ namespace ConverseTek.Services {
       backLink.Name = "..";
       backLink.Path = (parentDirectoryInfo == null) ? "{drives}" : parentDirectoryInfo.FullName;
       backLink.HasChildren = true;
+      backLink.IsDirectory = true;
       directories.Add(backLink);
 
       try {
@@ -65,6 +67,7 @@ namespace ConverseTek.Services {
           FsDirectory directory = new FsDirectory();
           directory.Name = directoryInfo.Name;
           directory.Path = directoryPath;
+          directory.IsDirectory = true;
           
           try {
             directory.HasChildren = Directory.GetDirectories(directoryPath).Length > 0;
@@ -81,6 +84,30 @@ namespace ConverseTek.Services {
       }
 
       return directories;
+    }
+
+    public List<FsFile> GetFiles(string path) {
+      List<FsFile> files = new List<FsFile>();
+
+      // Guard: No files at root
+      if (path == "{drives}") return files;
+
+      try {
+        string[] filePaths = Directory.GetFiles(path, "*.json");
+        foreach (string filePath in filePaths) {
+          FileInfo fileInfo = new FileInfo(filePath);
+          FsFile file = new FsFile();
+          file.Name = fileInfo.Name;
+          file.Path = filePath;
+          file.IsFile = true;
+
+          files.Add(file);
+        }
+      } catch (Exception error) {
+         Log.Error(error.ToString());
+      }
+
+      return files;
     }
   }
 }
