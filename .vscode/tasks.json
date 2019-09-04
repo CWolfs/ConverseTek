@@ -36,8 +36,8 @@
         },
         {
             "label": "UI Build",
-            "type": "shell",
-            "command": "yarn --cwd ./app build"
+            "type": "process",
+            "command": "npm run build --prefix app"
         },
         {
             "label": "Fast Run",
