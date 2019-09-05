@@ -77,7 +77,7 @@
     </Exec>
     <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE." />
 
-    <Exec Command="yarn build" WorkingDirectory="app" ContinueOnError="false" ConsoleToMSBuild="true">
+    <Exec Command="npm run build" WorkingDirectory="app" ContinueOnError="false" ConsoleToMSBuild="true">
       <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
     </Exec>
 
@@ -91,7 +91,7 @@
     </Exec>
     <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE." />
 
-    <Exec Command="yarn prod" WorkingDirectory="app" ContinueOnError="true" ConsoleToMSBuild="false">
+    <Exec Command="npm run prod" WorkingDirectory="app" ContinueOnError="true" ConsoleToMSBuild="false">
       <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
     </Exec>
 
