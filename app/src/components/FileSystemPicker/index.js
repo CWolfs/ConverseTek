@@ -11,6 +11,7 @@ import {
   getDirectories,
   saveWorkingDirectory,
   getConversations,
+  importConversation,
 } from '../../services/api';
 
 import './FileSystemPicker.css';
@@ -22,10 +23,14 @@ class FileSystemPicker extends Component {
   constructor(props) {
     super(props);
 
+    const { modalStore } = props;
+
     this.state = {
       directories: [],
+      files: [],
       selectedItem: null,
       loading: false,
+      fileMode: modalStore.props.fileMode,
     };
 
     getRootDrives().then(directories => this.setState({ directories }));
@@ -37,32 +42,48 @@ class FileSystemPicker extends Component {
     this.setupModal();
   }
 
-  componentWillReceiveProps() {
+  componentWillReceiveProps(nextProps) {
+    const { modalStore } = nextProps;
+    this.setState({ fileMode: modalStore.props.fileMode });
+
     this.setupModal();
   }
 
   onOk() {
     const { modalStore } = this.props;
-    const { selectedItem } = this.state;
+    const { selectedItem, fileMode } = this.state;
 
     this.setState({ loading: true });
     modalStore.setIsLoading(true);
 
-    saveWorkingDirectory(selectedItem.Path)
-      .then(() => getConversations())
-      .then(() => {
-        selectedItem.active = false;
-        this.setState({
-          selectedItem: null,
-          loading: false,
+    if (fileMode) {
+      importConversation(selectedItem.Path)
+        .then(() => getConversations())
+        .then(() => {
+          selectedItem.active = false;
+          this.setState({
+            selectedItem: null,
+            loading: false,
+          });
+          return modalStore.closeModal();
         });
-        return modalStore.closeModal();
-      });
+    } else {
+      saveWorkingDirectory(selectedItem.Path)
+        .then(() => getConversations())
+        .then(() => {
+          selectedItem.active = false;
+          this.setState({
+            selectedItem: null,
+            loading: false,
+          });
+          return modalStore.closeModal();
+        });
+    }
   }
 
   onDirectoryClicked(item) {
     const { modalStore } = this.props;
-    const { loading } = this.state;
+    const { loading, fileMode } = this.state;
 
     // GUARD - lock down things if loading
     if (loading) return;
@@ -74,24 +95,29 @@ class FileSystemPicker extends Component {
     this.debouncedClickEvents = this.debouncedClickEvents || [];
 
     const callback = debounce(() => {
-      const { directories } = this.state;
-      let newDirectories = [...directories];
+      const { directories, files } = this.state;
+      let newFsItems = [
+        ...sortBy(directories, fsItem => fsItem.Name.toLowerCase()),
+        ...sortBy(files, fsItem => fsItem.Name.toLowerCase()),
+      ];
 
       const clickedItem = {
         ...item,
         active: !item.active,
       };
 
-      remove(newDirectories, directory => directory.Path === clickedItem.Path);
-      newDirectories =
-        newDirectories.map(nonSelectedItem => ({ ...nonSelectedItem, active: false }));
-      newDirectories.push(clickedItem);
-      newDirectories = sortBy(newDirectories, directory => directory.Name.toLowerCase());
+      remove(newFsItems, fsItem => fsItem.Path === clickedItem.Path);
+      newFsItems =
+        newFsItems.map(nonSelectedItem => ({ ...nonSelectedItem, active: false }));
+      newFsItems.push(clickedItem);
+      newFsItems = sortBy(newFsItems, fsItem => fsItem.Name.toLowerCase());
 
       modalStore.setDisableOk(!clickedItem.active);
+      if (fileMode && clickedItem.IsDirectory) modalStore.setDisableOk(true);
 
       this.setState({
-        directories: newDirectories,
+        directories: newFsItems.filter(fsItem => fsItem.IsDirectory),
+        files: newFsItems.filter(fsItem => fsItem.IsFile),
         selectedItem: (clickedItem.active) ? clickedItem : null,
       });
 
@@ -104,13 +130,13 @@ class FileSystemPicker extends Component {
 
   onDirectoryDoubleClicked(item) {
     const { modalStore } = this.props;
-    const { loading } = this.state;
+    const { loading, fileMode } = this.state;
 
     // GUARD - lock down things if loading
     if (loading) return;
 
     // GUARD - If item has no children then ignore double clicks
-    if (!item.HasChildren) return;
+    if (!fileMode && !item.HasChildren) return;
 
     // If there were click events registered we cancel them
     if (this.debouncedClickEvents && this.debouncedClickEvents.length > 0) {
@@ -118,23 +144,38 @@ class FileSystemPicker extends Component {
       this.debouncedClickEvents = [];
     }
 
-    if (item.HasChildren) {
+    if (item.HasChildren || (fileMode && item.IsDirectory)) {
       this.setState({ selectedItem: null });
       modalStore.setDisableOk(true);
-      getDirectories(item.Path).then(directories => this.setState({ directories }));
+      getDirectories(item.Path, fileMode)
+        .then(({ directories, files }) => this.setState({ directories, files }));
     }
   }
 
   setupModal() {
     const { modalStore } = this.props;
+    const { fileMode } = this.state;
+
     modalStore.setOnOk(this.onOk);
-    modalStore.setTitle('Select a conversation directory');
+    modalStore.setTitle(`Select a conversation ${fileMode ? '' : 'directory'}`);
     modalStore.setOkLabel('Load');
     modalStore.setLoadingLabel('Loading');
   }
 
+  getItemIcon = (item) => {
+    if (item.HasChildren) return <Icon type="folder-add" className="file-system-picker__directory-icon" />;
+
+    if (item.File) return <Icon type="file-text" className="file-system-picker__file-icon" />;
+
+    return <Icon type="folder" className="file-system-picker__directory-icon" />;
+  };
+
   render() {
-    const { directories } = this.state;
+    const { directories, files } = this.state;
+    const items = [
+      ...directories,
+      ...files,
+    ];
 
     return (
       <div className="file-system-picker">
@@ -144,7 +185,7 @@ class FileSystemPicker extends Component {
         <div className="file-system-picker__directory-list">
           <List
             itemLayout="horizontal"
-            dataSource={directories}
+            dataSource={items}
             renderItem={(item) => {
               const itemClasses = classnames('file-system-picker__directory-item', {
                 'file-system-picker__directory-item--active': item.active,
@@ -157,11 +198,7 @@ class FileSystemPicker extends Component {
                   onClick={() => this.onDirectoryClicked(item)}
                   onDoubleClick={() => this.onDirectoryDoubleClicked(item)}
                 >
-                  {(item.HasChildren) ?
-                    <Icon type="folder-add" className="file-system-picker__directory-icon" />
-                  :
-                    <Icon type="folder" className="file-system-picker__directory-icon" />
-                  }
+                  {this.getItemIcon(item)}
                   <span className="file-system-picker__directory-name">{item.Name}</span>
                 </ListItem>
               );

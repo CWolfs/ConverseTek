@@ -5,16 +5,17 @@ namespace ConverseTek.Data {
     public string Name;
     public string Path;
     public bool HasChildren;
+    public bool IsDirectory;
   }
 
-  public class FsDirectoryView {
+  public struct FsFile {
+    public string Name;
+    public string Path;
+    public bool IsFile;
+  }
 
-    public string DesktopPath = "";
-    public string MyComputerPath = "";
-    public List<FsDirectory> DirectoryList = new List<FsDirectory>();
-
-    public FsDirectoryView() {
-      
-    }
+  public struct FsView {
+    public List<FsDirectory> directories;
+    public List<FsFile> files;
   }
 }

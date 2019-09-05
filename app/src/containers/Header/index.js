@@ -63,6 +63,14 @@ class Header extends Component {
             </MenuItem>
             )}
 
+            {workingDirectory && (
+            <MenuItem
+              onClick={() => modalStore.setModelContent(FileSystemPicker, { fileMode: true })}
+            >
+              Import Conversation from JSON
+            </MenuItem>
+            )}
+
             {hasActiveConversation && (
             <MenuItem
               onClick={() => {

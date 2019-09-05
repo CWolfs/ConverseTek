@@ -24,7 +24,7 @@
     background-color: #2ab0f77d;
   }
 
-  &__directory-icon {
+  &__directory-icon, &__file-icon {
     margin-right: $smallMediumSpace;
   }
 
