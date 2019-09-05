@@ -58,8 +58,23 @@ namespace ConverseTek.Services {
           conversationAsset = new ConversationAsset(filePath, conversation);
         }
       } catch (Exception error) {
-          Log.Error(error.ToString());
-          return null;
+        Log.Error(error.ToString());
+        return null;
+      }
+
+      return conversationAsset;
+    }
+
+    public ConversationAsset ImportConversation(string filePath) {
+      ConversationAsset conversationAsset = null;
+
+      try {
+        string json = File.ReadAllText(filePath);
+        Conversation conversation = JsonConvert.DeserializeObject<Conversation>(json);
+        conversationAsset = new ConversationAsset(filePath, conversation);
+      } catch (Exception error) {
+        Log.Error(error.ToString());
+        return null;
       }
 
       return conversationAsset;

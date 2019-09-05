@@ -21,6 +21,7 @@ namespace ConverseTek.Controllers {
             this.RegisterPostRequest("/conversations/put", this.UpdateConversations);
             this.RegisterPostRequest("/conversations/export", this.ExportConversations);
             this.RegisterPostRequest("/conversations/export-all", this.ExportAllConversations);
+            this.RegisterPostRequest("/conversations/import", this.ImportConversation);
         }
 
         private ChromelyResponse GetConversations(ChromelyRequest request) {
@@ -75,6 +76,26 @@ namespace ConverseTek.Controllers {
             response.Data = conversationsJson;
             return response;
         }
+
+        private ChromelyResponse ImportConversation(ChromelyRequest request) {
+            IDictionary<string, object> requestParams = request.Parameters;
+            string path = (string)requestParams["path"];
+
+            ConversationService conversationService = ConversationService.getInstance();
+
+            try {
+                ConversationAsset conversationAsset = conversationService.ImportConversation(path);
+                conversationService.SaveConversation(conversationAsset, FileFormat.BINARY);
+            } catch (Exception e) {
+                Log.Error(e);
+            }
+
+            List<ConversationAsset> conversations = conversationService.LoadConversations();
+            string conversationsJson = JsonConvert.SerializeObject(conversations);
+            ChromelyResponse response = new ChromelyResponse();
+            response.Data = conversationsJson;
+            return response;
+        } 
 
         private ChromelyResponse ExportAllConversations(ChromelyRequest request) {
             IDictionary<string, object> parameters = request.Parameters;

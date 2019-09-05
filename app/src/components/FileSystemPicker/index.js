@@ -11,6 +11,7 @@ import {
   getDirectories,
   saveWorkingDirectory,
   getConversations,
+  importConversation,
 } from '../../services/api';
 
 import './FileSystemPicker.css';
@@ -50,21 +51,34 @@ class FileSystemPicker extends Component {
 
   onOk() {
     const { modalStore } = this.props;
-    const { selectedItem } = this.state;
+    const { selectedItem, fileMode } = this.state;
 
     this.setState({ loading: true });
     modalStore.setIsLoading(true);
 
-    saveWorkingDirectory(selectedItem.Path)
-      .then(() => getConversations())
-      .then(() => {
-        selectedItem.active = false;
-        this.setState({
-          selectedItem: null,
-          loading: false,
+    if (fileMode) {
+      importConversation(selectedItem.Path)
+        .then(() => getConversations())
+        .then(() => {
+          selectedItem.active = false;
+          this.setState({
+            selectedItem: null,
+            loading: false,
+          });
+          return modalStore.closeModal();
         });
-        return modalStore.closeModal();
-      });
+    } else {
+      saveWorkingDirectory(selectedItem.Path)
+        .then(() => getConversations())
+        .then(() => {
+          selectedItem.active = false;
+          this.setState({
+            selectedItem: null,
+            loading: false,
+          });
+          return modalStore.closeModal();
+        });
+    }
   }
 
   onDirectoryClicked(item) {
@@ -122,7 +136,7 @@ class FileSystemPicker extends Component {
     if (loading) return;
 
     // GUARD - If item has no children then ignore double clicks
-    if (!item.HasChildren) return;
+    if (!fileMode && !item.HasChildren) return;
 
     // If there were click events registered we cancel them
     if (this.debouncedClickEvents && this.debouncedClickEvents.length > 0) {
@@ -130,7 +144,7 @@ class FileSystemPicker extends Component {
       this.debouncedClickEvents = [];
     }
 
-    if (item.HasChildren) {
+    if (item.HasChildren || (fileMode && item.IsDirectory)) {
       this.setState({ selectedItem: null });
       modalStore.setDisableOk(true);
       getDirectories(item.Path, fileMode)
@@ -149,19 +163,17 @@ class FileSystemPicker extends Component {
   }
 
   getItemIcon = (item) => {
-    const { fileMode } = this.state;
-
     if (item.HasChildren) return <Icon type="folder-add" className="file-system-picker__directory-icon" />;
 
-    if (fileMode) return <Icon type="file-text" className="file-system-picker__file-icon" />;
+    if (item.File) return <Icon type="file-text" className="file-system-picker__file-icon" />;
 
     return <Icon type="folder" className="file-system-picker__directory-icon" />;
   };
 
   render() {
-    const { directories, files, fileMode } = this.state;
+    const { directories, files } = this.state;
     const items = [
-      ...directories.filter(directory => (fileMode && directory.HasChildren) || !fileMode),
+      ...directories,
       ...files,
     ];
 

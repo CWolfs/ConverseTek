@@ -49,6 +49,11 @@ export function exportAllConversations(id, conversationAsset) {
   return post('/conversations/export-all', { id }, { method: 'PUT', conversationAsset });
 }
 
+export function importConversation(path) {
+  dataStore.clearActiveConversation();
+  return post('/conversations/import', { path });
+}
+
 /*
 ==========================
  || FILE SYSTEM METHODS ||
