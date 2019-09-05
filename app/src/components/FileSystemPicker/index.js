@@ -81,24 +81,29 @@ class FileSystemPicker extends Component {
     this.debouncedClickEvents = this.debouncedClickEvents || [];
 
     const callback = debounce(() => {
-      const { directories } = this.state;
-      let newDirectories = [...directories];
+      const { directories, files } = this.state;
+      let newFsItems = [
+        ...sortBy(directories, fsItem => fsItem.Name.toLowerCase()),
+        ...sortBy(files, fsItem => fsItem.Name.toLowerCase()),
+      ];
 
       const clickedItem = {
         ...item,
         active: !item.active,
       };
 
-      remove(newDirectories, directory => directory.Path === clickedItem.Path);
-      newDirectories =
-        newDirectories.map(nonSelectedItem => ({ ...nonSelectedItem, active: false }));
-      newDirectories.push(clickedItem);
-      newDirectories = sortBy(newDirectories, directory => directory.Name.toLowerCase());
+      remove(newFsItems, fsItem => fsItem.Path === clickedItem.Path);
+      newFsItems =
+        newFsItems.map(nonSelectedItem => ({ ...nonSelectedItem, active: false }));
+      newFsItems.push(clickedItem);
+      newFsItems = sortBy(newFsItems, fsItem => fsItem.Name.toLowerCase());
 
       modalStore.setDisableOk(!clickedItem.active);
+      if (fileMode && clickedItem.IsDirectory) modalStore.setDisableOk(true);
 
       this.setState({
-        directories: newDirectories,
+        directories: newFsItems.filter(fsItem => fsItem.IsDirectory),
+        files: newFsItems.filter(fsItem => fsItem.IsFile),
         selectedItem: (clickedItem.active) ? clickedItem : null,
       });
 
