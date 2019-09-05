@@ -49,6 +49,11 @@ export function exportAllConversations(id, conversationAsset) {
   return post('/conversations/export-all', { id }, { method: 'PUT', conversationAsset });
 }
 
+export function importConversation(path) {
+  dataStore.clearActiveConversation();
+  return post('/conversations/import', { path });
+}
+
 /*
 ==========================
  || FILE SYSTEM METHODS ||
@@ -58,8 +63,8 @@ export function getRootDrives() {
   return get('/filesystem');
 }
 
-export function getDirectories(path) {
-  return get('/directories', { path });
+export function getDirectories(path, includeFiles = false) {
+  return get('/directories', { path, includeFiles });
 }
 
 export function saveWorkingDirectory(path) {

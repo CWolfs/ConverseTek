@@ -18,8 +18,9 @@ class ModalStore {
     this.onCancel = this.closeModal;
   }
 
-  @action setModelContent(component, show = true) {
+  @action setModelContent(component, props = {}, show = true) {
     this.ModalContent = component;
+    this.props = props;
     if (show) this.showModal(true);
   }
 
@@ -63,6 +64,10 @@ class ModalStore {
     this.reset();
   }
 
+  @action setProps = (props) => {
+    this.props = props;
+  }
+
   @action reset = () => {
     this.isVisible = false;
     defer(() => {
@@ -75,6 +80,7 @@ class ModalStore {
       this.isLoading = false;
       this.width = '70vw';
       this.showCancelButton = true;
+      this.props = {};
     });
   }
 }
