@@ -12,7 +12,8 @@
         "specialLink": ["to"]
       }
     ],
-    "max-len": ["error", { "code": 140 }]
+    "max-len": ["error", { "code": 140 }],
+    "arrow-parens": ["error", "always"]
   },
   "parser": "babel-eslint",
   "globals": {
