@@ -22,9 +22,10 @@
   &__regenerate-ids-button {
     margin-right: $smallSpace;
   }
-  
+
   &__details {
-    flex: 1;
+    margin-top: $smallMediumSpace;
+    height: 30vh;
     overflow: hidden;
     padding-top: 1px;
 
@@ -51,7 +52,7 @@
       .ant-tabs {
         color: white;
         height: 100%;
-        
+
         &-bar {
           margin: 0;
         }
