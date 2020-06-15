@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { observer, inject } from 'mobx-react';
@@ -156,6 +158,13 @@ class DialogEditor extends Component {
     return allowDrop;
   }
 
+  onClicked = (event) => {
+    const { nodeStore } = this.props;
+    if (event.target.className === 'rst__node' || event.target.className === 'rst__lineBlock') {
+      nodeStore.clearActiveNode();
+    }
+  };
+
   render() {
     const { nodeStore } = this.props;
     const { treeData: data, treeWidth } = this.state;
@@ -168,6 +177,7 @@ class DialogEditor extends Component {
           ref={(ref) => {
             this.treeElement = ref;
           }}
+          onClick={this.onClicked}
         >
           <DialogEditorContextMenu id="dialog-context-menu" />
           <SortableTree
