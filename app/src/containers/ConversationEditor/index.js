@@ -32,8 +32,7 @@ class ConversationEditor extends Component {
     this.handleNameChange = this.handleNameChange.bind(this);
     this.onSaveButtonClicked = this.onSaveButtonClicked.bind(this);
     this.onRegenerateNodeIdsButtonClicked = this.onRegenerateNodeIdsButtonClicked.bind(this);
-    this.onRegenerateConversationIdButtonClicked =
-      this.onRegenerateConversationIdButtonClicked.bind(this);
+    this.onRegenerateConversationIdButtonClicked = this.onRegenerateConversationIdButtonClicked.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -52,10 +51,9 @@ class ConversationEditor extends Component {
 
     this.createNewUnsavedConversation(conversationAsset);
 
-    updateConversation(conversationAsset.Conversation.idRef.id, conversationAsset)
-      .then(() => {
-        message.success('Save successful');
-      });
+    updateConversation(conversationAsset.Conversation.idRef.id, conversationAsset).then(() => {
+      message.success('Save successful');
+    });
     dataStore.updateActiveConversation(conversationAsset); // local update for speed
   }
 
@@ -118,7 +116,6 @@ class ConversationEditor extends Component {
     return (
       <div className="conversation-editor">
         <div>
-          <h2>Editor</h2>
           <div className="conversation-editor__buttons">
             <Popconfirm
               title="Are you sure you want to regenerate all dialog node ids?"
@@ -127,20 +124,11 @@ class ConversationEditor extends Component {
               okText="Yes"
               cancelText="No"
             >
-              <Button
-                className="conversation-editor__regenerate-ids-button"
-                type="secondary"
-                size="small"
-              >
+              <Button className="conversation-editor__regenerate-ids-button" type="secondary" size="small">
                 <Icon type="retweet" />
               </Button>
             </Popconfirm>
-            <Button
-              className="conversation-editor__save-button"
-              type="primary"
-              size="small"
-              onClick={this.onSaveButtonClicked}
-            >
+            <Button className="conversation-editor__save-button" type="primary" size="small" onClick={this.onSaveButtonClicked}>
               <Icon type="save" />
             </Button>
           </div>
@@ -150,11 +138,7 @@ class ConversationEditor extends Component {
           <Row gutter={16}>
             <Col span={11}>
               <FormItem {...formItemLayout} label="Id">
-                <Input
-                  className="conversation-editor__id-input"
-                  value={conversationId}
-                  onChange={this.handleIdChange}
-                />
+                <Input className="conversation-editor__id-input" value={conversationId} onChange={this.handleIdChange} />
                 <Popconfirm
                   title="Are you sure you want to regenerate the conversation id?"
                   placement="bottomRight"
@@ -162,11 +146,7 @@ class ConversationEditor extends Component {
                   okText="Yes"
                   cancelText="No"
                 >
-                  <Button
-                    className="conversation-editor__regenerate-ids-button"
-                    type="secondary"
-                    size="small"
-                  >
+                  <Button className="conversation-editor__regenerate-ids-button" type="secondary" size="small">
                     <Icon type="retweet" />
                   </Button>
                 </Popconfirm>
@@ -174,10 +154,7 @@ class ConversationEditor extends Component {
             </Col>
             <Col span={12}>
               <FormItem {...formItemLayout} label="Name">
-                <Input
-                  value={Conversation.ui_name}
-                  onChange={this.handleNameChange}
-                />
+                <Input value={Conversation.ui_name} onChange={this.handleNameChange} />
               </FormItem>
             </Col>
           </Row>
@@ -186,20 +163,28 @@ class ConversationEditor extends Component {
         <DialogEditor conversationAsset={conversationAsset} rebuild={rebuild} />
 
         {activeNode && (
-        <div className="conversation-editor__details">
-          <Row gutter={16}>
-            <Col md={12} className="conversation-editor__details-left">
-              <DialogTextArea node={activeNode} />
-            </Col>
-            <Col md={12} className="conversation-editor__details-right">
-              <Tabs defaultActiveKey="1">
-                <TabPane tab="General" key="1"><ConversationGeneral node={activeNode} /></TabPane>
-                {(isRoot || isResponse) && <TabPane tab="Conditions" key="2"><ConversationConditions node={activeNode} /></TabPane>}
-                <TabPane tab="Actions" key="3"><ConversationActions node={activeNode} /></TabPane>
-              </Tabs>
-            </Col>
-          </Row>
-        </div>
+          <div className="conversation-editor__details">
+            <Row gutter={16}>
+              <Col md={12} className="conversation-editor__details-left">
+                <DialogTextArea node={activeNode} />
+              </Col>
+              <Col md={12} className="conversation-editor__details-right">
+                <Tabs defaultActiveKey="1">
+                  <TabPane tab="General" key="1">
+                    <ConversationGeneral node={activeNode} />
+                  </TabPane>
+                  {(isRoot || isResponse) && (
+                    <TabPane tab="Conditions" key="2">
+                      <ConversationConditions node={activeNode} />
+                    </TabPane>
+                  )}
+                  <TabPane tab="Actions" key="3">
+                    <ConversationActions node={activeNode} />
+                  </TabPane>
+                </Tabs>
+              </Col>
+            </Row>
+          </div>
         )}
       </div>
     );

@@ -1,6 +1,8 @@
 @import '../../css/constants.css';
 
 .footer {
+  position: fixed;
+  width: 100%;
   background-color: $backgroundSecondary;
   padding: $tinySpace;
   color: $grey4;
