@@ -9,7 +9,7 @@
         "build",
         "--configuration",
         "Release",
-        "D:/Modding/ConverseTek/ConverseTek.csproj",
+        "K:/Modding/ConverseTek/ConverseTek.csproj",
         "/t:BuildRelease"
       ],
       "problemMatcher": "$msCompile"
@@ -20,7 +20,7 @@
       "type": "process",
       "args": [
         "build",
-        "D:/Modding/ConverseTek/ConverseTek.csproj",
+        "K:/Modding/ConverseTek/ConverseTek.csproj",
         "/t:BuildDebug"
       ],
       "problemMatcher": "$msCompile"
@@ -31,7 +31,7 @@
       "type": "process",
       "args": [
         "build",
-        "D:/Modding/ConverseTek/ConverseTek.csproj",
+        "K:/Modding/ConverseTek/ConverseTek.csproj",
         "/t:BuildServer"
       ],
       "problemMatcher": "$msCompile"
@@ -43,7 +43,7 @@
     },
     {
       "label": "Fast Run",
-      "command": "D:/Modding/ConverseTek/bin/x64/Debug/net472/ConverseTek.exe",
+      "command": "K:/Modding/ConverseTek/bin/x64/Debug/net472/ConverseTek.exe",
       "type": "shell"
     }
   ]

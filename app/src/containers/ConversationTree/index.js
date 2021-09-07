@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { observer, inject } from 'mobx-react';
+import sortBy from 'lodash.sortby';
 
 import FileTree from '../../components/FileTree';
 
@@ -9,10 +10,13 @@ import './ConversationTree.css';
 @observer
 class ConversationTree extends Component {
   static remapConversationData(conversationAssets) {
-    return Array.from(conversationAssets.values()).map(asset => ({
-      key: asset.Conversation.idRef.id,
-      label: asset.Conversation.ui_name,
-    }));
+    return sortBy(
+      Array.from(conversationAssets.values()).map((asset) => ({
+        key: asset.Conversation.idRef.id,
+        label: asset.Conversation.ui_name,
+      })),
+      (c) => c.label,
+    );
   }
 
   constructor(props) {
@@ -31,17 +35,11 @@ class ConversationTree extends Component {
     const { conversationAssets, activeConversationAsset } = dataStore;
 
     const data = ConversationTree.remapConversationData(conversationAssets);
-    const selectedKeys = (activeConversationAsset) ?
-      [activeConversationAsset.Conversation.idRef.id] : undefined;
+    const selectedKeys = activeConversationAsset ? [activeConversationAsset.Conversation.idRef.id] : undefined;
 
     return (
       <div className="conversation-tree">
-        <FileTree
-          title="Conversations"
-          data={data}
-          onSelected={this.onNodeSelected}
-          selectedKeys={selectedKeys}
-        />
+        <FileTree title="Conversations" data={data} onSelected={this.onNodeSelected} selectedKeys={selectedKeys} />
       </div>
     );
   }
