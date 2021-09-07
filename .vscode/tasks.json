@@ -1,48 +1,50 @@
 {
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "label": "Release",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "build --configuration Release",
-                "D:/Modding/ConverseTek/ConverseTek.csproj",
-                "/t:BuildRelease"
-            ],
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "Build All",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "build",
-                "D:/Modding/ConverseTek/ConverseTek.csproj",
-                "/t:BuildDebug"
-            ],
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "Build Server",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "build",
-                "D:/Modding/ConverseTek/ConverseTek.csproj",
-                "/t:BuildServer"
-            ],
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "UI Build",
-            "type": "shell",
-            "command": "npm run build --prefix app"
-        },
-        {
-            "label": "Fast Run",
-            "command": "D:/Modding/ConverseTek/bin/x64/Debug/net472/ConverseTek.exe",
-            "type": "shell"
-        }
-    ]
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Release",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "--configuration",
+        "Release",
+        "K:/Modding/ConverseTek/ConverseTek.csproj",
+        "/t:BuildRelease"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Build All",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "K:/Modding/ConverseTek/ConverseTek.csproj",
+        "/t:BuildDebug"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Build Server",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "K:/Modding/ConverseTek/ConverseTek.csproj",
+        "/t:BuildServer"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "UI Build",
+      "type": "shell",
+      "command": "npm run build --prefix app"
+    },
+    {
+      "label": "Fast Run",
+      "command": "K:/Modding/ConverseTek/bin/x64/Debug/net472/ConverseTek.exe",
+      "type": "shell"
+    }
+  ]
 }
