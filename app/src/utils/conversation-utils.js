@@ -64,7 +64,7 @@ export function createConversation(filePath) {
     FilePath: `${filePath}/${fileName}.bytes`,
     Conversation: {
       idRef: {
-        id: generateId(),
+        id,
       },
       ui_name: 'Unnamed-Conversation',
       nodes: [],
