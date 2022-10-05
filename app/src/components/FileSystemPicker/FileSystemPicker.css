@@ -5,6 +5,12 @@
 
   &__quick-links {
     margin-right: $mediumLargeSpace;
+
+    .anticon {
+      display: block;
+      padding: 4px;
+      margin-top: 6px;
+    }
   }
 
   &__directory-list {
@@ -20,11 +26,14 @@
     padding-right: 8px;
   }
 
-  &__directory-item:hover, &__directory-item:focus, &__directory-item--active {
+  &__directory-item:hover,
+  &__directory-item:focus,
+  &__directory-item--active {
     background-color: #2ab0f77d;
   }
 
-  &__directory-icon, &__file-icon {
+  &__directory-icon,
+  &__file-icon {
     margin-right: $smallMediumSpace;
   }
 

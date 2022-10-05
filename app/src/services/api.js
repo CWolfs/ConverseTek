@@ -6,9 +6,9 @@ import defStore from '../stores/defStore';
 import { consolidateSpeaker, fillIndexGaps } from '../utils/conversation-utils';
 
 /*
-* CHROMELY DOESN'T SUPPORT PUTS SO PUTS AND DELETES ARE CURRENTLY POSTS WITH method DATA
-* e.g. { method: 'DELETE' }
-*/
+ * CHROMELY DOESN'T SUPPORT PUTS SO PUTS AND DELETES ARE CURRENTLY POSTS WITH method DATA
+ * e.g. { method: 'DELETE' }
+ */
 
 /*
 ======================
@@ -67,6 +67,10 @@ export function getDirectories(path, includeFiles = false) {
   return get('/directories', { path, includeFiles });
 }
 
+export function getQuickLinks() {
+  return get('/quicklinks');
+}
+
 export function saveWorkingDirectory(path) {
   dataStore.setWorkingDirectory(path);
   return post('/working-directory', { path });
@@ -78,9 +82,8 @@ export function saveWorkingDirectory(path) {
  =========================
 */
 export function getDefinitions() {
-  return get('/definitions')
-    .then((definitions) => {
-      defStore.setDefinitions(definitions);
-      return definitions;
-    });
+  return get('/definitions').then((definitions) => {
+    defStore.setDefinitions(definitions);
+    return definitions;
+  });
 }

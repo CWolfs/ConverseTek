@@ -13,7 +13,8 @@
       }
     ],
     "max-len": ["error", { "code": 140 }],
-    "arrow-parens": ["error", "always"]
+    "arrow-parens": ["error", "always"],
+    "object-curly-newline": 0
   },
   "parser": "babel-eslint",
   "globals": {

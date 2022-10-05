@@ -8,13 +8,7 @@ const { Option } = Select;
 @observer
 class EditableSelect extends Component {
   render() {
-    const {
-      value,
-      options,
-      placeholder,
-      style,
-      onChange,
-    } = this.props;
+    const { value, options, placeholder, style, onChange } = this.props;
 
     const conditionalProps = {};
     if (value) conditionalProps.defaultValue = value;
@@ -27,12 +21,8 @@ class EditableSelect extends Component {
         onChange={onChange}
         dropdownMatchSelectWidth={false}
       >
-        {options.map(option => (
-          <Option
-            key={option.Key || option}
-          >
-            {option.Key || option}
-          </Option>
+        {options.map((option) => (
+          <Option key={option.Key || option}>{option.Key || option}</Option>
         ))}
       </Select>
     );
