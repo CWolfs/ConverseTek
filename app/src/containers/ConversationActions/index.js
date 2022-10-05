@@ -70,13 +70,10 @@ class ConversationActions extends Component {
   renderPanel(condition, index) {
     const key = index;
 
-    const classes = classnames(
-      'conversation-actions__panel',
-      {
-        first: index === 0,
-        last: index === (this.dataSize - 1),
-      },
-    );
+    const classes = classnames('conversation-actions__panel', {
+      first: index === 0,
+      last: index === this.dataSize - 1,
+    });
 
     const header = (
       <div className="conversation-actions__panel-header">
@@ -86,7 +83,7 @@ class ConversationActions extends Component {
         <Popconfirm
           title="Are you sure you want to delete this condition?"
           placement="topLeft"
-          onConfirm={event => this.onDeleteAction(event, index)}
+          onConfirm={(event) => this.onDeleteAction(event, index)}
           okText="Yes"
           cancelText="No"
         >
@@ -94,21 +91,17 @@ class ConversationActions extends Component {
             size="small"
             type="caution"
             className="conversation-actions__panel-header-delete-button"
-            onClick={event => event.stopPropagation()}
+            onClick={(event) => event.stopPropagation()}
           >
             <Icon type="delete" />
           </Button>
         </Popconfirm>
-      </div>);
+      </div>
+    );
 
     return (
       <Panel key={key} className={classes} header={header}>
-        <EditableLogic
-          key={condition.functionName}
-          logic={condition}
-          category="primary"
-          scope="action"
-        />
+        <EditableLogic key={condition.functionName} logic={condition} category="primary" scope="action" />
       </Panel>
     );
   }
@@ -127,15 +120,9 @@ class ConversationActions extends Component {
 
     return (
       <div className="conversation-actions" style={{ height }}>
-        <Collapse>
-          {actions.map((condition, index) => this.renderPanel(condition, index))}
-        </Collapse>
+        <Collapse>{actions.map((condition, index) => this.renderPanel(condition, index))}</Collapse>
         <div className="conversation-actions__buttons">
-          <Button
-            type="secondary"
-            size="small"
-            onClick={this.onAddAction}
-          >
+          <Button type="secondary" size="small" onClick={this.onAddAction}>
             <Icon type="plus" />
           </Button>
         </div>
@@ -145,7 +132,6 @@ class ConversationActions extends Component {
 }
 
 ConversationActions.propTypes = {
-  nodeStore: PropTypes.object.isRequired,
   node: PropTypes.object.isRequired,
   defStore: PropTypes.object.isRequired,
 };

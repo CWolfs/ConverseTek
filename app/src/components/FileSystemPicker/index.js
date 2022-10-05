@@ -1,14 +1,16 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { List, Icon } from 'antd';
+import { List, Icon, Tooltip } from 'antd';
 import classnames from 'classnames';
 import remove from 'lodash.remove';
 import sortBy from 'lodash.sortby';
 import debounce from 'lodash.debounce';
+import toPairs from 'lodash.topairs';
 
 import {
   getRootDrives,
   getDirectories,
+  getQuickLinks,
   saveWorkingDirectory,
   getConversations,
   importConversation,
@@ -28,12 +30,14 @@ class FileSystemPicker extends Component {
     this.state = {
       directories: [],
       files: [],
+      quickLinks: null,
       selectedItem: null,
       loading: false,
       fileMode: modalStore.props.fileMode,
     };
 
-    getRootDrives().then(directories => this.setState({ directories }));
+    getRootDrives().then((directories) => this.setState({ directories }));
+    getQuickLinks().then((quickLinks) => this.setState({ quickLinks }));
 
     this.onOk = this.onOk.bind(this);
     this.onDirectoryClicked = this.onDirectoryClicked.bind(this);
@@ -97,8 +101,8 @@ class FileSystemPicker extends Component {
     const callback = debounce(() => {
       const { directories, files } = this.state;
       let newFsItems = [
-        ...sortBy(directories, fsItem => fsItem.Name.toLowerCase()),
-        ...sortBy(files, fsItem => fsItem.Name.toLowerCase()),
+        ...sortBy(directories, (fsItem) => fsItem.Name.toLowerCase()),
+        ...sortBy(files, (fsItem) => fsItem.Name.toLowerCase()),
       ];
 
       const clickedItem = {
@@ -106,19 +110,18 @@ class FileSystemPicker extends Component {
         active: !item.active,
       };
 
-      remove(newFsItems, fsItem => fsItem.Path === clickedItem.Path);
-      newFsItems =
-        newFsItems.map(nonSelectedItem => ({ ...nonSelectedItem, active: false }));
+      remove(newFsItems, (fsItem) => fsItem.Path === clickedItem.Path);
+      newFsItems = newFsItems.map((nonSelectedItem) => ({ ...nonSelectedItem, active: false }));
       newFsItems.push(clickedItem);
-      newFsItems = sortBy(newFsItems, fsItem => fsItem.Name.toLowerCase());
+      newFsItems = sortBy(newFsItems, (fsItem) => fsItem.Name.toLowerCase());
 
       modalStore.setDisableOk(!clickedItem.active);
       if (fileMode && clickedItem.IsDirectory) modalStore.setDisableOk(true);
 
       this.setState({
-        directories: newFsItems.filter(fsItem => fsItem.IsDirectory),
-        files: newFsItems.filter(fsItem => fsItem.IsFile),
-        selectedItem: (clickedItem.active) ? clickedItem : null,
+        directories: newFsItems.filter((fsItem) => fsItem.IsDirectory),
+        files: newFsItems.filter((fsItem) => fsItem.IsFile),
+        selectedItem: clickedItem.active ? clickedItem : null,
       });
 
       this.debouncedClickEvents = [];
@@ -140,17 +143,20 @@ class FileSystemPicker extends Component {
 
     // If there were click events registered we cancel them
     if (this.debouncedClickEvents && this.debouncedClickEvents.length > 0) {
-      this.debouncedClickEvents.forEach(debouncedClickEvent => debouncedClickEvent.cancel());
+      this.debouncedClickEvents.forEach((debouncedClickEvent) => debouncedClickEvent.cancel());
       this.debouncedClickEvents = [];
     }
 
     if (item.HasChildren || (fileMode && item.IsDirectory)) {
       this.setState({ selectedItem: null });
       modalStore.setDisableOk(true);
-      getDirectories(item.Path, fileMode)
-        .then(({ directories, files }) => this.setState({ directories, files }));
+      getDirectories(item.Path, fileMode).then(({ directories, files }) => this.setState({ directories, files }));
     }
   }
+
+  onDirectNavigation = (path) => {
+    getDirectories(path, false).then(({ directories, files }) => this.setState({ directories, files }));
+  };
 
   setupModal() {
     const { modalStore } = this.props;
@@ -171,16 +177,20 @@ class FileSystemPicker extends Component {
   };
 
   render() {
-    const { directories, files } = this.state;
-    const items = [
-      ...directories,
-      ...files,
-    ];
+    const { directories, files, quickLinks } = this.state;
+    const items = [...directories, ...files];
+    const quickLinkPairs = quickLinks ? toPairs(quickLinks) : [];
 
     return (
       <div className="file-system-picker">
         <div className="file-system-picker__quick-links">
-          <Icon type="desktop" />
+          <Icon type="desktop" style={{ fontSize: 20 }} />
+          {quickLinkPairs &&
+            quickLinkPairs.map(([name, path]) => (
+              <Tooltip title={name} onClick={() => this.onDirectNavigation(path)}>
+                <Icon type="book" style={{ fontSize: 20 }} />
+              </Tooltip>
+            ))}
         </div>
         <div className="file-system-picker__directory-list">
           <List
