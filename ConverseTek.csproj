@@ -64,10 +64,11 @@
     </None>
   </ItemGroup>
 
-  <Target Name="BuildServer" BeforeTargets="Build">
+  <Target Name="BuildServer" DependsOnTargets="Build">
     <Exec Command="xcopy &quot;$(ProjectDir)dist&quot; &quot;$(TargetDir)dist&quot;   /i /s /r /y /c&#xD;&#xA;" />
     <Exec Command="xcopy &quot;$(ProjectDir)libs&quot; &quot;$(TargetDir)&quot;   /i /s /r /y /c&#xD;&#xA;" />
     <Exec Command="xcopy &quot;$(ProjectDir)defs&quot; &quot;$(TargetDir)defs&quot;   /i /s /r /y /c&#xD;&#xA;" />
+    <Exec Command="xcopy &quot;$(ProjectDir)config&quot; &quot;$(TargetDir)config&quot;   /i /s /r /y /c&#xD;&#xA;" />
   </Target>
 
   <Target Name="BuildDebug" Condition=" '$(Configuration)' == 'Debug' ">
