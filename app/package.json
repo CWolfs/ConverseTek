@@ -22,7 +22,7 @@
     "babel-preset-stage-2": "^6.24.1",
     "copy-webpack-plugin": "^4.5.1",
     "cross-env": "^7.0.3",
-    "css-loader": "^3.6.0",
+    "css-loader": "^5.2.7",
     "eslint": "^4.19.1",
     "eslint-config-airbnb": "^16.1.0",
     "eslint-plugin-import": "^2.12.0",

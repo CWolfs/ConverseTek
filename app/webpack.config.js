@@ -1,8 +1,8 @@
 const path = require('path');
 
-const isLocal = (process.env.NODE_ENV === 'local');
-const isDev = (process.env.NODE_ENV === 'development');
-const isProd = (process.env.NODE_ENV === 'production');
+const isLocal = process.env.NODE_ENV === 'local';
+const isDev = process.env.NODE_ENV === 'development';
+const isProd = process.env.NODE_ENV === 'production';
 
 const APP_DIR = path.resolve(__dirname, 'src');
 const BUILD_DIR = path.resolve(__dirname, '../dist');
@@ -23,10 +23,7 @@ const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 // const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 
 let config = {
-  entry: [
-    'babel-polyfill',
-    `${APP_DIR}/index.js`,
-  ],
+  entry: ['babel-polyfill', `${APP_DIR}/index.js`],
 
   output: {
     path: BUILD_DIR,
