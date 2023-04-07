@@ -38,7 +38,7 @@
     "lodash.merge": "^4.6.2",
     "postcss": "^8.4.21",
     "postcss-assets": "^6.0.0",
-    "postcss-calc": "^7.0.5",
+    "postcss-calc": "^8.2.4",
     "postcss-import": "^15.1.0",
     "postcss-loader": "^4.3.0",
     "postcss-nested": "^4.0.0",
