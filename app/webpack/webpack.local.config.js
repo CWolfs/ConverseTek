@@ -1,39 +1,36 @@
 /* eslint-disable */
 const webpack = require('webpack');
-const merge = require('lodash.merge');
 
-module.exports = function(config, APP_DIR, BUILD_DIR) {
-    console.log('Using local config');
+module.exports = function (config, APP_DIR, BUILD_DIR) {
+  console.log('Using local config');
 
-    config = merge(config, {
-        mode: 'development',
-        devtool: 'inline-source-map',
+  config = {
+    ...config,
 
-        devServer: {
-            hot: true,
-            contentBase: BUILD_DIR,
-            publicPath: '/',
-            historyApiFallback: true,
-            host: '127.0.0.1',
-            port: 8080,
-            disableHostCheck: true
-        }
-    });
+    mode: 'development',
+    devtool: 'inline-source-map',
 
-    // push to the front of the array
-    config.entry.unshift(
-        'react-hot-loader/patch',
-        'webpack-dev-server/client?http://127.0.0.1:8080',
-        'webpack/hot/only-dev-server'
-    );
+    devServer: {
+      hot: true,
+      contentBase: BUILD_DIR,
+      publicPath: '/',
+      historyApiFallback: true,
+      host: '127.0.0.1',
+      port: 8080,
+      disableHostCheck: true,
+    },
+  };
 
-    config.plugins.push(
-        new webpack.HotModuleReplacementPlugin(),
-        new webpack.NamedModulesPlugin(),
-        new webpack.DefinePlugin({
-            __BUILD_DATE__: JSON.stringify(`LOCAL ${new Date(Date.now()).toUTCString()}`),
-        }),
-    );
+  // push to the front of the array
+  config.entry.unshift('react-hot-loader/patch', 'webpack-dev-server/client?http://127.0.0.1:8080', 'webpack/hot/only-dev-server');
 
-    return config;
-}
+  config.plugins.push(
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.NamedModulesPlugin(),
+    new webpack.DefinePlugin({
+      __BUILD_DATE__: JSON.stringify(`LOCAL ${new Date(Date.now()).toUTCString()}`),
+    }),
+  );
+
+  return config;
+};

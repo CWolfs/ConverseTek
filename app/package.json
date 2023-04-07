@@ -35,7 +35,6 @@
     "image-webpack-loader": "^4.2.0",
     "less": "^3.0.4",
     "less-loader": "^4.1.0",
-    "lodash.merge": "^4.6.2",
     "postcss": "^8.4.21",
     "postcss-assets": "^6.0.0",
     "postcss-calc": "^8.2.4",
