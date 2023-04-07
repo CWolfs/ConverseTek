@@ -41,7 +41,7 @@
     "postcss-calc": "^8.2.4",
     "postcss-import": "^15.1.0",
     "postcss-loader": "^4.3.0",
-    "postcss-nested": "^4.0.0",
+    "postcss-nested": "^6.0.1",
     "postcss-nested-ancestors": "^3.0.0",
     "postcss-simple-vars": "^7.0.1",
     "speed-measure-webpack-plugin": "^1.2.2",
