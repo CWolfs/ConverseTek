@@ -1,4 +1,4 @@
-import uuid from 'uuid/v4';
+import { v4 as uuidv4 } from 'uuid';
 import md5 from 'md5';
 import findIndex from 'lodash.findindex';
 import sortBy from 'lodash.sortby';
@@ -8,14 +8,14 @@ import forEachRight from 'lodash.foreachright';
 
 /* eslint-disable no-param-reassign, no-return-assign */
 export function generateId() {
-  return `9c${md5(uuid()).slice(10)}`;
+  return `9c${md5(uuidv4()).slice(10)}`;
 }
 
 export function regenerateNodeIds(conversationAsset) {
-  conversationAsset.Conversation.roots.forEach(root => root.idRef.id = generateId());
+  conversationAsset.Conversation.roots.forEach((root) => (root.idRef.id = generateId()));
   conversationAsset.Conversation.nodes.forEach((node) => {
     node.idRef.id = generateId();
-    node.branches.forEach(branch => branch.idRef.id = generateId());
+    node.branches.forEach((branch) => (branch.idRef.id = generateId()));
   });
 }
 
@@ -160,7 +160,6 @@ export function fillIndexGaps(conversationAsset) {
     if (index === -1) nodesToRemove.push(position);
   });
 
-
   forEachRight(nodesToRemove, (position) => {
     nodes.splice(position, 1);
   });
@@ -182,7 +181,7 @@ export function fillIndexGaps(conversationAsset) {
 
 export function updateRoot(conversationAsset, root) {
   const { roots } = conversationAsset.Conversation;
-  const index = findIndex(roots, r => getId(r) === getId(root));
+  const index = findIndex(roots, (r) => getId(r) === getId(root));
 
   if (index === -1) {
     roots.push(root);
@@ -193,7 +192,7 @@ export function updateRoot(conversationAsset, root) {
 
 export function updateNode(conversationAsset, node) {
   const { nodes } = conversationAsset.Conversation;
-  const index = findIndex(nodes, n => getId(n) === getId(node));
+  const index = findIndex(nodes, (n) => getId(n) === getId(node));
 
   if (index === -1) {
     nodes.push(node);
@@ -204,20 +203,20 @@ export function updateNode(conversationAsset, node) {
 
 export function addNodes(conversationAsset, newNodes) {
   const { nodes } = conversationAsset.Conversation;
-  newNodes.forEach(node => nodes.push(node));
+  newNodes.forEach((node) => nodes.push(node));
 }
 
 export function updateResponse(conversationAsset, parentNode, response) {
   const { nodes } = conversationAsset.Conversation;
 
-  const branchIndex = findIndex(parentNode.branches, b => getId(b) === getId(response));
+  const branchIndex = findIndex(parentNode.branches, (b) => getId(b) === getId(response));
   if (branchIndex === -1) {
     parentNode.branches.push(response);
   } else {
     parentNode.branches[branchIndex] = response;
   }
 
-  const parentNodeIndex = findIndex(nodes, n => getId(n) === getId(parentNode));
+  const parentNodeIndex = findIndex(nodes, (n) => getId(n) === getId(parentNode));
   if (parentNodeIndex === -1) {
     nodes.push(parentNode);
   } else {
@@ -232,7 +231,7 @@ export function setRoots(conversationAsset, roots) {
 
 export function setResponses(conversationAsset, parentNode, responses) {
   const { nodes } = conversationAsset.Conversation;
-  const parentNodeIndex = findIndex(nodes, n => getId(n) === getId(parentNode));
+  const parentNodeIndex = findIndex(nodes, (n) => getId(n) === getId(parentNode));
   nodes[parentNodeIndex].branches.replace(responses);
 }
 
