@@ -40,10 +40,12 @@ let config = {
   },
 
   plugins: [
-    new CopyWebpackPlugin([
-      { from: 'src/index.html', to: 'index.html' },
-      { from: 'src/assets/', to: 'assets/' },
-    ]),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: 'src/index.html', to: 'index.html' },
+        { from: 'src/assets/', to: 'assets/' },
+      ],
+    }),
     new HardSourceWebpackPlugin(),
   ],
 };
