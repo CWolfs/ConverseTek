@@ -12,7 +12,7 @@
   "author": "Richard Griffiths [CWolf] (cwolfs@gmail.com)",
   "license": "GPL-3.0",
   "devDependencies": {
-    "autoprefixer": "^8.5.2",
+    "autoprefixer": "^8.6.5",
     "babel-core": "^6.26.2",
     "babel-eslint": "^8.2.3",
     "babel-loader": "^7.1.4",
@@ -41,7 +41,7 @@
     "postcss-loader": "^4.3.0",
     "postcss-nested": "^4.0.0",
     "postcss-nested-ancestors": "^2.0.0",
-    "postcss-simple-vars": "^4.1.0",
+    "postcss-simple-vars": "^5.0.2",
     "postcss-smart-import": "^0.7.6",
     "speed-measure-webpack-plugin": "^1.2.2",
     "style-loader": "^0.21.0",
