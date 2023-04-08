@@ -20,7 +20,6 @@ const postcssLoader = require('./webpack/loaders/postcss.loader');
 const imageLoader = require('./webpack/loaders/image.loader');
 
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 // const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 
 let config = {
@@ -36,6 +35,13 @@ let config = {
     extensions: ['.js', '.json'],
   },
 
+  cache: {
+    type: 'filesystem',
+    buildDependencies: {
+      config: [__filename],
+    },
+  },
+
   module: {
     rules: [],
   },
@@ -47,7 +53,6 @@ let config = {
         { from: 'src/assets/', to: 'assets/' },
       ],
     }),
-    new HardSourceWebpackPlugin(),
   ],
 };
 
