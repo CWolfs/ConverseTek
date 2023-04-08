@@ -10,6 +10,10 @@ module.exports = function (config, APP_DIR, BUILD_DIR) {
     mode: 'development',
     devtool: 'inline-source-map',
 
+    optimization: {
+      moduleIds: 'named',
+    },
+
     devServer: {
       hot: true,
       contentBase: BUILD_DIR,
@@ -26,7 +30,7 @@ module.exports = function (config, APP_DIR, BUILD_DIR) {
 
   config.plugins.push(
     new webpack.HotModuleReplacementPlugin(),
-    new webpack.NamedModulesPlugin(),
+    // new webpack.NamedModulesPlugin(),
     new webpack.DefinePlugin({
       __BUILD_DATE__: JSON.stringify(`LOCAL ${new Date(Date.now()).toUTCString()}`),
     }),

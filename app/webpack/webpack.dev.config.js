@@ -8,10 +8,13 @@ module.exports = function (config, APP_DIR, BUILD_DIR) {
     ...config,
     mode: 'development',
     devtool: 'inline-source-map',
+    optimization: {
+      moduleIds: 'named',
+    },
   };
 
   config.plugins.push(
-    new webpack.NamedModulesPlugin(),
+    // new webpack.NamedModulesPlugin(),
     new webpack.DefinePlugin({
       __BUILD_DATE__: JSON.stringify(`LOCAL ${new Date(Date.now()).toUTCString()}`),
     }),
