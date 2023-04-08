@@ -80,7 +80,6 @@
     "lodash.values": "^4.3.0",
     "md5": "^2.2.1",
     "mobx": "^5.0.3",
-    "mobx-devtools-mst": "^0.9.9",
     "mobx-react": "^5.2.3",
     "prop-types": "^15.8.1",
     "react": "^16.2.0",
