@@ -23,7 +23,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 // const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 
 let config = {
-  entry: ['babel-polyfill', `${APP_DIR}/index.js`],
+  entry: ['@babel/polyfill', `${APP_DIR}/index.js`],
 
   output: {
     path: BUILD_DIR,
