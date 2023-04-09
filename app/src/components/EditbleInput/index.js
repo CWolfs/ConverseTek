@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
 import { Input, AutoComplete } from 'antd';
 
-@observer
 class EditableInput extends Component {
   render() {
     const {
@@ -96,4 +95,4 @@ EditableInput.propTypes = {
   valueLabel: PropTypes.string,
 };
 
-export default EditableInput;
+export default observer(EditableInput);

@@ -9,9 +9,8 @@ import EditableInput from '../EditbleInput';
 
 import './EditableLogic.css';
 
-@observer
-/* eslint-disable react/no-array-index-key, no-param-reassign */
-class EditableLogic extends Component {
+class /* eslint-disable react/no-array-index-key, no-param-reassign */
+EditableLogic extends Component {
   renderLogic(logicDef, logic) {
     const { defStore, scope, category, parentLogic, parentInput, parentArg } = this.props;
     const operations = defStore.getOperations(category, scope);
@@ -262,4 +261,5 @@ EditableLogic.propTypes = {
   isEven: PropTypes.bool,
 };
 
-export default inject('defStore')(EditableLogic);
+export default inject('defStore')(observer(/* eslint-disable react/no-array-index-key, no-param-reassign */
+EditableLogic));

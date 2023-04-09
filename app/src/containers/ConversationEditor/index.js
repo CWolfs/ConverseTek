@@ -19,7 +19,6 @@ import './ConversationEditor.css';
 const FormItem = Form.Item;
 const { TabPane } = Tabs;
 
-@observer
 class ConversationEditor extends Component {
   constructor(props) {
     super(props);
@@ -197,4 +196,4 @@ ConversationEditor.propTypes = {
   conversationAsset: PropTypes.object.isRequired,
 };
 
-export default inject('dataStore', 'nodeStore')(ConversationEditor);
+export default inject('dataStore', 'nodeStore')(observer(ConversationEditor));

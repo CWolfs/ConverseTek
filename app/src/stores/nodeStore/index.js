@@ -1,4 +1,4 @@
-import { observable, action, toJS } from 'mobx';
+import { observable, action, toJS, makeObservable } from 'mobx';
 import defer from 'lodash.defer';
 import remove from 'lodash.remove';
 import sortBy from 'lodash.sortby';
@@ -24,12 +24,46 @@ import { detectType } from '../../utils/node-utils';
 
 /* eslint-disable no-return-assign, no-param-reassign, class-methods-use-this */
 class NodeStore {
-  @observable activeNode;
-  @observable focusedNode;
-  @observable dirtyActiveNode = false;
-  @observable rebuild = false;
+  activeNode;
+  focusedNode;
+  dirtyActiveNode = false;
+  rebuild = false;
 
   constructor() {
+    makeObservable(this, {
+      activeNode: observable,
+      focusedNode: observable,
+      dirtyActiveNode: observable,
+      rebuild: observable,
+      setRebuild: action,
+      init: action,
+      updateActiveNode: action,
+      setActiveNode: action,
+      setActiveNodeByIndex: action,
+      clearActiveNode: action,
+      scrollToNode: action,
+      setFocusedNode: action,
+      clearFocusedNode: action,
+      setClipboard: action,
+      clearClipboard: action,
+      pasteAsLinkFromClipboard: action,
+      pasteAsCopyFromClipboard: action,
+      setNode: action,
+      processDeletes: action,
+      addNodeByParentId: action,
+      addRoot: action,
+      setRoots: action,
+      addNode: action,
+      addResponse: action,
+      setResponses: action,
+      deleteNodeCascadeById: action,
+      cleanUpDanglingResponseIndexes: action,
+      deleteNodeCascade: action,
+      deleteBranchCascade: action,
+      deleteLink: action,
+      reset: action
+    });
+
     this.ownerId = null;
     this.activeNode = null;
     this.focusedNode = null;
@@ -65,7 +99,7 @@ class NodeStore {
     return null;
   }
 
-  @action setRebuild(flag) {
+  setRebuild(flag) {
     this.rebuild = flag;
     if (this.rebuild) {
       defer(() => {
@@ -75,7 +109,7 @@ class NodeStore {
     }
   }
 
-  @action init(conversationAsset) {
+  init(conversationAsset) {
     const nextOwnerId = getId(conversationAsset.Conversation);
 
     // save the active node if it's the same conversation
@@ -95,15 +129,15 @@ class NodeStore {
   * || ACTIVE NODE METHODS ||
   * =========================
   */
-  @action updateActiveNode(node) {
+  updateActiveNode(node) {
     this.setActiveNode(getId(node), node.type);
   }
 
-  @action setActiveNode(nodeId) {
+  setActiveNode(nodeId) {
     this.activeNode = this.getNode(nodeId);
   }
 
-  @action setActiveNodeByIndex(nodeIndex) {
+  setActiveNodeByIndex(nodeIndex) {
     this.activeNode = this.getNodeByIndex(nodeIndex);
   }
 
@@ -112,7 +146,7 @@ class NodeStore {
     return getId(this.activeNode);
   }
 
-  @action clearActiveNode() {
+  clearActiveNode() {
     this.activeNode = null;
   }
 
@@ -121,7 +155,7 @@ class NodeStore {
   * || SCROLL TO  NODE METHODS ||
   * =============================
   */
-  @action scrollToNode(nodeId, direction, cachedTree) {
+  scrollToNode(nodeId, direction, cachedTree) {
     // Quickly scroll in the given direction to force the virtual tree to load
     // At the same time check for the required node
     const tree = cachedTree || window.document.querySelector('.ReactVirtualized__Grid');
@@ -149,11 +183,11 @@ class NodeStore {
   * || FOCUS NODE METHODS ||
   * ========================
   */
-  @action setFocusedNode(node) {
+  setFocusedNode(node) {
     this.focusedNode = node;
   }
 
-  @action clearFocusedNode() {
+  clearFocusedNode() {
     this.focusedNode = null;
   }
 
@@ -162,7 +196,7 @@ class NodeStore {
   * || NODE CLIPBOARD METHODS ||
   * ============================
   */
-  @action setClipboard(nodeId) {
+  setClipboard(nodeId) {
     const node = toJS(this.getNode(nodeId));
     const { type } = node;
     this.clipboard.originalNodeId = nodeId;
@@ -240,7 +274,7 @@ class NodeStore {
     return nodes;
   }
 
-  @action clearClipboard() {
+  clearClipboard() {
     this.clipboard = {
       node: null,
       originalNodeId: null,
@@ -250,7 +284,7 @@ class NodeStore {
     };
   }
 
-  @action pasteAsLinkFromClipboard(nodeId) {
+  pasteAsLinkFromClipboard(nodeId) {
     const response = this.getNode(nodeId);
     const { originalNodeIndex } = this.clipboard;
 
@@ -261,7 +295,7 @@ class NodeStore {
     this.setRebuild(true);
   }
 
-  @action pasteAsCopyFromClipboard(nodeId) {
+  pasteAsCopyFromClipboard(nodeId) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
 
     const node = this.getNode(nodeId);
@@ -300,7 +334,7 @@ class NodeStore {
   * ==================
   */
 
-  @action setNode(node) {
+  setNode(node) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     const { type } = node;
 
@@ -377,7 +411,7 @@ class NodeStore {
     }
   }
 
-  @action processDeletes() {
+  processDeletes() {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     const { roots, nodes } = conversationAsset.Conversation;
 
@@ -394,7 +428,7 @@ class NodeStore {
     });
   }
 
-  @action addNodeByParentId(parentId) {
+  addNodeByParentId(parentId) {
     const parent = this.getNode(parentId);
 
     if (parent === undefined || parent === null) {
@@ -412,7 +446,7 @@ class NodeStore {
     }
   }
 
-  @action addRoot() {
+  addRoot() {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
 
     const root = createRoot();
@@ -423,13 +457,13 @@ class NodeStore {
     this.setRebuild(true);
   }
 
-  @action setRoots(rootIds) {
+  setRoots(rootIds) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     const roots = rootIds.map(rootId => this.getNode(rootId));
     setRootsUtil(conversationAsset, roots);
   }
 
-  @action addNode(parent) {
+  addNode(parent) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     const { nextNodeIndex: existingNextNodeIndex } = parent;
 
@@ -455,7 +489,7 @@ class NodeStore {
     }
   }
 
-  @action addResponse(parent) {
+  addResponse(parent) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
 
     const response = createResponse();
@@ -466,14 +500,14 @@ class NodeStore {
     this.setRebuild(true);
   }
 
-  @action setResponses(parentId, responseIds) {
+  setResponses(parentId, responseIds) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     const responses = responseIds.map(responseId => this.getNode(responseId));
     const parent = this.getNode(parentId);
     setResponses(conversationAsset, parent, responses);
   }
 
-  @action deleteNodeCascadeById(id) {
+  deleteNodeCascadeById(id) {
     const node = this.getNode(id);
     if (node) {
       this.deleteNodeCascade(node);
@@ -484,7 +518,7 @@ class NodeStore {
   /*
   * Ensures that any node that refers to an id specified now points to 'END OF DIALOG' (-1)
   */
-  @action cleanUpDanglingResponseIndexes(idToClean) {
+  cleanUpDanglingResponseIndexes(idToClean) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     const { roots, nodes } = conversationAsset.Conversation;
 
@@ -507,7 +541,7 @@ class NodeStore {
     });
   }
 
-  @action deleteNodeCascade(node) {
+  deleteNodeCascade(node) {
     if (node.type === 'node') {
       const { index, branches } = node;
       branches.forEach((branch) => {
@@ -529,7 +563,7 @@ class NodeStore {
     }
   }
 
-  @action deleteBranchCascade(branch) {
+  deleteBranchCascade(branch) {
     const { auxiliaryLink } = branch;
 
     if (!auxiliaryLink) {
@@ -541,7 +575,7 @@ class NodeStore {
     this.removeNode(branch);
   }
 
-  @action deleteLink(parentId) {
+  deleteLink(parentId) {
     const node = this.getNode(parentId);
     node.nextNodeIndex = -1;
     node.auxiliaryLink = false;
@@ -657,11 +691,11 @@ class NodeStore {
     ];
   }
 
-  @action reset = () => {
+  reset = () => {
     this.focusedNode = null;
     this.takenNodeIndexes = [];
     this.nodeIdToTreeIndexMap.clear();
-  }
+  };
 }
 
 /* Statics */

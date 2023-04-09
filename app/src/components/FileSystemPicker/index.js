@@ -27,6 +27,8 @@ class FileSystemPicker extends Component {
 
     const { modalStore } = props;
 
+    console.log('filepicker');
+
     this.state = {
       directories: [],
       files: [],

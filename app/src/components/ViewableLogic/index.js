@@ -2,9 +2,8 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { observer, inject } from 'mobx-react';
 
-@observer
-/* eslint-disable react/no-array-index-key */
-class ViewableLogic extends Component {
+class /* eslint-disable react/no-array-index-key */
+ViewableLogic extends Component {
   renderResult(args) {
     const { defStore } = this.props;
 
@@ -84,4 +83,5 @@ ViewableLogic.propTypes = {
   logic: PropTypes.object.isRequired,
 };
 
-export default inject('defStore')(ViewableLogic);
+export default inject('defStore')(observer(/* eslint-disable react/no-array-index-key */
+ViewableLogic));

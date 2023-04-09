@@ -1,20 +1,29 @@
-import { observable, action } from 'mobx';
+import { observable, action, makeObservable } from 'mobx';
 
 class ErrorStore {
-  @observable authErrors = observable.map();
+  authErrors = observable.map();
 
-  @action setError = (code, error) => {
+  setError = (code, error) => {
     if ((code >= 100) && (code < 199)) {
       this.authErrors.set(code, error);
     }
-  }
+  };
 
-  @action resetAll = () => {
+  resetAll = () => {
     this.authErrors.clear();
-  }
+  };
 
-  @action reset = (codes) => {
+  reset = (codes) => {
     codes.forEach(code => this.authErrors.delete(code));
+  };
+
+  constructor() {
+    makeObservable(this, {
+      authErrors: observable,
+      setError: action,
+      resetAll: action,
+      reset: action
+    });
   }
 }
 

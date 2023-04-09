@@ -15,7 +15,6 @@ const MenuItem = Menu.Item;
 const { SubMenu } = Menu;
 
 /* eslint-disable no-return-assign, no-param-reassign */
-@observer
 class Header extends Component {
   render() {
     const { dataStore, modalStore } = this.props;
@@ -125,4 +124,4 @@ Header.propTypes = {
   modalStore: PropTypes.object.isRequired,
 };
 
-export default inject('dataStore', 'modalStore')(Header);
+export default inject('dataStore', 'modalStore')(observer(Header));
