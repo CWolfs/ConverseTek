@@ -45,6 +45,14 @@
       "label": "Fast Run",
       "command": "K:/Modding/ConverseTek/bin/x64/Debug/net472/ConverseTek.exe",
       "type": "shell"
+    },
+    {
+      "label": "UI-Only Run",
+      "command": "npm start",
+      "options": {
+        "cwd": "${workspaceFolder}/app/"
+      },
+      "type": "shell"
     }
   ]
 }

@@ -16,12 +16,16 @@ module.exports = function (config, APP_DIR, BUILD_DIR) {
 
     devServer: {
       hot: true,
-      contentBase: BUILD_DIR,
-      publicPath: '/',
+      static: {
+        directory: BUILD_DIR,
+      },
+      devMiddleware: {
+        publicPath: '/',
+      },
       historyApiFallback: true,
       host: '127.0.0.1',
       port: 8080,
-      disableHostCheck: true,
+      allowedHosts: 'all',
     },
   };
 
