@@ -20,11 +20,7 @@ class GlobalModal extends Component {
       modalStore;
     const { confirmLoading } = this.state;
 
-    console.log('test');
-
-    const content = ModalContent ? <ModalContent modalStore={modalStore} /> : undefined;
-
-    console.log('test2');
+    const content = ModalContent || undefined;
 
     const footer = [
       showCancelButton ? (

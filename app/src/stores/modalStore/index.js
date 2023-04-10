@@ -1,3 +1,4 @@
+import React from 'react';
 import { observable, action, makeObservable } from 'mobx';
 import defer from 'lodash.defer';
 
@@ -16,7 +17,7 @@ class ModalStore {
 
   constructor() {
     makeObservable(this, {
-      ModalContent: observable,
+      ModalContent: observable.shallow,
       title: observable,
       isVisible: observable,
       onOk: observable,
@@ -45,12 +46,10 @@ class ModalStore {
     this.onCancel = this.closeModal;
   }
 
-  setModelContent(component, props = {}, show = true) {
-    console.log('11');
-    this.ModalContent = component;
+  setModelContent(ModalContent, props = {}, show = true) {
+    this.ModalContent = <ModalContent modalStore={this} />;
     this.props = props;
     if (show) this.showModal(true);
-    console.log('12');
   }
 
   setTitle(title) {
@@ -99,18 +98,20 @@ class ModalStore {
 
   reset = () => {
     this.isVisible = false;
-    defer(() => {
-      this.ModalContent = null;
-      this.onOk = null;
-      this.disableOk = true;
-      this.okLabel = 'Ok';
-      this.loadingLabel = 'Loading';
-      this.onCancel = this.closeModal;
-      this.isLoading = false;
-      this.width = '70vw';
-      this.showCancelButton = true;
-      this.props = {};
-    });
+    defer(
+      action(() => {
+        this.ModalContent = null;
+        this.onOk = null;
+        this.disableOk = true;
+        this.okLabel = 'Ok';
+        this.loadingLabel = 'Loading';
+        this.onCancel = this.closeModal;
+        this.isLoading = false;
+        this.width = '70vw';
+        this.showCancelButton = true;
+        this.props = {};
+      }),
+    );
   };
 }
 

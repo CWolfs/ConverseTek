@@ -1,13 +1,18 @@
 {
     "compilerOptions": {
-       "target": "es2016",
+       "target": "esnext",
+       "moduleResolution": "node",
        "module": "commonjs",
-       "rootDir": "./",
+       "rootDir": ".",
        "resolveJsonModule": true,
        "esModuleInterop": true,
        "forceConsistentCasingInFileNames": true,
        "strict": true,
        "noImplicitAny": true,
-       "skipLibCheck": true
+       "skipLibCheck": true,
+       "allowJs": true,
+       "declaration": true,
+       "emitDeclarationOnly": true,
+       "isolatedModules": true
     }
   }
