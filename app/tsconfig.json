@@ -13,6 +13,7 @@
        "allowJs": true,
        "declaration": true,
        "emitDeclarationOnly": true,
-       "isolatedModules": true
+       "isolatedModules": true,
+       "jsx": "react" // change to "react-jsx" when upgrading to React 18
     }
   }
