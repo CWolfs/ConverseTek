@@ -6,10 +6,9 @@ module.exports = function (config, APP_DIR, BUILD_DIR) {
 
   config = {
     ...config,
-
     mode: 'development',
     devtool: 'inline-source-map',
-
+    
     optimization: {
       moduleIds: 'named',
     },
@@ -33,8 +32,6 @@ module.exports = function (config, APP_DIR, BUILD_DIR) {
   config.entry.unshift('react-hot-loader/patch', 'webpack-dev-server/client?http://127.0.0.1:8080', 'webpack/hot/only-dev-server');
 
   config.plugins.push(
-    new webpack.HotModuleReplacementPlugin(),
-    // new webpack.NamedModulesPlugin(),
     new webpack.DefinePlugin({
       __BUILD_DATE__: JSON.stringify(`LOCAL ${new Date(Date.now()).toUTCString()}`),
     }),

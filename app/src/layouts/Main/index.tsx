@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
 import { Switch, Route } from 'react-router-dom';
@@ -11,14 +11,14 @@ import Footer from '../../containers/Footer';
 
 import './Main.css';
 
-const Layout = ({ children }) => (
+const Layout = ({ children }): ReactElement => (
   <div className="main">
     <div className="main__content">
       <Header />
       <div className="main__children">
         <Switch>
           <Route exact path="/(|index.html)" component={Conversations} />
-          <Route exact path="/test" component={() => (<div>Test</div>)} />
+          <Route exact path="/test" component={() => <div>Test</div>} />
         </Switch>
         {children}
       </div>
@@ -33,10 +33,7 @@ Layout.defaultProps = {
 };
 
 Layout.propTypes = {
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.node),
-    PropTypes.node,
-  ]),
+  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
 };
 
 export default observer(Layout);

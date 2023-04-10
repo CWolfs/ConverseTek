@@ -12,7 +12,6 @@ import {
   isAllowedToPasteLink,
 } from '../../utils/node-utils';
 
-@observer
 class DialogEditorContextMenu extends Component {
   static getAddLabel(type) {
     let addItemLabel = 'Add';
@@ -108,4 +107,4 @@ DialogEditorContextMenu.propTypes = {
   id: PropTypes.string.isRequired,
 };
 
-export default inject('nodeStore')(DialogEditorContextMenu);
+export default inject('nodeStore')(observer(DialogEditorContextMenu));

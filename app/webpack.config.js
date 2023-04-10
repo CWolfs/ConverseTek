@@ -32,7 +32,7 @@ let config = {
   },
 
   resolve: {
-    extensions: ['.js', '.json'],
+    extensions: ['.js', '.json', '.jsx', '.tsx', '.ts'],
   },
 
   cache: {

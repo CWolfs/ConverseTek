@@ -6,7 +6,6 @@ import { Input } from 'antd';
 const { TextArea } = Input;
 
 /* eslint-disable no-param-reassign */
-@observer
 class DialogTextArea extends Component {
   constructor(props) {
     super(props);
@@ -43,4 +42,4 @@ DialogTextArea.propTypes = {
   node: PropTypes.object.isRequired,
 };
 
-export default DialogTextArea;
+export default observer(DialogTextArea);

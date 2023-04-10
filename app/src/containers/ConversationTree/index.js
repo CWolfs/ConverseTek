@@ -7,7 +7,6 @@ import FileTree from '../../components/FileTree';
 
 import './ConversationTree.css';
 
-@observer
 class ConversationTree extends Component {
   static remapConversationData(conversationAssets) {
     return sortBy(
@@ -49,4 +48,4 @@ ConversationTree.propTypes = {
   dataStore: PropTypes.object.isRequired,
 };
 
-export default inject('dataStore')(ConversationTree);
+export default inject('dataStore')(observer(ConversationTree));

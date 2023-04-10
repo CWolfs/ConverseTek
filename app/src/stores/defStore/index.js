@@ -1,4 +1,4 @@
-import { observable, action } from 'mobx';
+import { observable, action, makeObservable } from 'mobx';
 import keys from 'lodash.keys';
 import values from 'lodash.values';
 
@@ -7,15 +7,33 @@ import { tryParseInt, tryParseFloat } from '../../utils/number-utils';
 
 /* eslint-disable class-methods-use-this, no-param-reassign */
 class DefStore {
-  @observable operations = [];
-  @observable presets = [];
-  @observable tags = [];
+  operations = [];
+  presets = [];
+  tags = [];
 
   constructor() {
+    makeObservable(this, {
+      operations: observable,
+      presets: observable,
+      tags: observable,
+      setLogicTypeByConversation: action,
+      setLogicTypeByOperation: action,
+      setDefinitions: action,
+      getDefinition: action,
+      getDefinitionByName: action,
+      getOperations: action,
+      setArgType: action,
+      setArgValue: action,
+      setOperation: action,
+      getPresetValue: action,
+      getPresetKeys: action,
+      reset: action
+    });
+
     this.definitionCount = 0;
   }
 
-  @action setLogicTypeByConversation(conversationAsset) {
+  setLogicTypeByConversation(conversationAsset) {
     const { Conversation: conversation } = conversationAsset;
     const { roots, nodes } = conversation;
 
@@ -70,7 +88,7 @@ class DefStore {
     });
   }
 
-  @action setLogicTypeByOperation(operation) {
+  setLogicTypeByOperation(operation) {
     const { args } = operation;
     const logicDef = this.getDefinition(operation);
     const { Inputs: inputs } = logicDef;
@@ -146,7 +164,7 @@ class DefStore {
     });
   }
 
-  @action setDefinitions(definitions) {
+  setDefinitions(definitions) {
     const { operations, presets, tags } = definitions;
 
     this.reset();
@@ -158,12 +176,12 @@ class DefStore {
     this.definitionCount = this.operations.length + this.presets.length + this.tags.length;
   }
 
-  @action getDefinition(condition) {
+  getDefinition(condition) {
     const { functionName } = condition;
     return this.getDefinitionByName(functionName);
   }
 
-  @action getDefinitionByName(functionName) {
+  getDefinitionByName(functionName) {
     const definition = this.operations.find(operation => operation.Key === functionName);
     if (!definition) {
       console.error(`No operation definition found with functionName '${functionName}'`);
@@ -171,7 +189,7 @@ class DefStore {
     return definition;
   }
 
-  @action getOperations(category, scope = 'all') {
+  getOperations(category, scope = 'all') {
     return this.operations.filter(operation =>
       (operation.Category === category) && ((operation.Scope === scope) || (scope === 'all')));
   }
@@ -216,7 +234,7 @@ class DefStore {
     return null;
   }
 
-  @action setArgType(logic, arg, type) {
+  setArgType(logic, arg, type) {
     const { args } = logic;
     const argValue = this.getArgValue(arg);
     const { type: previousType, value: previousValue } = argValue;
@@ -245,7 +263,7 @@ class DefStore {
     }
   }
 
-  @action setArgValue(logic, arg, value) {
+  setArgValue(logic, arg, value) {
     const { args } = logic;
     const argValue = this.getArgValue(arg);
     const { type } = argValue;
@@ -260,7 +278,7 @@ class DefStore {
     logic.args.replace(args);
   }
 
-  @action setOperation(logic, value) {
+  setOperation(logic, value) {
     const { args } = logic;
     const logicDef = this.getDefinitionByName(value);
     const { Inputs: inputs } = logicDef;
@@ -321,7 +339,7 @@ class DefStore {
     }
   }
 
-  @action getPresetValue(key, value) {
+  getPresetValue(key, value) {
     const preset = this.presets.find(p => p.Key === key);
     if (preset === undefined) return '[BAD PRESET VALUE]';
     return preset.Values[value.toString()];
@@ -353,16 +371,16 @@ class DefStore {
     return options;
   }
 
-  @action getPresetKeys() {
+  getPresetKeys() {
     return this.presets.map(p => p.Key);
   }
 
-  @action reset = () => {
+  reset = () => {
     this.operations.clear();
     this.presets.clear();
     this.tags.clear();
     this.definitionCount = 0;
-  }
+  };
 }
 
 const defStore = new DefStore();

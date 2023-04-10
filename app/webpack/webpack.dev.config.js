@@ -8,6 +8,7 @@ module.exports = function (config, APP_DIR, BUILD_DIR) {
     ...config,
     mode: 'development',
     devtool: 'inline-source-map',
+
     optimization: {
       moduleIds: 'named',
     },

@@ -1,88 +1,118 @@
-import { observable, action } from 'mobx';
+import React from 'react';
+import { observable, action, makeObservable } from 'mobx';
 import defer from 'lodash.defer';
 
 class ModalStore {
-  @observable ModalContent;
-  @observable title = '';
-  @observable isVisible = false;
-  @observable onOk;
-  @observable disableOk = true;
-  @observable okLabel = 'Ok';
-  @observable loadingLabel = 'Loading';
-  @observable onCancel;
-  @observable isLoading = false;
-  @observable width = '70vw';
-  @observable showCancelButton = true;
+  ModalContent;
+  title = '';
+  isVisible = false;
+  onOk;
+  disableOk = true;
+  okLabel = 'Ok';
+  loadingLabel = 'Loading';
+  onCancel;
+  isLoading = false;
+  width = '70vw';
+  showCancelButton = true;
 
   constructor() {
+    makeObservable(this, {
+      ModalContent: observable.shallow,
+      title: observable,
+      isVisible: observable,
+      onOk: observable,
+      disableOk: observable,
+      okLabel: observable,
+      loadingLabel: observable,
+      onCancel: observable,
+      isLoading: observable,
+      width: observable,
+      showCancelButton: observable,
+      setModelContent: action,
+      setTitle: action,
+      setWidth: action,
+      setShowCancelButton: action,
+      setOnOk: action,
+      setDisableOk: action,
+      setOkLabel: action,
+      setIsLoading: action,
+      setLoadingLabel: action,
+      showModal: action,
+      closeModal: action,
+      setProps: action,
+      reset: action,
+    });
+
     this.onCancel = this.closeModal;
   }
 
-  @action setModelContent(component, props = {}, show = true) {
-    this.ModalContent = component;
+  setModelContent(ModalContent, props = {}, show = true) {
+    this.ModalContent = <ModalContent modalStore={this} />;
     this.props = props;
     if (show) this.showModal(true);
   }
 
-  @action setTitle(title) {
+  setTitle(title) {
     this.title = title;
   }
 
-  @action setWidth(width) {
+  setWidth(width) {
     this.width = width;
   }
 
-  @action setShowCancelButton(flag) {
+  setShowCancelButton(flag) {
     this.showCancelButton = flag;
   }
 
-  @action setOnOk(onOk) {
+  setOnOk(onOk) {
     this.onOk = onOk;
   }
 
-  @action setDisableOk(flag) {
+  setDisableOk(flag) {
     this.disableOk = flag;
   }
 
-  @action setOkLabel(label) {
+  setOkLabel(label) {
     this.okLabel = label;
   }
 
-  @action setIsLoading(flag) {
+  setIsLoading(flag) {
     this.isLoading = flag;
   }
 
-  @action setLoadingLabel(label) {
+  setLoadingLabel(label) {
     this.loadingLabel = label;
   }
 
-  @action showModal(flag) {
+  showModal(flag) {
     this.isVisible = flag;
   }
 
-  @action closeModal = () => {
+  closeModal = () => {
     this.reset();
-  }
+  };
 
-  @action setProps = (props) => {
+  setProps = (props) => {
     this.props = props;
-  }
+  };
 
-  @action reset = () => {
+  reset = () => {
     this.isVisible = false;
-    defer(() => {
-      this.ModalContent = null;
-      this.onOk = null;
-      this.disableOk = true;
-      this.okLabel = 'Ok';
-      this.loadingLabel = 'Loading';
-      this.onCancel = this.closeModal;
-      this.isLoading = false;
-      this.width = '70vw';
-      this.showCancelButton = true;
-      this.props = {};
-    });
-  }
+    defer(
+      action(() => {
+        this.ModalContent = null;
+        this.onOk = null;
+        this.disableOk = true;
+        this.okLabel = 'Ok';
+        this.loadingLabel = 'Loading';
+        this.onCancel = this.closeModal;
+        this.isLoading = false;
+        this.width = '70vw';
+        this.showCancelButton = true;
+        this.props = {};
+      }),
+    );
+  };
 }
 
 const modalStore = new ModalStore();

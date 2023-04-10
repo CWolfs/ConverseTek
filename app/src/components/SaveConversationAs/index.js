@@ -8,7 +8,6 @@ import { updateConversation } from '../../services/api';
 import './SaveConversationAs.css';
 
 /* eslint-disable react/prefer-stateless-function, no-useless-constructor, class-methods-use-this */
-@observer
 class SaveConversationAs extends Component {
   constructor(props) {
     super(props);
@@ -87,4 +86,4 @@ SaveConversationAs.propTypes = {
   modalStore: PropTypes.object.isRequired,
 };
 
-export default inject('dataStore')(SaveConversationAs);
+export default inject('dataStore')(observer(SaveConversationAs));

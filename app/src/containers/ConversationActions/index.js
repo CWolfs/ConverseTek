@@ -14,7 +14,6 @@ import './ConversationActions.css';
 
 const { Panel } = Collapse;
 
-@observer
 class ConversationActions extends Component {
   constructor(props) {
     super(props);
@@ -136,4 +135,4 @@ ConversationActions.propTypes = {
   defStore: PropTypes.object.isRequired,
 };
 
-export default inject('nodeStore', 'defStore')(ConversationActions);
+export default inject('nodeStore', 'defStore')(observer(ConversationActions));

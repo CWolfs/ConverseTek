@@ -8,8 +8,7 @@ import Main from './layouts/Main';
 
 import './css/styles.css';
 
-@observer
-export default class App extends Component {
+class App extends Component {
   render() {
     return (
       <Provider {...stores}>
@@ -20,3 +19,5 @@ export default class App extends Component {
     );
   }
 }
+
+export default observer(App);

@@ -26,7 +26,6 @@ const colTwoLayout = {
   xxl: { span: 24 - colOneLayout.xxl.span },
 };
 
-@observer
 class ConversationGeneral extends Component {
   constructor(props) {
     super(props);
@@ -267,4 +266,4 @@ ConversationGeneral.propTypes = {
   node: PropTypes.object.isRequired,
 };
 
-export default inject('nodeStore')(ConversationGeneral);
+export default inject('nodeStore')(observer(ConversationGeneral));

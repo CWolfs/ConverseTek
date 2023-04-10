@@ -15,7 +15,6 @@ import { detectType } from '../../utils/node-utils';
 import './DialogEditor.css';
 
 /* eslint-disable react/no-unused-state, no-param-reassign, react/no-did-mount-set-state */
-@observer
 class DialogEditor extends Component {
   static buildTreeData(nodeStore, conversationAsset) {
     const data = [
@@ -221,4 +220,4 @@ DialogEditor.propTypes = {
   rebuild: PropTypes.bool,
 };
 
-export default inject('nodeStore')(DialogEditor);
+export default inject('nodeStore')(observer(DialogEditor));

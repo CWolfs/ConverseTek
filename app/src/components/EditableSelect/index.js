@@ -5,7 +5,6 @@ import { Select } from 'antd';
 
 const { Option } = Select;
 
-@observer
 class EditableSelect extends Component {
   render() {
     const { value, options, placeholder, style, onChange } = this.props;
@@ -43,4 +42,4 @@ EditableSelect.propTypes = {
   onChange: PropTypes.func.isRequired,
 };
 
-export default EditableSelect;
+export default observer(EditableSelect);
