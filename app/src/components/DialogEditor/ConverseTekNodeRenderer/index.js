@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Icon } from 'antd';
-import { useContextMenu } from 'react-contexify';
 
 import { isDescendant } from '../../../utils/tree-data-utils';
 import { detectType } from '../../../utils/node-utils';
@@ -17,6 +16,7 @@ const ConverseTekNodeRenderer = observer(
   ({
     nodeStore,
     activeNodeId,
+    onNodeContextMenu,
     scaffoldBlockPxWidth,
     toggleChildrenVisibility,
     connectDragPreview,
@@ -42,10 +42,6 @@ const ConverseTekNodeRenderer = observer(
     rowDirection,
     ...otherProps
   }) => {
-    const { show } = useContextMenu({
-      id: 'dialog-context-menu',
-    });
-
     const nodeSubtitle = subtitle || node.subtitle;
     const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : null;
     const isActiveNode = activeNodeId === node.id;
@@ -181,7 +177,7 @@ const ConverseTekNodeRenderer = observer(
 
     const rowContents = (
       <div
-        onContextMenu={(event) => show({ event, props: { id: contextMenuId, type: nodeType, parentId } })}
+        onContextMenu={(event) => onNodeContextMenu({ event, contextMenuId, type: nodeType, parentId })}
         className={rowContentsClasses}
         onClick={() => {
           const { type } = node;
@@ -316,6 +312,7 @@ ConverseTekNodeRenderer.defaultProps = {
 ConverseTekNodeRenderer.propTypes = {
   nodeStore: PropTypes.object.isRequired,
   activeNodeId: PropTypes.string,
+  onNodeContextMenu: PropTypes.func.isRequired,
   node: PropTypes.shape({}).isRequired,
   title: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
   subtitle: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),

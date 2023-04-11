@@ -1,9 +1,10 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import React, { Component } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { observer, inject } from 'mobx-react';
 import SortableTree from 'react-sortable-tree';
+import { useContextMenu } from 'react-contexify';
 
 import 'react-sortable-tree/style.css';
 
@@ -14,78 +15,33 @@ import { detectType } from '../../utils/node-utils';
 
 import './DialogEditor.css';
 
-/* eslint-disable react/no-unused-state, no-param-reassign, react/no-did-mount-set-state */
-class DialogEditor extends Component {
-  static buildTreeData(nodeStore, conversationAsset) {
-    const data = [
-      {
-        title: 'Root',
-        id: '0',
-        children: nodeStore.getChildrenFromRoots(conversationAsset.Conversation.roots),
-        expanded: true,
-        canDrag: false,
-      },
-    ];
+function buildTreeData(nodeStore, conversationAsset) {
+  const data = [
+    {
+      title: 'Root',
+      id: '0',
+      children: nodeStore.getChildrenFromRoots(conversationAsset.Conversation.roots),
+      expanded: true,
+      canDrag: false,
+    },
+  ];
 
-    return data;
-  }
+  return data;
+}
 
-  constructor(props) {
-    super(props);
+function DialogEditor({ nodeStore, conversationAsset, rebuild }) {
+  // const [conversationAsset, setConversationAsset] = useState(conversationAsset);
+  const [treeData, setTreeData] = useState(null);
+  const [treeWidth, setTreeWidth] = useState(0);
+  const treeElement = useRef(null);
+  const { show } = useContextMenu({
+    id: 'dialog-context-menu',
+  });
 
-    const { nodeStore, conversationAsset } = this.props;
-    nodeStore.init(conversationAsset);
+  const activeNodeId = nodeStore.getActiveNodeId();
 
-    this.state = {
-      conversationAsset,
-      treeData: DialogEditor.buildTreeData(nodeStore, conversationAsset),
-      treeWidth: 0,
-    };
-
-    this.resize = this.resize.bind(this);
-    this.onMove = this.onMove.bind(this);
-    this.canDrop = this.canDrop.bind(this);
-  }
-
-  componentDidMount() {
-    window.addEventListener('resize', this.resize);
-
-    const treeWidth = this.treeElement.clientWidth;
-    this.setState({
-      treeWidth,
-    });
-  }
-
-  componentWillReceiveProps(nextProps) {
-    const { conversationAsset: stateConversationAsset } = this.state;
-    const { conversationAsset: propConversationAsset, nodeStore, rebuild } = nextProps;
-
-    const newState = { ...this.state };
-
-    if (propConversationAsset !== stateConversationAsset || rebuild) {
-      nodeStore.init(propConversationAsset);
-      newState.conversationAsset = propConversationAsset;
-      newState.treeData = DialogEditor.buildTreeData(nodeStore, propConversationAsset);
-      this.setState(newState);
-    }
-  }
-
-  componentDidUpdate() {
-    const { treeWidth } = this.state;
-    const calculatedTreeWidth = this.treeElement.clientWidth;
-
-    if (treeWidth !== calculatedTreeWidth) {
-      this.resize();
-    }
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.resize);
-  }
-
-  onMove(nodeContainer) {
+  const onMove = (nodeContainer) => {
     const { node, nextParentNode } = nodeContainer;
-    const { nodeStore } = this.props;
     const { id: nodeId, type: nodeType, parentId: nodeParentId } = node;
     const { id: parentNodeId, children: parentChildren } = nextParentNode;
     const { isRoot, isNode, isResponse } = detectType(nodeType);
@@ -113,17 +69,14 @@ class DialogEditor extends Component {
       const responseIds = parentChildren.map((child) => child.id);
       nodeStore.setResponses(parentNodeId, responseIds);
     }
-  }
+  };
 
-  resize() {
-    const treeWidth = this.treeElement.clientWidth;
-    this.setState({
-      treeWidth,
-    });
-  }
+  const resize = () => {
+    const calculatedTreeWidth = treeElement.current.clientWidth;
+    setTreeWidth(calculatedTreeWidth);
+  };
 
-  canDrop(nodeContainer) {
-    const { nodeStore } = this.props;
+  const canDrop = (nodeContainer) => {
     const { nextParent, node } = nodeContainer;
 
     // GUARD - Don't allow drop at the very top of the tree
@@ -155,59 +108,80 @@ class DialogEditor extends Component {
     }
 
     return allowDrop;
-  }
+  };
 
-  onClicked = (event) => {
-    const { nodeStore } = this.props;
+  const onClicked = (event) => {
     if (event.target.className === 'rst__node' || event.target.className === 'rst__lineBlock') {
       nodeStore.clearActiveNode();
     }
   };
 
-  render() {
-    const { nodeStore } = this.props;
-    const { treeData: data, treeWidth } = this.state;
-    const activeNodeId = nodeStore.getActiveNodeId();
+  const onNodeContextMenu = ({ event, contextMenuId, type, parentId }) => {
+    show({ event, props: { id: contextMenuId, type, parentId } });
+  };
 
-    return (
-      <div className="dialog-editor">
-        <div
-          className="dialog-editor__tree"
-          ref={(ref) => {
-            this.treeElement = ref;
+  // onMount
+  useEffect(() => {
+    nodeStore.init(conversationAsset);
+    setTreeData(buildTreeData(nodeStore, conversationAsset));
+
+    window.addEventListener('resize', resize);
+
+    console.log('treelement.current', treeElement.current);
+    const calculatedTreeWidth = treeElement.current.clientWidth;
+    setTreeWidth(calculatedTreeWidth);
+
+    return () => {
+      window.removeEventListener('resize', resize);
+    };
+  }, []);
+
+  // OnConversationChange or rebuild
+  useEffect(() => {
+    nodeStore.init(conversationAsset);
+    setTreeData(buildTreeData(nodeStore, conversationAsset));
+  }, [conversationAsset, rebuild]);
+
+  // On every update
+  useEffect(() => {
+    const calculatedTreeWidth = treeElement.current.clientWidth;
+    if (treeWidth !== calculatedTreeWidth) resize();
+  });
+
+  return (
+    <div className="dialog-editor">
+      <div className="dialog-editor__tree" ref={treeElement} onClick={onClicked}>
+        <DialogEditorContextMenu id="dialog-context-menu" />
+        <SortableTree
+          treeData={treeData}
+          onChange={(data) => setTreeData(data)}
+          getNodeKey={({ node, treeIndex }) => {
+            if (node.treeIndex !== treeIndex) {
+              // eslint-disable-next-line no-param-reassign
+              node.treeIndex = treeIndex;
+            }
+            if (!node.id) return treeIndex;
+
+            nodeStore.addNodeIdAndTreeIndexPair(node.id, treeIndex);
+            return node.id;
           }}
-          onClick={this.onClicked}
-        >
-          <DialogEditorContextMenu id="dialog-context-menu" />
-          <SortableTree
-            treeData={data}
-            onChange={(treeData) => this.setState({ treeData })}
-            getNodeKey={({ node, treeIndex }) => {
-              if (node.treeIndex !== treeIndex) {
-                node.treeIndex = treeIndex;
-              }
-              if (!node.id) return treeIndex;
-
-              nodeStore.addNodeIdAndTreeIndexPair(node.id, treeIndex);
-              return node.id;
-            }}
-            rowHeight={40}
-            canDrag={(nodeContainer) => !(nodeContainer.node.id === 0)}
-            canDrop={this.canDrop}
-            onMoveNode={this.onMove}
-            generateNodeProps={() => ({
-              nodeStore,
-              activeNodeId,
-            })}
-            nodeContentRenderer={ConverseTekNodeRenderer}
-            reactVirtualizedListProps={{
-              width: treeWidth,
-            }}
-          />
-        </div>
+          rowHeight={40}
+          canDrag={(nodeContainer) => !(nodeContainer.node.id === 0)}
+          canDrop={canDrop}
+          onMoveNode={onMove}
+          generateNodeProps={() => ({
+            nodeStore,
+            activeNodeId,
+            onNodeContextMenu,
+          })}
+          nodeContentRenderer={ConverseTekNodeRenderer}
+          reactVirtualizedListProps={{
+            width: treeWidth,
+          }}
+        />
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 DialogEditor.defaultProps = {
