@@ -26,6 +26,13 @@ module.exports = {
         'arrow-parens': ['error', 'always'],
         'object-curly-newline': 0,
         'function-paren-newline': ['error', 'multiline'],
+        'import/no-unresolved': [0, { commonjs: true, amd: true }],
+        'import/named': 0,
+        'import/no-named-as-default': 0,
+        'import/no-named-as-default-member': 0,
+        'import/namespace': 0,
+        'import/default': 0,
+        'import/export': 0,
       },
     },
     {

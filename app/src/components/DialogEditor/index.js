@@ -1,6 +1,3 @@
-/* eslint-disable import/named */
-/* eslint-disable import/no-named-as-default-member */
-/* eslint-disable import/no-named-as-default */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { useState, useEffect, useRef } from 'react';
