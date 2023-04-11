@@ -33,6 +33,7 @@ module.exports = {
         'import/namespace': 0,
         'import/default': 0,
         'import/export': 0,
+        'import/prefer-default-export': 0,
       },
     },
     {
