@@ -26,7 +26,7 @@ function getAddLabel(type) {
   return addItemLabel;
 }
 
-const DialogEditorContextMenu = ({ id, nodeStore }) => {
+function DialogEditorContextMenu({ id, nodeStore, onVisibilityChange }) {
   const { focusedNode, clipboard } = nodeStore;
 
   // GUARD - no need to render the menu if there's no focused node
@@ -56,18 +56,18 @@ const DialogEditorContextMenu = ({ id, nodeStore }) => {
   };
 
   const onDeleteClicked = ({ props }) => {
-    const { id, type, parentId } = props;
+    const { id: nodeId, type, parentId } = props;
     const { isLink } = detectType(type);
 
     if (isLink) {
       nodeStore.deleteLink(parentId);
     } else {
-      nodeStore.deleteNodeCascadeById(id, type);
+      nodeStore.deleteNodeCascadeById(nodeId, type);
     }
   };
 
   return (
-    <Menu id={id}>
+    <Menu id={id} onVisibilityChange={onVisibilityChange}>
       {allowAdd && <Item onClick={onAddClicked}>{getAddLabel(type)}</Item>}
       {(isNode || isResponse) && <Item onClick={onCopyClicked}>Copy</Item>}
       {allowedToPasteCopy && <Item onClick={onPasteAsCopy}>Paste as Copy</Item>}
@@ -75,11 +75,12 @@ const DialogEditorContextMenu = ({ id, nodeStore }) => {
       {type && <Item onClick={onDeleteClicked}>Delete</Item>}
     </Menu>
   );
-};
+}
 
 DialogEditorContextMenu.propTypes = {
   nodeStore: PropTypes.object.isRequired,
   id: PropTypes.string.isRequired,
+  onVisibilityChange: PropTypes.func.isRequired,
 };
 
 export default inject('nodeStore')(observer(DialogEditorContextMenu));

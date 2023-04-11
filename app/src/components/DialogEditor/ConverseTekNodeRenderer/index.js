@@ -1,3 +1,6 @@
+/* eslint-disable react/jsx-props-no-spreading */
+/* eslint-disable function-paren-newline */
+/* eslint-disable indent */
 import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
@@ -17,6 +20,7 @@ const ConverseTekNodeRenderer = observer(
     nodeStore,
     activeNodeId,
     onNodeContextMenu,
+    isContextMenuVisible,
     scaffoldBlockPxWidth,
     toggleChildrenVisibility,
     connectDragPreview,
@@ -177,7 +181,10 @@ const ConverseTekNodeRenderer = observer(
 
     const rowContents = (
       <div
-        onContextMenu={(event) => onNodeContextMenu({ event, contextMenuId, type: nodeType, parentId })}
+        onContextMenu={(event) => {
+          nodeStore.setFocusedNode(node);
+          onNodeContextMenu({ event, contextMenuId, type: nodeType, parentId });
+        }}
         className={rowContentsClasses}
         onClick={() => {
           const { type } = node;
@@ -190,7 +197,7 @@ const ConverseTekNodeRenderer = observer(
             nodeStore.setActiveNode(node.id, node.type);
           }
         }}
-        onMouseEnter={() => nodeStore.setFocusedNode(node)}
+        onMouseEnter={() => !isContextMenuVisible && nodeStore.setFocusedNode(node)}
       >
         {isLink && (
           <div className="node-renderer__link-row-icon">
@@ -313,6 +320,7 @@ ConverseTekNodeRenderer.propTypes = {
   nodeStore: PropTypes.object.isRequired,
   activeNodeId: PropTypes.string,
   onNodeContextMenu: PropTypes.func.isRequired,
+  isContextMenuVisible: PropTypes.bool.isRequired,
   node: PropTypes.shape({}).isRequired,
   title: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
   subtitle: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),

@@ -35,6 +35,7 @@ function buildTreeData(nodeStore, conversationAsset) {
 function DialogEditor({ nodeStore, conversationAsset, rebuild }) {
   const [treeData, setTreeData] = useState(null);
   const [treeWidth, setTreeWidth] = useState(0);
+  const [isContextMenuVisible, setIsContextMenuVisible] = useState(false);
   const treeElement = useRef(null);
   const { show } = useContextMenu({
     id: 'dialog-context-menu',
@@ -122,6 +123,10 @@ function DialogEditor({ nodeStore, conversationAsset, rebuild }) {
     show({ event, props: { id: contextMenuId, type, parentId } });
   };
 
+  const onNodeContextMenuVisibilityChange = (isVisible) => {
+    setIsContextMenuVisible(isVisible);
+  };
+
   // onMount
   useEffect(() => {
     nodeStore.init(conversationAsset);
@@ -141,6 +146,7 @@ function DialogEditor({ nodeStore, conversationAsset, rebuild }) {
   useEffect(() => {
     nodeStore.init(conversationAsset);
     setTreeData(buildTreeData(nodeStore, conversationAsset));
+    setIsContextMenuVisible(false);
   }, [conversationAsset, rebuild]);
 
   // On every update
@@ -152,7 +158,7 @@ function DialogEditor({ nodeStore, conversationAsset, rebuild }) {
   return (
     <div className="dialog-editor">
       <div className="dialog-editor__tree" ref={treeElement} onClick={onClicked}>
-        <DialogEditorContextMenu id="dialog-context-menu" />
+        <DialogEditorContextMenu id="dialog-context-menu" onVisibilityChange={onNodeContextMenuVisibilityChange} />
         <SortableTree
           treeData={treeData}
           onChange={(data) => setTreeData(data)}
@@ -174,6 +180,7 @@ function DialogEditor({ nodeStore, conversationAsset, rebuild }) {
             nodeStore,
             activeNodeId,
             onNodeContextMenu,
+            isContextMenuVisible,
           })}
           nodeContentRenderer={ConverseTekNodeRenderer}
           reactVirtualizedListProps={{
