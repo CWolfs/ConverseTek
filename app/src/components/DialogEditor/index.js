@@ -1,3 +1,6 @@
+/* eslint-disable import/named */
+/* eslint-disable import/no-named-as-default-member */
+/* eslint-disable import/no-named-as-default */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { useState, useEffect, useRef } from 'react';
@@ -30,7 +33,6 @@ function buildTreeData(nodeStore, conversationAsset) {
 }
 
 function DialogEditor({ nodeStore, conversationAsset, rebuild }) {
-  // const [conversationAsset, setConversationAsset] = useState(conversationAsset);
   const [treeData, setTreeData] = useState(null);
   const [treeWidth, setTreeWidth] = useState(0);
   const treeElement = useRef(null);
@@ -127,7 +129,6 @@ function DialogEditor({ nodeStore, conversationAsset, rebuild }) {
 
     window.addEventListener('resize', resize);
 
-    console.log('treelement.current', treeElement.current);
     const calculatedTreeWidth = treeElement.current.clientWidth;
     setTreeWidth(calculatedTreeWidth);
 
