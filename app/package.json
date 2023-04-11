@@ -83,7 +83,7 @@
     "mobx-react": "^7.6.0",
     "prop-types": "^15.8.1",
     "react": "^16.14.0",
-    "react-contexify": "^3.0.1",
+    "react-contexify": "^6.0.0",
     "react-custom-scroll": "^3.2.1",
     "react-dom": "^16.14.0",
     "react-hot-loader": "^4.2.0",

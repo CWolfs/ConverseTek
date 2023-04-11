@@ -1,16 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { observer, inject } from 'mobx-react';
-import { ContextMenu, Item } from 'react-contexify';
+import { Menu, Item } from 'react-contexify';
 
-import 'react-contexify/dist/ReactContexify.min.css';
+import 'react-contexify/ReactContexify.css';
 
-import {
-  detectType,
-  isAllowedToCreateNode,
-  isAllowedToPasteCopy,
-  isAllowedToPasteLink,
-} from '../../utils/node-utils';
+import { detectType, isAllowedToCreateNode, isAllowedToPasteCopy, isAllowedToPasteLink } from '../../utils/node-utils';
 
 class DialogEditorContextMenu extends Component {
   static getAddLabel(type) {
@@ -42,29 +37,29 @@ class DialogEditorContextMenu extends Component {
     this.onDeleteClicked = this.onDeleteClicked.bind(this);
   }
 
-  onAddClicked({ dataFromProvider }) {
+  onAddClicked({ props }) {
     const { nodeStore } = this.props;
-    nodeStore.addNodeByParentId(dataFromProvider.id);
+    nodeStore.addNodeByParentId(props.id);
   }
 
-  onCopyClicked({ dataFromProvider }) {
+  onCopyClicked({ props }) {
     const { nodeStore } = this.props;
-    nodeStore.setClipboard(dataFromProvider.id);
+    nodeStore.setClipboard(props.id);
   }
 
-  onPasteAsCopy({ dataFromProvider }) {
+  onPasteAsCopy({ props }) {
     const { nodeStore } = this.props;
-    nodeStore.pasteAsCopyFromClipboard(dataFromProvider.id);
+    nodeStore.pasteAsCopyFromClipboard(props.id);
   }
 
-  onPasteAsLink({ dataFromProvider }) {
+  onPasteAsLink({ props }) {
     const { nodeStore } = this.props;
-    nodeStore.pasteAsLinkFromClipboard(dataFromProvider.id);
+    nodeStore.pasteAsLinkFromClipboard(props.id);
   }
 
-  onDeleteClicked({ dataFromProvider }) {
+  onDeleteClicked({ props }) {
     const { nodeStore } = this.props;
-    const { id, type, parentId } = dataFromProvider;
+    const { id, type, parentId } = props;
     const { isLink } = detectType(type);
 
     if (isLink) {
@@ -89,15 +84,13 @@ class DialogEditorContextMenu extends Component {
     const allowedToPasteLink = isAllowedToPasteLink(focusedNodeId, clipboard);
 
     return (
-      <ContextMenu id={id}>
-        {(allowAdd) &&
-          <Item onClick={this.onAddClicked}>{DialogEditorContextMenu.getAddLabel(type)}</Item>
-        }
+      <Menu id={id}>
+        {allowAdd && <Item onClick={this.onAddClicked}>{DialogEditorContextMenu.getAddLabel(type)}</Item>}
         {(isNode || isResponse) && <Item onClick={this.onCopyClicked}>Copy</Item>}
-        {(allowedToPasteCopy) && <Item onClick={this.onPasteAsCopy}>Paste as Copy</Item>}
-        {(allowedToPasteLink) && <Item onClick={this.onPasteAsLink}>Paste as Link</Item>}
-        {(type) && <Item onClick={this.onDeleteClicked}>Delete</Item>}
-      </ContextMenu>
+        {allowedToPasteCopy && <Item onClick={this.onPasteAsCopy}>Paste as Copy</Item>}
+        {allowedToPasteLink && <Item onClick={this.onPasteAsLink}>Paste as Link</Item>}
+        {type && <Item onClick={this.onDeleteClicked}>Delete</Item>}
+      </Menu>
     );
   }
 }
