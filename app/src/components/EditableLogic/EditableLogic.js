@@ -8,7 +8,7 @@ import { observer, inject } from 'mobx-react';
 import classnames from 'classnames';
 import { Icon, Tooltip } from 'antd';
 
-import EditableSelect from '../EditableSelect';
+import { EditableSelect } from '../EditableSelect';
 import EditableInput from '../EditbleInput';
 
 import './EditableLogic.css';

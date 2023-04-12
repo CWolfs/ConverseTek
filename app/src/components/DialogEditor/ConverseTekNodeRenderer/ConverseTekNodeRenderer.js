@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable function-paren-newline */
 /* eslint-disable indent */
 import React from 'react';
