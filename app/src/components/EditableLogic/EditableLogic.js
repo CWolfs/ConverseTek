@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { Icon, Tooltip } from 'antd';
 
 import { EditableSelect } from '../EditableSelect';
-import EditableInput from '../EditbleInput';
+import { EditableInput } from '../EditbleInput';
 
 import './EditableLogic.css';
 
