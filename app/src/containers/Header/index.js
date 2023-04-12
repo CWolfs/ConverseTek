@@ -4,7 +4,7 @@ import { message, Menu } from 'antd';
 import { observer, inject } from 'mobx-react';
 
 import { FileSystemPicker } from '../../components/FileSystemPicker';
-import SaveConversationAs from '../../components/SaveConversationAs';
+import { SaveConversationAs } from '../../components/SaveConversationAs';
 import { About } from '../../components/About';
 
 import { updateConversation, exportConversation, exportAllConversations } from '../../services/api';
