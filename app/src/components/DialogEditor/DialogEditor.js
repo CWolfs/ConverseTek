@@ -9,7 +9,7 @@ import { useContextMenu } from 'react-contexify';
 import 'react-sortable-tree/style.css';
 
 import { ConverseTekNodeRenderer } from './ConverseTekNodeRenderer';
-import DialogEditorContextMenu from '../DialogEditorContextMenu';
+import { DialogEditorContextMenu } from '../DialogEditorContextMenu';
 
 import { detectType } from '../../utils/node-utils';
 
@@ -199,4 +199,4 @@ DialogEditor.propTypes = {
   rebuild: PropTypes.bool,
 };
 
-export const ObservedDialogueEditor = inject('nodeStore')(observer(DialogEditor));
+export const ObservingDialogueEditor = inject('nodeStore')(observer(DialogEditor));

@@ -1,1 +1,1 @@
-export { ObservedDialogueEditor as DialogEditor } from './DialogEditor';
+export { ObservingDialogueEditor as DialogEditor } from './DialogEditor';
