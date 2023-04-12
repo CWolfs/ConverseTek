@@ -14,10 +14,10 @@ function DialogTextArea({ node }) {
     const inputText = event.target.value;
 
     if (type === 'node') {
-      // TODO: Implement immutability for nodes
+      // FIXME: Implement immutability for nodes
       node.text = inputText;
     } else {
-      // TODO: Implement immutability for nodes
+      // FIXME: Implement immutability for nodes
       node.responseText = inputText;
     }
   };

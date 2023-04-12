@@ -1,0 +1,15 @@
+{
+    "todohighlight.keywords": [
+    {  
+        "text": "TODO:",
+        "color": "white",
+        "backgroundColor": "blue",
+        "overviewRulerColor": "grey" 
+    },
+    {  
+        "text": "FIXME:",
+        "color": "red",
+        "backgroundColor": "",
+        "overviewRulerColor": "grey" 
+    }]
+}

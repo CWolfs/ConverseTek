@@ -8,7 +8,7 @@ import remove from 'lodash.remove';
 import 'react-custom-scroll/dist/customScroll.css';
 
 import ViewableLogic from '../../components/ViewableLogic';
-import EditableLogic from '../../components/EditableLogic';
+import { EditableLogic } from '../../components/EditableLogic';
 
 import './ConversationConditions.css';
 
@@ -69,13 +69,10 @@ class ConversationConditions extends Component {
   renderPanel(condition, index) {
     const key = index;
 
-    const classes = classnames(
-      'conversation-conditions__panel',
-      {
-        first: index === 0,
-        last: index === (this.dataSize - 1),
-      },
-    );
+    const classes = classnames('conversation-conditions__panel', {
+      first: index === 0,
+      last: index === this.dataSize - 1,
+    });
 
     const header = (
       <div className="conversation-conditions__panel-header">
@@ -85,7 +82,7 @@ class ConversationConditions extends Component {
         <Popconfirm
           title="Are you sure you want to delete this condition?"
           placement="topLeft"
-          onConfirm={event => this.onDeleteCondition(event, index)}
+          onConfirm={(event) => this.onDeleteCondition(event, index)}
           okText="Yes"
           cancelText="No"
         >
@@ -93,21 +90,17 @@ class ConversationConditions extends Component {
             size="small"
             type="caution"
             className="conversation-conditions__panel-header-delete-button"
-            onClick={event => event.stopPropagation()}
+            onClick={(event) => event.stopPropagation()}
           >
             <Icon type="delete" />
           </Button>
         </Popconfirm>
-      </div>);
+      </div>
+    );
 
     return (
       <Panel key={key} className={classes} header={header}>
-        <EditableLogic
-          key={condition.functionName}
-          logic={condition}
-          category="primary"
-          scope="condition"
-        />
+        <EditableLogic key={condition.functionName} logic={condition} category="primary" scope="condition" />
       </Panel>
     );
   }
@@ -126,15 +119,9 @@ class ConversationConditions extends Component {
 
     return (
       <div className="conversation-conditions" style={{ height }}>
-        <Collapse>
-          {conditions.map((condition, index) => this.renderPanel(condition, index))}
-        </Collapse>
+        <Collapse>{conditions.map((condition, index) => this.renderPanel(condition, index))}</Collapse>
         <div className="conversation-conditions__buttons">
-          <Button
-            type="secondary"
-            size="small"
-            onClick={this.onAddCondition}
-          >
+          <Button type="secondary" size="small" onClick={this.onAddCondition}>
             <Icon type="plus" />
           </Button>
         </div>
