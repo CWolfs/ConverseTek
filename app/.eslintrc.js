@@ -35,6 +35,7 @@ module.exports = {
         'import/export': 0,
         'import/prefer-default-export': 0,
         'react/jsx-props-no-spreading': 0,
+        'react/function-component-definition': 0,
       },
     },
     {

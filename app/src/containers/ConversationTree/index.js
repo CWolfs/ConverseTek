@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { observer, inject } from 'mobx-react';
 import sortBy from 'lodash.sortby';
 
-import FileTree from '../../components/FileTree';
+import { FileTree } from '../../components/FileTree';
 
 import './ConversationTree.css';
 
