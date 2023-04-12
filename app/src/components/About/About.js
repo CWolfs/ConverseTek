@@ -24,8 +24,6 @@ export function About({ modalStore }) {
     setupModal();
   }, []);
 
-  setupModal();
-
   return (
     <div className="about">
       <div className="about__author">

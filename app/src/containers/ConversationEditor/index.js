@@ -4,7 +4,7 @@ import { toJS } from 'mobx';
 import { observer, inject } from 'mobx-react';
 import { message, Button, Row, Col, Form, Input, Icon, Tabs, Popconfirm } from 'antd';
 
-import DialogEditor from '../../components/DialogEditor';
+import { DialogEditor } from '../../components/DialogEditor';
 import DialogTextArea from '../../components/DialogTextArea';
 import ConversationGeneral from '../ConversationGeneral';
 import ConversationConditions from '../ConversationConditions';
