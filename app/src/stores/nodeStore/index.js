@@ -49,6 +49,7 @@ class NodeStore {
       pasteAsLinkFromClipboard: action,
       pasteAsCopyFromClipboard: action,
       setNode: action,
+      setNodeActions: action,
       processDeletes: action,
       addNodeByParentId: action,
       addRoot: action,
@@ -61,7 +62,7 @@ class NodeStore {
       deleteNodeCascade: action,
       deleteBranchCascade: action,
       deleteLink: action,
-      reset: action
+      reset: action,
     });
 
     this.ownerId = null;
@@ -82,7 +83,7 @@ class NodeStore {
   }
 
   generateNextNodeIndex() {
-    this.takenNodeIndexes = sortBy(this.takenNodeIndexes, index => index);
+    this.takenNodeIndexes = sortBy(this.takenNodeIndexes, (index) => index);
     const nextNodeIndex = last(this.takenNodeIndexes) + 1 || 0;
     this.takenNodeIndexes.push(nextNodeIndex);
     return nextNodeIndex;
@@ -125,10 +126,10 @@ class NodeStore {
   }
 
   /*
-  * =========================
-  * || ACTIVE NODE METHODS ||
-  * =========================
-  */
+   * =========================
+   * || ACTIVE NODE METHODS ||
+   * =========================
+   */
   updateActiveNode(node) {
     this.setActiveNode(getId(node), node.type);
   }
@@ -151,10 +152,10 @@ class NodeStore {
   }
 
   /*
-  * =============================
-  * || SCROLL TO  NODE METHODS ||
-  * =============================
-  */
+   * =============================
+   * || SCROLL TO  NODE METHODS ||
+   * =============================
+   */
   scrollToNode(nodeId, direction, cachedTree) {
     // Quickly scroll in the given direction to force the virtual tree to load
     // At the same time check for the required node
@@ -179,10 +180,10 @@ class NodeStore {
   }
 
   /*
-  * ========================
-  * || FOCUS NODE METHODS ||
-  * ========================
-  */
+   * ========================
+   * || FOCUS NODE METHODS ||
+   * ========================
+   */
   setFocusedNode(node) {
     this.focusedNode = node;
   }
@@ -192,10 +193,10 @@ class NodeStore {
   }
 
   /*
-  * ============================
-  * || NODE CLIPBOARD METHODS ||
-  * ============================
-  */
+   * ============================
+   * || NODE CLIPBOARD METHODS ||
+   * ============================
+   */
   setClipboard(nodeId) {
     const node = toJS(this.getNode(nodeId));
     const { type } = node;
@@ -214,26 +215,28 @@ class NodeStore {
     }
 
     this.clipboard.node = node;
-    const branches = (isNode) ? node.branches : [node];
+    const branches = isNode ? node.branches : [node];
 
-    this.clipboard.nodes = flattenDeep(branches.map((branch) => {
-      const { nextNodeIndex, auxiliaryLink } = branch;
-      const newBranchId = generateId();
-      branch.idRef.id = newBranchId;
-      branch.parentId = newNodeId;
+    this.clipboard.nodes = flattenDeep(
+      branches.map((branch) => {
+        const { nextNodeIndex, auxiliaryLink } = branch;
+        const newBranchId = generateId();
+        branch.idRef.id = newBranchId;
+        branch.parentId = newNodeId;
 
-      // Change link indexes
-      if (nextNodeIndex !== -1 && auxiliaryLink) {
-        const copiedAndUpdatedNodeId = this.clipboard.nodeIdMap.get(branch.nextNodeIndex);
-        if (copiedAndUpdatedNodeId) branch.nextNodeIndex = copiedAndUpdatedNodeId;
-      }
+        // Change link indexes
+        if (nextNodeIndex !== -1 && auxiliaryLink) {
+          const copiedAndUpdatedNodeId = this.clipboard.nodeIdMap.get(branch.nextNodeIndex);
+          if (copiedAndUpdatedNodeId) branch.nextNodeIndex = copiedAndUpdatedNodeId;
+        }
 
-      if (nextNodeIndex === -1 || auxiliaryLink) return [];
+        if (nextNodeIndex === -1 || auxiliaryLink) return [];
 
-      const newNextNodeIndex = this.generateNextNodeIndex();
-      branch.nextNodeIndex = newNextNodeIndex;
-      return this.copyNodesRecursive(nextNodeIndex, newNextNodeIndex, newBranchId);
-    }));
+        const newNextNodeIndex = this.generateNextNodeIndex();
+        branch.nextNodeIndex = newNextNodeIndex;
+        return this.copyNodesRecursive(nextNodeIndex, newNextNodeIndex, newBranchId);
+      }),
+    );
   }
 
   copyNodesRecursive(nodeIndex, newNextNodeIndex, newNodeParentId) {
@@ -301,12 +304,10 @@ class NodeStore {
     const node = this.getNode(nodeId);
     const { node: clipboardNode, nodes: clipboardNodes } = this.clipboard;
     const { isRoot, isNode, isResponse } = detectType(node.type);
-    const {
-      isNode: clipboardIsNode,
-      isResponse: clipboardIsResponse,
-    } = detectType(clipboardNode.type);
+    const { isNode: clipboardIsNode, isResponse: clipboardIsResponse } = detectType(clipboardNode.type);
 
-    if (isRoot || isResponse) { // Only allow nodes to be copied in if target is a root or response
+    if (isRoot || isResponse) {
+      // Only allow nodes to be copied in if target is a root or response
       if (clipboardIsNode) {
         node.nextNodeIndex = clipboardNode.index;
         clipboardNode.parentId = nodeId;
@@ -314,7 +315,8 @@ class NodeStore {
       } else {
         console.error('[NodeStore] Cannot copy - wrong node types');
       }
-    } else if (isNode) { // Only allow response to be copied in
+    } else if (isNode) {
+      // Only allow response to be copied in
       if (clipboardIsResponse) {
         clipboardNode.parentId = nodeId;
         updateResponse(conversationAsset, node, clipboardNode);
@@ -329,10 +331,10 @@ class NodeStore {
   }
 
   /*
-  * ==================
-  * || NODE METHODS ||
-  * ==================
-  */
+   * ==================
+   * || NODE METHODS ||
+   * ==================
+   */
 
   setNode(node) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
@@ -348,17 +350,21 @@ class NodeStore {
     }
   }
 
+  setNodeActions(node, actions) {
+    node.actions = actions;
+  }
+
   getNode(nodeId) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     const { roots, nodes } = conversationAsset.Conversation;
 
-    const root = roots.find(r => getId(r) === nodeId);
+    const root = roots.find((r) => getId(r) === nodeId);
     if (root) return root;
 
     let branch = null;
     const node = nodes.find((n) => {
       if (getId(n) === nodeId) return true;
-      branch = n.branches.find(b => getId(b) === nodeId);
+      branch = n.branches.find((b) => getId(b) === nodeId);
       if (branch) return true;
       return false;
     });
@@ -372,7 +378,7 @@ class NodeStore {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     const { nodes } = conversationAsset.Conversation;
 
-    const node = nodes.find(n => n.index === index);
+    const node = nodes.find((n) => n.index === index);
     if (node) return node;
     return null;
   }
@@ -416,11 +422,11 @@ class NodeStore {
     const { roots, nodes } = conversationAsset.Conversation;
 
     nodes.forEach((n) => {
-      remove(n.branches, b => b.deleting);
+      remove(n.branches, (b) => b.deleting);
     });
 
-    remove(nodes, n => n.deleting);
-    remove(roots, r => r.deleting);
+    remove(nodes, (n) => n.deleting);
+    remove(roots, (r) => r.deleting);
 
     defer(() => {
       NodeStore.deleteDeferred = false;
@@ -459,7 +465,7 @@ class NodeStore {
 
   setRoots(rootIds) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-    const roots = rootIds.map(rootId => this.getNode(rootId));
+    const roots = rootIds.map((rootId) => this.getNode(rootId));
     setRootsUtil(conversationAsset, roots);
   }
 
@@ -485,7 +491,7 @@ class NodeStore {
       this.updateActiveNode(node);
       this.setRebuild(true);
     } else {
-      console.warn('[Node Store] Will not create new node. Only one node per \'root\' or \'response\' allowed');
+      console.warn("[Node Store] Will not create new node. Only one node per 'root' or 'response' allowed");
     }
   }
 
@@ -502,7 +508,7 @@ class NodeStore {
 
   setResponses(parentId, responseIds) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-    const responses = responseIds.map(responseId => this.getNode(responseId));
+    const responses = responseIds.map((responseId) => this.getNode(responseId));
     const parent = this.getNode(parentId);
     setResponses(conversationAsset, parent, responses);
   }
@@ -516,8 +522,8 @@ class NodeStore {
   }
 
   /*
-  * Ensures that any node that refers to an id specified now points to 'END OF DIALOG' (-1)
-  */
+   * Ensures that any node that refers to an id specified now points to 'END OF DIALOG' (-1)
+   */
   cleanUpDanglingResponseIndexes(idToClean) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     const { roots, nodes } = conversationAsset.Conversation;
@@ -548,10 +554,10 @@ class NodeStore {
         this.deleteBranchCascade(branch);
       });
 
-      remove(this.takenNodeIndexes, i => i === index);
+      remove(this.takenNodeIndexes, (i) => i === index);
       this.removeNode(node);
 
-      if (this.activeNode && (getId(this.activeNode) === getId(node))) this.clearActiveNode();
+      if (this.activeNode && getId(this.activeNode) === getId(node)) this.clearActiveNode();
 
       this.cleanUpDanglingResponseIndexes(index);
     } else if (node.type === 'response') {
@@ -559,7 +565,7 @@ class NodeStore {
     } else if (node.type === 'root') {
       this.deleteBranchCascade(node);
       this.removeNode(node);
-      if (this.activeNode && (getId(this.activeNode) === getId(node))) this.clearActiveNode();
+      if (this.activeNode && getId(this.activeNode) === getId(node)) this.clearActiveNode();
     }
   }
 
@@ -571,7 +577,7 @@ class NodeStore {
       if (nextNode) this.deleteNodeCascade(nextNode);
     }
 
-    if (this.activeNode && (getId(this.activeNode) === getId(branch))) this.clearActiveNode();
+    if (this.activeNode && getId(this.activeNode) === getId(branch)) this.clearActiveNode();
     this.removeNode(branch);
   }
 
@@ -615,14 +621,14 @@ class NodeStore {
   }
 
   getNodeResponseIds(node) {
-    return node.branches.map(branch => getId(branch));
+    return node.branches.map((branch) => getId(branch));
   }
 
   /*
-  * =======================================
-  * || DIALOG TREE DATA BUILDING METHODS ||
-  * =======================================
-  */
+   * =======================================
+   * || DIALOG TREE DATA BUILDING METHODS ||
+   * =======================================
+   */
   getChildren(node) {
     const { nextNodeIndex } = node; // root or response/branch
 
@@ -660,19 +666,21 @@ class NodeStore {
           branch.type = 'response';
           branch.parentId = childNodeId;
 
-          const isValidLink = auxiliaryLink && (branch.nextNodeIndex !== -1);
+          const isValidLink = auxiliaryLink && branch.nextNodeIndex !== -1;
           let branchChildren = [];
 
           if (auxiliaryLink) {
             if (isValidLink) {
-              branchChildren = [{
-                title: `[Link to NODE ${branch.nextNodeIndex}]`,
-                type: 'link',
-                linkId: getId(this.getNodeByIndex(branch.nextNodeIndex)),
-                linkIndex: branch.nextNodeIndex,
-                canDrag: false,
-                parentId: branchNodeId,
-              }];
+              branchChildren = [
+                {
+                  title: `[Link to NODE ${branch.nextNodeIndex}]`,
+                  type: 'link',
+                  linkId: getId(this.getNodeByIndex(branch.nextNodeIndex)),
+                  linkIndex: branch.nextNodeIndex,
+                  canDrag: false,
+                  parentId: branchNodeId,
+                },
+              ];
             }
           } else {
             branchChildren = this.getChildren(branch);

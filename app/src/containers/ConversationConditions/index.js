@@ -45,8 +45,10 @@ class ConversationConditions extends Component {
     defStore.setOperation(newCondition, newCondition.functionName);
 
     if (conditions) {
+      // FIXME: Use an action
       conditions.ops.push(newCondition);
     } else {
+      // FIXME: Use an action
       node.conditions = {
         ops: [newCondition],
       };

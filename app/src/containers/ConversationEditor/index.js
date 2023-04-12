@@ -8,7 +8,7 @@ import { DialogEditor } from '../../components/DialogEditor';
 import { DialogTextArea } from '../../components/DialogTextArea';
 import ConversationGeneral from '../ConversationGeneral';
 import ConversationConditions from '../ConversationConditions';
-import ConversationActions from '../ConversationActions';
+import { ConversationActions } from '../ConversationActions';
 
 import { updateConversation } from '../../services/api';
 import { regenerateNodeIds, regenerateConversationId } from '../../utils/conversation-utils';
@@ -160,6 +160,8 @@ class ConversationEditor extends Component {
         </Form>
 
         <DialogEditor conversationAsset={conversationAsset} rebuild={rebuild} />
+
+        {console.log('[ConversationEditor] active node', activeNode)}
 
         {activeNode && (
           <div className="conversation-editor__details">
