@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { message, Menu } from 'antd';
 import { observer, inject } from 'mobx-react';
 
-import FileSystemPicker from '../../components/FileSystemPicker';
+import { FileSystemPicker } from '../../components/FileSystemPicker';
 import SaveConversationAs from '../../components/SaveConversationAs';
 import { About } from '../../components/About';
 
@@ -14,7 +14,7 @@ import './Header.css';
 const MenuItem = Menu.Item;
 const { SubMenu } = Menu;
 
-export const Header = ({ dataStore, modalStore }) => {
+export function Header({ dataStore, modalStore }) {
   const { workingDirectory } = dataStore;
   const hasActiveConversation = dataStore.activeConversationAsset !== null;
 
@@ -82,7 +82,7 @@ export const Header = ({ dataStore, modalStore }) => {
       </Menu>
     </div>
   );
-};
+}
 
 Header.propTypes = {
   dataStore: PropTypes.object.isRequired,
