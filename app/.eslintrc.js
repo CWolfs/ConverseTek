@@ -22,7 +22,7 @@ module.exports = {
             specialLink: ['to'],
           },
         ],
-        'max-len': ['error', { code: 140 }],
+        'max-len': ['error', { code: 150 }],
         'arrow-parens': ['error', 'always'],
         'object-curly-newline': 0,
         'function-paren-newline': ['error', 'multiline'],

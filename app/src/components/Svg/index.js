@@ -1,5 +1,1 @@
-import LinkIcon from './LinkIcon';
-
-export { LinkIcon };
-
-export default {};
+export * from './LinkIcon';
