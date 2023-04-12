@@ -7,7 +7,7 @@ import remove from 'lodash.remove';
 
 import 'react-custom-scroll/dist/customScroll.css';
 
-import ViewableLogic from '../../components/ViewableLogic';
+import { ViewableLogic } from '../../components/ViewableLogic';
 import { EditableLogic } from '../../components/EditableLogic';
 
 import './ConversationConditions.css';
