@@ -1,3 +1,4 @@
+/* eslint-disable function-paren-newline */
 import { observable, action, toJS, makeObservable } from 'mobx';
 import defer from 'lodash.defer';
 import remove from 'lodash.remove';
@@ -351,7 +352,16 @@ class NodeStore {
   }
 
   setNodeActions(node, actions) {
-    node.actions = actions;
+    if (actions === null) node.actions = null;
+
+    node.actions = {
+      ops: actions,
+    };
+  }
+
+  addNodeAction(node, nodeAction) {
+    const { actions } = node;
+    this.setNodeActions(node, [...actions.ops, nodeAction]);
   }
 
   getNode(nodeId) {

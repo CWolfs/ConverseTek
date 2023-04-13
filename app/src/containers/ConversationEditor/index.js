@@ -161,8 +161,6 @@ class ConversationEditor extends Component {
 
         <DialogEditor conversationAsset={conversationAsset} rebuild={rebuild} />
 
-        {console.log('[ConversationEditor] active node', activeNode)}
-
         {activeNode && (
           <div className="conversation-editor__details">
             <Row gutter={16}>

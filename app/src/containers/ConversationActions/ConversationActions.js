@@ -16,7 +16,7 @@ const { Panel } = Collapse;
 
 function ConversationActions({ nodeStore, defStore, node }) {
   const dataSize = useRef(0);
-  let { actions } = node;
+  const { actions } = node;
 
   const onAddAction = () => {
     const newCondition = {
@@ -26,20 +26,15 @@ function ConversationActions({ nodeStore, defStore, node }) {
     defStore.setOperation(newCondition, newCondition.functionName);
 
     if (actions) {
-      nodeStore.setNodeActions(node, {
-        ops: [...actions, newCondition],
-      });
+      nodeStore.addNodeAction(node, newCondition);
     } else {
-      nodeStore.setNodeActions(node, {
-        ops: [newCondition],
-      });
+      nodeStore.setNodeActions(node, [newCondition]);
     }
   };
 
   const onDeleteAction = (event, index) => {
     remove(actions.ops, (value, i) => i === index);
-    // FIXME: Implement better immutability
-    if (actions.ops.length <= 0) node.actions = null;
+    if (actions.ops.length <= 0) nodeStore.setNodeActions(node, null);
 
     event.stopPropagation();
   };
@@ -83,18 +78,13 @@ function ConversationActions({ nodeStore, defStore, node }) {
     );
   };
 
-  if (actions === null) {
-    actions = [];
-  } else {
-    actions = actions.ops;
-  }
-
-  dataSize.current = actions.length;
+  const displayActions = actions === null ? [] : actions.ops;
+  dataSize.current = displayActions.length;
   const height = window.document.getElementsByClassName('conversation-editor__details')[0].clientHeight - 22;
 
   return (
     <div className="conversation-actions" style={{ height }}>
-      <Collapse>{actions.map((condition, index) => renderPanel(condition, index))}</Collapse>
+      <Collapse>{displayActions.map((condition, index) => renderPanel(condition, index))}</Collapse>
       <div className="conversation-actions__buttons">
         <Button type="secondary" size="small" onClick={onAddAction}>
           <Icon type="plus" />
