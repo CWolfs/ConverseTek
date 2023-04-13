@@ -6,7 +6,7 @@ import { useStore } from 'hooks/useStore';
 
 import { ConversationTree } from '../ConversationTree';
 import { ConversationEditor } from '../ConversationEditor';
-import SplashScreen from '../SplashScreen';
+import { SplashScreen } from '../SplashScreen';
 
 import './Conversations.css';
 

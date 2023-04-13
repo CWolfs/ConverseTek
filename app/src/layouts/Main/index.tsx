@@ -3,10 +3,10 @@ import { observer } from 'mobx-react';
 import { Switch, Route } from 'react-router-dom';
 
 import { Conversations } from '../../containers/Conversations';
-import GlobalModal from '../../containers/GlobalModal';
+import { GlobalModal } from '../../containers/GlobalModal';
 
-import Header from '../../containers/Header';
-import Footer from '../../containers/Footer';
+import { Header } from '../../containers/Header';
+import { Footer } from '../../containers/Footer';
 
 import './Main.css';
 

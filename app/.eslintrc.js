@@ -37,6 +37,7 @@ module.exports = {
         'import/extensions': 0,
         'react/jsx-props-no-spreading': 0,
         'react/function-component-definition': 0,
+        'react/jsx-one-expression-per-line': 0,
       },
     },
     {
