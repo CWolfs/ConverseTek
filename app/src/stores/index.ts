@@ -13,4 +13,10 @@ const stores = {
   errorStore,
 };
 
+export * from './dataStore';
+export * from './nodeStore';
+export * from './modalStore';
+export * from './defStore';
+export * from './errorStore';
+
 export default stores;

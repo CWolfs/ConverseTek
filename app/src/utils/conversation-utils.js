@@ -1,3 +1,4 @@
+/* eslint-disable import/extensions */
 import { v4 as uuidv4 } from 'uuid';
 import md5 from 'md5';
 import findIndex from 'lodash.findindex';
@@ -5,6 +6,8 @@ import sortBy from 'lodash.sortby';
 import range from 'lodash.range';
 import difference from 'lodash.difference';
 import forEachRight from 'lodash.foreachright';
+
+import { dataStore } from '../stores';
 
 /* eslint-disable no-param-reassign, no-return-assign */
 export function generateId() {
@@ -20,7 +23,7 @@ export function regenerateNodeIds(conversationAsset) {
 }
 
 export function regenerateConversationId(conversationAsset) {
-  conversationAsset.Conversation.idRef.id = generateId();
+  dataStore.setConversationId(conversationAsset, generateId());
 }
 
 /*

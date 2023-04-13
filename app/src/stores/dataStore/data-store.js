@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import { observable, action, makeObservable } from 'mobx';
 
 import { createConversation } from '../../utils/conversation-utils';
@@ -27,6 +28,9 @@ class DataStore {
       updateActiveConversation: action,
       setActiveConversation: action,
       setUnsavedActiveConversation: action,
+      setUnsavedConversationId: action,
+      setConversationId: action,
+      setUnsavedConversationUIName: action,
       reset: action,
     });
 
@@ -79,6 +83,20 @@ class DataStore {
 
   setUnsavedActiveConversation(conversationAsset) {
     this.unsavedActiveConversationAsset = observable(conversationAsset);
+  }
+
+  setConversationId(conversationAsset, id) {
+    // FIXME: Implement immutability
+    conversationAsset.Conversation.idRef.id = id;
+  }
+
+  setUnsavedConversationId(id) {
+    // FIXME: Implement immutability
+    this.unsavedActiveConversationAsset.Conversation.idRef.id = id;
+  }
+
+  setUnsavedConversationUIName(name) {
+    this.unsavedActiveConversationAsset.Conversation.ui_name = name;
   }
 
   reset = () => {

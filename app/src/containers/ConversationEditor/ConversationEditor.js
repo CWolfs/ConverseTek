@@ -47,11 +47,11 @@ function ConversationEditor({ nodeStore, dataStore, conversationAsset }) {
   };
 
   const handleIdChange = (event) => {
-    unsavedActiveConversationAsset.Conversation.idRef.id = event.target.value.trim();
+    dataStore.setUnsavedConversationId(event.target.value.trim());
   };
 
   const handleNameChange = (event) => {
-    unsavedActiveConversationAsset.Conversation.ui_name = event.target.value.trim();
+    dataStore.setUnsavedConversationUIName(event.target.value.trim());
   };
 
   // onMount
