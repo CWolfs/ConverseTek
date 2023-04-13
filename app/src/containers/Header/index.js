@@ -1,8 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { message, Menu } from 'antd';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 
+import { useStore } from '../../hooks/useStore';
 import { FileSystemPicker } from '../../components/FileSystemPicker';
 import { SaveConversationAs } from '../../components/SaveConversationAs';
 import { About } from '../../components/About';
@@ -14,7 +14,10 @@ import './Header.css';
 const MenuItem = Menu.Item;
 const { SubMenu } = Menu;
 
-export function Header({ dataStore, modalStore }) {
+export function Header() {
+  const dataStore = useStore('data');
+  const modalStore = useStore('modal');
+
   const { workingDirectory } = dataStore;
   const hasActiveConversation = dataStore.activeConversationAsset !== null;
 
@@ -40,14 +43,10 @@ export function Header({ dataStore, modalStore }) {
             </MenuItem>
           )}
 
-          {hasActiveConversation && (
-            <MenuItem onClick={() => modalStore.setModelContent(SaveConversationAs)}>Save Conversation As...</MenuItem>
-          )}
+          {hasActiveConversation && <MenuItem onClick={() => modalStore.setModelContent(SaveConversationAs)}>Save Conversation As...</MenuItem>}
 
           {workingDirectory && (
-            <MenuItem onClick={() => modalStore.setModelContent(FileSystemPicker, { fileMode: true })}>
-              Import Conversation from JSON
-            </MenuItem>
+            <MenuItem onClick={() => modalStore.setModelContent(FileSystemPicker, { fileMode: true })}>Import Conversation from JSON</MenuItem>
           )}
 
           {hasActiveConversation && (
@@ -84,9 +83,4 @@ export function Header({ dataStore, modalStore }) {
   );
 }
 
-Header.propTypes = {
-  dataStore: PropTypes.object.isRequired,
-  modalStore: PropTypes.object.isRequired,
-};
-
-export default inject('dataStore', 'modalStore')(observer(Header));
+export default observer(Header);

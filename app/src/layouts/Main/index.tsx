@@ -1,9 +1,8 @@
 import React, { ReactElement } from 'react';
-import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
 import { Switch, Route } from 'react-router-dom';
 
-import Conversations from '../../containers/Conversations';
+import { Conversations } from '../../containers/Conversations';
 import GlobalModal from '../../containers/GlobalModal';
 
 import Header from '../../containers/Header';
@@ -11,7 +10,7 @@ import Footer from '../../containers/Footer';
 
 import './Main.css';
 
-const Layout = ({ children }): ReactElement => (
+const Layout = ({ children }: { children: React.ReactNode }): ReactElement => (
   <div className="main">
     <div className="main__content">
       <Header />
@@ -27,13 +26,5 @@ const Layout = ({ children }): ReactElement => (
     </div>
   </div>
 );
-
-Layout.defaultProps = {
-  children: undefined,
-};
-
-Layout.propTypes = {
-  children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]),
-};
 
 export default observer(Layout);

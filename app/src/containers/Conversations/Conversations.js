@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { observer, inject } from 'mobx-react';
 
-import ConversationTree from '../ConversationTree';
+import { ConversationTree } from '../ConversationTree';
 import { ConversationEditor } from '../ConversationEditor';
 import SplashScreen from '../SplashScreen';
 
