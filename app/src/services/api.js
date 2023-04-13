@@ -1,7 +1,7 @@
 import { get, post } from './rest';
 
-import dataStore from '../stores/dataStore';
-import defStore from '../stores/defStore';
+import { dataStore } from '../stores/dataStore';
+import { defStore } from '../stores/defStore';
 
 import { consolidateSpeaker, fillIndexGaps } from '../utils/conversation-utils';
 

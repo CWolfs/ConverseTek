@@ -1,11 +1,11 @@
-import nodeStore from '../stores/nodeStore';
+import { nodeStore } from '../stores/nodeStore';
 
 export function detectType(type) {
   return {
-    isRoot: (type === 'root'),
-    isNode: (type === 'node'),
-    isResponse: (type === 'response'),
-    isLink: (type === 'link'),
+    isRoot: type === 'root',
+    isNode: type === 'node',
+    isResponse: type === 'response',
+    isLink: type === 'link',
   };
 }
 
@@ -35,14 +35,13 @@ export function isAllowedToPasteCopy(nodeId, clipboard) {
   if (!node || !clipboardNode) return false;
 
   const { isRoot, isNode, isResponse } = detectType(node.type);
-  const {
-    isNode: clipboardIsNode,
-    isResponse: clipboardIsResponse,
-  } = detectType(clipboardNode.type);
+  const { isNode: clipboardIsNode, isResponse: clipboardIsResponse } = detectType(clipboardNode.type);
 
-  if (isRoot || isResponse) { // Only allow nodes to be copied in if target is a root or response
+  if (isRoot || isResponse) {
+    // Only allow nodes to be copied in if target is a root or response
     if (!clipboardIsNode) return false;
-  } else if (isNode) { // Only allow response to be copied in
+  } else if (isNode) {
+    // Only allow response to be copied in
     if (!clipboardIsResponse) return false;
   }
 
