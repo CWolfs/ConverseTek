@@ -58,7 +58,7 @@ class ModalStore {
   }
 
   setModelContent(ModalContent, props = {}, show = true) {
-    this.ModalContent = <ModalContent modalStore={this} />;
+    this.ModalContent = <ModalContent />;
     this.props = props;
     if (show) this.showModal(true);
   }

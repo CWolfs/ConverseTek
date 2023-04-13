@@ -1,11 +1,15 @@
 /* eslint-disable react/jsx-one-expression-per-line */
 import React, { useEffect } from 'react';
-import PropTypes from 'prop-types';
-import packageJson from '../../../package.json';
+
+import packageJson from 'package.json';
+
+import { useStore } from 'hooks/useStore';
 
 import './About.css';
 
-export function About({ modalStore }) {
+export function About() {
+  const modalStore = useStore('modal');
+
   const onOk = () => {
     modalStore.closeModal();
   };
@@ -42,7 +46,3 @@ export function About({ modalStore }) {
     </div>
   );
 }
-
-About.propTypes = {
-  modalStore: PropTypes.object.isRequired,
-};

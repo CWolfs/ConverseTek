@@ -1,16 +1,19 @@
 import React, { useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
+
+import { getConversations, getDefinitions } from 'services/api';
+import { useStore } from 'hooks/useStore';
 
 import { ConversationTree } from '../ConversationTree';
 import { ConversationEditor } from '../ConversationEditor';
 import SplashScreen from '../SplashScreen';
 
-import { getConversations, getDefinitions } from '../../services/api';
-
 import './Conversations.css';
 
-const Conversations = ({ dataStore, defStore }) => {
+const Conversations = () => {
+  const dataStore = useStore('data');
+  const defStore = useStore('def');
+
   const { conversationAssets, activeConversationAsset } = dataStore;
   const { definitionCount } = defStore;
 
@@ -31,9 +34,4 @@ const Conversations = ({ dataStore, defStore }) => {
   );
 };
 
-Conversations.propTypes = {
-  dataStore: PropTypes.object.isRequired,
-  defStore: PropTypes.object.isRequired,
-};
-
-export const ObservingConversations = inject('dataStore', 'defStore')(observer(Conversations));
+export const ObservingConversations = observer(Conversations);

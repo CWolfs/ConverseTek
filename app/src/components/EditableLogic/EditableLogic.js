@@ -4,16 +4,20 @@
 /* eslint-disable operator-linebreak */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Icon, Tooltip } from 'antd';
+
+import { useStore } from 'hooks/useStore';
 
 import { EditableSelect } from '../EditableSelect';
 import { EditableInput } from '../EditbleInput';
 
 import './EditableLogic.css';
 
-function EditableLogic({ defStore, scope, category, logic, isEven, parentLogic, parentInput, parentArg }) {
+function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInput, parentArg }) {
+  const defStore = useStore('def');
+
   const renderLogic = (logicDef) => {
     const operations = defStore.getOperations(category, scope);
     const { functionName } = logic;
@@ -249,7 +253,6 @@ EditableLogic.defaultProps = {
 };
 
 EditableLogic.propTypes = {
-  defStore: PropTypes.object.isRequired,
   parentLogic: PropTypes.object,
   parentInput: PropTypes.object,
   parentArg: PropTypes.object,
@@ -259,4 +262,4 @@ EditableLogic.propTypes = {
   isEven: PropTypes.bool,
 };
 
-export const ObservingEditableLogic = inject('defStore')(observer(EditableLogic));
+export const ObservingEditableLogic = observer(EditableLogic);

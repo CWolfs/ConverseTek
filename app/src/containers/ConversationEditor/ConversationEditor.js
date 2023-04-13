@@ -1,25 +1,29 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { toJS } from 'mobx';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { message, Button, Row, Col, Form, Input, Icon, Tabs, Popconfirm } from 'antd';
 
-import { DialogEditor } from '../../components/DialogEditor';
-import { DialogTextArea } from '../../components/DialogTextArea';
+import { updateConversation } from 'services/api';
+import { regenerateNodeIds, regenerateConversationId } from 'utils/conversation-utils';
+import { detectType } from 'utils/node-utils';
+import { useStore } from 'hooks/useStore';
+import { DialogEditor } from 'components/DialogEditor';
+import { DialogTextArea } from 'components/DialogTextArea';
+
 import { ConversationGeneral } from '../ConversationGeneral';
 import { ConversationConditions } from '../ConversationConditions';
 import { ConversationActions } from '../ConversationActions';
-
-import { updateConversation } from '../../services/api';
-import { regenerateNodeIds, regenerateConversationId } from '../../utils/conversation-utils';
-import { detectType } from '../../utils/node-utils';
 
 import './ConversationEditor.css';
 
 const FormItem = Form.Item;
 const { TabPane } = Tabs;
 
-function ConversationEditor({ nodeStore, dataStore, conversationAsset }) {
+function ConversationEditor({ conversationAsset }) {
+  const nodeStore = useStore('node');
+  const dataStore = useStore('data');
+
   const { unsavedActiveConversationAsset } = dataStore;
   const { activeNode, rebuild } = nodeStore;
 
@@ -163,9 +167,7 @@ function ConversationEditor({ nodeStore, dataStore, conversationAsset }) {
 }
 
 ConversationEditor.propTypes = {
-  dataStore: PropTypes.object.isRequired,
-  nodeStore: PropTypes.object.isRequired,
   conversationAsset: PropTypes.object.isRequired,
 };
 
-export const ObservingConversationEditor = inject('dataStore', 'nodeStore')(observer(ConversationEditor));
+export const ObservingConversationEditor = observer(ConversationEditor);

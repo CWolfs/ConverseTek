@@ -2,16 +2,17 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import SortableTree from 'react-sortable-tree';
 import { useContextMenu } from 'react-contexify';
 
 import 'react-sortable-tree/style.css';
 
+import { useStore } from 'hooks/useStore';
+import { detectType } from 'utils/node-utils';
+
 import { ConverseTekNodeRenderer } from './ConverseTekNodeRenderer';
 import { DialogEditorContextMenu } from '../DialogEditorContextMenu';
-
-import { detectType } from '../../utils/node-utils';
 
 import './DialogEditor.css';
 
@@ -29,7 +30,9 @@ function buildTreeData(nodeStore, conversationAsset) {
   return data;
 }
 
-function DialogEditor({ nodeStore, conversationAsset, rebuild }) {
+function DialogEditor({ conversationAsset, rebuild }) {
+  const nodeStore = useStore('node');
+
   const [treeData, setTreeData] = useState(null);
   const [treeWidth, setTreeWidth] = useState(0);
   const [isContextMenuVisible, setIsContextMenuVisible] = useState(false);
@@ -194,9 +197,8 @@ DialogEditor.defaultProps = {
 };
 
 DialogEditor.propTypes = {
-  nodeStore: PropTypes.object.isRequired,
   conversationAsset: PropTypes.object.isRequired,
   rebuild: PropTypes.bool,
 };
 
-export const ObservingDialogueEditor = inject('nodeStore')(observer(DialogEditor));
+export const ObservingDialogueEditor = observer(DialogEditor);

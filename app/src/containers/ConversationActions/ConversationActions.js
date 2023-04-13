@@ -1,20 +1,24 @@
 import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { Button, Icon, Collapse, Popconfirm } from 'antd';
 import classnames from 'classnames';
 import remove from 'lodash.remove';
 
 import 'react-custom-scroll/dist/customScroll.css';
 
-import { ViewableLogic } from '../../components/ViewableLogic';
-import { EditableLogic } from '../../components/EditableLogic';
+import { ViewableLogic } from 'components/ViewableLogic';
+import { EditableLogic } from 'components/EditableLogic';
+import { useStore } from 'hooks/useStore';
 
 import './ConversationActions.css';
 
 const { Panel } = Collapse;
 
-function ConversationActions({ nodeStore, defStore, node }) {
+function ConversationActions({ node }) {
+  const nodeStore = useStore('node');
+  const defStore = useStore('def');
+
   const dataSize = useRef(0);
   const { actions } = node;
 
@@ -96,8 +100,6 @@ function ConversationActions({ nodeStore, defStore, node }) {
 
 ConversationActions.propTypes = {
   node: PropTypes.object.isRequired,
-  nodeStore: PropTypes.object.isRequired,
-  defStore: PropTypes.object.isRequired,
 };
 
-export const ObservingConversationActions = inject('nodeStore', 'defStore')(observer(ConversationActions));
+export const ObservingConversationActions = observer(ConversationActions);

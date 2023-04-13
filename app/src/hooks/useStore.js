@@ -13,7 +13,7 @@ export const useStore = (storeType) => {
   if (storeType === 'data') return store.dataStore;
   if (storeType === 'node') return store.nodeStore;
   if (storeType === 'modal') return store.modalStore;
-  if (storeType === 'def') return store.def;
+  if (storeType === 'def') return store.defStore;
   if (storeType === 'error') return store.errorStore;
 
   throw new Error('useStore must be used with a valid store type');

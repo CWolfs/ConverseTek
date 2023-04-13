@@ -3,9 +3,13 @@
 /* eslint-disable react/jsx-one-expression-per-line */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 
-function ViewableLogic({ defStore, logic }) {
+import { useStore } from 'hooks/useStore';
+
+function ViewableLogic({ logic }) {
+  const defStore = useStore('def');
+
   const logicDef = defStore.getDefinition(logic);
 
   // GUARD
@@ -77,8 +81,7 @@ function ViewableLogic({ defStore, logic }) {
 }
 
 ViewableLogic.propTypes = {
-  defStore: PropTypes.object.isRequired,
   logic: PropTypes.object.isRequired,
 };
 
-export const ObservingViewableLogic = inject('defStore')(observer(ViewableLogic));
+export const ObservingViewableLogic = observer(ViewableLogic);

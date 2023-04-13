@@ -2,7 +2,7 @@ import React from 'react';
 import { message, Menu } from 'antd';
 import { observer } from 'mobx-react';
 
-import { useStore } from '../../hooks/useStore';
+import { useStore } from 'hooks/useStore';
 import { FileSystemPicker } from '../../components/FileSystemPicker';
 import { SaveConversationAs } from '../../components/SaveConversationAs';
 import { About } from '../../components/About';

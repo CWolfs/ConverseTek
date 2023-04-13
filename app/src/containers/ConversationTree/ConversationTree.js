@@ -1,9 +1,9 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import sortBy from 'lodash.sortby';
 
-import { FileTree } from '../../components/FileTree';
+import { useStore } from 'hooks/useStore';
+import { FileTree } from 'components/FileTree';
 
 import './ConversationTree.css';
 
@@ -17,7 +17,9 @@ function remapConversationData(conversationAssets) {
   );
 }
 
-function ConversationTree({ dataStore }) {
+function ConversationTree() {
+  const dataStore = useStore('data');
+
   const { conversationAssets, activeConversationAsset } = dataStore;
   const data = remapConversationData(conversationAssets);
   const selectedKeys = activeConversationAsset ? [activeConversationAsset.Conversation.idRef.id] : undefined;
@@ -33,8 +35,4 @@ function ConversationTree({ dataStore }) {
   );
 }
 
-ConversationTree.propTypes = {
-  dataStore: PropTypes.object.isRequired,
-};
-
-export const ObservingConversationTree = inject('dataStore')(observer(ConversationTree));
+export const ObservingConversationTree = observer(ConversationTree);

@@ -1,5 +1,7 @@
 /* eslint-disable no-console */
 const path = require('path');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+// const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 
 const isLocal = process.env.NODE_ENV === 'local';
 const isDev = process.env.NODE_ENV === 'development';
@@ -19,9 +21,6 @@ const lessLoader = require('./webpack/loaders/less.loader');
 const postcssLoader = require('./webpack/loaders/postcss.loader');
 const imageLoader = require('./webpack/loaders/image.loader');
 
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-// const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
-
 let config = {
   entry: ['@babel/polyfill', `${APP_DIR}/index.js`],
 
@@ -33,6 +32,16 @@ let config = {
 
   resolve: {
     extensions: ['.js', '.json', '.jsx', '.tsx', '.ts'],
+    alias: {
+      root: path.resolve(__dirname, 'src/'),
+      components: path.resolve(__dirname, 'src/components/'),
+      containers: path.resolve(__dirname, 'src/containers/'),
+      services: path.resolve(__dirname, 'src/services/'),
+      hooks: path.resolve(__dirname, 'src/hooks/'),
+      stores: path.resolve(__dirname, 'src/stores/'),
+      utils: path.resolve(__dirname, 'src/utils/'),
+    },
+    modules: [path.resolve(__dirname), 'node_modules'],
   },
 
   cache: {

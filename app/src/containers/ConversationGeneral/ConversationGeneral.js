@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Card, Row, Col, Input, Select, Tooltip, Icon, Checkbox } from 'antd';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import capitalize from 'lodash.capitalize';
 
-import { getId, createId } from '../../utils/conversation-utils';
+import { getId, createId } from 'utils/conversation-utils';
+import { useStore } from 'hooks/useStore';
 
 import './ConversationGeneral.css';
 
@@ -26,7 +27,9 @@ const colTwoLayout = {
   xxl: { span: 24 - colOneLayout.xxl.span },
 };
 
-function ConversationGeneral({ nodeStore, node }) {
+function ConversationGeneral({ node }) {
+  const nodeStore = useStore('node');
+
   const { idRef, speaker_override_id: speakerOverrideId, sourceInSceneRef, type } = node;
   const sceneRefCastId = sourceInSceneRef && sourceInSceneRef.id ? sourceInSceneRef.id : null;
   const nodeSpeakerId = speakerOverrideId !== '' ? speakerOverrideId : null;
@@ -188,8 +191,7 @@ function ConversationGeneral({ nodeStore, node }) {
 }
 
 ConversationGeneral.propTypes = {
-  nodeStore: PropTypes.object.isRequired,
   node: PropTypes.object.isRequired,
 };
 
-export const ObservingConversationGeneral = inject('nodeStore')(observer(ConversationGeneral));
+export const ObservingConversationGeneral = observer(ConversationGeneral);

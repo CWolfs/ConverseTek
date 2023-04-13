@@ -1,6 +1,5 @@
 /* eslint-disable operator-linebreak */
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import { List, Icon, Tooltip } from 'antd';
 import classnames from 'classnames';
 import remove from 'lodash.remove';
@@ -8,14 +7,8 @@ import sortBy from 'lodash.sortby';
 import debounce from 'lodash.debounce';
 import toPairs from 'lodash.topairs';
 
-import {
-  getRootDrives,
-  getDirectories,
-  getQuickLinks,
-  saveWorkingDirectory,
-  getConversations,
-  importConversation,
-} from '../../services/api';
+import { getRootDrives, getDirectories, getQuickLinks, saveWorkingDirectory, getConversations, importConversation } from 'services/api';
+import { useStore } from 'hooks/useStore';
 
 import './FileSystemPicker.css';
 
@@ -29,7 +22,9 @@ function getItemIcon(item) {
 
 let debouncedClickEvents = [];
 
-export function FileSystemPicker({ modalStore }) {
+export function FileSystemPicker() {
+  const modalStore = useStore('modal');
+
   const [loading, setLoading] = useState(false);
   const [fileMode, setFileMode] = useState(modalStore.props.fileMode);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -73,10 +68,7 @@ export function FileSystemPicker({ modalStore }) {
     debouncedClickEvents = debouncedClickEvents || [];
 
     const callback = debounce(() => {
-      let newFsItems = [
-        ...sortBy(directories, (fsItem) => fsItem.Name.toLowerCase()),
-        ...sortBy(files, (fsItem) => fsItem.Name.toLowerCase()),
-      ];
+      let newFsItems = [...sortBy(directories, (fsItem) => fsItem.Name.toLowerCase()), ...sortBy(files, (fsItem) => fsItem.Name.toLowerCase())];
 
       const clickedItem = {
         ...item,
@@ -190,7 +182,3 @@ export function FileSystemPicker({ modalStore }) {
     </div>
   );
 }
-
-FileSystemPicker.propTypes = {
-  modalStore: PropTypes.object.isRequired,
-};

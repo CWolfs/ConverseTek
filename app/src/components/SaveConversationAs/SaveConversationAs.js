@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { message, Input } from 'antd';
 
-import { updateConversation } from '../../services/api';
+import { updateConversation } from 'services/api';
+import { useStore } from 'hooks/useStore';
 
 import './SaveConversationAs.css';
 
-function SaveConversationAs({ dataStore, modalStore }) {
+function SaveConversationAs() {
+  const dataStore = useStore('data');
+  const modalStore = useStore('modal');
+
   const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
 
   const [suggestedFileName] = useState(`${conversationAsset.Conversation.idRef.id}.convo.bytes`);
@@ -52,9 +55,4 @@ function SaveConversationAs({ dataStore, modalStore }) {
   );
 }
 
-SaveConversationAs.propTypes = {
-  dataStore: PropTypes.object.isRequired,
-  modalStore: PropTypes.object.isRequired,
-};
-
-export const ObservingSaveConversationAs = inject('dataStore')(observer(SaveConversationAs));
+export const ObservingSaveConversationAs = observer(SaveConversationAs);
