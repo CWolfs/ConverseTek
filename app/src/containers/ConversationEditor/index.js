@@ -7,7 +7,7 @@ import { message, Button, Row, Col, Form, Input, Icon, Tabs, Popconfirm } from '
 import { DialogEditor } from '../../components/DialogEditor';
 import { DialogTextArea } from '../../components/DialogTextArea';
 import ConversationGeneral from '../ConversationGeneral';
-import ConversationConditions from '../ConversationConditions';
+import { ConversationConditions } from '../ConversationConditions';
 import { ConversationActions } from '../ConversationActions';
 
 import { updateConversation } from '../../services/api';

@@ -19,16 +19,16 @@ function ConversationActions({ nodeStore, defStore, node }) {
   const { actions } = node;
 
   const onAddAction = () => {
-    const newCondition = {
+    const newAction = {
       functionName: 'Play BattleTech Audio Event',
       args: [],
     };
-    defStore.setOperation(newCondition, newCondition.functionName);
+    defStore.setOperation(newAction, newAction.functionName);
 
     if (actions) {
-      nodeStore.addNodeAction(node, newCondition);
+      nodeStore.addNodeAction(node, newAction);
     } else {
-      nodeStore.setNodeActions(node, [newCondition]);
+      nodeStore.setNodeActions(node, [newAction]);
     }
   };
 
@@ -39,7 +39,7 @@ function ConversationActions({ nodeStore, defStore, node }) {
     event.stopPropagation();
   };
 
-  const renderPanel = (condition, index) => {
+  const renderPanel = (action, index) => {
     const key = index;
 
     const classes = classnames('conversation-actions__panel', {
@@ -50,7 +50,7 @@ function ConversationActions({ nodeStore, defStore, node }) {
     const header = (
       <div className="conversation-actions__panel-header">
         <div className="conversation-actions__panel-header-logic">
-          <ViewableLogic key={condition.functionName} logic={condition} />
+          <ViewableLogic key={action.functionName} logic={action} />
         </div>
         <Popconfirm
           title="Are you sure you want to delete this condition?"
@@ -73,7 +73,7 @@ function ConversationActions({ nodeStore, defStore, node }) {
 
     return (
       <Panel key={key} className={classes} header={header}>
-        <EditableLogic key={condition.functionName} logic={condition} category="primary" scope="action" />
+        <EditableLogic key={action.functionName} logic={action} category="primary" scope="action" />
       </Panel>
     );
   };

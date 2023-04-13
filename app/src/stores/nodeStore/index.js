@@ -26,8 +26,11 @@ import { detectType } from '../../utils/node-utils';
 /* eslint-disable no-return-assign, no-param-reassign, class-methods-use-this */
 class NodeStore {
   activeNode;
+
   focusedNode;
+
   dirtyActiveNode = false;
+
   rebuild = false;
 
   constructor() {
@@ -362,6 +365,19 @@ class NodeStore {
   addNodeAction(node, nodeAction) {
     const { actions } = node;
     this.setNodeActions(node, [...actions.ops, nodeAction]);
+  }
+
+  setNodeConditions(node, conditions) {
+    if (conditions === null) node.conditions = null;
+
+    node.conditions = {
+      ops: conditions,
+    };
+  }
+
+  addNodeCondition(node, nodeCondition) {
+    const { conditions } = node;
+    this.setNodeConditions(node, [...conditions.ops, nodeCondition]);
   }
 
   getNode(nodeId) {
