@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { observer, inject } from 'mobx-react';
 
 import ConversationTree from '../ConversationTree';
-import ConversationEditor from '../ConversationEditor';
+import { ConversationEditor } from '../ConversationEditor';
 import SplashScreen from '../SplashScreen';
 
 import { getConversations, getDefinitions } from '../../services/api';
@@ -17,17 +17,14 @@ const Conversations = ({ dataStore, defStore }) => {
   if (conversationAssets.size <= 0) getConversations();
   if (definitionCount <= 0) getDefinitions();
 
-  const mainView = (activeConversationAsset) ?
-    <ConversationEditor conversationAsset={activeConversationAsset} /> : <SplashScreen />;
+  const mainView = activeConversationAsset ? <ConversationEditor conversationAsset={activeConversationAsset} /> : <SplashScreen />;
 
   return (
     <div className="conversations">
       <div className="conversations__tree">
         <ConversationTree />
       </div>
-      <div className="conversations__main">
-        {mainView}
-      </div>
+      <div className="conversations__main">{mainView}</div>
     </div>
   );
 };
