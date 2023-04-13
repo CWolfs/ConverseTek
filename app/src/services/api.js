@@ -1,8 +1,8 @@
+import { consolidateSpeaker, fillIndexGaps } from 'utils/conversation-utils';
+
 import { get, post } from './rest';
 
 import { dataStore, defStore } from '../stores';
-
-import { consolidateSpeaker, fillIndexGaps } from '../utils/conversation-utils';
 
 /*
  * CHROMELY DOESN'T SUPPORT PUTS SO PUTS AND DELETES ARE CURRENTLY POSTS WITH method DATA

@@ -6,8 +6,8 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Icon } from 'antd';
 
-import { isDescendant } from '../../../utils/tree-data-utils';
-import { detectType } from '../../../utils/node-utils';
+import { isDescendant } from 'utils/tree-data-utils';
+import { detectType } from 'utils/node-utils';
 
 import { LinkIcon } from '../../Svg';
 

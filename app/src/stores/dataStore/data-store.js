@@ -1,7 +1,7 @@
 /* eslint-disable class-methods-use-this */
 import { observable, action, makeObservable } from 'mobx';
 
-import { createConversation } from '../../utils/conversation-utils';
+import { createConversation } from 'utils/conversation-utils';
 import { defStore } from '../defStore';
 
 class DataStore {

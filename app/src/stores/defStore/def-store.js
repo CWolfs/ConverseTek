@@ -2,8 +2,8 @@ import { observable, action, makeObservable } from 'mobx';
 import keys from 'lodash.keys';
 import values from 'lodash.values';
 
-import { createArg } from '../../utils/def-utils';
-import { tryParseInt, tryParseFloat } from '../../utils/number-utils';
+import { createArg } from 'utils/def-utils';
+import { tryParseInt, tryParseFloat } from 'utils/number-utils';
 
 /* eslint-disable class-methods-use-this, no-param-reassign */
 class DefStore {

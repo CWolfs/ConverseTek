@@ -1,11 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { observer, inject } from 'mobx-react';
+import { observer } from 'mobx-react';
 import { Menu, Item } from 'react-contexify';
 
 import 'react-contexify/ReactContexify.css';
 
-import { detectType, isAllowedToCreateNode, isAllowedToPasteCopy, isAllowedToPasteLink } from '../../utils/node-utils';
+import { useStore } from 'hooks/useStore';
+import { detectType, isAllowedToCreateNode, isAllowedToPasteCopy, isAllowedToPasteLink } from 'utils/node-utils';
 
 function getAddLabel(type) {
   let addItemLabel = 'Add';
@@ -26,7 +27,9 @@ function getAddLabel(type) {
   return addItemLabel;
 }
 
-function DialogEditorContextMenu({ id, nodeStore, onVisibilityChange }) {
+function DialogEditorContextMenu({ id, onVisibilityChange }) {
+  const nodeStore = useStore('node');
+
   const { focusedNode, clipboard } = nodeStore;
 
   // GUARD - no need to render the menu if there's no focused node
@@ -78,11 +81,10 @@ function DialogEditorContextMenu({ id, nodeStore, onVisibilityChange }) {
 }
 
 DialogEditorContextMenu.propTypes = {
-  nodeStore: PropTypes.object.isRequired,
   id: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired,
   parentId: PropTypes.string.isRequired,
   onVisibilityChange: PropTypes.func.isRequired,
 };
 
-export const ObservingDialogEditorContextMenu = inject('nodeStore')(observer(DialogEditorContextMenu));
+export const ObservingDialogEditorContextMenu = observer(DialogEditorContextMenu);

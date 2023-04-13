@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 
-import { isDescendant } from '../../../utils/tree-data-utils';
+import { isDescendant } from 'utils/tree-data-utils';
 
 import './DefaultNodeRenderer.css';
 
