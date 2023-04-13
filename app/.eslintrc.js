@@ -34,17 +34,14 @@ module.exports = {
         'import/default': 0,
         'import/export': 0,
         'import/prefer-default-export': 0,
+        'import/extensions': 0,
         'react/jsx-props-no-spreading': 0,
         'react/function-component-definition': 0,
       },
     },
     {
       files: ['**/*.ts', '**/*.tsx'],
-      extends: [
-        'eslint:recommended',
-        'plugin:@typescript-eslint/recommended',
-        'plugin:@typescript-eslint/recommended-requiring-type-checking',
-      ],
+      extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'plugin:@typescript-eslint/recommended-requiring-type-checking'],
       parser: '@typescript-eslint/parser',
       parserOptions: {
         project: true,

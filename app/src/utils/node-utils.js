@@ -1,4 +1,4 @@
-import { nodeStore } from '../stores/nodeStore';
+import { nodeStore } from '../stores';
 
 export function detectType(type) {
   return {
