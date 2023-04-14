@@ -3,6 +3,9 @@ import { message, Menu } from 'antd';
 import { observer } from 'mobx-react';
 
 import { useStore } from 'hooks/useStore';
+import { DataStore } from 'stores/dataStore/data-store';
+import { ModalStore } from 'stores/modalStore/modal-store';
+
 import { FileSystemPicker } from 'components/FileSystemPicker';
 import { SaveConversationAs } from 'components/SaveConversationAs';
 import { About } from 'components/About';
@@ -14,8 +17,8 @@ const MenuItem = Menu.Item;
 const { SubMenu } = Menu;
 
 export function Header() {
-  const dataStore = useStore('data');
-  const modalStore = useStore('modal');
+  const dataStore = useStore<DataStore>('data');
+  const modalStore = useStore<ModalStore>('modal');
 
   const { workingDirectory } = dataStore;
   const hasActiveConversation = dataStore.activeConversationAsset !== null;
@@ -32,7 +35,9 @@ export function Header() {
             <MenuItem
               onClick={() => {
                 const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-                updateConversation(conversationAsset.conversation.idRef.id, conversationAsset).then(() => {
+                if (!conversationAsset) return;
+
+                void updateConversation(conversationAsset.conversation.idRef.id, conversationAsset).then(() => {
                   message.success('Save successful');
                 });
                 dataStore.updateActiveConversation(conversationAsset); // local update for speed
@@ -52,7 +57,9 @@ export function Header() {
             <MenuItem
               onClick={() => {
                 const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-                exportConversation(conversationAsset.conversation.idRef.id, conversationAsset).then(() => {
+                if (!conversationAsset) return;
+
+                void exportConversation(conversationAsset.conversation.idRef.id, conversationAsset).then(() => {
                   message.success('Export successful');
                 });
               }}
@@ -65,7 +72,9 @@ export function Header() {
             <MenuItem
               onClick={() => {
                 const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-                exportAllConversations(conversationAsset ? conversationAsset.conversation.idRef.id : -1, conversationAsset).then(() => {
+                if (!conversationAsset) return;
+
+                void exportAllConversations(conversationAsset ? conversationAsset.conversation.idRef.id : '-1', conversationAsset).then(() => {
                   message.success('Export successful');
                 });
               }}

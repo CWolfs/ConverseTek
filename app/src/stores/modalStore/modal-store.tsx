@@ -1,10 +1,10 @@
 /* eslint-disable function-paren-newline */
-import React, { ElementType } from 'react';
+import React, { MouseEvent, ElementType } from 'react';
 import { observable, action, makeObservable } from 'mobx';
 import defer from 'lodash.defer';
 
-export type OnOkType = (() => void) | null;
-export type OnCancelType = (() => void) | null;
+export type OnOkType = ((event: MouseEvent<HTMLButtonElement>) => void) | null;
+export type OnCancelType = ((event: MouseEvent<HTMLButtonElement>) => void) | null;
 
 class ModalStore {
   ModalContent: ElementType | JSX.Element | null = null;

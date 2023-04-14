@@ -9,6 +9,7 @@ import { useContextMenu } from 'react-contexify';
 import 'react-sortable-tree/style.css';
 
 import { NodeStore } from 'stores/nodeStore/node-store';
+import { ConversationAssetType } from 'types/ConversationAssetType';
 
 import { useStore } from 'hooks/useStore';
 import { detectType } from 'utils/node-utils';
@@ -17,7 +18,6 @@ import { ConverseTekNodeRenderer } from './ConverseTekNodeRenderer';
 import { DialogEditorContextMenu } from '../DialogEditorContextMenu';
 
 import './DialogEditor.css';
-import { ConversationAssetType } from 'types/ConversationAssetType';
 
 function buildTreeData(nodeStore: NodeStore, conversationAsset: ConversationAssetType) {
   const data = [
@@ -34,7 +34,7 @@ function buildTreeData(nodeStore: NodeStore, conversationAsset: ConversationAsse
 }
 
 function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: ConversationAssetType; rebuild: boolean }) {
-  const nodeStore = useStore('node');
+  const nodeStore = useStore<NodeStore>('node');
 
   const [treeData, setTreeData] = useState<object[] | null>(null);
   const [treeWidth, setTreeWidth] = useState(0);
