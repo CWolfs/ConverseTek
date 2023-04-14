@@ -1,0 +1,29 @@
+{
+    "compilerOptions": {
+       "target": "esnext",
+       "moduleResolution": "node",
+       "module": "commonjs",
+       "rootDir": ".",
+       "resolveJsonModule": true,
+       "esModuleInterop": true,
+       "forceConsistentCasingInFileNames": true,
+       "strict": true,
+       "noImplicitAny": true,
+       "skipLibCheck": true,
+       "allowJs": true,
+       "declaration": true,
+       "emitDeclarationOnly": true,
+       "isolatedModules": true,
+       "jsx": "react", // change to "react-jsx" when upgrading to React 18
+       "baseUrl": "./",
+       "paths": {
+         "components/*": ["src/components/*"],
+         "containers/*": ["src/containers/*"],
+         "services/*": ["src/services/*"],
+         "hooks/*": ["src/hooks/*"],
+         "stores/*": ["src/stores/*"],
+         "utils/*": ["src/utils/*"],
+         "types/*": ["src/types/*"],
+     }
+    }
+  }

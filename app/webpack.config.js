@@ -1,8 +1,11 @@
+/* eslint-disable no-console */
 const path = require('path');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+// const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 
-const isLocal = (process.env.NODE_ENV === 'local');
-const isDev = (process.env.NODE_ENV === 'development');
-const isProd = (process.env.NODE_ENV === 'production');
+const isLocal = process.env.NODE_ENV === 'local';
+const isDev = process.env.NODE_ENV === 'development';
+const isProd = process.env.NODE_ENV === 'production';
 
 const APP_DIR = path.resolve(__dirname, 'src');
 const BUILD_DIR = path.resolve(__dirname, '../dist');
@@ -18,15 +21,8 @@ const lessLoader = require('./webpack/loaders/less.loader');
 const postcssLoader = require('./webpack/loaders/postcss.loader');
 const imageLoader = require('./webpack/loaders/image.loader');
 
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
-// const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
-
 let config = {
-  entry: [
-    'babel-polyfill',
-    `${APP_DIR}/index.js`,
-  ],
+  entry: ['@babel/polyfill', `${APP_DIR}/index.js`],
 
   output: {
     path: BUILD_DIR,
@@ -35,7 +31,24 @@ let config = {
   },
 
   resolve: {
-    extensions: ['.js', '.json'],
+    extensions: ['.js', '.json', '.jsx', '.tsx', '.ts'],
+    alias: {
+      components: path.resolve(__dirname, 'src/components/'),
+      containers: path.resolve(__dirname, 'src/containers/'),
+      services: path.resolve(__dirname, 'src/services/'),
+      hooks: path.resolve(__dirname, 'src/hooks/'),
+      stores: path.resolve(__dirname, 'src/stores/'),
+      utils: path.resolve(__dirname, 'src/utils/'),
+      types: path.resolve(__dirname, 'src/types/'),
+    },
+    modules: [path.resolve(__dirname), 'node_modules'],
+  },
+
+  cache: {
+    type: 'filesystem',
+    buildDependencies: {
+      config: [__filename],
+    },
   },
 
   module: {
@@ -43,11 +56,12 @@ let config = {
   },
 
   plugins: [
-    new CopyWebpackPlugin([
-      { from: 'src/index.html', to: 'index.html' },
-      { from: 'src/assets/', to: 'assets/' },
-    ]),
-    new HardSourceWebpackPlugin(),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: 'src/index.html', to: 'index.html' },
+        { from: 'src/assets/', to: 'assets/' },
+      ],
+    }),
   ],
 };
 

@@ -446,3 +446,7 @@
   right: 50%;
   left: initial;
 }
+
+.contexify {
+  border: 1px solid $grey4;
+}
