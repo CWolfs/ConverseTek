@@ -1,6 +1,13 @@
 import { nodeStore } from '../stores';
 
-export function detectType(type) {
+export type NodeTypeDetectionResult = {
+  isRoot: boolean;
+  isNode: boolean;
+  isResponse: boolean;
+  isLink: boolean;
+};
+
+export function detectType(type: string): NodeTypeDetectionResult {
   return {
     isRoot: type === 'root',
     isNode: type === 'node',
@@ -9,7 +16,7 @@ export function detectType(type) {
   };
 }
 
-export function isAllowedToCreateNode(nodeId) {
+export function isAllowedToCreateNode(nodeId: string) {
   if (nodeId === '0') return true; // for the 'Root'
 
   const node = nodeStore.getNode(nodeId);
@@ -17,8 +24,10 @@ export function isAllowedToCreateNode(nodeId) {
   // GUARD
   if (!node) return false;
 
-  const { type, nextNodeIndex } = node;
+  const { type } = node;
   if (type === 'node') return true;
+
+  const { nextNodeIndex } = node;
   if (type === 'root' || type === 'response') {
     if (nextNodeIndex === -1) return true;
     return false;
@@ -27,7 +36,7 @@ export function isAllowedToCreateNode(nodeId) {
   return false;
 }
 
-export function isAllowedToPasteCopy(nodeId, clipboard) {
+export function isAllowedToPasteCopy(nodeId: string, clipboard) {
   const node = nodeStore.getNode(nodeId);
   const { node: clipboardNode } = clipboard;
 
@@ -48,7 +57,7 @@ export function isAllowedToPasteCopy(nodeId, clipboard) {
   return true;
 }
 
-export function isAllowedToPasteLink(nodeId, clipboard) {
+export function isAllowedToPasteLink(nodeId: string, clipboard) {
   // GUARD - Don't allow pasting link into a root
   if (nodeId === '0') return false;
 
@@ -58,7 +67,7 @@ export function isAllowedToPasteLink(nodeId, clipboard) {
   // GUARD
   if (!node || !clipboardNode) return false;
 
-  const { type, auxiliaryLink } = node;
+  const { type } = node;
   const { type: clipboardType } = clipboardNode;
 
   const { isResponse } = detectType(type);
@@ -69,6 +78,9 @@ export function isAllowedToPasteLink(nodeId, clipboard) {
 
   // GUARD - Only allow pasting of nodes
   if (!clipboardIsNode) return false;
+
+  let auxiliaryLink;
+  if ('auxiliaryLink' in node) ({ auxiliaryLink } = node);
 
   if (!auxiliaryLink) return true;
 
