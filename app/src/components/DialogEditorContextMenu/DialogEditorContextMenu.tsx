@@ -1,14 +1,20 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
-import { Menu, Item } from 'react-contexify';
+import { Menu, Item, ItemParams } from 'react-contexify';
 
 import 'react-contexify/ReactContexify.css';
 
 import { useStore } from 'hooks/useStore';
+import { NodeStore } from 'stores/nodeStore/node-store';
 import { detectType, isAllowedToCreateNode, isAllowedToPasteCopy, isAllowedToPasteLink } from 'utils/node-utils';
 
-function getAddLabel(type) {
+export type EventProps = {
+  id: string;
+  type: string;
+  parentId: string;
+};
+
+function getAddLabel(type: string) {
   let addItemLabel = 'Add';
   switch (type) {
     case 'root':
@@ -27,10 +33,10 @@ function getAddLabel(type) {
   return addItemLabel;
 }
 
-function DialogEditorContextMenu({ id, onVisibilityChange }) {
-  const nodeStore = useStore('node');
+function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string; onVisibilityChange: (flag: boolean) => void }) {
+  const nodeStore = useStore<NodeStore>('node');
 
-  const { focusedNode, clipboard } = nodeStore;
+  const { focusedTreeNode: focusedNode, clipboard } = nodeStore;
 
   // GUARD - no need to render the menu if there's no focused node
   if (!focusedNode) return null;
@@ -42,30 +48,36 @@ function DialogEditorContextMenu({ id, onVisibilityChange }) {
   const allowedToPasteCopy = isAllowedToPasteCopy(focusedNodeId, clipboard);
   const allowedToPasteLink = isAllowedToPasteLink(focusedNodeId, clipboard);
 
-  const onAddClicked = ({ props }) => {
+  const onAddClicked = ({ props }: ItemParams<EventProps>) => {
+    if (!props) return;
     nodeStore.addNodeByParentId(props.id);
   };
 
-  const onCopyClicked = ({ props }) => {
+  const onCopyClicked = ({ props }: ItemParams<EventProps>) => {
+    if (!props) return;
     nodeStore.setClipboard(props.id);
   };
 
-  const onPasteAsCopy = ({ props }) => {
+  const onPasteAsCopy = ({ props }: ItemParams<EventProps>) => {
+    if (!props) return;
     nodeStore.pasteAsCopyFromClipboard(props.id);
   };
 
-  const onPasteAsLink = ({ props }) => {
+  const onPasteAsLink = ({ props }: ItemParams<EventProps>) => {
+    if (!props) return;
     nodeStore.pasteAsLinkFromClipboard(props.id);
   };
 
-  const onDeleteClicked = ({ props }) => {
+  const onDeleteClicked = ({ props }: ItemParams<EventProps>) => {
+    if (!props) return;
+
     const { id: nodeId, type: nodeType, parentId } = props;
     const { isLink } = detectType(nodeType);
 
     if (isLink) {
       nodeStore.deleteLink(parentId);
     } else {
-      nodeStore.deleteNodeCascadeById(nodeId, nodeType);
+      nodeStore.deleteNodeCascadeById(nodeId);
     }
   };
 
@@ -79,12 +91,5 @@ function DialogEditorContextMenu({ id, onVisibilityChange }) {
     </Menu>
   );
 }
-
-DialogEditorContextMenu.propTypes = {
-  id: PropTypes.string.isRequired,
-  type: PropTypes.string.isRequired,
-  parentId: PropTypes.string.isRequired,
-  onVisibilityChange: PropTypes.func.isRequired,
-};
 
 export const ObservingDialogEditorContextMenu = observer(DialogEditorContextMenu);

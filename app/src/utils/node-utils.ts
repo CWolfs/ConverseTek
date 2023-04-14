@@ -44,10 +44,11 @@ export function isAllowedToCreateNode(nodeId: string) {
 
 export function isAllowedToPasteCopy(nodeId: string, clipboard: MockClipboard) {
   const node = nodeStore.getNode(nodeId);
-  const { node: clipboardNode } = clipboard;
 
   // GUARD
-  if (!node || !clipboardNode) return false;
+  if (!node || !clipboard) return false;
+
+  const { node: clipboardNode } = clipboard;
 
   const { isRoot, isNode, isResponse } = detectType(node.type);
   const { isNode: clipboardIsNode, isResponse: clipboardIsResponse } = detectType(clipboardNode.type);
@@ -68,10 +69,11 @@ export function isAllowedToPasteLink(nodeId: string, clipboard: MockClipboard) {
   if (nodeId === '0') return false;
 
   const node = nodeStore.getNode(nodeId);
-  const { node: clipboardNode } = clipboard;
 
   // GUARD
-  if (!node || !clipboardNode) return false;
+  if (!node || !clipboard) return false;
+
+  const { node: clipboardNode } = clipboard;
 
   const { type } = node;
   const { type: clipboardType } = clipboardNode;

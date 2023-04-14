@@ -21,6 +21,8 @@ export type NodeType = {
   speakerType: 'speakerId' | null;
   overrideSpeaker: null; // Not used in BT
   speakerOverrideId: string;
-  actions: OperationType[] | null;
+  actions: {
+    ops: OperationType[] | null;
+  } | null;
   comment: string | null;
 };

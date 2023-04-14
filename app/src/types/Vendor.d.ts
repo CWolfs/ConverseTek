@@ -2,7 +2,7 @@ declare module 'react-sortable-tree';
 
 type RSTNodeOnMoveContainer = {
   treeData: object[];
-  node: { id: string; type: string; parentId: string };
+  node: RSTNode;
   nextParentNode: { id: string; children: { id: number }[] };
   prevPath: number[] | string[];
   prevTreeIndex: number;
@@ -11,20 +11,26 @@ type RSTNodeOnMoveContainer = {
 };
 
 type RSTNodeCanDropContainer = {
-  node: { id: string; type: string; parentId: string };
+  node: RSTNode;
   prevPath: number[] | string[];
-  prevParent: { id: string; type: string; parentId: string };
+  prevParent: RSTNode;
   prevTreeIndex: number;
   nextPath: number[] | string[];
-  nextParent: { id: string; type: string; parentId: string };
+  nextParent: RSTNode;
   nextTreeIndex: number;
 };
 
 type RSTNodeCanDragContainer = {
-  node: { id: string; type: string; parentId: string };
+  node: RSTNode;
   path: number[] | string[];
   treeIndex: number;
   lowerSiblingCounts: number[];
   isSearchMatch: bool;
   isSearchFocus: bool;
+};
+
+type RSTNode = {
+  id: string;
+  type: string;
+  parentId: string;
 };

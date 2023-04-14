@@ -175,6 +175,8 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
     }
   });
 
+  if (treeData === null) return null;
+
   return (
     <div className="dialog-editor">
       <div className="dialog-editor__tree" ref={treeElement} onClick={onClicked}>

@@ -8,8 +8,12 @@ export type NodeLinkType = {
   };
   nextNodeIndex: number;
   responseText: string;
-  conditions: OperationType[] | null;
-  actions: OperationType[] | null;
+  conditions: {
+    ops: OperationType[] | null;
+  } | null;
+  actions: {
+    ops: OperationType[] | null;
+  } | null;
   hideIfUnavailable: boolean;
   onlyOnce: boolean;
   inputBypass: boolean;
