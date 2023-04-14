@@ -1,7 +1,7 @@
 import { OperationCallType } from './OperationCallType';
 
-export type OperationType = {
-  type: 'int' | 'float' | 'bool' | 'string' | 'operation';
+export type OperationArgType = {
+  type?: 'int' | 'float' | 'bool' | 'string' | 'operation';
   intValue: number;
   boolValue: boolean;
   floatValue: number;

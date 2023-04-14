@@ -3,23 +3,18 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+export type JsonValue = string | number | boolean | JsonObject | JsonArray | null;
+export type JsonObject = { [key: string]: JsonValue };
+export type JsonArray = JsonValue[];
+
 type PropertyMapping = {
   [apiProperty: string]: string;
 };
 
+// CONVERSATIONS
+
 /**
-    Conversation: {
-        idRef: {
-            id: string;
-        };
-        uiName: string;
-        roots: [];
-        nodes: [];
-        default_speaker_id: string;
-        default_speaker_override: string | null;
-        persistent_conversation: false;
-        speaker_override_id: string;
-    };
+ Used for conversations
  */
 export const conversationMapping: PropertyMapping = {
   FileName: 'filename',
@@ -34,14 +29,7 @@ export const conversationMapping: PropertyMapping = {
 
 /**
     Used for actions and conditions.
-
-    "int_value": 0,
-    "bool_value": false,
-    "float_value": 0.0,
-    "string_value": "",
-    "call_value": null,
-    "variableref_value": null
- */
+*/
 export const operationMapping: PropertyMapping = {
   int_value: 'intValue',
   bool_value: 'boolValue',
@@ -55,6 +43,29 @@ export const fullConversationAssetMapping: PropertyMapping = {
   ...conversationMapping,
   ...operationMapping,
 };
+
+// DEFINITIONS
+
+export const operationDefinitionMapping: PropertyMapping = {};
+
+// PROCESSING
+export function lowercasePropertyNames(obj: JsonValue): JsonValue {
+  if (Array.isArray(obj)) {
+    return obj.map((item) => lowercasePropertyNames(item));
+  } else if (typeof obj === 'object' && obj !== null) {
+    const newObj: JsonObject = {};
+
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        newObj[key.toLowerCase()] = lowercasePropertyNames(obj[key]);
+      }
+    }
+
+    return newObj;
+  } else {
+    return obj;
+  }
+}
 
 function isObject(value: any): boolean {
   return value !== null && typeof value === 'object' && !Array.isArray(value);

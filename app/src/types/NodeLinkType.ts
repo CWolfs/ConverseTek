@@ -1,4 +1,4 @@
-import { OperationType } from './OperationType';
+import { OperationCallType } from './OperationCallType';
 
 /** NodeLinks are either roots or branches spoken by the Player */
 export type NodeLinkType = {
@@ -9,10 +9,10 @@ export type NodeLinkType = {
   nextNodeIndex: number;
   responseText: string;
   conditions: {
-    ops: OperationType[] | null;
+    ops: OperationCallType[] | null;
   } | null;
   actions: {
-    ops: OperationType[] | null;
+    ops: OperationCallType[] | null;
   } | null;
   hideIfUnavailable: boolean;
   onlyOnce: boolean;

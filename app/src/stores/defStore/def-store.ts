@@ -5,12 +5,18 @@ import values from 'lodash.values';
 import { createArg } from 'utils/def-utils';
 import { tryParseInt, tryParseFloat } from 'utils/number-utils';
 import { ConversationAssetType } from 'types/ConversationAssetType';
+import { OperationCallType } from 'types/OperationCallType';
+import { OperationArgType } from 'types/OperationArgType';
+import { DefinitionsType } from 'types/DefinitionsType';
+import { OperationDefinitionType } from 'types/OperationDefinition';
+import { PresetDefinitionType } from 'types/PresetDefinition';
+import { TagDefinitionType } from 'types/TagDefinition';
 
 /* eslint-disable class-methods-use-this, no-param-reassign */
 class DefStore {
-  public operations = [];
-  public presets = [];
-  public tags = [];
+  public operations: OperationDefinitionType[] = [];
+  public presets: PresetDefinitionType[] = [];
+  public tags: TagDefinitionType[] = [];
   public definitionCount = 0;
 
   constructor() {
@@ -41,7 +47,7 @@ class DefStore {
       // Root Operations
       if (root.conditions && root.conditions.ops) {
         const operations = root.conditions.ops;
-        operations.forEach((operation) => {
+        operations.forEach((operation): void => {
           this.setLogicTypeByOperation(operation);
         });
       }
@@ -49,7 +55,7 @@ class DefStore {
       // Root Actions
       if (root.actions && root.actions.ops) {
         const operations = root.actions.ops;
-        operations.forEach((operation) => {
+        operations.forEach((operation): void => {
           this.setLogicTypeByOperation(operation);
         });
       }
@@ -59,7 +65,7 @@ class DefStore {
       // Node Actions
       if (node.actions && node.actions.ops) {
         const operations = node.actions.ops;
-        operations.forEach((operation) => {
+        operations.forEach((operation): void => {
           this.setLogicTypeByOperation(operation);
         });
       }
@@ -71,7 +77,7 @@ class DefStore {
           // Branch Conditions
           if (response.conditions && response.conditions.ops) {
             const operations = response.conditions.ops;
-            operations.forEach((operation) => {
+            operations.forEach((operation): void => {
               this.setLogicTypeByOperation(operation);
             });
           }
@@ -79,7 +85,7 @@ class DefStore {
           // Branch Actions
           if (response.actions && response.actions.ops) {
             const operations = response.actions.ops;
-            operations.forEach((operation) => {
+            operations.forEach((operation): void => {
               this.setLogicTypeByOperation(operation);
             });
           }
@@ -88,7 +94,7 @@ class DefStore {
     });
   }
 
-  setLogicTypeByOperation(operation) {
+  setLogicTypeByOperation(operation: OperationCallType) {
     const { args } = operation;
     const logicDef = this.getDefinition(operation);
     const { Inputs: inputs } = logicDef;
@@ -165,7 +171,7 @@ class DefStore {
     });
   }
 
-  setDefinitions(definitions) {
+  setDefinitions(definitions: DefinitionsType) {
     const { operations, presets, tags } = definitions;
 
     this.reset();
@@ -177,12 +183,12 @@ class DefStore {
     this.definitionCount = this.operations.length + this.presets.length + this.tags.length;
   }
 
-  getDefinition(condition) {
+  getDefinition(condition: OperationCallType) {
     const { functionName } = condition;
     return this.getDefinitionByName(functionName);
   }
 
-  getDefinitionByName(functionName) {
+  getDefinitionByName(functionName: string) {
     const definition = this.operations.find((operation) => operation.Key === functionName);
     if (!definition) {
       console.error(`No operation definition found with functionName '${functionName}'`);
@@ -194,7 +200,7 @@ class DefStore {
     return this.operations.filter((operation) => operation.Category === category && (operation.Scope === scope || scope === 'all'));
   }
 
-  getRawArgType(arg) {
+  getRawArgType(arg: OperationArgType) {
     const { intValue, boolValue, floatValue, stringValue, callValue, variableRefValue } = arg;
 
     // Use same logic BT uses
@@ -204,7 +210,7 @@ class DefStore {
     return 'int';
   }
 
-  getArgValue(arg) {
+  getArgValue(arg: OperationArgType) {
     if (arg === null || arg === undefined) return { type: null, value: null };
 
     const { intValue, boolValue, floatValue, stringValue, callValue, variableRefValue, type } = arg;
@@ -219,7 +225,19 @@ class DefStore {
     return null;
   }
 
-  setArgType(logic, arg, type) {
+  createNewArg(type, defaultValue = null) {
+    return {
+      boolValue: false,
+      callValue: null,
+      floatValue: type === 'float' && defaultValue != null ? defaultValue : 0,
+      intValue: type === 'int' && defaultValue != null ? defaultValue : 0,
+      stringValue: type === 'string' && defaultValue != null ? defaultValue : '',
+      type,
+      variableRefValue: null,
+    };
+  }
+
+  setArgType(logic, arg: OperationArgType, type) {
     const { args } = logic;
     const argValue = this.getArgValue(arg);
     const { type: previousType, value: previousValue } = argValue;
@@ -248,7 +266,7 @@ class DefStore {
     }
   }
 
-  setArgValue(logic, arg, value) {
+  setArgValue(logic, arg: OperationArgType, value) {
     const { args } = logic;
     const argValue = this.getArgValue(arg);
     const { type } = argValue;
@@ -259,6 +277,11 @@ class DefStore {
     if (type === 'int') arg.intValue = value;
 
     arg.type = type;
+
+    // Workaround for bad code design in CT. Lack of immutability causes problems for newly introduced args
+    if (!logic.args.find((storedArg) => storedArg === arg)) {
+      args.push(arg);
+    }
 
     logic.args.replace(args);
   }
@@ -304,7 +327,7 @@ class DefStore {
     return logic;
   }
 
-  resetArg(input, arg) {
+  resetArg(input, arg: OperationArgType) {
     const { Types: types } = input;
 
     arg.callValue = null;

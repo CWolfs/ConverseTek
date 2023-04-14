@@ -2,9 +2,11 @@ import { consolidateSpeaker, fillIndexGaps } from 'utils/conversation-utils';
 
 import { get, post } from './rest';
 
-import { dataStore, defStore } from '../stores';
-import { fullConversationAssetMapping, mapToType } from './mappings/mapping';
 import { ConversationAssetType } from 'types/ConversationAssetType';
+import { DefinitionsType } from 'types/DefinitionsType';
+
+import { dataStore, defStore } from '../stores';
+import { JsonValue, fullConversationAssetMapping, lowercasePropertyNames, mapToType } from './mappings/mapping';
 
 /*
  * CHROMELY DOESN'T SUPPORT PUTS SO PUTS AND DELETES ARE CURRENTLY POSTS WITH method DATA
@@ -88,8 +90,9 @@ export function saveWorkingDirectory(path: string) {
  =========================
 */
 export function getDefinitions(): Promise<any> {
-  return get('/definitions').then((definitions): any[] => {
-    defStore.setDefinitions(definitions);
-    return definitions;
+  return get('/definitions').then((definitions: JsonValue): DefinitionsType => {
+    const typedDefinitions = lowercasePropertyNames(definitions) as DefinitionsType;
+    defStore.setDefinitions(typedDefinitions);
+    return typedDefinitions;
   });
 }

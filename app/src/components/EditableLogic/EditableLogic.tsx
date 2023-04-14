@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import { Icon, Tooltip } from 'antd';
 
 import { useStore } from 'hooks/useStore';
+import { DefStore } from 'stores/defStore/def-store';
 
 import { EditableSelect } from '../EditableSelect';
 import { EditableInput } from '../EditbleInput';
@@ -16,7 +17,7 @@ import { EditableInput } from '../EditbleInput';
 import './EditableLogic.css';
 
 function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInput, parentArg }) {
-  const defStore = useStore('def');
+  const defStore = useStore<DefStore>('def');
 
   const renderLogic = (logicDef) => {
     const operations = defStore.getOperations(category, scope);
@@ -68,8 +69,8 @@ function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInpu
     const { Key: logicDefKey, Inputs: inputs } = logicDef;
 
     return inputs.map((input, index) => {
-      const { Label: label, Types: types, Values: values, Tooltip: tooltip } = input;
-      const arg = args.length > index ? args[index] : null;
+      const { Label: label, Types: types, Values: values, Tooltip: tooltip, DefaultValue: defaultValue = null } = input;
+      const arg = args.length > index ? args[index] : defStore.createNewArg(types[0], defaultValue);
       const argValue = defStore.getArgValue(arg);
       let content = null;
 

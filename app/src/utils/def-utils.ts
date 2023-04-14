@@ -1,6 +1,6 @@
-import { OperationType } from 'types/OperationType';
+import { OperationArgType } from 'types/OperationArgType';
 
-export function createArg(): OperationType {
+export function createArg(): OperationArgType {
   return {
     intValue: 0,
     boolValue: false,

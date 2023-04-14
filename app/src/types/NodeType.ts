@@ -1,5 +1,5 @@
 import { NodeLinkType } from './NodeLinkType';
-import { OperationType } from './OperationType';
+import { OperationCallType } from './OperationCallType';
 
 /** NodeLinks are spoken by the NPCs/game description */
 export type NodeType = {
@@ -22,7 +22,7 @@ export type NodeType = {
   overrideSpeaker: null; // Not used in BT
   speakerOverrideId: string;
   actions: {
-    ops: OperationType[] | null;
+    ops: OperationCallType[] | null;
   } | null;
   comment: string | null;
 };

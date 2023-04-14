@@ -25,7 +25,7 @@ import { detectType } from '../../utils/node-utils';
 import { NodeType } from 'types/NodeType';
 import { NodeLinkType } from 'types/NodeLinkType';
 import { ConversationAssetType } from 'types/ConversationAssetType';
-import { OperationType } from 'types/OperationType';
+import { OperationArgType } from 'types/OperationArgType';
 
 export type Clipboard = {
   node: NodeType | NodeLinkType;
@@ -378,7 +378,7 @@ class NodeStore {
     }
   }
 
-  setNodeActions(node: NodeType | NodeLinkType, actions: OperationType[]) {
+  setNodeActions(node: NodeType | NodeLinkType, actions: OperationArgType[]) {
     if (actions === null) node.actions = null;
 
     node.actions = {
@@ -386,7 +386,7 @@ class NodeStore {
     };
   }
 
-  addNodeAction(node: NodeType | NodeLinkType, nodeAction: OperationType) {
+  addNodeAction(node: NodeType | NodeLinkType, nodeAction: OperationArgType) {
     const { actions } = node;
 
     if (actions) {
@@ -396,7 +396,7 @@ class NodeStore {
     }
   }
 
-  setNodeConditions(node: NodeLinkType, conditions: OperationType[]) {
+  setNodeConditions(node: NodeLinkType, conditions: OperationArgType[]) {
     if (conditions === null) node.conditions = null;
 
     node.conditions = {
@@ -404,7 +404,7 @@ class NodeStore {
     };
   }
 
-  addNodeCondition(node: NodeLinkType, nodeCondition: OperationType) {
+  addNodeCondition(node: NodeLinkType, nodeCondition: OperationArgType) {
     const { conditions } = node;
 
     if (conditions) {

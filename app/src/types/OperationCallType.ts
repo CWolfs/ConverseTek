@@ -1,6 +1,6 @@
-import { OperationType } from './OperationType';
+import { OperationArgType } from './OperationArgType';
 
 export type OperationCallType = {
   functionName: string;
-  args: OperationType[];
+  args: OperationArgType[];
 };
