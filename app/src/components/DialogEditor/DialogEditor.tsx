@@ -1,12 +1,14 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, MouseEvent } from 'react';
 import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
 import SortableTree from 'react-sortable-tree';
 import { useContextMenu } from 'react-contexify';
 
 import 'react-sortable-tree/style.css';
+
+import { NodeStore } from 'stores/nodeStore/node-store';
 
 import { useStore } from 'hooks/useStore';
 import { detectType } from 'utils/node-utils';
@@ -15,8 +17,9 @@ import { ConverseTekNodeRenderer } from './ConverseTekNodeRenderer';
 import { DialogEditorContextMenu } from '../DialogEditorContextMenu';
 
 import './DialogEditor.css';
+import { ConversationAssetType } from 'types/ConversationAssetType';
 
-function buildTreeData(nodeStore, conversationAsset) {
+function buildTreeData(nodeStore: NodeStore, conversationAsset: ConversationAssetType) {
   const data = [
     {
       title: 'Root',
@@ -30,20 +33,20 @@ function buildTreeData(nodeStore, conversationAsset) {
   return data;
 }
 
-function DialogEditor({ conversationAsset, rebuild }) {
+function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: ConversationAssetType; rebuild: boolean }) {
   const nodeStore = useStore('node');
 
-  const [treeData, setTreeData] = useState(null);
+  const [treeData, setTreeData] = useState<object[] | null>(null);
   const [treeWidth, setTreeWidth] = useState(0);
   const [isContextMenuVisible, setIsContextMenuVisible] = useState(false);
-  const treeElement = useRef(null);
+  const treeElement = useRef<HTMLDivElement>(null);
   const { show } = useContextMenu({
     id: 'dialog-context-menu',
   });
 
   const activeNodeId = nodeStore.getActiveNodeId();
 
-  const onMove = (nodeContainer) => {
+  const onMove = (nodeContainer: RSTNodeOnMoveContainer) => {
     const { node, nextParentNode } = nodeContainer;
     const { id: nodeId, type: nodeType, parentId: nodeParentId } = node;
     const { id: parentNodeId, children: parentChildren } = nextParentNode;
@@ -75,11 +78,13 @@ function DialogEditor({ conversationAsset, rebuild }) {
   };
 
   const resize = () => {
-    const calculatedTreeWidth = treeElement.current.clientWidth;
-    setTreeWidth(calculatedTreeWidth);
+    if (treeElement.current) {
+      const calculatedTreeWidth = treeElement.current.clientWidth;
+      setTreeWidth(calculatedTreeWidth);
+    }
   };
 
-  const canDrop = (nodeContainer) => {
+  const canDrop = (nodeContainer: RSTNodeCanDropContainer) => {
     const { nextParent, node } = nodeContainer;
 
     // GUARD - Don't allow drop at the very top of the tree
@@ -113,17 +118,28 @@ function DialogEditor({ conversationAsset, rebuild }) {
     return allowDrop;
   };
 
-  const onClicked = (event) => {
-    if (event.target.className === 'rst__node' || event.target.className === 'rst__lineBlock') {
+  const onClicked = (event: MouseEvent<HTMLElement>) => {
+    const target = event.target as HTMLElement;
+    if (target.className === 'rst__node' || target.className === 'rst__lineBlock') {
       nodeStore.clearActiveNode();
     }
   };
 
-  const onNodeContextMenu = ({ event, contextMenuId, type, parentId }) => {
+  const onNodeContextMenu = ({
+    event,
+    contextMenuId,
+    type,
+    parentId,
+  }: {
+    event: MouseEvent<HTMLDivElement>;
+    contextMenuId: string;
+    type: 'node' | 'response' | 'root' | 'link';
+    parentId: string;
+  }) => {
     show({ event, props: { id: contextMenuId, type, parentId } });
   };
 
-  const onNodeContextMenuVisibilityChange = (isVisible) => {
+  const onNodeContextMenuVisibilityChange = (isVisible: boolean) => {
     setIsContextMenuVisible(isVisible);
   };
 
@@ -134,8 +150,10 @@ function DialogEditor({ conversationAsset, rebuild }) {
 
     window.addEventListener('resize', resize);
 
-    const calculatedTreeWidth = treeElement.current.clientWidth;
-    setTreeWidth(calculatedTreeWidth);
+    if (treeElement.current) {
+      const calculatedTreeWidth = treeElement.current.clientWidth;
+      setTreeWidth(calculatedTreeWidth);
+    }
 
     return () => {
       window.removeEventListener('resize', resize);
@@ -151,8 +169,10 @@ function DialogEditor({ conversationAsset, rebuild }) {
 
   // On every update
   useEffect(() => {
-    const calculatedTreeWidth = treeElement.current.clientWidth;
-    if (treeWidth !== calculatedTreeWidth) resize();
+    if (treeElement.current) {
+      const calculatedTreeWidth = treeElement.current.clientWidth;
+      if (treeWidth !== calculatedTreeWidth) resize();
+    }
   });
 
   return (
@@ -161,8 +181,8 @@ function DialogEditor({ conversationAsset, rebuild }) {
         <DialogEditorContextMenu id="dialog-context-menu" onVisibilityChange={onNodeContextMenuVisibilityChange} />
         <SortableTree
           treeData={treeData}
-          onChange={(data) => setTreeData(data)}
-          getNodeKey={({ node, treeIndex }) => {
+          onChange={(data: object[]) => setTreeData(data)}
+          getNodeKey={({ node, treeIndex }: { node: { id: number; treeIndex: number }; treeIndex: number }) => {
             if (node.treeIndex !== treeIndex) {
               // eslint-disable-next-line no-param-reassign
               node.treeIndex = treeIndex;
@@ -173,7 +193,7 @@ function DialogEditor({ conversationAsset, rebuild }) {
             return node.id;
           }}
           rowHeight={40}
-          canDrag={(nodeContainer) => !(nodeContainer.node.id === 0)}
+          canDrag={(nodeContainer: RSTNodeCanDragContainer) => !(nodeContainer.node.id === '0')}
           canDrop={canDrop}
           onMoveNode={onMove}
           generateNodeProps={() => ({

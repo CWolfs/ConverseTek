@@ -11,11 +11,11 @@ import './About.css';
 export function About() {
   const modalStore = useStore<ModalStore>('modal');
 
-  const onOk = () => {
+  const onOk = (): void => {
     modalStore.closeModal();
   };
 
-  const setupModal = () => {
+  const setupModal = (): void => {
     modalStore.setOnOk(onOk);
     modalStore.setTitle('About ConverseTek');
     modalStore.setOkLabel('Ok');
