@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, MouseEvent } from 'react';
 import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
 import { Button, Icon, Collapse, Popconfirm } from 'antd';
@@ -10,20 +10,25 @@ import 'react-custom-scroll/dist/customScroll.css';
 import { ViewableLogic } from 'components/ViewableLogic';
 import { EditableLogic } from 'components/EditableLogic';
 import { useStore } from 'hooks/useStore';
+import { NodeStore } from 'stores/nodeStore/node-store';
+import { DefStore } from 'stores/defStore/def-store';
+import { NodeType } from 'types/NodeType';
+import { NodeLinkType } from 'types/NodeLinkType';
+import { OperationCallType } from 'types/OperationCallType';
 
 import './ConversationActions.css';
 
 const { Panel } = Collapse;
 
-function ConversationActions({ node }) {
-  const nodeStore = useStore('node');
-  const defStore = useStore('def');
+function ConversationActions({ node }: { node: NodeType | NodeLinkType }) {
+  const nodeStore = useStore<NodeStore>('node');
+  const defStore = useStore<DefStore>('def');
 
   const dataSize = useRef(0);
   const { actions } = node;
 
   const onAddAction = () => {
-    const newAction = {
+    const newAction: OperationCallType = {
       functionName: 'Play BattleTech Audio Event',
       args: [],
     };
@@ -36,14 +41,16 @@ function ConversationActions({ node }) {
     }
   };
 
-  const onDeleteAction = (event, index) => {
+  const onDeleteAction = (event: MouseEvent, index: number) => {
+    if (!actions || !actions.ops) return;
+
     remove(actions.ops, (value, i) => i === index);
     if (actions.ops.length <= 0) nodeStore.setNodeActions(node, null);
 
     event.stopPropagation();
   };
 
-  const renderPanel = (action, index) => {
+  const renderPanel = (action: OperationCallType, index: number) => {
     const key = index;
 
     const classes = classnames('conversation-actions__panel', {
@@ -59,7 +66,7 @@ function ConversationActions({ node }) {
         <Popconfirm
           title="Are you sure you want to delete this condition?"
           placement="topLeft"
-          onConfirm={(event) => onDeleteAction(event, index)}
+          onConfirm={(event: MouseEvent) => onDeleteAction(event, index)}
           okText="Yes"
           cancelText="No"
         >
@@ -67,7 +74,7 @@ function ConversationActions({ node }) {
             size="small"
             type="caution"
             className="conversation-actions__panel-header-delete-button"
-            onClick={(event) => event.stopPropagation()}
+            onClick={(event: MouseEvent) => event.stopPropagation()}
           >
             <Icon type="delete" />
           </Button>
@@ -76,13 +83,13 @@ function ConversationActions({ node }) {
     );
 
     return (
-      <Panel key={key} className={classes} header={header}>
+      <Panel key={`${key}`} className={classes} header={header}>
         <EditableLogic key={action.functionName} logic={action} category="primary" scope="action" />
       </Panel>
     );
   };
 
-  const displayActions = actions === null ? [] : actions.ops;
+  const displayActions = actions === null || !actions.ops ? [] : actions.ops;
   dataSize.current = displayActions.length;
   const height = window.document.getElementsByClassName('conversation-editor__details')[0].clientHeight - 22;
 
