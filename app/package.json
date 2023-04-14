@@ -25,6 +25,7 @@
     "@babel/preset-env": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
     "@babel/preset-typescript": "^7.21.4",
+    "@types/lodash.defer": "^4.1.7",
     "@types/lodash.difference": "^4.5.7",
     "@types/lodash.findindex": "^4.6.7",
     "@types/lodash.foreachright": "^4.4.7",

@@ -22,7 +22,7 @@ const postcssLoader = require('./webpack/loaders/postcss.loader');
 const imageLoader = require('./webpack/loaders/image.loader');
 
 let config = {
-  entry: ['@babel/polyfill', `${APP_DIR}/index.js`],
+  entry: ['@babel/polyfill', `${APP_DIR}/index.tsx`],
 
   output: {
     path: BUILD_DIR,

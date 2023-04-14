@@ -1,30 +1,24 @@
 /* eslint-disable function-paren-newline */
-import React from 'react';
+import React, { ElementType } from 'react';
 import { observable, action, makeObservable } from 'mobx';
 import defer from 'lodash.defer';
 
+export type OnOkType = (() => void) | null;
+export type OnCancelType = (() => void) | null;
+
 class ModalStore {
-  ModalContent;
-
+  ModalContent: ElementType | JSX.Element | null = null;
   title = '';
-
   isVisible = false;
-
-  onOk;
-
+  onOk: OnOkType = null;
   disableOk = true;
-
   okLabel = 'Ok';
-
   loadingLabel = 'Loading';
-
-  onCancel;
-
+  onCancel: OnCancelType = null;
   isLoading = false;
-
   width = '70vw';
-
   showCancelButton = true;
+  props = {};
 
   constructor() {
     makeObservable(this, {
@@ -57,57 +51,57 @@ class ModalStore {
     this.onCancel = this.closeModal;
   }
 
-  setModelContent(ModalContent, props = {}, show = true) {
+  setModelContent(ModalContent: ElementType, props = {}, show = true): void {
     this.ModalContent = <ModalContent />;
     this.props = props;
     if (show) this.showModal(true);
   }
 
-  setTitle(title) {
+  setTitle(title: string): void {
     this.title = title;
   }
 
-  setWidth(width) {
+  setWidth(width: string): void {
     this.width = width;
   }
 
-  setShowCancelButton(flag) {
+  setShowCancelButton(flag: boolean): void {
     this.showCancelButton = flag;
   }
 
-  setOnOk(onOk) {
+  setOnOk(onOk: OnOkType): void {
     this.onOk = onOk;
   }
 
-  setDisableOk(flag) {
+  setDisableOk(flag: boolean): void {
     this.disableOk = flag;
   }
 
-  setOkLabel(label) {
+  setOkLabel(label: string): void {
     this.okLabel = label;
   }
 
-  setIsLoading(flag) {
+  setIsLoading(flag: boolean): void {
     this.isLoading = flag;
   }
 
-  setLoadingLabel(label) {
+  setLoadingLabel(label: string): void {
     this.loadingLabel = label;
   }
 
-  showModal(flag) {
+  showModal(flag: boolean): void {
     this.isVisible = flag;
   }
 
-  closeModal = () => {
+  closeModal = (): void => {
     this.reset();
   };
 
-  setProps = (props) => {
+  setProps = (props: object): void => {
     this.props = props;
   };
 
-  reset = () => {
+  reset = (): void => {
     this.isVisible = false;
     defer(
       action(() => {

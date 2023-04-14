@@ -1,9 +1,9 @@
 import { observable, action, makeObservable } from 'mobx';
 
 class ErrorStore {
-  authErrors = observable.map();
+  authErrors = observable.map<number, string>();
 
-  setError = (code, error) => {
+  setError = (code: number, error: string) => {
     if (code >= 100 && code < 199) {
       this.authErrors.set(code, error);
     }
@@ -13,7 +13,7 @@ class ErrorStore {
     this.authErrors.clear();
   };
 
-  reset = (codes) => {
+  reset = (codes: number[]) => {
     codes.forEach((code) => this.authErrors.delete(code));
   };
 
