@@ -1,4 +1,4 @@
-export function tryParseInt(stringValue, defaultValue) {
+export function tryParseInt(stringValue: string, defaultValue: number): number {
   let retValue = defaultValue;
   if (stringValue !== null) {
     if (stringValue.length > 0) {
@@ -11,13 +11,13 @@ export function tryParseInt(stringValue, defaultValue) {
   return retValue;
 }
 
-export function tryParseFloat(stringValue, defaultValue) {
+export function tryParseFloat(stringValue: string, defaultValue: number): number {
   let retValue = defaultValue;
 
   if (stringValue !== null) {
     if (stringValue.length > 0) {
       if (!Number.isNaN(stringValue)) {
-        retValue = parseFloat(stringValue, 10);
+        retValue = parseFloat(stringValue);
       }
     }
   }
