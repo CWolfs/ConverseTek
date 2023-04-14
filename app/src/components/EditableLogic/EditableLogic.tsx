@@ -10,13 +10,22 @@ import { Icon, Tooltip } from 'antd';
 
 import { useStore } from 'hooks/useStore';
 import { DefStore } from 'stores/defStore/def-store';
+import { OperationCallType } from 'types/OperationCallType';
 
 import { EditableSelect } from '../EditableSelect';
 import { EditableInput } from '../EditbleInput';
 
 import './EditableLogic.css';
+import { OperationDefinitionType } from 'types/OperationDefinition';
 
-function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInput, parentArg }) {
+type Props = {
+  scope: 'all';
+  category: 'primary' | 'secondary';
+  logic: OperationCallType;
+  isEven: boolean;
+  parentLogic: OperationCallType;
+};
+function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInput, parentArg }: Props) {
   const defStore = useStore<DefStore>('def');
 
   const renderLogic = (logicDef) => {
@@ -64,12 +73,12 @@ function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInpu
     );
   };
 
-  const renderInputsAndArgs = (logicDef) => {
+  const renderInputsAndArgs = (logicDef: OperationDefinitionType) => {
     const { functionName, args } = logic;
-    const { Key: logicDefKey, Inputs: inputs } = logicDef;
+    const { key: logicDefKey, inputs } = logicDef;
 
     return inputs.map((input, index) => {
-      const { Label: label, Types: types, Values: values, Tooltip: tooltip, DefaultValue: defaultValue = null } = input;
+      const { label, types, values, tooltip, defaultValue = null } = input;
       const arg = args.length > index ? args[index] : defStore.createNewArg(types[0], defaultValue);
       const argValue = defStore.getArgValue(arg);
       let content = null;
@@ -103,17 +112,7 @@ function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInpu
       ) : null;
 
       if (argType === 'operation' && types.includes('operation')) {
-        content = (
-          <EditableLogic
-            defStore={defStore}
-            logic={argVal}
-            category="secondary"
-            isEven={!isEven}
-            parentLogic={logic}
-            parentInput={input}
-            parentArg={arg}
-          />
-        );
+        content = <EditableLogic logic={argVal} category="secondary" isEven={!isEven} parentLogic={logic} parentInput={input} parentArg={arg} />;
       } else if (argType === 'operation' && !types.includes('operation')) {
         console.error(`[EditableLogic] Argument and input type mismatch for ${label}`);
       } else {

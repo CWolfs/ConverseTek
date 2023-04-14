@@ -1,10 +1,17 @@
 /* eslint-disable no-else-return */
 import React from 'react';
-import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
 import { Input, AutoComplete } from 'antd';
 
-function EditableInput({ value, options, onChange, optionLabelProp, valueLabel }) {
+type Props = {
+  value: string | null;
+  options: null;
+  onChange: null;
+  optionLabelProp: null;
+  valueLabel: null;
+};
+
+function EditableInput({ value = null, options = null, onChange, optionLabelProp = null, valueLabel = null }: Props) {
   const isAutocomplete = !!options;
   const conditionalProps = {};
   let displayValueLabel = valueLabel;
@@ -70,20 +77,5 @@ function EditableInput({ value, options, onChange, optionLabelProp, valueLabel }
     />
   );
 }
-
-EditableInput.defaultProps = {
-  value: null,
-  options: null,
-  optionLabelProp: null,
-  valueLabel: null,
-};
-
-EditableInput.propTypes = {
-  value: PropTypes.any,
-  options: PropTypes.array,
-  onChange: PropTypes.func.isRequired,
-  optionLabelProp: PropTypes.string,
-  valueLabel: PropTypes.string,
-};
 
 export const ObservingEditableInput = observer(EditableInput);

@@ -4,11 +4,16 @@ import { observer } from 'mobx-react';
 import { Input } from 'antd';
 import { NodeType } from 'types/NodeType';
 import { NodeLinkType } from 'types/NodeLinkType';
+import { useStore } from 'hooks/useStore';
+import { NodeStore } from 'stores/nodeStore/node-store';
 
 const { TextArea } = Input;
 
 function DialogTextArea({ node }: { node: NodeType | NodeLinkType }) {
   const { type } = node;
+  const nodeStore = useStore<NodeStore>('node');
+
+  console.log('rendering....');
 
   let text = '';
   if (type === 'node') {
@@ -18,17 +23,9 @@ function DialogTextArea({ node }: { node: NodeType | NodeLinkType }) {
   }
 
   const handleDialogChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
-    const { type } = node;
-
     const inputText = event.target.value;
-
-    if (type === 'node') {
-      // FIXME: Implement immutability for nodes
-      node.text = inputText;
-    } else {
-      // FIXME: Implement immutability for nodes
-      node.responseText = inputText;
-    }
+    console.log('setting....');
+    nodeStore.setNodeText(node, inputText);
   };
 
   return (

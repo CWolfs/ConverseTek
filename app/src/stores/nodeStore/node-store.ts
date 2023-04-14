@@ -67,6 +67,7 @@ class NodeStore {
       pasteAsLinkFromClipboard: action,
       pasteAsCopyFromClipboard: action,
       setNode: action,
+      setNodeText: action,
       setNodeActions: action,
       addNodeAction: action,
       setNodeConditions: action,
@@ -375,6 +376,17 @@ class NodeStore {
     } else if (type === 'response') {
       const parentNode = this.getNode(node.parentId);
       updateResponse(conversationAsset, parentNode, node);
+    }
+  }
+
+  setNodeText(node: NodeType | NodeLinkType, text: string) {
+    const { type } = node;
+    if (type === 'node') {
+      // FIXME: Implement immutability for nodes
+      node.text = text;
+    } else {
+      // FIXME: Implement immutability for nodes
+      node.responseText = text;
     }
   }
 

@@ -204,7 +204,7 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
             onNodeContextMenu,
             isContextMenuVisible,
           })}
-          nodeContentRenderer={ConverseTekNodeRenderer}
+          nodeContentRenderer={(props: any) => <ConverseTekNodeRenderer {...props} />}
           reactVirtualizedListProps={{
             width: treeWidth,
           }}
