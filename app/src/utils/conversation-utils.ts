@@ -7,14 +7,18 @@ import range from 'lodash.range';
 import difference from 'lodash.difference';
 import forEachRight from 'lodash.foreachright';
 
+import { ConversationAssetType, IdRef } from 'types/ConversationAssetType';
+import { NodeType } from 'types/NodeType';
+import { NodeLinkType } from 'types/NodeLinkType';
+
 import { dataStore } from '../stores';
 
 /* eslint-disable no-param-reassign, no-return-assign */
-export function generateId() {
+export function generateId(): string {
   return `9c${md5(uuidv4()).slice(10)}`;
 }
 
-export function regenerateNodeIds(conversationAsset) {
+export function regenerateNodeIds(conversationAsset: ConversationAssetType): void {
   conversationAsset.conversation.roots.forEach((root) => (root.idRef.id = generateId()));
   conversationAsset.conversation.nodes.forEach((node) => {
     node.idRef.id = generateId();
@@ -22,7 +26,7 @@ export function regenerateNodeIds(conversationAsset) {
   });
 }
 
-export function regenerateConversationId(conversationAsset) {
+export function regenerateConversationId(conversationAsset: ConversationAssetType): void {
   dataStore.setConversationId(conversationAsset, generateId());
 }
 
@@ -32,20 +36,34 @@ export function regenerateConversationId(conversationAsset) {
   These methods display only the latter `id` but maintain the full ids on
   those that use them
 */
-export function getId(idContainer) {
-  let id = null;
-  ({ id } = idContainer);
-  if (id === undefined) {
-    if (!idContainer.idRef) {
-      id = '-1';
-    } else {
-      ({ id } = idContainer.idRef);
-    }
+export function getId(idContainer: IdRef | { idRef: IdRef }): string {
+  let id: string | null = null;
+
+  // TODO: Keep an eye on the difference from the old method that used to return -1 for no ids
+  // With TS it might no longe be required, or it needs to be added back in with a null or {} incoming type
+
+  if (typeof idContainer === 'object' && 'id' in idContainer) {
+    id = idContainer.id;
+  } else {
+    id = idContainer.idRef.id;
   }
+
   return id.split(':')[1] || id;
 }
 
-export function createId(idRef, newId) {
+// let id = null;
+// ({ id } = idContainer);
+// if (id === undefined) {
+//   if (!idContainer.idRef) {
+//     id = '-1';
+//   } else {
+//     ({ id } = idContainer.idRef);
+//   }
+// }
+// return id.split(':')[1] || id;
+// }
+
+export function createId(idRef: IdRef, newId: string): string {
   const { id } = idRef;
 
   // strip any colons - this is a special character for ids
@@ -59,10 +77,10 @@ export function createId(idRef, newId) {
   return newId;
 }
 
-export function createConversation(filePath) {
+export function createConversation(filePath: string): ConversationAssetType {
   const id = generateId();
   const fileName = `${id}.convo`;
-  const conversation = {
+  const conversation: ConversationAssetType = {
     filename: fileName,
     filepath: `${filePath}/${fileName}.bytes`,
     conversation: {
@@ -82,7 +100,7 @@ export function createConversation(filePath) {
   return conversation;
 }
 
-export function createRoot() {
+export function createRoot(): NodeLinkType {
   return {
     type: 'root',
     responseText: '',
@@ -100,7 +118,7 @@ export function createRoot() {
   };
 }
 
-export function createNode(index) {
+export function createNode(index: number): NodeType {
   return {
     type: 'node',
     idRef: {
@@ -116,15 +134,16 @@ export function createNode(index) {
     sourceTopicRef: null,
     subjectTopicRefs: [],
     sourceInSceneRef: null,
-    sourceWithTagInScene: '',
-    override_speaker: null,
-    speaker_override_id: '',
+    sourceWithTagInScene: null,
+    overrideSpeaker: null,
+    speakerOverrideId: '',
     actions: null,
     comment: '',
+    speakerType: null,
   };
 }
 
-export function createResponse() {
+export function createResponse(): NodeLinkType {
   return {
     type: 'response',
     responseText: '',
@@ -142,7 +161,7 @@ export function createResponse() {
   };
 }
 
-export function consolidateSpeaker(conversationAsset) {
+export function consolidateSpeaker(conversationAsset: ConversationAssetType): void {
   const { nodes } = conversationAsset.conversation;
   nodes.forEach((node) => {
     const { speakerType } = node;
@@ -152,10 +171,10 @@ export function consolidateSpeaker(conversationAsset) {
   });
 }
 
-export function fillIndexGaps(conversationAsset) {
+export function fillIndexGaps(conversationAsset: ConversationAssetType): void {
   const { nodes } = conversationAsset.conversation;
-  const usedIndexes = [];
-  const nodesToRemove = [];
+  const usedIndexes: number[] = [];
+  const nodesToRemove: number[] = [];
 
   // Remove all padding nodes first
   nodes.forEach((node, position) => {
@@ -182,7 +201,7 @@ export function fillIndexGaps(conversationAsset) {
   });
 }
 
-export function updateRoot(conversationAsset, root) {
+export function updateRoot(conversationAsset: ConversationAssetType, root: NodeLinkType): void {
   const { roots } = conversationAsset.conversation;
   const index = findIndex(roots, (r) => getId(r) === getId(root));
 
@@ -193,7 +212,7 @@ export function updateRoot(conversationAsset, root) {
   }
 }
 
-export function updateNode(conversationAsset, node) {
+export function updateNode(conversationAsset: ConversationAssetType, node: NodeType): void {
   const { nodes } = conversationAsset.conversation;
   const index = findIndex(nodes, (n) => getId(n) === getId(node));
 
@@ -204,12 +223,12 @@ export function updateNode(conversationAsset, node) {
   }
 }
 
-export function addNodes(conversationAsset, newNodes) {
+export function addNodes(conversationAsset: ConversationAssetType, newNodes: NodeType[]): void {
   const { nodes } = conversationAsset.conversation;
   newNodes.forEach((node) => nodes.push(node));
 }
 
-export function updateResponse(conversationAsset, parentNode, response) {
+export function updateResponse(conversationAsset: ConversationAssetType, parentNode: NodeType, response: NodeLinkType): void {
   const { nodes } = conversationAsset.conversation;
 
   const branchIndex = findIndex(parentNode.branches, (b) => getId(b) === getId(response));
@@ -227,15 +246,21 @@ export function updateResponse(conversationAsset, parentNode, response) {
   }
 }
 
-export function setRoots(conversationAsset, roots) {
-  const { roots: conversationRoots } = conversationAsset.conversation;
-  conversationRoots.replace(roots);
+export function setRoots(conversationAsset: ConversationAssetType, roots: NodeLinkType[]): void {
+  // const { roots: conversationRoots } = conversationAsset.conversation;
+  // // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  // conversationRoots.replace(roots);
+
+  // TODO: Keep an eye on this. It might break something related to mobx reactions
+  const { conversation } = conversationAsset;
+  conversation.roots = [...roots];
 }
 
-export function setResponses(conversationAsset, parentNode, responses) {
+export function setResponses(conversationAsset: ConversationAssetType, parentNode: NodeType, responses: NodeLinkType[]): void {
   const { nodes } = conversationAsset.conversation;
   const parentNodeIndex = findIndex(nodes, (n) => getId(n) === getId(parentNode));
-  nodes[parentNodeIndex].branches.replace(responses);
-}
 
-export default {};
+  // TODO: Keep an eye on this. It might break something related to mobx reactions
+  // nodes[parentNodeIndex].branches.replace(responses);
+  nodes[parentNodeIndex].branches = [...responses];
+}

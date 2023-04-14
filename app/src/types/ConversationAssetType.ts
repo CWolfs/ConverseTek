@@ -1,13 +1,15 @@
 import { NodeLinkType } from './NodeLinkType';
 import { NodeType } from './NodeType';
 
+export type IdRef = {
+  id: string;
+};
+
 export type ConversationAssetType = {
+  filename: string;
+  filepath: string;
   conversation: {
-    filename: string;
-    filepath: string;
-    idRef: {
-      id: string;
-    };
+    idRef: IdRef;
     uiName: string;
     /** NodeLinks are either roots or branches spoken by the Player */
     roots: NodeLinkType[];

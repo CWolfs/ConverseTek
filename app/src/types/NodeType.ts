@@ -18,8 +18,9 @@ export type NodeType = {
   subjectTopicRefs: [] | null; // Not used in BT
   sourceInSceneRef: null;
   sourceWithTagInScene: null; // Not used in BT
+  speakerType: 'speakerId' | null;
   overrideSpeaker: null; // Not used in BT
-  speakerOverrideId: string | null;
+  speakerOverrideId: string;
   actions: OperationType[] | null;
   comment: string | null;
 };
