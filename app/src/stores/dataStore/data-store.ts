@@ -44,6 +44,10 @@ class DataStore {
   }
 
   createNewConversation(): void {
+    if (!this.workingDirectory) {
+      throw Error('Working directory is not defined. This is unexpected');
+    }
+
     const conversation = createConversation(this.workingDirectory);
     this.updateActiveConversation(conversation);
   }
