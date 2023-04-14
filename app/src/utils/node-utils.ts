@@ -7,6 +7,12 @@ export type NodeTypeDetectionResult = {
   isLink: boolean;
 };
 
+export type MockClipboard = {
+  node: {
+    type: string;
+  };
+};
+
 export function detectType(type: string): NodeTypeDetectionResult {
   return {
     isRoot: type === 'root',
@@ -36,7 +42,7 @@ export function isAllowedToCreateNode(nodeId: string) {
   return false;
 }
 
-export function isAllowedToPasteCopy(nodeId: string, clipboard) {
+export function isAllowedToPasteCopy(nodeId: string, clipboard: MockClipboard) {
   const node = nodeStore.getNode(nodeId);
   const { node: clipboardNode } = clipboard;
 
@@ -57,7 +63,7 @@ export function isAllowedToPasteCopy(nodeId: string, clipboard) {
   return true;
 }
 
-export function isAllowedToPasteLink(nodeId: string, clipboard) {
+export function isAllowedToPasteLink(nodeId: string, clipboard: MockClipboard) {
   // GUARD - Don't allow pasting link into a root
   if (nodeId === '0') return false;
 
