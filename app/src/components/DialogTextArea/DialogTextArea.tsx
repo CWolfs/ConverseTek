@@ -13,8 +13,6 @@ function DialogTextArea({ node }: { node: NodeType | NodeLinkType }) {
   const { type } = node;
   const nodeStore = useStore<NodeStore>('node');
 
-  console.log('rendering....');
-
   let text = '';
   if (type === 'node') {
     text = node.text;
@@ -24,7 +22,6 @@ function DialogTextArea({ node }: { node: NodeType | NodeLinkType }) {
 
   const handleDialogChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     const inputText = event.target.value;
-    console.log('setting....');
     nodeStore.setNodeText(node, inputText);
   };
 
