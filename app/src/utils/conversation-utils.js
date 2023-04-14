@@ -15,8 +15,8 @@ export function generateId() {
 }
 
 export function regenerateNodeIds(conversationAsset) {
-  conversationAsset.Conversation.roots.forEach((root) => (root.idRef.id = generateId()));
-  conversationAsset.Conversation.nodes.forEach((node) => {
+  conversationAsset.conversation.roots.forEach((root) => (root.idRef.id = generateId()));
+  conversationAsset.conversation.nodes.forEach((node) => {
     node.idRef.id = generateId();
     node.branches.forEach((branch) => (branch.idRef.id = generateId()));
   });
@@ -63,19 +63,19 @@ export function createConversation(filePath) {
   const id = generateId();
   const fileName = `${id}.convo`;
   const conversation = {
-    FileName: fileName,
-    FilePath: `${filePath}/${fileName}.bytes`,
-    Conversation: {
+    filename: fileName,
+    filepath: `${filePath}/${fileName}.bytes`,
+    conversation: {
       idRef: {
         id,
       },
-      ui_name: 'Unnamed-Conversation',
+      uiName: 'Unnamed-Conversation',
       nodes: [],
       roots: [],
-      default_speaker_id: '',
-      default_speaker_override: null,
-      persistent_conversation: false,
-      speaker_override_id: '',
+      defaultSpeakerId: '',
+      defaultSpeakerOverride: null,
+      persistentConversation: false,
+      speakerOverrideId: '',
     },
   };
 
@@ -143,7 +143,7 @@ export function createResponse() {
 }
 
 export function consolidateSpeaker(conversationAsset) {
-  const { nodes } = conversationAsset.Conversation;
+  const { nodes } = conversationAsset.conversation;
   nodes.forEach((node) => {
     const { speakerType } = node;
     if (speakerType === 'speakerId') {
@@ -153,7 +153,7 @@ export function consolidateSpeaker(conversationAsset) {
 }
 
 export function fillIndexGaps(conversationAsset) {
-  const { nodes } = conversationAsset.Conversation;
+  const { nodes } = conversationAsset.conversation;
   const usedIndexes = [];
   const nodesToRemove = [];
 
@@ -183,7 +183,7 @@ export function fillIndexGaps(conversationAsset) {
 }
 
 export function updateRoot(conversationAsset, root) {
-  const { roots } = conversationAsset.Conversation;
+  const { roots } = conversationAsset.conversation;
   const index = findIndex(roots, (r) => getId(r) === getId(root));
 
   if (index === -1) {
@@ -194,7 +194,7 @@ export function updateRoot(conversationAsset, root) {
 }
 
 export function updateNode(conversationAsset, node) {
-  const { nodes } = conversationAsset.Conversation;
+  const { nodes } = conversationAsset.conversation;
   const index = findIndex(nodes, (n) => getId(n) === getId(node));
 
   if (index === -1) {
@@ -205,12 +205,12 @@ export function updateNode(conversationAsset, node) {
 }
 
 export function addNodes(conversationAsset, newNodes) {
-  const { nodes } = conversationAsset.Conversation;
+  const { nodes } = conversationAsset.conversation;
   newNodes.forEach((node) => nodes.push(node));
 }
 
 export function updateResponse(conversationAsset, parentNode, response) {
-  const { nodes } = conversationAsset.Conversation;
+  const { nodes } = conversationAsset.conversation;
 
   const branchIndex = findIndex(parentNode.branches, (b) => getId(b) === getId(response));
   if (branchIndex === -1) {
@@ -228,12 +228,12 @@ export function updateResponse(conversationAsset, parentNode, response) {
 }
 
 export function setRoots(conversationAsset, roots) {
-  const { roots: conversationRoots } = conversationAsset.Conversation;
+  const { roots: conversationRoots } = conversationAsset.conversation;
   conversationRoots.replace(roots);
 }
 
 export function setResponses(conversationAsset, parentNode, responses) {
-  const { nodes } = conversationAsset.Conversation;
+  const { nodes } = conversationAsset.conversation;
   const parentNodeIndex = findIndex(nodes, (n) => getId(n) === getId(parentNode));
   nodes[parentNodeIndex].branches.replace(responses);
 }

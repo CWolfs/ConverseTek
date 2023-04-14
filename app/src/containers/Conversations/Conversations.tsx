@@ -1,6 +1,9 @@
 import React, { useEffect } from 'react';
 import { observer } from 'mobx-react';
 
+import type { DataStore } from 'stores/dataStore/data-store';
+import type { DefStore } from 'stores/defStore/def-store';
+
 import { getConversations, getDefinitions } from 'services/api';
 import { useStore } from 'hooks/useStore';
 
@@ -11,8 +14,8 @@ import { SplashScreen } from '../SplashScreen';
 import './Conversations.css';
 
 const Conversations = () => {
-  const dataStore = useStore('data');
-  const defStore = useStore('def');
+  const dataStore = useStore<DataStore>('data');
+  const defStore = useStore<DefStore>('def');
 
   const { conversationAssets, activeConversationAsset } = dataStore;
   const { definitionCount } = defStore;

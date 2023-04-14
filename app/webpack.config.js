@@ -33,13 +33,13 @@ let config = {
   resolve: {
     extensions: ['.js', '.json', '.jsx', '.tsx', '.ts'],
     alias: {
-      root: path.resolve(__dirname, 'src/'),
       components: path.resolve(__dirname, 'src/components/'),
       containers: path.resolve(__dirname, 'src/containers/'),
       services: path.resolve(__dirname, 'src/services/'),
       hooks: path.resolve(__dirname, 'src/hooks/'),
       stores: path.resolve(__dirname, 'src/stores/'),
       utils: path.resolve(__dirname, 'src/utils/'),
+      types: path.resolve(__dirname, 'src/types/'),
     },
     modules: [path.resolve(__dirname), 'node_modules'],
   },

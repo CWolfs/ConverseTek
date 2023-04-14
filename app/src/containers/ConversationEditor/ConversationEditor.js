@@ -35,7 +35,7 @@ function ConversationEditor({ conversationAsset }) {
   const onSaveButtonClicked = () => {
     createNewUnsavedConversation(unsavedActiveConversationAsset);
 
-    updateConversation(unsavedActiveConversationAsset.Conversation.idRef.id, unsavedActiveConversationAsset).then(() => {
+    updateConversation(unsavedActiveConversationAsset.conversation.idRef.id, unsavedActiveConversationAsset).then(() => {
       message.success('Save successful');
     });
     dataStore.updateActiveConversation(unsavedActiveConversationAsset); // local update for speed
@@ -69,8 +69,8 @@ function ConversationEditor({ conversationAsset }) {
     createNewUnsavedConversation(conversationAsset);
   }, [conversationAsset]);
 
-  const { Conversation } = unsavedActiveConversationAsset;
-  const conversationId = Conversation.idRef.id;
+  const { conversation } = unsavedActiveConversationAsset;
+  const conversationId = conversation.idRef.id;
   const { type } = activeNode || { type: null };
   const { isRoot, isResponse } = detectType(type);
 
@@ -130,7 +130,7 @@ function ConversationEditor({ conversationAsset }) {
           </Col>
           <Col span={12}>
             <FormItem {...formItemLayout} label="Name">
-              <Input value={Conversation.ui_name} onChange={handleNameChange} />
+              <Input value={conversation.uiName} onChange={handleNameChange} />
             </FormItem>
           </Col>
         </Row>

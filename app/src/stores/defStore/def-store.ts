@@ -4,14 +4,14 @@ import values from 'lodash.values';
 
 import { createArg } from 'utils/def-utils';
 import { tryParseInt, tryParseFloat } from 'utils/number-utils';
+import { ConversationAssetType } from 'types/ConversationAssetType';
 
 /* eslint-disable class-methods-use-this, no-param-reassign */
 class DefStore {
-  operations = [];
-
-  presets = [];
-
-  tags = [];
+  public operations = [];
+  public presets = [];
+  public tags = [];
+  public definitionCount = 0;
 
   constructor() {
     makeObservable(this, {
@@ -31,12 +31,10 @@ class DefStore {
       getPresetKeys: action,
       reset: action,
     });
-
-    this.definitionCount = 0;
   }
 
-  setLogicTypeByConversation(conversationAsset) {
-    const { Conversation: conversation } = conversationAsset;
+  setLogicTypeByConversation(conversationAsset: ConversationAssetType) {
+    const { conversation } = conversationAsset;
     const { roots, nodes } = conversation;
 
     roots.forEach((root) => {
@@ -104,27 +102,27 @@ class DefStore {
         if (type === 'operation') {
           // favour: operation, string, float, int
           rawType = 'operation';
-          if (arg.call_value === null && types.length > 1) {
+          if (arg.callValue === null && types.length > 1) {
             return false; // favour another field if no operation is set but is a valid input type
-          } else if (arg.call_value === null) {
-            arg.call_value = {
+          } else if (arg.callValue === null) {
+            arg.callValue = {
               functionName: 'Get Preset Value (int)',
               args: [
                 {
-                  int_value: 0,
-                  bool_value: false,
-                  float_value: 0.0,
-                  string_value: 'HasOrHasNot',
-                  call_value: null,
-                  variableref_value: null,
+                  intValue: 0,
+                  boolValue: false,
+                  floatValue: 0.0,
+                  stringValue: 'HasOrHasNot',
+                  callValue: null,
+                  variableRefValue: null,
                 },
                 {
-                  int_value: 1,
-                  bool_value: false,
-                  float_value: 0.0,
-                  string_value: '',
-                  call_value: null,
-                  variableref_value: null,
+                  intValue: 1,
+                  boolValue: false,
+                  floatValue: 0.0,
+                  stringValue: '',
+                  callValue: null,
+                  variableRefValue: null,
                 },
               ],
             }; // if not other valid input type - populate
@@ -147,8 +145,8 @@ class DefStore {
       if (!types.includes(rawType)) {
         if (types.includes('operation')) { // favour: operation, string, float, int
           rawType = 'operation';
-          arg.call_value = { functionName: 'Get Preset Value (int)', args: [] };
-          // this.setOperation(arg.call_value, arg.call_value.functionName);
+          arg.callValue = { functionName: 'Get Preset Value (int)', args: [] };
+          // this.setOperation(arg.callValue, arg.callValue.functionName);
         } else if (types.includes('string')) {
           rawType = 'string';
         } else if (types.includes('float')) {
@@ -161,8 +159,8 @@ class DefStore {
 
       arg.type = rawType;
 
-      if (rawType === 'operation' && arg.call_value !== null) {
-        this.setLogicTypeByOperation(arg.call_value);
+      if (rawType === 'operation' && arg.callValue !== null) {
+        this.setLogicTypeByOperation(arg.callValue);
       }
     });
   }
@@ -197,14 +195,7 @@ class DefStore {
   }
 
   getRawArgType(arg) {
-    const {
-      int_value: intValue,
-      // bool_value: boolValue,
-      float_value: floatValue,
-      string_value: stringValue,
-      call_value: callValue,
-      // variableref_value: variableRefValue,
-    } = arg;
+    const { intValue, boolValue, floatValue, stringValue, callValue, variableRefValue } = arg;
 
     // Use same logic BT uses
     if (callValue) return 'operation';
@@ -216,15 +207,7 @@ class DefStore {
   getArgValue(arg) {
     if (arg === null || arg === undefined) return { type: null, value: null };
 
-    const {
-      int_value: intValue,
-      // bool_value: boolValue,
-      float_value: floatValue,
-      string_value: stringValue,
-      call_value: callValue,
-      // variableref_value: variableRefValue,
-      type,
-    } = arg;
+    const { intValue, boolValue, floatValue, stringValue, callValue, variableRefValue, type } = arg;
 
     if (type) {
       if (type === 'operation') return { type, value: callValue };
@@ -242,21 +225,21 @@ class DefStore {
     const { type: previousType, value: previousValue } = argValue;
 
     if (previousType !== type) {
-      if (previousType === 'operation') arg.call_value = null;
-      if (previousType === 'string') arg.string_value = '';
-      if (previousType === 'float') arg.float_value = 0.0;
-      if (previousType === 'int') arg.int_value = 0;
+      if (previousType === 'operation') arg.callValue = null;
+      if (previousType === 'string') arg.stringValue = '';
+      if (previousType === 'float') arg.floatValue = 0.0;
+      if (previousType === 'int') arg.intValue = 0;
 
       if (type === 'operation') {
-        arg.call_value = { functionName: 'Get Preset Value (int)', args: [] };
-        this.setOperation(arg.call_value, arg.call_value.functionName);
+        arg.callValue = { functionName: 'Get Preset Value (int)', args: [] };
+        this.setOperation(arg.callValue, arg.callValue.functionName);
       }
 
-      if (type === 'string') arg.string_value = previousValue && !previousValue.functionName ? previousValue.toString() : '';
+      if (type === 'string') arg.stringValue = previousValue && !previousValue.functionName ? previousValue.toString() : '';
 
       if (previousType === 'float' || previousType === 'int' || previousType === 'string') {
-        if (type === 'float') arg.float_value = tryParseFloat(previousValue, 0.0);
-        if (type === 'int') arg.int_value = tryParseInt(previousValue, 0);
+        if (type === 'float') arg.floatValue = tryParseFloat(previousValue, 0.0);
+        if (type === 'int') arg.intValue = tryParseInt(previousValue, 0);
       }
 
       arg.type = type;
@@ -270,10 +253,10 @@ class DefStore {
     const argValue = this.getArgValue(arg);
     const { type } = argValue;
 
-    if (type === 'operation') arg.call_value = value;
-    if (type === 'string') arg.string_value = value;
-    if (type === 'float') arg.float_value = value;
-    if (type === 'int') arg.int_value = value;
+    if (type === 'operation') arg.callValue = value;
+    if (type === 'string') arg.stringValue = value;
+    if (type === 'float') arg.floatValue = value;
+    if (type === 'int') arg.intValue = value;
 
     arg.type = type;
 
@@ -299,7 +282,7 @@ class DefStore {
             // favour: operation, string, float, int
             newArg.type = 'operation';
             const opLogic = { functionName: 'Get Preset Value (int)', args: [] };
-            newArg.call_value = this.setOperation(opLogic, opLogic.functionName);
+            newArg.callValue = this.setOperation(opLogic, opLogic.functionName);
           } else if (types.includes('string')) {
             newArg.type = 'string';
           } else if (types.includes('float')) {
@@ -324,15 +307,15 @@ class DefStore {
   resetArg(input, arg) {
     const { Types: types } = input;
 
-    arg.call_value = null;
-    arg.string_value = '';
-    arg.float_value = 0.0;
-    arg.int_value = 0;
+    arg.callValue = null;
+    arg.stringValue = '';
+    arg.floatValue = 0.0;
+    arg.intValue = 0;
 
     if (types.includes('operation')) {
       arg.type = 'operation';
       const opLogic = { functionName: 'Get Preset Value (int)', args: [] };
-      arg.call_value = this.setOperation(opLogic, opLogic.functionName);
+      arg.callValue = this.setOperation(opLogic, opLogic.functionName);
     } else if (types.includes('string')) {
       arg.type = 'string';
     } else if (types.includes('float')) {

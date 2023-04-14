@@ -17,13 +17,13 @@
        "jsx": "react", // change to "react-jsx" when upgrading to React 18
        "baseUrl": "./",
        "paths": {
-         "root/*": ["src/*"],
          "components/*": ["src/components/*"],
          "containers/*": ["src/containers/*"],
          "services/*": ["src/services/*"],
          "hooks/*": ["src/hooks/*"],
          "stores/*": ["src/stores/*"],
          "utils/*": ["src/utils/*"],
+         "types/*": ["src/types/*"],
      }
     }
   }

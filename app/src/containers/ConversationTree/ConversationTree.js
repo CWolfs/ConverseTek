@@ -10,8 +10,8 @@ import './ConversationTree.css';
 function remapConversationData(conversationAssets) {
   return sortBy(
     Array.from(conversationAssets.values()).map((asset) => ({
-      key: asset.Conversation.idRef.id,
-      label: asset.Conversation.ui_name,
+      key: asset.conversation.idRef.id,
+      label: asset.conversation.uiName,
     })),
     (c) => c.label,
   );
@@ -22,7 +22,7 @@ function ConversationTree() {
 
   const { conversationAssets, activeConversationAsset } = dataStore;
   const data = remapConversationData(conversationAssets);
-  const selectedKeys = activeConversationAsset ? [activeConversationAsset.Conversation.idRef.id] : undefined;
+  const selectedKeys = activeConversationAsset ? [activeConversationAsset.conversation.idRef.id] : undefined;
 
   const onNodeSelected = (newSelectedKeys) => {
     dataStore.setActiveConversation(newSelectedKeys[0]);

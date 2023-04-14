@@ -118,7 +118,7 @@ class NodeStore {
   }
 
   init(conversationAsset) {
-    const nextOwnerId = getId(conversationAsset.Conversation);
+    const nextOwnerId = getId(conversationAsset.conversation);
 
     // save the active node if it's the same conversation
     if (this.ownerId !== nextOwnerId) {
@@ -385,7 +385,7 @@ class NodeStore {
 
   getNode(nodeId) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-    const { roots, nodes } = conversationAsset.Conversation;
+    const { roots, nodes } = conversationAsset.conversation;
 
     const root = roots.find((r) => getId(r) === nodeId);
     if (root) return root;
@@ -405,7 +405,7 @@ class NodeStore {
 
   getNodeByIndex(index) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-    const { nodes } = conversationAsset.Conversation;
+    const { nodes } = conversationAsset.conversation;
 
     const node = nodes.find((n) => n.index === index);
     if (node) return node;
@@ -414,7 +414,7 @@ class NodeStore {
 
   removeNode(node, immediate = false) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-    const { roots, nodes } = conversationAsset.Conversation;
+    const { roots, nodes } = conversationAsset.conversation;
     const { type } = node;
     const nodeId = getId(node);
 
@@ -448,7 +448,7 @@ class NodeStore {
 
   processDeletes() {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-    const { roots, nodes } = conversationAsset.Conversation;
+    const { roots, nodes } = conversationAsset.conversation;
 
     nodes.forEach((n) => {
       remove(n.branches, (b) => b.deleting);
@@ -555,7 +555,7 @@ class NodeStore {
    */
   cleanUpDanglingResponseIndexes(idToClean) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-    const { roots, nodes } = conversationAsset.Conversation;
+    const { roots, nodes } = conversationAsset.conversation;
 
     roots.forEach((root) => {
       const { nextNodeIndex } = root;

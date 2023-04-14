@@ -21,7 +21,7 @@ function buildTreeData(nodeStore, conversationAsset) {
     {
       title: 'Root',
       id: '0',
-      children: nodeStore.getChildrenFromRoots(conversationAsset.Conversation.roots),
+      children: nodeStore.getChildrenFromRoots(conversationAsset.conversation.roots),
       expanded: true,
       canDrag: false,
     },

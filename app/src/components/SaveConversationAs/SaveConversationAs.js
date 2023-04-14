@@ -13,16 +13,16 @@ function SaveConversationAs() {
 
   const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
 
-  const [suggestedFileName] = useState(`${conversationAsset.Conversation.idRef.id}.convo.bytes`);
+  const [suggestedFileName] = useState(`${conversationAsset.conversation.idRef.id}.convo.bytes`);
   const [modifiedFileName, setModifiedFileName] = useState(null);
 
   const onOk = () => {
-    const { FileName: previousFileName, FilePath: previousFilePath } = conversationAsset;
+    const { filename: previousFileName, filepath: previousFilePath } = conversationAsset;
 
-    conversationAsset.FileName = (modifiedFileName || suggestedFileName).replace('.bytes', '');
-    conversationAsset.FilePath = previousFilePath.replace(previousFileName, conversationAsset.FileName);
+    conversationAsset.filename = (modifiedFileName || suggestedFileName).replace('.bytes', '');
+    conversationAsset.filepath = previousFilePath.replace(previousFileName, conversationAsset.filename);
 
-    updateConversation(conversationAsset.Conversation.idRef.id, conversationAsset).then(() => {
+    updateConversation(conversationAsset.conversation.idRef.id, conversationAsset).then(() => {
       message.success('Save successful');
     });
     dataStore.updateActiveConversation(conversationAsset); // local update for speed

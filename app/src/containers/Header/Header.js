@@ -32,7 +32,7 @@ export function Header() {
             <MenuItem
               onClick={() => {
                 const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-                updateConversation(conversationAsset.Conversation.idRef.id, conversationAsset).then(() => {
+                updateConversation(conversationAsset.conversation.idRef.id, conversationAsset).then(() => {
                   message.success('Save successful');
                 });
                 dataStore.updateActiveConversation(conversationAsset); // local update for speed
@@ -52,7 +52,7 @@ export function Header() {
             <MenuItem
               onClick={() => {
                 const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-                exportConversation(conversationAsset.Conversation.idRef.id, conversationAsset).then(() => {
+                exportConversation(conversationAsset.conversation.idRef.id, conversationAsset).then(() => {
                   message.success('Export successful');
                 });
               }}
@@ -65,7 +65,7 @@ export function Header() {
             <MenuItem
               onClick={() => {
                 const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-                exportAllConversations(conversationAsset ? conversationAsset.Conversation.idRef.id : -1, conversationAsset).then(() => {
+                exportAllConversations(conversationAsset ? conversationAsset.conversation.idRef.id : -1, conversationAsset).then(() => {
                   message.success('Export successful');
                 });
               }}
