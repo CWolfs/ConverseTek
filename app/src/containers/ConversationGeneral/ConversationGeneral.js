@@ -43,15 +43,15 @@ function ConversationGeneral({ node }) {
 
   const populateState = () => {
     setNodeId(getId(idRef));
-    setSelectedSpeaker(selectedSpeaker);
+    setSelectedSpeaker(defaultSpeaker);
     setCastId(castId);
-    setSpeakerId(speakerId);
+    setSpeakerId(nodeSpeakerId);
   };
 
   // onNodeChange
   // Maybe only this useEffect is needed. Test it.
   useEffect(() => {
-    populateState(node);
+    populateState();
   }, [node]);
 
   const handleIdChange = (event) => {
