@@ -30,7 +30,7 @@ const colTwoLayout = {
 function ConversationGeneral({ node }) {
   const nodeStore = useStore('node');
 
-  const { idRef, speaker_override_id: speakerOverrideId, sourceInSceneRef, type } = node;
+  const { idRef, speakerOverrideId, sourceInSceneRef, type } = node;
   const sceneRefCastId = sourceInSceneRef && sourceInSceneRef.id ? sourceInSceneRef.id : null;
   const nodeSpeakerId = speakerOverrideId !== '' ? speakerOverrideId : null;
   const defaultSpeaker = sceneRefCastId !== null || nodeSpeakerId === null ? 'castId' : 'speakerId';
@@ -87,7 +87,7 @@ function ConversationGeneral({ node }) {
   const handleSpeakerIdChange = (event) => {
     const newSpeakerId = event.target.value.trim();
     // FIXME: Add immutability
-    node.speaker_override_id = newSpeakerId;
+    node.speakerOverrideId = newSpeakerId;
 
     setSpeakerId(newSpeakerId);
   };
