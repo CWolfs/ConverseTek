@@ -1,14 +1,23 @@
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
 import { Input } from 'antd';
+import { NodeType } from 'types/NodeType';
+import { NodeLinkType } from 'types/NodeLinkType';
 
 const { TextArea } = Input;
 
-function DialogTextArea({ node }) {
-  const text = node.text || node.responseText;
+function DialogTextArea({ node }: { node: NodeType | NodeLinkType }) {
+  const { type } = node;
 
-  const handleDialogChange = (event) => {
+  let text = '';
+  if (type === 'node') {
+    text = node.text;
+  } else {
+    text = node.responseText;
+  }
+
+  const handleDialogChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     const { type } = node;
 
     const inputText = event.target.value;
