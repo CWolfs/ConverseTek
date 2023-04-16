@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import { Button } from 'antd';
 
 import './ToggleEditable.css';
 
-export function ToggleEditable({ children }) {
+export function ToggleEditable({ children }: { children: JSX.Element[] }) {
   const [editable] = useState(false);
 
-  const renderFirstChild = () => children[0];
-  const renderSecondChild = () => children[1];
+  if (!children) return null;
+
+  const renderFirstChild = (): JSX.Element => children[0];
+  const renderSecondChild = (): JSX.Element => children[1];
 
   const content = editable ? renderSecondChild() : renderFirstChild();
 
@@ -21,7 +22,3 @@ export function ToggleEditable({ children }) {
     </div>
   );
 }
-
-ToggleEditable.propTypes = {
-  children: PropTypes.node.isRequired,
-};
