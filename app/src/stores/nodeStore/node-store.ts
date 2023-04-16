@@ -44,7 +44,7 @@ class NodeStore {
   takenNodeIndexes: number[] = [];
   expandMap = new Map<string, boolean>();
   clipboard: Clipboard | null = null;
-  rstNodeIdToTreeIndexMap = new Map<number, number>();
+  nodeIdToTreeIndexMap = new Map<string, number>();
   dirtyActiveNode = false;
   rebuild = false;
 
@@ -105,13 +105,13 @@ class NodeStore {
     return nextNodeIndex;
   }
 
-  addNodeIdAndTreeIndexPair(rstNodeId: number, index: number) {
-    this.rstNodeIdToTreeIndexMap.set(rstNodeId, index);
+  addNodeIdAndTreeIndexPair(nodeId: string, index: number) {
+    this.nodeIdToTreeIndexMap.set(nodeId, index);
   }
 
-  getTreeIndex(rstNodeId: number) {
-    if (this.rstNodeIdToTreeIndexMap.has(rstNodeId)) {
-      return this.rstNodeIdToTreeIndexMap.get(rstNodeId);
+  getTreeIndex(nodeId: string) {
+    if (this.nodeIdToTreeIndexMap.has(nodeId)) {
+      return this.nodeIdToTreeIndexMap.get(nodeId);
     }
     return null;
   }
@@ -172,7 +172,7 @@ class NodeStore {
    * || SCROLL TO  NODE METHODS ||
    * =============================
    */
-  scrollToNode(nodeId: string, direction: 'up' | 'down', cachedTree: HTMLElement) {
+  scrollToNode(nodeId: string, direction: 'up' | 'down', cachedTree?: HTMLElement) {
     // Quickly scroll in the given direction to force the virtual tree to load
     // At the same time check for the required node
     const tree = cachedTree || window.document.querySelector('.ReactVirtualized__Grid');
@@ -427,7 +427,7 @@ class NodeStore {
     }
   }
 
-  getNode(nodeId: string) {
+  getNode(nodeId: string | undefined): NodeType | NodeLinkType | null {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     if (!conversationAsset) {
       throw Error('Unsaved conversation is null or undefined');
@@ -572,7 +572,7 @@ class NodeStore {
       if (parent.type === 'root') {
         updateRoot(conversationAsset, parent);
       } else if (parent.type === 'response') {
-        const grandParentNode = this.getNode(parent.parentId);
+        const grandParentNode = this.getNode(parent.parentId) as NodeType;
         updateResponse(conversationAsset, grandParentNode, parent);
       }
 
@@ -601,8 +601,8 @@ class NodeStore {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     if (conversationAsset === null) return;
 
-    const responses = responseIds.map((responseId) => this.getNode(responseId));
-    const parent = this.getNode(parentId);
+    const responses = responseIds.map((responseId) => this.getNode(responseId)) as NodeLinkType[];
+    const parent = this.getNode(parentId) as NodeType;
     setResponses(conversationAsset, parent, responses);
   }
 
@@ -700,11 +700,15 @@ class NodeStore {
     });
   }
 
-  setNodeExpansion(nodeId: string, flag: boolean) {
+  setNodeExpansion(nodeId: string | undefined, flag: boolean) {
+    if (!nodeId) return;
+
     this.expandMap.set(nodeId, flag);
   }
 
-  isNodeExpanded(nodeId: string) {
+  isNodeExpanded(nodeId: string | undefined) {
+    if (!nodeId) return false;
+
     const isNodeExpanded = this.expandMap.get(nodeId);
     if (isNodeExpanded === undefined) return true;
     return isNodeExpanded;
@@ -724,7 +728,7 @@ class NodeStore {
    * || DIALOG TREE DATA BUILDING METHODS ||
    * =======================================
    */
-  getChildren(node: NodeLinkType): object[] | null {
+  getChildren(node: NodeLinkType): RSTNode[] | null {
     const { nextNodeIndex } = node; // root or response/branch
 
     // GUARD - End of branch so this would be tagged as a DIALOG END node
@@ -753,7 +757,7 @@ class NodeStore {
         type: 'node',
         expanded: isChildExpanded,
 
-        children: childNode.branches.map((branch) => {
+        children: childNode.branches.map((branch): RSTNode => {
           const { auxiliaryLink } = branch;
           const branchNodeId = getId(branch);
           const isBranchExpanded = this.isNodeExpanded(branchNodeId);
@@ -762,7 +766,7 @@ class NodeStore {
           branch.parentId = childNodeId;
 
           const isValidLink = auxiliaryLink && branch.nextNodeIndex !== -1;
-          let branchChildren: object[] | null = [];
+          let branchChildren: RSTNode[] | null = [];
 
           if (auxiliaryLink) {
             if (isValidLink) {
@@ -799,7 +803,7 @@ class NodeStore {
   reset = () => {
     this.focusedTreeNode = null;
     this.takenNodeIndexes = [];
-    this.rstNodeIdToTreeIndexMap.clear();
+    this.nodeIdToTreeIndexMap.clear();
   };
 }
 

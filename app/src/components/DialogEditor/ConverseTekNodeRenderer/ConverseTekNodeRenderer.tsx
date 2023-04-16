@@ -6,6 +6,8 @@ import { observer } from 'mobx-react';
 import { Icon } from 'antd';
 
 import { OnNodeContextMenuProps } from '../DialogEditor';
+import { NodeType } from 'types/NodeType';
+import { NodeLinkType } from 'types/NodeLinkType';
 
 import { isDescendant } from 'utils/tree-data-utils';
 import { detectType } from 'utils/node-utils';
@@ -52,6 +54,25 @@ type Props = {
   rowDirection: string;
 };
 
+function hasActionsAndConditions(node: NodeType | NodeLinkType | null): { hasActions: boolean; hasConditions: boolean } {
+  let hasActions = false;
+  let hasConditions = false;
+
+  if (!node) return { hasActions, hasConditions };
+
+  const { type } = node;
+  if (type === 'node') {
+    const { actions } = node;
+    hasActions = !!actions;
+  } else if (type === 'response') {
+    const { actions, conditions } = node;
+    hasActions = !!actions;
+    hasConditions = !!conditions;
+  }
+
+  return { hasActions, hasConditions };
+}
+
 /* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
 export const ConverseTekNodeRenderer = observer(
   ({
@@ -89,13 +110,9 @@ export const ConverseTekNodeRenderer = observer(
     const isActiveNode = activeNodeId === node.id;
     const storedNode = nodeStore.getNode(node.id);
     const { type: nodeType } = node;
-
     const canNodeBeDragged = !(node.canDrag === false);
 
-    const { actions, conditions } = storedNode || { actions: null, conditions: null };
-    const hasActions = !!actions;
-    const hasConditions = !!conditions;
-
+    const { hasActions, hasConditions } = hasActionsAndConditions(storedNode);
     const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node);
     const isLandingPadActive = !didDrop && isDragging;
 
@@ -104,11 +121,15 @@ export const ConverseTekNodeRenderer = observer(
     const contextMenuId = node.id || Math.random().toString();
     const { parentId } = node;
 
-    let nodeTitle = '';
+    let nodeTitle: ((nodeState: NodeStateProps) => string | JSX.Element) | JSX.Element | string = '';
     if (storedNode === null || storedNode === undefined) {
       nodeTitle = title || node.title;
     } else {
-      nodeTitle = storedNode.text || storedNode.responseText;
+      if (storedNode.type === 'node') {
+        nodeTitle = storedNode.text;
+      } else {
+        nodeTitle = storedNode.responseText;
+      }
     }
 
     const moveHandleClasses = classnames('rst__moveHandle', {
@@ -174,6 +195,7 @@ export const ConverseTekNodeRenderer = observer(
         handle = (
           <div className="rst__loadingHandle">
             <div className="rst__loadingCircle">
+              {/* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */}
               {[...new Array(12)].map((_, index) => (
                 <div
                   // eslint-disable-next-line react/no-array-index-key
@@ -195,17 +217,17 @@ export const ConverseTekNodeRenderer = observer(
       }
     }
 
-    let buttonStyle = { left: -0.5 * scaffoldBlockPxWidth };
+    let buttonStyle: { left?: number; right?: number } = { left: -0.5 * scaffoldBlockPxWidth };
     if (rowDirection === 'rtl') {
       buttonStyle = { right: -0.5 * scaffoldBlockPxWidth };
     }
 
-    const logicStyle = {
+    const logicStyle: { color: string; fontSize: string; paddingRight?: string } = {
       color: isResponse ? 'white' : '#2f71d4',
       fontSize: '18px',
     };
 
-    if (nodeTitle && nodeTitle.length > 0) {
+    if (nodeTitle && typeof nodeTitle === 'string' && nodeTitle.length > 0) {
       logicStyle.paddingRight = '8px';
     }
 
@@ -213,7 +235,7 @@ export const ConverseTekNodeRenderer = observer(
       ...logicStyle,
     };
 
-    if ((!nodeTitle || nodeTitle.length <= 0) && hasActions) {
+    if ((!nodeTitle || (typeof nodeTitle === 'string' && nodeTitle.length <= 0)) && hasActions) {
       logicStyle.paddingRight = '8px';
     }
 
@@ -225,14 +247,21 @@ export const ConverseTekNodeRenderer = observer(
         }}
         className={rowContentsClasses}
         onClick={() => {
-          const { type } = node;
+          const { id, type } = node;
           if (type === 'link') {
-            const linkTreeIndex = nodeStore.getTreeIndex(node.linkId);
+            const { linkId } = node;
+            if (!linkId) throw Error(`Link has no link id. Link: ${node.title}`);
+
+            const linkTreeIndex = nodeStore.getTreeIndex(linkId);
+
+            if (!linkTreeIndex) throw Error(`link tree index is not found for linkId ${linkId}`);
+
             const direction = linkTreeIndex < treeIndex ? 'up' : 'down';
-            nodeStore.setActiveNode(node.linkId);
-            nodeStore.scrollToNode(node.linkId, direction);
+            nodeStore.setActiveNode(linkId);
+            nodeStore.scrollToNode(linkId, direction);
           } else {
-            nodeStore.setActiveNode(node.id, node.type);
+            if (!id) throw Error('id should be valid but it is not defined');
+            nodeStore.setActiveNode(id);
           }
         }}
         onMouseEnter={() => !isContextMenuVisible && nodeStore.setFocusedTreeNode(node)}
@@ -336,56 +365,3 @@ export const ConverseTekNodeRenderer = observer(
     );
   },
 );
-
-// ConverseTekNodeRenderer.defaultProps = {
-//   activeNodeId: null,
-//   isSearchMatch: false,
-//   isSearchFocus: false,
-//   canDrag: false,
-//   toggleChildrenVisibility: null,
-//   buttons: [],
-//   className: '',
-//   style: {},
-//   parentNode: null,
-//   draggedNode: null,
-//   canDrop: false,
-//   title: null,
-//   subtitle: null,
-//   rowDirection: 'ltr',
-// };
-
-// ConverseTekNodeRenderer.propTypes = {
-//   nodeStore: PropTypes.object.isRequired,
-//   activeNodeId: PropTypes.string,
-//   onNodeContextMenu: PropTypes.func.isRequired,
-//   isContextMenuVisible: PropTypes.bool.isRequired,
-//   node: PropTypes.shape({}).isRequired,
-//   title: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
-//   subtitle: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
-//   path: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number])).isRequired,
-//   treeIndex: PropTypes.number.isRequired,
-//   treeId: PropTypes.string.isRequired,
-//   isSearchMatch: PropTypes.bool,
-//   isSearchFocus: PropTypes.bool,
-//   canDrag: PropTypes.bool,
-//   scaffoldBlockPxWidth: PropTypes.number.isRequired,
-//   toggleChildrenVisibility: PropTypes.func,
-//   buttons: PropTypes.arrayOf(PropTypes.node),
-//   className: PropTypes.string,
-//   style: PropTypes.shape({}),
-
-//   // Drag and drop API functions
-//   // Drag source
-//   connectDragPreview: PropTypes.func.isRequired,
-//   connectDragSource: PropTypes.func.isRequired,
-//   parentNode: PropTypes.shape({}), // Needed for dndManager
-//   isDragging: PropTypes.bool.isRequired,
-//   didDrop: PropTypes.bool.isRequired,
-//   draggedNode: PropTypes.shape({}),
-//   // Drop target
-//   isOver: PropTypes.bool.isRequired,
-//   canDrop: PropTypes.bool,
-
-//   // rtl support
-//   rowDirection: PropTypes.string,
-// };

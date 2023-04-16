@@ -6,6 +6,7 @@ export type NodeLinkType = {
   idRef: {
     id: string;
   };
+  parentId: string;
   nextNodeIndex: number;
   responseText: string;
   conditions: {

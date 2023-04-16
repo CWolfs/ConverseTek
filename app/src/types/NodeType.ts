@@ -8,6 +8,7 @@ export type NodeType = {
     id: string;
   };
   index: number;
+  parentId: string;
   text: string;
   branches: NodeLinkType[];
   nodeType: number;

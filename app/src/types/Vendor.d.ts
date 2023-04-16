@@ -30,13 +30,16 @@ type RSTNodeCanDragContainer = {
 };
 
 type RSTNode = {
-  id: string;
-  type: string;
+  id?: string;
+  type: 'root' | 'node' | 'response' | 'link';
   parentId: string;
-  expanded: boolean;
-  children: RSTNode[];
+  expanded?: boolean;
+  children?: RSTNode[] | null;
   title: string;
-  subtitle: string;
+  subtitle?: string;
+  canDrag?: boolean;
+  linkId?: string | null;
+  linkIndex?: number;
 };
 
 type RSTPath = number[] | string[];
