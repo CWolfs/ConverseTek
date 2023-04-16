@@ -235,8 +235,8 @@ class DefStore {
     return {
       boolValue: false,
       callValue: null,
-      floatValue: type === 'float' && defaultValue != null ? defaultValue : 0,
-      intValue: type === 'int' && defaultValue != null ? defaultValue : 0,
+      floatValue: type === 'float' && defaultValue != null ? Number(defaultValue) : 0,
+      intValue: type === 'int' && defaultValue != null ? Number(defaultValue) : 0,
       stringValue: type === 'string' && defaultValue != null ? defaultValue : '',
       type,
       variableRefValue: null,

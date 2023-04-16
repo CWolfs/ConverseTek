@@ -32,7 +32,7 @@ function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInpu
     const operations = defStore.getOperations(category, scope);
     const { functionName } = logic;
     const parentArgValue = defStore.getArgValue(parentArg);
-    const { Tooltip: tooltip } = logicDef;
+    const { tooltip } = logicDef;
 
     const tooltipContent = tooltip ? (
       <Tooltip title={tooltip}>
@@ -44,7 +44,7 @@ function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInpu
       parentInput && parentArg ? (
         <EditableSelect
           value={parentArgValue.type}
-          options={parentInput.Types}
+          options={parentInput.types}
           placeholder="Select a type"
           style={{ width: 120 }}
           onChange={(value) => {
@@ -83,6 +83,8 @@ function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInpu
       const argValue = defStore.getArgValue(arg);
       let content = null;
 
+      if (!argValue) throw Error('Arg value is null');
+
       const { type: argType, value: argVal } = argValue;
 
       let argsContainerClasses = classnames('editable-logic__args-container');
@@ -102,7 +104,7 @@ function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInpu
         <EditableSelect
           key={key}
           value={argValue.type}
-          options={input.Types}
+          options={input.types}
           placeholder="Select a type"
           style={{ width: 120 }}
           onChange={(value) => {

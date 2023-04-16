@@ -26,17 +26,17 @@ function ViewableLogic({ logic }) {
   };
 
   const { args } = logic;
-  const { View: view, Inputs: inputs } = logicDef;
+  const { view, inputs } = logicDef;
 
   return (
     <span>
-      {view.includes('label') && `${logicDef.Label} `}
+      {view.includes('label') && `${logicDef.label} `}
       {view.includes('inputs') &&
         args.map((arg, index) => {
           const argValue = defStore.getArgValue(arg);
           const { type, value } = argValue;
           const input = inputs[index];
-          const { Viewlabel: viewLabel, Values: inputValues } = input;
+          const { viewLabel, values: inputValues } = input;
 
           if (type === 'operation' && value !== null) return <ViewableLogic key={index} defStore={defStore} logic={value} />;
 
@@ -55,18 +55,18 @@ function ViewableLogic({ logic }) {
 
           if (inputValues) {
             const inputVal = inputValues.find((inputValue) => {
-              if (inputValue.Value === valueFromArg) return true;
-              if (Number(inputValue.Value) === valueFromArg) return true;
+              if (inputValue.value === valueFromArg) return true;
+              if (Number(inputValue.value) === valueFromArg) return true;
               return false;
             });
             if (inputVal) {
-              displayValue = inputVal.Text;
-              if (inputVal.Viewlabel) {
-                const inputValueViewLabel = inputVal.Viewlabel;
+              displayValue = inputVal.text;
+              if (inputVal.viewlabel) {
+                const inputValueViewLabel = inputVal.viewlabel;
                 if (inputValueViewLabel.includes('{value}')) {
                   displayValue = inputValueViewLabel.replace('{value}', displayValue);
                 } else {
-                  displayValue = inputVal.Viewlabel;
+                  displayValue = inputVal.viewlabel;
                 }
               }
             }
