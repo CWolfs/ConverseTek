@@ -21,6 +21,13 @@ import { DialogEditorContextMenu } from '../DialogEditorContextMenu';
 
 import './DialogEditor.css';
 
+export type OnNodeContextMenuProps = {
+  event: MouseEvent<HTMLDivElement>;
+  contextMenuId: string;
+  type: 'node' | 'response' | 'root' | 'link';
+  parentId: string;
+};
+
 function buildTreeData(nodeStore: NodeStore, conversationAsset: ConversationAssetType) {
   const data = [
     {
@@ -129,17 +136,7 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
     }
   };
 
-  const onNodeContextMenu = ({
-    event,
-    contextMenuId,
-    type,
-    parentId,
-  }: {
-    event: MouseEvent<HTMLDivElement>;
-    contextMenuId: string;
-    type: 'node' | 'response' | 'root' | 'link';
-    parentId: string;
-  }) => {
+  const onNodeContextMenu = ({ event, contextMenuId, type, parentId }: OnNodeContextMenuProps) => {
     show({ event, props: { id: contextMenuId, type, parentId } });
   };
 

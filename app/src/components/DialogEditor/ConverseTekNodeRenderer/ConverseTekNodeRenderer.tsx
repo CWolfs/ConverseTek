@@ -1,50 +1,89 @@
 /* eslint-disable function-paren-newline */
 /* eslint-disable indent */
 import React from 'react';
-import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Icon } from 'antd';
 
+import { OnNodeContextMenuProps } from '../DialogEditor';
+
 import { isDescendant } from 'utils/tree-data-utils';
 import { detectType } from 'utils/node-utils';
+
+import { NodeStore } from 'stores/nodeStore/node-store';
 
 import { LinkIcon } from '../../Svg';
 
 import './ConverseTekNodeRenderer.css';
 
+type NodeStateProps = {
+  node: RSTNode;
+  path: RSTPath;
+  treeIndex: number;
+};
+
+type Props = {
+  nodeStore: NodeStore;
+  activeNodeId: string | null;
+  onNodeContextMenu: (props: OnNodeContextMenuProps) => void;
+  isContextMenuVisible: boolean;
+  scaffoldBlockPxWidth: number;
+  toggleChildrenVisibility: (({ node, path, treeIndex }: NodeStateProps) => void) | null;
+  connectDragPreview: (element: JSX.Element) => void;
+  connectDragSource: (element: JSX.Element, effect: { dropEffect: string }) => void;
+  isDragging: boolean;
+  canDrop: boolean;
+  canDrag: boolean;
+  node: RSTNode;
+  title: ((nodeState: NodeStateProps) => string | JSX.Element) | JSX.Element | null;
+  subtitle: ((nodeState: NodeStateProps) => string | JSX.Element) | JSX.Element | null;
+  draggedNode: RSTNode | null;
+  path: RSTPath;
+  treeIndex: number;
+  isSearchMatch: boolean;
+  isSearchFocus: boolean;
+  buttons: JSX.Element[];
+  className: string;
+  style: object;
+  didDrop: boolean;
+  treeId: string;
+  isOver: boolean;
+  parentNode: RSTNode | null;
+  rowDirection: string;
+};
+
 /* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
 export const ConverseTekNodeRenderer = observer(
   ({
     nodeStore,
-    activeNodeId,
+    activeNodeId = null,
     onNodeContextMenu,
     isContextMenuVisible,
     scaffoldBlockPxWidth,
-    toggleChildrenVisibility,
+    toggleChildrenVisibility = null,
     connectDragPreview,
     connectDragSource,
     isDragging,
-    canDrop,
-    canDrag,
+    canDrop = false,
+    canDrag = false,
     node,
-    title,
-    subtitle,
-    draggedNode,
+    title = null,
+    subtitle = null,
+    draggedNode = null,
     path,
     treeIndex,
-    isSearchMatch,
-    isSearchFocus,
-    buttons,
-    className,
-    style,
+    isSearchMatch = false,
+    isSearchFocus = false,
+    buttons = [],
+    className = '',
+    style = {},
     didDrop,
     treeId,
     isOver, // Not needed, but preserved for other renderers
-    parentNode, // Needed for dndManager
-    rowDirection,
+    parentNode = null, // Needed for dndManager
+    rowDirection = 'ltr',
     ...otherProps
-  }) => {
+  }: Props) => {
     const nodeSubtitle = subtitle || node.subtitle;
     const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : null;
     const isActiveNode = activeNodeId === node.id;
@@ -298,55 +337,55 @@ export const ConverseTekNodeRenderer = observer(
   },
 );
 
-ConverseTekNodeRenderer.defaultProps = {
-  activeNodeId: null,
-  isSearchMatch: false,
-  isSearchFocus: false,
-  canDrag: false,
-  toggleChildrenVisibility: null,
-  buttons: [],
-  className: '',
-  style: {},
-  parentNode: null,
-  draggedNode: null,
-  canDrop: false,
-  title: null,
-  subtitle: null,
-  rowDirection: 'ltr',
-};
+// ConverseTekNodeRenderer.defaultProps = {
+//   activeNodeId: null,
+//   isSearchMatch: false,
+//   isSearchFocus: false,
+//   canDrag: false,
+//   toggleChildrenVisibility: null,
+//   buttons: [],
+//   className: '',
+//   style: {},
+//   parentNode: null,
+//   draggedNode: null,
+//   canDrop: false,
+//   title: null,
+//   subtitle: null,
+//   rowDirection: 'ltr',
+// };
 
-ConverseTekNodeRenderer.propTypes = {
-  nodeStore: PropTypes.object.isRequired,
-  activeNodeId: PropTypes.string,
-  onNodeContextMenu: PropTypes.func.isRequired,
-  isContextMenuVisible: PropTypes.bool.isRequired,
-  node: PropTypes.shape({}).isRequired,
-  title: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
-  subtitle: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
-  path: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number])).isRequired,
-  treeIndex: PropTypes.number.isRequired,
-  treeId: PropTypes.string.isRequired,
-  isSearchMatch: PropTypes.bool,
-  isSearchFocus: PropTypes.bool,
-  canDrag: PropTypes.bool,
-  scaffoldBlockPxWidth: PropTypes.number.isRequired,
-  toggleChildrenVisibility: PropTypes.func,
-  buttons: PropTypes.arrayOf(PropTypes.node),
-  className: PropTypes.string,
-  style: PropTypes.shape({}),
+// ConverseTekNodeRenderer.propTypes = {
+//   nodeStore: PropTypes.object.isRequired,
+//   activeNodeId: PropTypes.string,
+//   onNodeContextMenu: PropTypes.func.isRequired,
+//   isContextMenuVisible: PropTypes.bool.isRequired,
+//   node: PropTypes.shape({}).isRequired,
+//   title: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
+//   subtitle: PropTypes.oneOfType([PropTypes.func, PropTypes.node]),
+//   path: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number])).isRequired,
+//   treeIndex: PropTypes.number.isRequired,
+//   treeId: PropTypes.string.isRequired,
+//   isSearchMatch: PropTypes.bool,
+//   isSearchFocus: PropTypes.bool,
+//   canDrag: PropTypes.bool,
+//   scaffoldBlockPxWidth: PropTypes.number.isRequired,
+//   toggleChildrenVisibility: PropTypes.func,
+//   buttons: PropTypes.arrayOf(PropTypes.node),
+//   className: PropTypes.string,
+//   style: PropTypes.shape({}),
 
-  // Drag and drop API functions
-  // Drag source
-  connectDragPreview: PropTypes.func.isRequired,
-  connectDragSource: PropTypes.func.isRequired,
-  parentNode: PropTypes.shape({}), // Needed for dndManager
-  isDragging: PropTypes.bool.isRequired,
-  didDrop: PropTypes.bool.isRequired,
-  draggedNode: PropTypes.shape({}),
-  // Drop target
-  isOver: PropTypes.bool.isRequired,
-  canDrop: PropTypes.bool,
+//   // Drag and drop API functions
+//   // Drag source
+//   connectDragPreview: PropTypes.func.isRequired,
+//   connectDragSource: PropTypes.func.isRequired,
+//   parentNode: PropTypes.shape({}), // Needed for dndManager
+//   isDragging: PropTypes.bool.isRequired,
+//   didDrop: PropTypes.bool.isRequired,
+//   draggedNode: PropTypes.shape({}),
+//   // Drop target
+//   isOver: PropTypes.bool.isRequired,
+//   canDrop: PropTypes.bool,
 
-  // rtl support
-  rowDirection: PropTypes.string,
-};
+//   // rtl support
+//   rowDirection: PropTypes.string,
+// };
