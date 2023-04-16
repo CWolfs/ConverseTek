@@ -19,7 +19,7 @@ import './EditableLogic.css';
 import { OperationDefinitionType } from 'types/OperationDefinition';
 
 type Props = {
-  scope: 'all' | 'action';
+  scope: 'all' | 'action' | 'condition';
   category: 'primary' | 'secondary';
   logic: OperationCallType;
   isEven: boolean;
