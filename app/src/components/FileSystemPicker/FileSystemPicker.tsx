@@ -9,6 +9,7 @@ import toPairs from 'lodash.topairs';
 
 import { getRootDrives, getDirectories, getQuickLinks, saveWorkingDirectory, getConversations, importConversation } from 'services/api';
 import { useStore } from 'hooks/useStore';
+import { ModalStore } from 'stores/modalStore/modal-store';
 
 import './FileSystemPicker.css';
 
@@ -23,7 +24,7 @@ function getItemIcon(item) {
 let debouncedClickEvents = [];
 
 export function FileSystemPicker() {
-  const modalStore = useStore('modal');
+  const modalStore = useStore<ModalStore>('modal');
 
   const [loading, setLoading] = useState(false);
   const [fileMode, setFileMode] = useState(modalStore.props.fileMode);
@@ -37,7 +38,7 @@ export function FileSystemPicker() {
     modalStore.setIsLoading(true);
 
     if (fileMode) {
-      importConversation(selectedItem.Path)
+      void importConversation(selectedItem.Path)
         .then(() => getConversations())
         .then(() => {
           selectedItem.active = false;
@@ -46,7 +47,7 @@ export function FileSystemPicker() {
           return modalStore.closeModal();
         });
     } else {
-      saveWorkingDirectory(selectedItem.Path)
+      void saveWorkingDirectory(selectedItem.Path)
         .then(() => getConversations())
         .then(() => {
           selectedItem.active = false;
@@ -110,7 +111,7 @@ export function FileSystemPicker() {
     if (item.HasChildren || (fileMode && item.IsDirectory)) {
       setSelectedItem(null);
       modalStore.setDisableOk(true);
-      getDirectories(item.Path, fileMode).then(({ directories: updatedDirectories, files: updatedFiles }) => {
+      void getDirectories(item.Path, fileMode).then(({ directories: updatedDirectories, files: updatedFiles }) => {
         setDirectories(updatedDirectories);
         setFiles(updatedFiles);
       });
@@ -125,7 +126,7 @@ export function FileSystemPicker() {
   };
 
   const onDirectNavigation = (path) => {
-    getDirectories(path, false).then(({ directories: updatedDirectories, files: updatedFiles }) => {
+    void getDirectories(path, false).then(({ directories: updatedDirectories, files: updatedFiles }) => {
       setDirectories(updatedDirectories);
       setFiles(updatedFiles);
     });
@@ -133,8 +134,8 @@ export function FileSystemPicker() {
 
   // onMount
   useEffect(() => {
-    getRootDrives().then((updatedDirectories) => setDirectories(updatedDirectories));
-    getQuickLinks().then((updatedQuickLinks) => setQuickLinks(updatedQuickLinks));
+    void getRootDrives().then((updatedDirectories) => setDirectories(updatedDirectories));
+    void getQuickLinks().then((updatedQuickLinks) => setQuickLinks(updatedQuickLinks));
   }, []);
 
   useEffect(() => {

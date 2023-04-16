@@ -12,6 +12,8 @@ import { NodeStore } from 'stores/nodeStore/node-store';
 import { ConversationAssetType } from 'types/ConversationAssetType';
 
 import { useStore } from 'hooks/useStore';
+import { NodeType } from 'types/NodeType';
+import { NodeLinkType } from 'types/NodeLinkType';
 import { detectType } from 'utils/node-utils';
 
 import { ConverseTekNodeRenderer } from './ConverseTekNodeRenderer';
@@ -56,15 +58,17 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
       const rootIds = parentChildren.map((child) => child.id);
       nodeStore.setRoots(rootIds);
     } else if (isNode) {
-      const convoNode = nodeStore.getNode(nodeId);
+      const convoNode = nodeStore.getNode(nodeId) as NodeType;
       const { index: nodeIndex } = convoNode;
 
       // Set new root/response parent 'nextNodeIndex' to node 'index'
-      const nextParent = nodeStore.getNode(parentNodeId);
+      const nextParent = nodeStore.getNode(parentNodeId) as NodeLinkType;
+      if (!nextParent) throw Error(`nextParent '${parentNodeId}' not found`);
       nextParent.nextNodeIndex = nodeIndex;
 
       // Set previous root/response parent 'nextNodeIndex' to -1
-      const previousParent = nodeStore.getNode(nodeParentId);
+      const previousParent = nodeStore.getNode(nodeParentId) as NodeLinkType;
+      if (!previousParent) throw Error(`previousParent '${nodeParentId}' not found`);
       previousParent.nextNodeIndex = -1;
     } else if (isResponse) {
       // FIXME: This causes key clash if moving a response to another node
@@ -109,7 +113,7 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
       } else if (isResponse) {
         allowDrop = nodeParentId === parentId;
       } else if (isNode) {
-        const parent = nodeStore.getNode(parentId);
+        const parent = nodeStore.getNode(parentId) as NodeLinkType;
         const { nextNodeIndex } = parent;
         if (nextNodeIndex !== -1) allowDrop = false;
       }

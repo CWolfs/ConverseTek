@@ -3,7 +3,7 @@ declare module 'react-sortable-tree';
 type RSTNodeOnMoveContainer = {
   treeData: object[];
   node: RSTNode;
-  nextParentNode: { id: string; children: { id: number }[] };
+  nextParentNode: { id: string; children: { id: string }[] };
   prevPath: number[] | string[];
   prevTreeIndex: number;
   nextPath: number[] | string[];
