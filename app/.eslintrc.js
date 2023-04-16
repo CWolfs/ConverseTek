@@ -38,6 +38,7 @@ module.exports = {
         'react/jsx-props-no-spreading': 0,
         'react/function-component-definition': 0,
         'react/jsx-one-expression-per-line': 0,
+        'no-empty-function': ['error', { allow: ['arrowFunctions'] }],
       },
     },
     {
@@ -49,6 +50,9 @@ module.exports = {
         tsconfigRootDir: __dirname,
       },
       plugins: ['@typescript-eslint'],
+      rules: {
+        '@typescript-eslint/no-empty-function': ['error', { allow: ['arrowFunctions'] }],
+      },
     },
   ],
 };
