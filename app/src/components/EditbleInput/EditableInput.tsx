@@ -3,18 +3,19 @@ import React, { CSSProperties } from 'react';
 import { observer } from 'mobx-react';
 import { Input, AutoComplete } from 'antd';
 import { SelectValue } from 'antd/lib/select';
+import { DataSourceItemType } from 'antd/lib/auto-complete';
 
 type Props = {
   value: string | null;
-  options: ({ text: string; value: string } | string)[] | null;
+  options: ({ text: string; value: string | number } | string)[] | null;
   onChange: (value: SelectValue) => void;
-  optionLabelProp: string | null;
-  valueLabel: string | null;
+  optionLabelProp?: string | null;
+  valueLabel?: string | { text: string; value: string } | null;
 };
 
 function EditableInput({ value = null, options = null, onChange, optionLabelProp = null, valueLabel = null }: Props) {
   const isAutocomplete = !!options;
-  let displayValueLabel: string | { text: string; value: string } | null = valueLabel;
+  let displayValueLabel: string | { text: string; value: string | number } | null = valueLabel;
   const conditionalProps: {
     defaultValue?: string;
     optionLabelProp?: string;
@@ -40,7 +41,7 @@ function EditableInput({ value = null, options = null, onChange, optionLabelProp
 
     if (!displayValueLabel) {
       displayValueLabel =
-        options.find((option: string | number | { text: string; value: string }): boolean => {
+        options.find((option: string | number | { text: string; value: string | number }): boolean => {
           if (typeof option === 'object' && 'value' in option) {
             if (option.value === value) return true;
             // if (Number(option.value) === value) return true;
@@ -59,7 +60,7 @@ function EditableInput({ value = null, options = null, onChange, optionLabelProp
         <AutoComplete
           {...conditionalProps}
           style={style}
-          dataSource={options}
+          dataSource={options as DataSourceItemType[]}
           filterOption={(inputValue, option) => {
             if (typeof inputValue === 'number') {
               // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
@@ -73,7 +74,11 @@ function EditableInput({ value = null, options = null, onChange, optionLabelProp
           }}
           onChange={onChange}
         />
-        {optionLabelProp && <span style={valueLabelStyle}>{displayValueLabel ? `(${displayValueLabel})` : 'Invalid'}</span>}
+        {optionLabelProp && (
+          <span style={valueLabelStyle}>
+            {displayValueLabel ? `(${typeof displayValueLabel === 'object' ? displayValueLabel.text : displayValueLabel})` : 'Invalid'}
+          </span>
+        )}
       </section>
     );
   }

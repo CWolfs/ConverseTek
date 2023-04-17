@@ -154,11 +154,17 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
                 </section>
               );
             } else {
-              const valueProps = {};
+              const valueProps: {
+                optionLabelProp: string | null;
+                options: ({ text: string; value: string | number } | string)[] | null;
+              } = {
+                optionLabelProp: null,
+                options: null,
+              };
 
               if (values) {
                 valueProps.optionLabelProp = 'value';
-                valueProps.options = values.map((value) => ({ text: value.text, value: value.value }));
+                valueProps.options = values.map((value) => ({ text: value.text, value: value.value })) || null;
               }
 
               content = (
