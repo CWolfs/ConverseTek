@@ -44,20 +44,20 @@ export const fullConversationAssetMapping: PropertyMapping = {
   ...operationMapping,
 };
 
-// DEFINITIONS
-
-export const operationDefinitionMapping: PropertyMapping = {};
-
 // PROCESSING
-export function lowercasePropertyNames(obj: JsonValue): JsonValue {
+
+export function lowercasePropertyNames(obj: JsonValue, firstCharacterLower = false): JsonValue {
   if (Array.isArray(obj)) {
-    return obj.map((item) => lowercasePropertyNames(item));
+    return obj.map((item) => lowercasePropertyNames(item, firstCharacterLower));
   } else if (typeof obj === 'object' && obj !== null) {
     const newObj: JsonObject = {};
 
     for (const key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        newObj[key.toLowerCase()] = lowercasePropertyNames(obj[key]);
+        newObj[firstCharacterLower ? `${key[0].toLowerCase()}${key.substring(1)}` : key.toLowerCase()] = lowercasePropertyNames(
+          obj[key],
+          firstCharacterLower,
+        );
       }
     }
 

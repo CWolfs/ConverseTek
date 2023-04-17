@@ -6,6 +6,10 @@ import defer from 'lodash.defer';
 export type OnOkType = ((event: MouseEvent<HTMLButtonElement>) => void) | null;
 export type OnCancelType = ((event: MouseEvent<HTMLButtonElement>) => void) | null;
 
+export type FSModalProps = {
+  fileMode?: boolean;
+};
+
 class ModalStore {
   ModalContent: ElementType | JSX.Element | null = null;
   title = '';

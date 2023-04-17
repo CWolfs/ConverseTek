@@ -16,7 +16,7 @@ type ParsedResponse = {
 function promiseSupportedCallback<T>(response: Response, resolve: ResolveType<T>, reject: RejectType) {
   const responseText: ParsedResponse = JSON.parse(response.ResponseText) as ParsedResponse;
   if (responseText.ReadyState === 4 && responseText.Status === 200) {
-    console.log(`[Data] ${responseText.Data}`);
+    // console.log(`[Data] ${responseText.Data}`);
     const data: T = JSON.parse(responseText.Data) as T;
     resolve(data);
   } else {

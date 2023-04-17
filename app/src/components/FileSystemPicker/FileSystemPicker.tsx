@@ -6,39 +6,45 @@ import remove from 'lodash.remove';
 import sortBy from 'lodash.sortby';
 import debounce from 'lodash.debounce';
 import toPairs from 'lodash.topairs';
+import type { DebouncedFunc } from 'lodash';
 
 import { getRootDrives, getDirectories, getQuickLinks, saveWorkingDirectory, getConversations, importConversation } from 'services/api';
 import { useStore } from 'hooks/useStore';
-import { ModalStore } from 'stores/modalStore/modal-store';
+import { FSModalProps, ModalStore } from 'stores/modalStore/modal-store';
+import { DirectoryItemType, FileSystemItemType } from 'types/FileSystemItemType';
 
 import './FileSystemPicker.css';
+import { QuickLinkType } from 'types/QuickLinkType';
 
 const ListItem = List.Item;
 
-function getItemIcon(item) {
-  if (item.HasChildren) return <Icon type="folder-add" className="file-system-picker__directory-icon" />;
-  if (item.File) return <Icon type="file-text" className="file-system-picker__file-icon" />;
+function getItemIcon(item: FileSystemItemType) {
+  if (item.isDirectory && item.hasChildren) return <Icon type="folder-add" className="file-system-picker__directory-icon" />;
+  if (item.isFile) return <Icon type="file-text" className="file-system-picker__file-icon" />;
   return <Icon type="folder" className="file-system-picker__directory-icon" />;
 }
 
-let debouncedClickEvents = [];
+let debouncedClickEvents: DebouncedFunc<() => void>[] = [];
 
 export function FileSystemPicker() {
   const modalStore = useStore<ModalStore>('modal');
+  const modalProps: FSModalProps = modalStore.props;
 
   const [loading, setLoading] = useState(false);
-  const [fileMode, setFileMode] = useState(modalStore.props.fileMode);
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [directories, setDirectories] = useState([]);
-  const [files, setFiles] = useState([]);
-  const [quickLinks, setQuickLinks] = useState(null);
+  const [fileMode, setFileMode] = useState<boolean>(modalProps.fileMode || false);
+  const [selectedItem, setSelectedItem] = useState<FileSystemItemType | null>(null);
+  const [directories, setDirectories] = useState<FileSystemItemType[]>([]);
+  const [files, setFiles] = useState<FileSystemItemType[]>([]);
+  const [quickLinks, setQuickLinks] = useState<QuickLinkType[]>([]);
 
   const onOk = () => {
+    if (selectedItem == null) return;
+
     setLoading(true);
     modalStore.setIsLoading(true);
 
     if (fileMode) {
-      void importConversation(selectedItem.Path)
+      void importConversation(selectedItem.path)
         .then(() => getConversations())
         .then(() => {
           selectedItem.active = false;
@@ -47,7 +53,7 @@ export function FileSystemPicker() {
           return modalStore.closeModal();
         });
     } else {
-      void saveWorkingDirectory(selectedItem.Path)
+      void saveWorkingDirectory(selectedItem.path)
         .then(() => getConversations())
         .then(() => {
           selectedItem.active = false;
@@ -58,34 +64,34 @@ export function FileSystemPicker() {
     }
   };
 
-  const onDirectoryClicked = (item) => {
+  const onDirectoryClicked = (item: FileSystemItemType) => {
     // GUARD - lock down things if loading
     if (loading) return;
 
     // GUARD - prevent selection of backLinks
-    if (item.Name === '..') return;
+    if (item.name === '..') return;
 
     // Array of debounced click events
     debouncedClickEvents = debouncedClickEvents || [];
 
     const callback = debounce(() => {
-      let newFsItems = [...sortBy(directories, (fsItem) => fsItem.Name.toLowerCase()), ...sortBy(files, (fsItem) => fsItem.Name.toLowerCase())];
+      let newFsItems = [...sortBy(directories, (fsItem) => fsItem.name.toLowerCase()), ...sortBy(files, (fsItem) => fsItem.name.toLowerCase())];
 
       const clickedItem = {
         ...item,
         active: !item.active,
       };
 
-      remove(newFsItems, (fsItem) => fsItem.Path === clickedItem.Path);
+      remove(newFsItems, (fsItem) => fsItem.path === clickedItem.path);
       newFsItems = newFsItems.map((nonSelectedItem) => ({ ...nonSelectedItem, active: false }));
       newFsItems.push(clickedItem);
-      newFsItems = sortBy(newFsItems, (fsItem) => fsItem.Name.toLowerCase());
+      newFsItems = sortBy(newFsItems, (fsItem) => fsItem.name.toLowerCase());
 
       modalStore.setDisableOk(!clickedItem.active);
-      if (fileMode && clickedItem.IsDirectory) modalStore.setDisableOk(true);
+      if (fileMode && clickedItem.isDirectory) modalStore.setDisableOk(true);
 
-      setDirectories(newFsItems.filter((fsItem) => fsItem.IsDirectory));
-      setFiles(newFsItems.filter((fsItem) => fsItem.IsFile));
+      setDirectories(newFsItems.filter((fsItem) => fsItem.isDirectory));
+      setFiles(newFsItems.filter((fsItem) => fsItem.isFile));
       setSelectedItem(clickedItem.active ? clickedItem : null);
 
       debouncedClickEvents = [];
@@ -95,12 +101,12 @@ export function FileSystemPicker() {
     callback();
   };
 
-  const onDirectoryDoubleClicked = (item) => {
+  const onDirectoryDoubleClicked = (item: DirectoryItemType) => {
     // GUARD - lock down things if loading
     if (loading) return;
 
     // GUARD - If item has no children then ignore double clicks
-    if (!fileMode && !item.HasChildren) return;
+    if (!fileMode && !item.hasChildren) return;
 
     // If there were click events registered we cancel them
     if (debouncedClickEvents && debouncedClickEvents.length > 0) {
@@ -108,13 +114,15 @@ export function FileSystemPicker() {
       debouncedClickEvents = [];
     }
 
-    if (item.HasChildren || (fileMode && item.IsDirectory)) {
+    if (item.hasChildren || (fileMode && item.isDirectory)) {
       setSelectedItem(null);
       modalStore.setDisableOk(true);
-      void getDirectories(item.Path, fileMode).then(({ directories: updatedDirectories, files: updatedFiles }) => {
-        setDirectories(updatedDirectories);
-        setFiles(updatedFiles);
-      });
+      void getDirectories(item.path, fileMode).then(
+        ({ directories: updatedDirectories, files: updatedFiles }: { directories: FileSystemItemType[]; files: FileSystemItemType[] }) => {
+          setDirectories(updatedDirectories);
+          setFiles(updatedFiles);
+        },
+      );
     }
   };
 
@@ -125,35 +133,42 @@ export function FileSystemPicker() {
     modalStore.setLoadingLabel('Loading');
   };
 
-  const onDirectNavigation = (path) => {
-    void getDirectories(path, false).then(({ directories: updatedDirectories, files: updatedFiles }) => {
-      setDirectories(updatedDirectories);
-      setFiles(updatedFiles);
-    });
+  const onDirectNavigation = (path: string) => {
+    void getDirectories(path, false).then(
+      ({ directories: updatedDirectories, files: updatedFiles }: { directories: FileSystemItemType[]; files: FileSystemItemType[] }) => {
+        setDirectories(updatedDirectories);
+        setFiles(updatedFiles);
+      },
+    );
   };
 
   // onMount
   useEffect(() => {
-    void getRootDrives().then((updatedDirectories) => setDirectories(updatedDirectories));
-    void getQuickLinks().then((updatedQuickLinks) => setQuickLinks(updatedQuickLinks));
+    void getRootDrives().then((updatedDirectories: FileSystemItemType[]) => setDirectories(updatedDirectories));
+    void getQuickLinks().then((updatedQuickLinks: QuickLinkType[]) => {
+      setQuickLinks(updatedQuickLinks);
+    });
   }, []);
 
   useEffect(() => {
-    setFileMode(modalStore.props.fileMode);
+    const modalProps: FSModalProps = modalStore.props;
+    setFileMode(modalProps.fileMode || false);
     setupModal();
   });
 
   const items = [...directories, ...files];
-  const quickLinkPairs = quickLinks ? toPairs(quickLinks) : [];
+  // const quickLinkPairs = quickLinks ? toPairs(quickLinks) : [];
 
   return (
     <div className="file-system-picker">
       <div className="file-system-picker__quick-links">
         <Icon type="desktop" style={{ fontSize: 20 }} />
-        {quickLinkPairs &&
-          quickLinkPairs.map(([name, path]) => (
-            <Tooltip title={name} onClick={() => onDirectNavigation(path)}>
-              <Icon type="book" style={{ fontSize: 20 }} />
+        {quickLinks &&
+          quickLinks.map(({ title, path }) => (
+            <Tooltip title={title}>
+              <div onClick={() => onDirectNavigation(path)}>
+                <Icon type="book" style={{ fontSize: 20 }} />
+              </div>
             </Tooltip>
           ))}
       </div>
@@ -161,21 +176,23 @@ export function FileSystemPicker() {
         <List
           itemLayout="horizontal"
           dataSource={items}
-          renderItem={(item) => {
+          renderItem={(item: FileSystemItemType) => {
             const itemClasses = classnames('file-system-picker__directory-item', {
               'file-system-picker__directory-item--active': item.active,
             });
 
             return (
+              // <div onClick={() => onDirectoryClicked(item)} onDoubleClick={() => item.isDirectory && onDirectoryDoubleClicked(item)}>
               <ListItem
-                key={item.Path}
+                key={item.path}
                 className={itemClasses}
                 onClick={() => onDirectoryClicked(item)}
-                onDoubleClick={() => onDirectoryDoubleClicked(item)}
+                onDoubleClick={() => item.isDirectory && onDirectoryDoubleClicked(item)}
               >
                 {getItemIcon(item)}
-                <span className="file-system-picker__directory-name">{item.Name}</span>
+                <span className="file-system-picker__directory-name">{item.name}</span>
               </ListItem>
+              // </div>
             );
           }}
         />

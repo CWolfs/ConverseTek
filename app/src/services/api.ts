@@ -7,6 +7,8 @@ import { DefinitionsType } from 'types/DefinitionsType';
 
 import { dataStore, defStore } from '../stores';
 import { JsonValue, fullConversationAssetMapping, lowercasePropertyNames, mapToType } from './mappings/mapping';
+import { FileSystemItemType } from 'types/FileSystemItemType';
+import { QuickLinkType } from 'types/QuickLinkType';
 
 /*
  * CHROMELY DOESN'T SUPPORT PUTS SO PUTS AND DELETES ARE CURRENTLY POSTS WITH method DATA
@@ -30,7 +32,6 @@ export default function noop() {
 export function getConversations(): Promise<any> {
   return get('/conversations').then((conversations: object[]): ConversationAssetType[] => {
     const typedConversations = conversations.map((conversation) => mapToType<ConversationAssetType>(conversation, fullConversationAssetMapping));
-    console.log('typed conversations are: ', typedConversations);
     dataStore.setConversations(typedConversations);
     return typedConversations;
   });
@@ -68,15 +69,21 @@ export function importConversation(path: string): Promise<any> {
  =========================
 */
 export function getRootDrives(): Promise<any> {
-  return get('/filesystem');
+  return get('/filesystem').then((directories: JsonValue): FileSystemItemType[] => lowercasePropertyNames(directories, true) as FileSystemItemType[]);
 }
 
 export function getDirectories(path: string, includeFiles = false): Promise<any> {
-  return get('/directories', { path, includeFiles });
+  return get('/directories', { path, includeFiles }).then((directories: JsonValue) => lowercasePropertyNames(directories, true));
 }
 
 export function getQuickLinks() {
-  return get('/quicklinks');
+  return get('/quicklinks').then((quickLinks: [string, string]) => {
+    const entries: QuickLinkType[] = [];
+    for (const [key, value] of Object.entries(quickLinks)) {
+      entries.push({ title: key, path: value } as QuickLinkType);
+    }
+    return entries;
+  });
 }
 
 export function saveWorkingDirectory(path: string) {
