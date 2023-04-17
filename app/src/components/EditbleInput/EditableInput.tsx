@@ -62,12 +62,11 @@ function EditableInput({ value = null, options = null, onChange, optionLabelProp
           style={style}
           dataSource={options as DataSourceItemType[]}
           filterOption={(inputValue, option) => {
+            const autocompleteValueTitle = option.props.children as string; // Preset Def value strings: 'SimGameScope', 'SimGameFadeValues', 'DoesOrDoesNot', 'has', 'doesn't have' etc
             if (typeof inputValue === 'number') {
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-              return option.props.children?.indexOf(inputValue) !== -1;
+              return autocompleteValueTitle.indexOf(inputValue) !== -1;
             } else if (typeof inputValue === 'string') {
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-              return option.props.children?.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1;
+              return autocompleteValueTitle.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1;
             }
 
             return false;
