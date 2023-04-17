@@ -40,6 +40,7 @@ type RSTNode = {
   canDrag?: boolean;
   linkId?: string | null;
   linkIndex?: number;
+  treeIndex?: number;
 };
 
 type RSTPath = number[] | string[];

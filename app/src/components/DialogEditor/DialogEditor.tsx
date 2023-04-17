@@ -185,7 +185,7 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
         <SortableTree
           treeData={treeData}
           onChange={(data: object[]) => setTreeData(data)}
-          getNodeKey={({ node, treeIndex }: { node: { id: number; treeIndex: number }; treeIndex: number }) => {
+          getNodeKey={({ node, treeIndex }: { node: RSTNode; treeIndex: number }) => {
             if (node.treeIndex !== treeIndex) {
               // eslint-disable-next-line no-param-reassign
               node.treeIndex = treeIndex;
