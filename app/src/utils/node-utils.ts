@@ -22,7 +22,8 @@ export function detectType(type: string): NodeTypeDetectionResult {
   };
 }
 
-export function isAllowedToCreateNode(nodeId: string) {
+export function isAllowedToCreateNode(nodeId: string | undefined) {
+  if (!nodeId) return false;
   if (nodeId === '0') return true; // for the 'Root'
 
   const node = nodeStore.getNode(nodeId);
@@ -42,7 +43,8 @@ export function isAllowedToCreateNode(nodeId: string) {
   return false;
 }
 
-export function isAllowedToPasteCopy(nodeId: string, clipboard: MockClipboard) {
+export function isAllowedToPasteCopy(nodeId: string | undefined, clipboard: MockClipboard) {
+  if (!nodeId) return false;
   const node = nodeStore.getNode(nodeId);
 
   // GUARD
@@ -64,7 +66,8 @@ export function isAllowedToPasteCopy(nodeId: string, clipboard: MockClipboard) {
   return true;
 }
 
-export function isAllowedToPasteLink(nodeId: string, clipboard: MockClipboard) {
+export function isAllowedToPasteLink(nodeId: string | undefined, clipboard: MockClipboard) {
+  if (!nodeId) return false;
   // GUARD - Don't allow pasting link into a root
   if (nodeId === '0') return false;
 
