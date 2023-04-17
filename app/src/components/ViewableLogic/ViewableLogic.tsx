@@ -1,26 +1,35 @@
-/* eslint-disable react/no-array-index-key */
-/* eslint-disable operator-linebreak */
-/* eslint-disable react/jsx-one-expression-per-line */
 import React from 'react';
-import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
 
 import { useStore } from 'hooks/useStore';
+import { DefStore } from 'stores/defStore/def-store';
+import { OperationCallType } from 'types/OperationCallType';
+import { OperationArgType } from 'types/OperationArgType';
 
-function ViewableLogic({ logic }) {
-  const defStore = useStore('def');
+type Props = {
+  logic: OperationCallType;
+};
+
+function ViewableLogic({ logic }: Props) {
+  const defStore = useStore<DefStore>('def');
 
   const logicDef = defStore.getDefinition(logic);
 
   // GUARD
-  if (!logicDef) {
+  if (logicDef == null) {
     console.error(`[ViewableLogic] No definition exists for ${JSON.stringify(logic)}`);
     return null;
   }
 
-  const renderResult = (args) => {
+  const renderResult = (args: OperationArgType[]) => {
     const { value: key } = defStore.getArgValue(args.length > 0 ? args[0] : null);
     const { value } = defStore.getArgValue(args.length > 1 ? args[1] : null);
+
+    if (key == null || value == null) throw Error('renderResult key and/or value are null or undefined');
+
+    if (typeof key !== 'string') throw Error('Investigate: key should be a string');
+    if (typeof value !== 'string') throw Error('Investigate: value should be a string');
+
     const presetValue = defStore.getPresetValue(key, value);
     return <span>{presetValue} </span>;
   };
@@ -34,11 +43,14 @@ function ViewableLogic({ logic }) {
       {view.includes('inputs') &&
         args.map((arg, index) => {
           const argValue = defStore.getArgValue(arg);
+
+          if (argValue == null) throw Error('argValue is null or undefined');
+
           const { type, value } = argValue;
           const input = inputs[index];
           const { viewLabel, values: inputValues } = input;
 
-          if (type === 'operation' && value !== null) return <ViewableLogic key={index} defStore={defStore} logic={value} />;
+          if (type === 'operation' && value !== null) return <ObservingViewableLogic key={index} logic={value} />;
 
           const { value: valueFromArg } = argValue;
           let displayValue = valueFromArg;
@@ -47,7 +59,7 @@ function ViewableLogic({ logic }) {
               if (!displayValue) {
                 return displayValue;
               }
-              displayValue = viewLabel.replace('{value}', displayValue);
+              displayValue = viewLabel.replace('{value}', displayValue.toString());
             } else {
               displayValue = viewLabel;
             }
@@ -59,6 +71,7 @@ function ViewableLogic({ logic }) {
               if (Number(inputValue.value) === valueFromArg) return true;
               return false;
             });
+
             if (inputVal) {
               displayValue = inputVal.text;
               if (inputVal.viewlabel) {
@@ -79,9 +92,5 @@ function ViewableLogic({ logic }) {
     </span>
   );
 }
-
-ViewableLogic.propTypes = {
-  logic: PropTypes.object.isRequired,
-};
 
 export const ObservingViewableLogic = observer(ViewableLogic);

@@ -217,7 +217,7 @@ class DefStore {
   }
 
   getArgValue(arg: OperationArgType | null) {
-    if (arg === null || arg === undefined) return { type: null, value: null };
+    if (arg == null) return { type: null, value: null };
 
     const { intValue, boolValue, floatValue, stringValue, callValue, variableRefValue, type } = arg;
 
@@ -228,7 +228,7 @@ class DefStore {
       if (type === 'int') return { type, value: intValue };
     }
 
-    return null;
+    return { type: null, value: null };
   }
 
   createNewArg(type: InputTypeType, defaultValue: DefaultInputValueType = null) {
