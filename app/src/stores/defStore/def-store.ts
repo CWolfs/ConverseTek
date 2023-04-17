@@ -216,7 +216,7 @@ class DefStore {
     return 'int';
   }
 
-  getArgValue(arg: OperationArgType) {
+  getArgValue(arg: OperationArgType | null) {
     if (arg === null || arg === undefined) return { type: null, value: null };
 
     const { intValue, boolValue, floatValue, stringValue, callValue, variableRefValue, type } = arg;

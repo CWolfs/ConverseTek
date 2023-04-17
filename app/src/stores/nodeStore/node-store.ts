@@ -262,8 +262,10 @@ class NodeStore {
     // }
   }
 
-  copyNodesRecursive(nodeIndex, newNextNodeIndex, newNodeParentId) {
+  copyNodesRecursive(nodeIndex: number, newNextNodeIndex: number, newNodeParentId: string): (NodeType | NodeLinkType)[] {
     const node = toJS(this.getNodeByIndex(nodeIndex));
+    if (!node) return [];
+
     const newNodeId = generateId();
     node.idRef.id = newNodeId;
 
@@ -271,9 +273,9 @@ class NodeStore {
     node.index = newNextNodeIndex;
     node.parentId = newNodeParentId;
 
-    const nodes = [
+    const nodes: (NodeType | NodeLinkType)[] = [
       node,
-      ...node.branches.map((branch) => {
+      ...node.branches.map((branch: NodeLinkType) => {
         const { nextNodeIndex, auxiliaryLink } = branch;
         const newBranchId = generateId();
         branch.idRef.id = newBranchId;

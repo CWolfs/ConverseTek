@@ -1,6 +1,7 @@
 type ViewType = 'label' | 'inputs' | 'result';
 
 export type InputTypeType = 'string' | 'int' | 'operation' | 'float' | 'bool';
+export const InputTypeTypes = ['string', 'int', 'operation', 'float', 'bool'];
 
 export type DefaultInputValueType = 'string' | 'number' | null;
 

@@ -1,15 +1,19 @@
-import React from 'react';
+import React, { JSXElementConstructor, ReactElement } from 'react';
 import { observer } from 'mobx-react';
 import { Select } from 'antd';
+import { SelectValue } from 'antd/lib/select';
 
 const { Option } = Select;
 
 type Props = {
-  value: string;
+  value: string | null;
   options: string[] | { key: string }[];
   placeholder: string;
-  style: object;
-  onChange: () => void;
+  style?: object;
+  onChange: (
+    value: SelectValue,
+    option: ReactElement<any, string | JSXElementConstructor<any>> | ReactElement<any, string | JSXElementConstructor<any>>[],
+  ) => void;
 };
 
 function EditableSelect({ value, options, placeholder, style = {}, onChange }: Props) {

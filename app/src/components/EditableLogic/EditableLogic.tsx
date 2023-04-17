@@ -3,10 +3,10 @@
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable operator-linebreak */
 import React from 'react';
-import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Icon, Tooltip } from 'antd';
+import { SelectValue } from 'antd/lib/select';
 
 import { useStore } from 'hooks/useStore';
 import { DefStore } from 'stores/defStore/def-store';
@@ -16,23 +16,28 @@ import { EditableSelect } from '../EditableSelect';
 import { EditableInput } from '../EditbleInput';
 
 import './EditableLogic.css';
-import { OperationDefinitionType } from 'types/OperationDefinition';
+import { InputType, InputTypeType, InputTypeTypes, OperationDefinitionType } from 'types/OperationDefinition';
+import { OperationArgType } from 'types/OperationArgType';
 
 type Props = {
   scope: 'all' | 'action' | 'condition';
   category: 'primary' | 'secondary';
   logic: OperationCallType;
   isEven: boolean;
-  parentLogic: OperationCallType;
+  parentLogic: OperationCallType | null;
+  parentInput: InputType | null;
+  parentArg: OperationArgType | null;
 };
-function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInput, parentArg }: Props) {
+
+function EditableLogic({ scope, category, logic, isEven = false, parentLogic = null, parentInput = null, parentArg = null }: Props) {
   const defStore = useStore<DefStore>('def');
 
-  const renderLogic = (logicDef) => {
+  const renderLogic = (logicDef: OperationDefinitionType) => {
     const operations = defStore.getOperations(category, scope);
     const { functionName } = logic;
-    const parentArgValue = defStore.getArgValue(parentArg);
     const { tooltip } = logicDef;
+
+    const parentArgValue = defStore.getArgValue(parentArg);
 
     const tooltipContent = tooltip ? (
       <Tooltip title={tooltip}>
@@ -43,12 +48,14 @@ function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInpu
     const typeSelector =
       parentInput && parentArg ? (
         <EditableSelect
-          value={parentArgValue.type}
+          value={parentArgValue ? parentArgValue.type : parentArgValue}
           options={parentInput.types}
           placeholder="Select a type"
           style={{ width: 120 }}
-          onChange={(value) => {
-            defStore.setArgType(parentLogic, parentArg, value);
+          onChange={(value: SelectValue) => {
+            if (typeof value === 'string' && InputTypeTypes.includes(value as InputTypeType)) {
+              if (parentLogic) defStore.setArgType(parentLogic, parentArg, value as InputTypeType);
+            }
           }}
         />
       ) : null;
@@ -58,8 +65,8 @@ function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInpu
         value={functionName}
         options={operations}
         placeholder="Select an operation"
-        onChange={(value) => {
-          defStore.setOperation(logic, value);
+        onChange={(value: SelectValue) => {
+          if (typeof value === 'string') defStore.setOperation(logic, value);
         }}
       />
     );
@@ -142,7 +149,7 @@ function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInpu
 
               if (values) {
                 valueProps.optionLabelProp = 'value';
-                valueProps.options = values.map((value) => ({ text: value.Text, value: value.Value }));
+                valueProps.options = values.map((value) => ({ text: value.text, value: value.value }));
               }
 
               content = (
@@ -183,7 +190,7 @@ function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInpu
 
               if (values) {
                 valueProps.optionLabelProp = 'value';
-                valueProps.options = values.map((value) => ({ text: value.Text, value: value.Value }));
+                valueProps.options = values.map((value) => ({ text: value.text, value: value.value }));
               }
 
               content = (
@@ -207,7 +214,7 @@ function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInpu
         }
       }
 
-      if (!content) content = <div>Unprocessed Input: {input.Label}</div>;
+      if (!content) content = <div>Unprocessed Input: {input.label}</div>;
 
       return (
         <div className={argsContainerClasses} key={index}>
@@ -245,23 +252,5 @@ function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInpu
     </div>
   );
 }
-
-EditableLogic.defaultProps = {
-  scope: 'all',
-  isEven: false,
-  parentLogic: null,
-  parentInput: null,
-  parentArg: null,
-};
-
-EditableLogic.propTypes = {
-  parentLogic: PropTypes.object,
-  parentInput: PropTypes.object,
-  parentArg: PropTypes.object,
-  logic: PropTypes.object.isRequired,
-  scope: PropTypes.string,
-  category: PropTypes.string.isRequired,
-  isEven: PropTypes.bool,
-};
 
 export const ObservingEditableLogic = observer(EditableLogic);
