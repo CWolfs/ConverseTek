@@ -1,26 +1,30 @@
 /* eslint-disable no-else-return */
-import React from 'react';
+import React, { CSSProperties } from 'react';
 import { observer } from 'mobx-react';
 import { Input, AutoComplete } from 'antd';
+import { SelectValue } from 'antd/lib/select';
 
 type Props = {
   value: string | null;
-  options: null;
-  onChange: null;
-  optionLabelProp: null;
-  valueLabel: null;
+  options: ({ text: string; value: string } | string)[] | null;
+  onChange: (value: SelectValue) => void;
+  optionLabelProp: string | null;
+  valueLabel: string | null;
 };
 
 function EditableInput({ value = null, options = null, onChange, optionLabelProp = null, valueLabel = null }: Props) {
   const isAutocomplete = !!options;
-  const conditionalProps = {};
-  let displayValueLabel = valueLabel;
+  let displayValueLabel: string | { text: string; value: string } | null = valueLabel;
+  const conditionalProps: {
+    defaultValue?: string;
+    optionLabelProp?: string;
+  } = {};
 
   const style = {
     width: '275px',
     display: 'inline-block',
     position: 'relative',
-  };
+  } as CSSProperties;
 
   const valueLabelStyle = {
     position: 'absolute',
@@ -28,19 +32,23 @@ function EditableInput({ value = null, options = null, onChange, optionLabelProp
     color: '#2e9bff',
     zIndex: '1',
     top: '5px',
-  };
+  } as CSSProperties;
 
   if (isAutocomplete) {
     if (value !== null && value !== undefined) conditionalProps.defaultValue = value;
     if (optionLabelProp) conditionalProps.optionLabelProp = optionLabelProp;
 
     if (!displayValueLabel) {
-      displayValueLabel = options.find((option) => {
-        if (option.value === value) return true;
-        if (Number(option.value) === value) return true;
-        return false;
-      });
-      if (displayValueLabel && displayValueLabel.text) displayValueLabel = displayValueLabel.text;
+      displayValueLabel =
+        options.find((option: string | number | { text: string; value: string }): boolean => {
+          if (typeof option === 'object' && 'value' in option) {
+            if (option.value === value) return true;
+            // if (Number(option.value) === value) return true;
+          }
+          return false;
+        }) || null;
+
+      if (displayValueLabel && typeof displayValueLabel === 'object' && 'text' in displayValueLabel) displayValueLabel = displayValueLabel.text;
       if (!displayValueLabel) {
         valueLabelStyle.color = '#ff6666';
       }
@@ -54,10 +62,13 @@ function EditableInput({ value = null, options = null, onChange, optionLabelProp
           dataSource={options}
           filterOption={(inputValue, option) => {
             if (typeof inputValue === 'number') {
-              return option.props.children.indexOf(inputValue) !== -1;
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+              return option.props.children?.indexOf(inputValue) !== -1;
             } else if (typeof inputValue === 'string') {
-              return option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1;
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+              return option.props.children?.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1;
             }
+
             return false;
           }}
           onChange={onChange}
@@ -70,7 +81,7 @@ function EditableInput({ value = null, options = null, onChange, optionLabelProp
   return (
     <Input
       style={style}
-      value={value}
+      value={value || undefined}
       onChange={(event) => {
         onChange(event.target.value);
       }}

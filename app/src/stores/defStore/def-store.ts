@@ -253,6 +253,7 @@ class DefStore {
 
     const { type: previousType, value: previousValue } = argValue;
 
+    // FIXME: Consider better immutability instead of modifying existing props
     if (previousType !== type) {
       if (previousType === 'operation') arg.callValue = null;
       if (previousType === 'string') arg.stringValue = '';
@@ -272,9 +273,6 @@ class DefStore {
       }
 
       arg.type = type;
-
-      // logic.args.replace(args);
-      // TODO: Watch this for reactivity bugs
       logic.args = [...args];
     }
   }
@@ -289,6 +287,7 @@ class DefStore {
 
     const { type } = argValue;
 
+    // FIXME: Consider better immutability instead of modifying existing props
     if (type === 'operation') arg.callValue = value as OperationCallType;
     if (type === 'string') arg.stringValue = value as string;
     if (type === 'float') arg.floatValue = value as number;
@@ -301,8 +300,6 @@ class DefStore {
       args.push(arg);
     }
 
-    // logic.args.replace(args);
-    // TODO: Watch this for reactivity bugs
     logic.args = [...args];
   }
 

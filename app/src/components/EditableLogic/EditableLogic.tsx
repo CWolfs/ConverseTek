@@ -18,9 +18,10 @@ import { EditableInput } from '../EditbleInput';
 import './EditableLogic.css';
 import { InputType, InputTypeType, InputTypeTypes, OperationDefinitionType } from 'types/OperationDefinition';
 import { OperationArgType } from 'types/OperationArgType';
+import { tryParseInt } from 'utils/number-utils';
 
 type Props = {
-  scope: 'all' | 'action' | 'condition';
+  scope?: 'all' | 'action' | 'condition';
   category: 'primary' | 'secondary';
   logic: OperationCallType;
   isEven: boolean;
@@ -29,7 +30,7 @@ type Props = {
   parentArg: OperationArgType | null;
 };
 
-function EditableLogic({ scope, category, logic, isEven = false, parentLogic = null, parentInput = null, parentArg = null }: Props) {
+function EditableLogic({ scope = 'all', category, logic, isEven = false, parentLogic = null, parentInput = null, parentArg = null }: Props) {
   const defStore = useStore<DefStore>('def');
 
   const renderLogic = (logicDef: OperationDefinitionType) => {
@@ -90,9 +91,11 @@ function EditableLogic({ scope, category, logic, isEven = false, parentLogic = n
       const argValue = defStore.getArgValue(arg);
       let content = null;
 
-      if (!argValue) throw Error('Arg value is null');
+      if (argValue == null) throw Error('Arg value is null or undefined');
 
       const { type: argType, value: argVal } = argValue;
+
+      if (argVal == null) throw Error("Arg value is null or undefined. This shouldn't be the case");
 
       let argsContainerClasses = classnames('editable-logic__args-container');
       argsContainerClasses = classnames(argsContainerClasses, {
@@ -114,14 +117,18 @@ function EditableLogic({ scope, category, logic, isEven = false, parentLogic = n
           options={input.types}
           placeholder="Select a type"
           style={{ width: 120 }}
-          onChange={(value) => {
-            defStore.setArgType(logic, arg, value);
+          onChange={(value: SelectValue) => {
+            if (typeof value === 'string' && InputTypeTypes.includes(value as InputTypeType)) {
+              defStore.setArgType(logic, arg, value as InputTypeType);
+            }
           }}
         />
       ) : null;
 
       if (argType === 'operation' && types.includes('operation')) {
-        content = <EditableLogic logic={argVal} category="secondary" isEven={!isEven} parentLogic={logic} parentInput={input} parentArg={arg} />;
+        content = (
+          <ObservingEditableLogic logic={argVal} category="secondary" isEven={!isEven} parentLogic={logic} parentInput={input} parentArg={arg} />
+        );
       } else if (argType === 'operation' && !types.includes('operation')) {
         console.error(`[EditableLogic] Argument and input type mismatch for ${label}`);
       } else {
@@ -130,6 +137,8 @@ function EditableLogic({ scope, category, logic, isEven = false, parentLogic = n
         if (argVal !== null) {
           if (argType === 'string' && types.includes('string')) {
             if (logicDefKey.includes('Preset')) {
+              if (parentLogic == null) throw Error('parentLogic is null or undefined. This should not happen');
+
               const presetKey = `${parentLogic.functionName}-${functionName}`.replace(/\s/g, '');
               content = (
                 <section className="editable-logic__arg">
@@ -169,7 +178,12 @@ function EditableLogic({ scope, category, logic, isEven = false, parentLogic = n
             if (logicDefKey.includes('Preset')) {
               const presetArg = args[0];
               const presetArgValue = defStore.getArgValue(presetArg);
+
+              if (presetArgValue == null) throw Error('Present Arg Value is null or undefined');
+
               const { value: presetValue } = presetArgValue;
+
+              console.log('Value for use is: ', argVal);
 
               content = (
                 <section className="editable-logic__arg">
@@ -178,7 +192,12 @@ function EditableLogic({ scope, category, logic, isEven = false, parentLogic = n
                     value={typeof argVal === 'number' ? argVal.toString() : argVal}
                     options={defStore.getPresetValuesForOptions(presetValue)}
                     onChange={(value) => {
-                      defStore.setArgValue(logic, arg, value);
+                      if (typeof value === 'string') {
+                        const parsedValue = tryParseInt(value, 0);
+                        defStore.setArgValue(logic, arg, parsedValue);
+                      } else {
+                        defStore.setArgValue(logic, arg, value as number);
+                      }
                     }}
                     optionLabelProp="value"
                     valueLabel={defStore.getPresetValue(presetValue, argVal)}
