@@ -5,7 +5,7 @@ export const InputTypeTypes = ['string', 'int', 'operation', 'float', 'bool'];
 
 export type DefaultInputValueType = 'string' | 'number' | null;
 
-type InputValueType = {
+export type InputValueType = {
   viewlabel?: string;
   text: string;
   value: string | number;

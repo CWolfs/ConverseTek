@@ -369,7 +369,7 @@ class DefStore {
     }
   }
 
-  getPresetValue(key: string, value: string): string {
+  getPresetValue(key: string, value: string | number): string {
     const preset = this.presets.find((p) => p.key === key);
     if (preset === undefined) return '[BAD PRESET VALUE]';
     return preset.values[value.toString()];
@@ -389,12 +389,7 @@ class DefStore {
     return values(preset.values);
   }
 
-  getPresetValuesForOptions(key: string):
-    | {
-        text: string;
-        value: string;
-      }[]
-    | null {
+  getPresetValuesForOptions(key: string): { text: string; value: string }[] | null {
     const preset = this.presets.find((p) => p.key === key);
     if (preset === undefined) return null;
 

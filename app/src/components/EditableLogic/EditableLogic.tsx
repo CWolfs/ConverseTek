@@ -11,14 +11,14 @@ import { SelectValue } from 'antd/lib/select';
 import { useStore } from 'hooks/useStore';
 import { DefStore } from 'stores/defStore/def-store';
 import { OperationCallType } from 'types/OperationCallType';
+import { InputType, InputTypeType, InputTypeTypes, InputValueType, OperationDefinitionType } from 'types/OperationDefinition';
+import { OperationArgType } from 'types/OperationArgType';
+import { tryParseInt } from 'utils/number-utils';
 
 import { EditableSelect } from '../EditableSelect';
 import { EditableInput } from '../EditbleInput';
 
 import './EditableLogic.css';
-import { InputType, InputTypeType, InputTypeTypes, OperationDefinitionType } from 'types/OperationDefinition';
-import { OperationArgType } from 'types/OperationArgType';
-import { tryParseInt } from 'utils/number-utils';
 
 type Props = {
   scope?: 'all' | 'action' | 'condition';
@@ -29,6 +29,25 @@ type Props = {
   parentInput: InputType | null;
   parentArg: OperationArgType | null;
 };
+
+type ValueProps = {
+  optionLabelProp: string | null;
+  options: ({ text: string; value: string | number } | string)[] | null;
+};
+
+function getValueProps(values: InputValueType[] | undefined): ValueProps {
+  const valueProps: ValueProps = {
+    optionLabelProp: null,
+    options: null,
+  };
+
+  if (values) {
+    valueProps.optionLabelProp = 'value';
+    valueProps.options = values.map((value) => ({ text: value.text, value: value.value })) || null;
+  }
+
+  return valueProps;
+}
 
 function EditableLogic({ scope = 'all', category, logic, isEven = false, parentLogic = null, parentInput = null, parentArg = null }: Props) {
   const defStore = useStore<DefStore>('def');
@@ -148,24 +167,13 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
                     value={argVal}
                     options={defStore.getPresetKeys()}
                     onChange={(value) => {
-                      defStore.setArgValue(logic, arg, value);
+                      defStore.setArgValue(logic, arg, value as string);
                     }}
                   />
                 </section>
               );
             } else {
-              const valueProps: {
-                optionLabelProp: string | null;
-                options: ({ text: string; value: string | number } | string)[] | null;
-              } = {
-                optionLabelProp: null,
-                options: null,
-              };
-
-              if (values) {
-                valueProps.optionLabelProp = 'value';
-                valueProps.options = values.map((value) => ({ text: value.text, value: value.value })) || null;
-              }
+              const valueProps = getValueProps(values);
 
               content = (
                 <section className="editable-logic__arg">
@@ -173,7 +181,7 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
                   <EditableInput
                     value={argVal}
                     onChange={(value) => {
-                      defStore.setArgValue(logic, arg, value);
+                      defStore.setArgValue(logic, arg, value as string);
                     }}
                     {...valueProps}
                   />
@@ -189,14 +197,12 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
 
               const { value: presetValue } = presetArgValue;
 
-              console.log('Value for use is: ', argVal);
-
               content = (
                 <section className="editable-logic__arg">
                   {content}
                   <EditableInput
                     value={typeof argVal === 'number' ? argVal.toString() : argVal}
-                    options={defStore.getPresetValuesForOptions(presetValue)}
+                    options={defStore.getPresetValuesForOptions(presetValue as string)}
                     onChange={(value) => {
                       if (typeof value === 'string') {
                         const parsedValue = tryParseInt(value, 0);
@@ -206,17 +212,12 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
                       }
                     }}
                     optionLabelProp="value"
-                    valueLabel={defStore.getPresetValue(presetValue, argVal)}
+                    valueLabel={defStore.getPresetValue(presetValue as string, argVal)}
                   />
                 </section>
               );
             } else {
-              const valueProps = {};
-
-              if (values) {
-                valueProps.optionLabelProp = 'value';
-                valueProps.options = values.map((value) => ({ text: value.text, value: value.value }));
-              }
+              const valueProps = getValueProps(values);
 
               content = (
                 <section className="editable-logic__arg">
@@ -224,7 +225,12 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
                   <EditableInput
                     value={typeof argVal === 'number' ? argVal.toString() : argVal}
                     onChange={(value) => {
-                      defStore.setArgValue(logic, arg, value);
+                      if (typeof value === 'string') {
+                        const parsedValue = tryParseInt(value, 0);
+                        defStore.setArgValue(logic, arg, parsedValue);
+                      } else {
+                        defStore.setArgValue(logic, arg, value as number);
+                      }
                     }}
                     {...valueProps}
                   />
