@@ -17,23 +17,16 @@ import {
   updateNode,
   updateResponse,
   setResponses,
-  addNodes,
+  // addNodes,
 } from '../../utils/conversation-utils';
 
 import { dataStore } from '../dataStore';
-import { detectType, isNodeLinkType, isNodeType } from '../../utils/node-utils';
+// import { detectType, isNodeLinkType, isNodeType } from '../../utils/node-utils';
 import { NodeType } from 'types/NodeType';
 import { NodeLinkType } from 'types/NodeLinkType';
 import { ConversationAssetType } from 'types/ConversationAssetType';
 import { OperationCallType } from 'types/OperationCallType';
-
-export type Clipboard = {
-  node: NodeType | NodeLinkType;
-  originalNodeId: string;
-  originalNodeIndex: number | null;
-  nodes: (NodeType | NodeLinkType)[];
-  nodeIdMap: Map<number, number>;
-};
+import { ClipboardType } from 'types/ClipboardType';
 
 /* eslint-disable no-return-assign, no-param-reassign, class-methods-use-this */
 class NodeStore {
@@ -44,7 +37,7 @@ class NodeStore {
   ownerId: string | null = null;
   takenNodeIndexes: number[] = [];
   expandMap = new Map<string, boolean>();
-  clipboard: Clipboard | null = null;
+  clipboard: ClipboardType | null = null;
   nodeIdToTreeIndexMap = new Map<string, number>();
   dirtyActiveNode = false;
   rebuild = false;
@@ -64,10 +57,10 @@ class NodeStore {
       scrollToNode: action,
       setFocusedTreeNode: action,
       clearFocusedNode: action,
-      setClipboard: action,
+      // setClipboard: action,
       clearClipboard: action,
-      pasteAsLinkFromClipboard: action,
-      pasteAsCopyFromClipboard: action,
+      // pasteAsLinkFromClipboard: action,
+      // pasteAsCopyFromClipboard: action,
       setNode: action,
       setNodeText: action,
       setNodeActions: action,
@@ -89,14 +82,6 @@ class NodeStore {
       deleteLink: action,
       reset: action,
     });
-
-    // this.clipboard = {
-    //   node: null,
-    //   originalNodeId: null,
-    //   originalNodeIndex: null,
-    //   nodes: [],
-    //   nodeIdMap: new Map<number, number>(),
-    // };
   }
 
   generateNextNodeIndex() {
@@ -219,151 +204,156 @@ class NodeStore {
    * || NODE CLIPBOARD METHODS ||
    * ============================
    */
-  setClipboard(nodeId: string) {
-    const tempClipboard: Partial<Clipboard> = {
-      nodeIdMap: new Map<number, number>(),
-    };
+  // FIXME: Rewrite copy/pasting/linking
+  // setClipboard(nodeId: string) {
+  //   const tempClipboard: Partial<ClipboardType> = {
+  //     nodeIdMap: new Map<number, number>(),
+  //   };
 
-    const node = toJS(this.getNode(nodeId));
-    if (node === null) return;
+  //   const node = toJS(this.getNode(nodeId));
+  //   if (node === null) return;
 
-    tempClipboard.originalNodeId = nodeId;
-    tempClipboard.originalNodeIndex = (isNodeType(node) && node.index) || null;
+  //   tempClipboard.originalNodeId = nodeId;
+  //   tempClipboard.originalNodeIndex = (isNodeType(node) && node.index) || null;
 
-    const newNodeId = generateId();
-    node.idRef.id = newNodeId;
+  //   const newNodeId = generateId();
+  //   node.idRef.id = newNodeId;
 
-    if (isNodeType(node)) {
-      const newNodeIndex = this.generateNextNodeIndex();
-      tempClipboard.nodeIdMap?.set(node.index, newNodeIndex);
-      node.index = newNodeIndex;
-    }
+  //   if (isNodeType(node)) {
+  //     const newNodeIndex = this.generateNextNodeIndex();
+  //     tempClipboard.nodeIdMap?.set(node.index, newNodeIndex);
+  //     node.index = newNodeIndex;
+  //   }
 
-    tempClipboard.node = node;
-    const branches = isNodeType(node) ? node.branches : [node];
+  //   tempClipboard.node = node;
+  //   const branches = isNodeType(node) ? node.branches : [node];
 
-    tempClipboard.nodes = flattenDeep(
-      branches.map((branch) => {
-        const { nextNodeIndex, auxiliaryLink } = branch;
-        const newBranchId = generateId();
-        branch.idRef.id = newBranchId;
-        branch.parentId = newNodeId;
+  //   tempClipboard.nodes = flattenDeep(
+  //     branches.map((branch) => {
+  //       const { nextNodeIndex, auxiliaryLink } = branch;
+  //       const newBranchId = generateId();
+  //       branch.idRef.id = newBranchId;
+  //       branch.parentId = newNodeId;
 
-        // Change link indexes
-        if (nextNodeIndex !== -1 && auxiliaryLink) {
-          const copiedAndUpdatedNodeId = tempClipboard.nodeIdMap?.get(branch.nextNodeIndex);
-          if (copiedAndUpdatedNodeId) branch.nextNodeIndex = copiedAndUpdatedNodeId;
-        }
+  //       // Change link indexes
+  //       if (nextNodeIndex !== -1 && auxiliaryLink) {
+  //         const copiedAndUpdatedNodeId = tempClipboard.nodeIdMap?.get(branch.nextNodeIndex);
+  //         if (copiedAndUpdatedNodeId) branch.nextNodeIndex = copiedAndUpdatedNodeId;
+  //       }
 
-        if (nextNodeIndex === -1 || auxiliaryLink) return [];
+  //       if (nextNodeIndex === -1 || auxiliaryLink) return [];
 
-        const newNextNodeIndex = this.generateNextNodeIndex();
-        branch.nextNodeIndex = newNextNodeIndex;
-        return this.copyNodesRecursive(nextNodeIndex, newNextNodeIndex, newBranchId);
-      }),
-    );
+  //       const newNextNodeIndex = this.generateNextNodeIndex();
+  //       branch.nextNodeIndex = newNextNodeIndex;
+  //       return this.copyNodesRecursive(nextNodeIndex, newNextNodeIndex, newBranchId);
+  //     }),
+  //   );
 
-    this.clipboard = tempClipboard as Clipboard;
-  }
+  //   this.clipboard = tempClipboard as Clipboard;
+  // }
 
-  copyNodesRecursive(nodeIndex: number, newNextNodeIndex: number, newNodeParentId: string): (NodeType | NodeLinkType)[] {
-    if (this.clipboard == null) throw Error('Clipboard is null or undefined. Cannot copy nodes with no clipboard');
+  // FIXME: Rewrite copy/pasting/linking as there are known bugs and I can't resolve this type mess
 
-    const node = toJS(this.getNodeByIndex(nodeIndex));
-    if (!node) return [];
+  // copyNodesRecursive(nodeIndex: number, newNextNodeIndex: number, newNodeParentId: string): (NodeType | NodeLinkType)[] {
+  //   if (this.clipboard == null) throw Error('Clipboard is null or undefined. Cannot copy nodes with no clipboard');
 
-    const newNodeId = generateId();
-    node.idRef.id = newNodeId;
+  //   const node = toJS(this.getNodeByIndex(nodeIndex));
+  //   if (!node) return [];
 
-    this.clipboard.nodeIdMap.set(node.index, newNextNodeIndex);
-    node.index = newNextNodeIndex;
-    node.parentId = newNodeParentId;
+  //   const newNodeId = generateId();
+  //   node.idRef.id = newNodeId;
 
-    const nodes: (NodeType | NodeLinkType)[] = [
-      node,
-      ...node.branches.map((branch: NodeLinkType) => {
-        const { nextNodeIndex, auxiliaryLink } = branch;
-        const newBranchId = generateId();
-        branch.idRef.id = newBranchId;
-        branch.parentId = newNodeId;
+  //   this.clipboard.nodeIdMap.set(node.index, newNextNodeIndex);
+  //   node.index = newNextNodeIndex;
+  //   node.parentId = newNodeParentId;
 
-        // Change link indexes
-        if (nextNodeIndex !== -1 && auxiliaryLink) {
-          const linkedNextNodeIndex = this.clipboard.nodeIdMap.get(branch.nextNodeIndex);
+  //   const nodes: (NodeType | NodeLinkType)[] = [
+  //     node,
+  //     ...node.branches.map((branch: NodeLinkType) => {
+  //       const { nextNodeIndex, auxiliaryLink } = branch;
+  //       const newBranchId = generateId();
+  //       branch.idRef.id = newBranchId;
+  //       branch.parentId = newNodeId;
 
-          // If the index exists in the copied branch then link to the new node,
-          // otherwise keep the existing link
-          if (linkedNextNodeIndex) {
-            branch.nextNodeIndex = linkedNextNodeIndex;
-          }
-        }
+  //       // Change link indexes
+  //       if (nextNodeIndex !== -1 && auxiliaryLink) {
+  //         const linkedNextNodeIndex = this.clipboard.nodeIdMap.get(branch.nextNodeIndex);
 
-        if (nextNodeIndex === -1 || auxiliaryLink) return [];
+  //         // If the index exists in the copied branch then link to the new node,
+  //         // otherwise keep the existing link
+  //         if (linkedNextNodeIndex) {
+  //           branch.nextNodeIndex = linkedNextNodeIndex;
+  //         }
+  //       }
 
-        const newNodeIndex = this.generateNextNodeIndex();
-        branch.nextNodeIndex = newNodeIndex;
-        return this.copyNodesRecursive(nextNodeIndex, newNodeIndex, newBranchId);
-      }),
-    ];
-    return nodes;
-  }
+  //       if (nextNodeIndex === -1 || auxiliaryLink) return [];
+
+  //       const newNodeIndex = this.generateNextNodeIndex();
+  //       branch.nextNodeIndex = newNodeIndex;
+  //       return this.copyNodesRecursive(nextNodeIndex, newNodeIndex, newBranchId);
+  //     }),
+  //   ];
+  //   return nodes;
+  // }
 
   clearClipboard() {
     this.clipboard = null;
   }
 
-  pasteAsLinkFromClipboard(nodeId: string) {
-    const response = this.getNode(nodeId);
-    if (response === null) return;
+  // FIXME: Rewrite copy/pasting/linking
+  // pasteAsLinkFromClipboard(nodeId: string) {
+  //   const response = this.getNode(nodeId);
+  //   if (response === null) return;
 
-    if (this.clipboard == null) throw Error('Clipboard is null or undefined. Cannot paste as link from clipboard.');
+  //   if (this.clipboard == null) throw Error('Clipboard is null or undefined. Cannot paste as link from clipboard.');
 
-    const { originalNodeIndex } = this.clipboard;
+  //   const { originalNodeIndex } = this.clipboard;
 
-    if ('nextNodeIndex' in response) {
-      if (originalNodeIndex) response.nextNodeIndex = originalNodeIndex;
-      response.auxiliaryLink = true;
+  //   if ('nextNodeIndex' in response) {
+  //     if (originalNodeIndex) response.nextNodeIndex = originalNodeIndex;
+  //     response.auxiliaryLink = true;
 
-      this.clearClipboard();
-      this.setRebuild(true);
-    }
-  }
+  //     this.clearClipboard();
+  //     this.setRebuild(true);
+  //   }
+  // }
 
-  pasteAsCopyFromClipboard(nodeId: string) {
-    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-    if (this.clipboard == null) throw Error('Clipboard is null or undefined. Cannot paste as copy from clipboard.');
-    if (conversationAsset == null) throw Error('Conversation is null. Cannot paste as copy from cipboard');
+  // FIXME: Rewrite copy/pasting/linking
+  // pasteAsCopyFromClipboard(nodeId: string) {
+  //   const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+  //   if (this.clipboard == null) throw Error('Clipboard is null or undefined. Cannot paste as copy from clipboard.');
+  //   if (conversationAsset == null) throw Error('Conversation is null. Cannot paste as copy from cipboard');
 
-    const node = this.getNode(nodeId);
-    if (node == null) throw Error('Node is null.');
+  //   const node = this.getNode(nodeId);
+  //   if (node == null) throw Error('Node is null.');
 
-    const { node: clipboardNode, nodes: clipboardNodes } = this.clipboard;
-    const { isRoot, isNode, isResponse } = detectType(node.type);
+  //   const { node: clipboardNode, nodes: clipboardNodes } = this.clipboard;
+  //   const { isRoot, isNode, isResponse } = detectType(node.type);
 
-    if (isRoot || isResponse) {
-      // Only allow nodes to be copied in if target is a root or response
-      if (isNodeType(clipboardNode)) {
-        if (!isNodeLinkType(node)) throw Error('Target node for paste as copy is not a NodeLink. It must be a NodeLink.');
-        node.nextNodeIndex = clipboardNode.index;
-        clipboardNode.parentId = nodeId;
-        addNodes(conversationAsset, [clipboardNode, ...(clipboardNodes as NodeType[])]);
-      } else {
-        console.error('[NodeStore] Cannot copy - wrong node types');
-      }
-    } else if (isNode) {
-      // Only allow response to be copied in
-      if (isNodeLinkType(clipboardNode)) {
-        clipboardNode.parentId = nodeId;
-        updateResponse(conversationAsset, node as NodeType, clipboardNode);
-        addNodes(conversationAsset, clipboardNodes as NodeType[]);
-      } else {
-        console.error('[NodeStore] Cannot copy - wrong node types');
-      }
-    }
+  //   if (isRoot || isResponse) {
+  //     // Only allow nodes to be copied in if target is a root or response
+  //     if (isNodeType(clipboardNode)) {
+  //       if (!isNodeLinkType(node)) throw Error('Target node for paste as copy is not a NodeLink. It must be a NodeLink.');
+  //       node.nextNodeIndex = clipboardNode.index;
+  //       clipboardNode.parentId = nodeId;
+  //       addNodes(conversationAsset, [clipboardNode, ...(clipboardNodes as NodeType[])]);
+  //     } else {
+  //       console.error('[NodeStore] Cannot copy - wrong node types');
+  //     }
+  //   } else if (isNode) {
+  //     // Only allow response to be copied in
+  //     if (isNodeLinkType(clipboardNode)) {
+  //       clipboardNode.parentId = nodeId;
+  //       updateResponse(conversationAsset, node as NodeType, clipboardNode);
+  //       addNodes(conversationAsset, clipboardNodes as NodeType[]);
+  //     } else {
+  //       console.error('[NodeStore] Cannot copy - wrong node types');
+  //     }
+  //   }
 
-    this.clearClipboard();
-    this.setRebuild(true);
-  }
+  //   this.clearClipboard();
+  //   this.setRebuild(true);
+  // }
 
   /*
    * ==================

@@ -55,17 +55,20 @@ function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string; onVis
 
   const onCopyClicked = ({ props }: ItemParams<EventProps>) => {
     if (!props) return;
-    nodeStore.setClipboard(props.id);
+    console.log('Copying is disabled for now pending a rewrite');
+    // nodeStore.setClipboard(props.id);
   };
 
   const onPasteAsCopy = ({ props }: ItemParams<EventProps>) => {
     if (!props) return;
-    nodeStore.pasteAsCopyFromClipboard(props.id);
+    console.log('Pasting as copy is disabled for now pending a rewrite');
+    // nodeStore.pasteAsCopyFromClipboard(props.id);
   };
 
   const onPasteAsLink = ({ props }: ItemParams<EventProps>) => {
     if (!props) return;
-    nodeStore.pasteAsLinkFromClipboard(props.id);
+    console.log('Pasting as link is disabled for now pending a rewrite');
+    // nodeStore.pasteAsLinkFromClipboard(props.id);
   };
 
   const onDeleteClicked = ({ props }: ItemParams<EventProps>) => {

@@ -1,18 +1,13 @@
 import { NodeType } from 'types/NodeType';
 import { nodeStore } from '../stores';
 import { NodeLinkType } from 'types/NodeLinkType';
+import { ClipboardType } from 'types/ClipboardType';
 
 export type NodeTypeDetectionResult = {
   isRoot: boolean;
   isNode: boolean;
   isResponse: boolean;
   isLink: boolean;
-};
-
-export type MockClipboard = {
-  node: {
-    type: string;
-  };
 };
 
 export function isNodeType(node: NodeType | NodeLinkType): node is NodeType {
@@ -55,12 +50,12 @@ export function isAllowedToCreateNode(nodeId: string | undefined) {
   return false;
 }
 
-export function isAllowedToPasteCopy(nodeId: string | undefined, clipboard: MockClipboard) {
+export function isAllowedToPasteCopy(nodeId: string | undefined, clipboard: ClipboardType | null) {
   if (!nodeId) return false;
   const node = nodeStore.getNode(nodeId);
 
   // GUARD
-  if (!node || !clipboard) return false;
+  if (node == null || clipboard == null) return false;
 
   const { node: clipboardNode } = clipboard;
 
@@ -78,7 +73,7 @@ export function isAllowedToPasteCopy(nodeId: string | undefined, clipboard: Mock
   return true;
 }
 
-export function isAllowedToPasteLink(nodeId: string | undefined, clipboard: MockClipboard) {
+export function isAllowedToPasteLink(nodeId: string | undefined, clipboard: ClipboardType | null) {
   if (!nodeId) return false;
   // GUARD - Don't allow pasting link into a root
   if (nodeId === '0') return false;
@@ -86,7 +81,7 @@ export function isAllowedToPasteLink(nodeId: string | undefined, clipboard: Mock
   const node = nodeStore.getNode(nodeId);
 
   // GUARD
-  if (!node || !clipboard) return false;
+  if (node == null || clipboard == null) return false;
 
   const { node: clipboardNode } = clipboard;
 
