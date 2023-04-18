@@ -78,7 +78,7 @@ function ConversationActions({ node }: { node: NodeType | NodeLinkType }) {
           <ViewableLogic key={action.functionName} logic={action} />
         </div>
         <Popconfirm
-          title="Are you sure you want to delete this condition?"
+          title="Are you sure you want to delete this action?"
           placement="topLeft"
           onConfirm={(event: MouseEvent) => onDeleteAction(event, index)}
           okText="Yes"
