@@ -24,10 +24,10 @@ type Props = {
   scope?: 'all' | 'action' | 'condition';
   category: 'primary' | 'secondary';
   logic: OperationCallType;
-  isEven: boolean;
-  parentLogic: OperationCallType | null;
-  parentInput: InputType | null;
-  parentArg: OperationArgType | null;
+  isEven?: boolean;
+  parentLogic?: OperationCallType | null;
+  parentInput?: InputType | null;
+  parentArg?: OperationArgType | null;
 };
 
 type ValueProps = {

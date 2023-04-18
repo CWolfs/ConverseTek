@@ -13,7 +13,9 @@ export type MockClipboard = {
   };
 };
 
-export function detectType(type: string): NodeTypeDetectionResult {
+export function detectType(type: string | null): NodeTypeDetectionResult {
+  if (type == null) return { isRoot: false, isNode: false, isResponse: false, isLink: false };
+
   return {
     isRoot: type === 'root',
     isNode: type === 'node',
