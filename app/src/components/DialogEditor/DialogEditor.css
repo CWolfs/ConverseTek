@@ -22,10 +22,6 @@
     background-color: gold;
   }
 
-  .rst__virtualScrollOverride * {
-    color: black;
-  }
-
   .rst__nodeContent {
     color: black;
   }
@@ -48,6 +44,7 @@
 
   .rst__rowLabel {
     padding-right: 5px !important;
+    margin-bottom: 2px;
   }
 
   .rst__rowWrapper {

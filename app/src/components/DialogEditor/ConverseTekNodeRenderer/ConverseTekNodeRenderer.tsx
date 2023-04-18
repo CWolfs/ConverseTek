@@ -58,13 +58,13 @@ function hasActionsAndConditions(node: NodeType | NodeLinkType | null): { hasAct
   let hasActions = false;
   let hasConditions = false;
 
-  if (!node) return { hasActions, hasConditions };
+  if (node == null) return { hasActions, hasConditions };
 
   const { type } = node;
   if (type === 'node') {
     const { actions } = node;
     hasActions = !!actions;
-  } else if (type === 'response') {
+  } else if (type === 'root' || type === 'response') {
     const { actions, conditions } = node;
     hasActions = !!actions;
     hasConditions = !!conditions;
@@ -274,8 +274,8 @@ export const ConverseTekNodeRenderer = observer(
         {!isLink && (
           <section>
             <div className="node-renderer__row-contents-logic">
-              {hasConditions && <Icon type="question-circle" style={logicStyle} />}
-              {hasActions && <Icon type="right-circle" style={actionsIconStyle} />}
+              {hasConditions && <Icon type="question-circle" theme="filled" style={logicStyle} />}
+              {hasActions && <Icon type="right-circle" theme="filled" style={actionsIconStyle} />}
             </div>
 
             <div className={labelClasses}>

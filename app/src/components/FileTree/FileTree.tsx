@@ -2,33 +2,45 @@
 import React from 'react';
 import { Tree } from 'antd';
 import CustomScroll from 'react-custom-scroll';
+import classnames from 'classnames';
+
+import { AntTreeNodeSelectedEvent } from 'antd/lib/tree';
 
 import 'react-custom-scroll/dist/customScroll.css';
 
 import './FileTree.css';
-import { AntTreeNodeEvent } from 'antd/lib/tree';
 
 type Props = {
   title: string;
   data: { key: string; label: string }[] | null;
-  onSelected: (selectedKeys: string[], e: AntTreeNodeEvent) => void;
+  onSelected: (selectedKeys: string[], e: AntTreeNodeSelectedEvent) => void;
   selectedKeys: string[];
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const { TreeNode } = Tree;
 
-export const FileTree = ({ title, data = null, onSelected = () => {}, selectedKeys = [] }: Props) => (
-  <div className="file-tree">
-    {title && <h4 className="file-tree__title">{title}</h4>}
-    <div className="file-tree__tree">
-      <CustomScroll heightRelativeToParent="calc(100% - 1px)">
-        <Tree showLine defaultExpandedKeys={['0']} onSelect={onSelected} selectedKeys={selectedKeys}>
-          <TreeNode title={data && data.length ? 'simGameConversations' : 'No Conversations'} key="0">
-            {data && data.map((item) => <TreeNode key={item.key} title={item.label} />)}
-          </TreeNode>
-        </Tree>
-      </CustomScroll>
+function renderTreeNodes(data: { key: string; label: string }[] | null): JSX.Element[] | undefined {
+  if (data) return data.map((item) => <TreeNode className="file-tree__tree__conversation" key={item.key} title={item.label} />);
+  return undefined;
+}
+
+export const FileTree = ({ title, data = null, onSelected = () => {}, selectedKeys = [] }: Props) => {
+  const headerClasses = classnames('file-tree__tree__conversation_header', {
+    'file-tree__tree__conversation_header--no-data': data == null || data.length <= 0,
+  });
+
+  return (
+    <div className="file-tree">
+      {title && <h4 className="file-tree__title">{title}</h4>}
+      <div className="file-tree__tree">
+        <CustomScroll heightRelativeToParent="calc(100% - 1px)">
+          <Tree showIcon showLine defaultExpandedKeys={['0']} onSelect={onSelected} selectedKeys={selectedKeys}>
+            <TreeNode className={headerClasses} title={data && data.length ? 'simGameConversations' : 'No Conversations'} key="0">
+              {renderTreeNodes(data)}
+            </TreeNode>
+          </Tree>
+        </CustomScroll>
+      </div>
     </div>
-  </div>
-);
+  );
+};
