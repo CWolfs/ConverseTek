@@ -2,7 +2,7 @@
 const webpack = require('webpack');
 
 module.exports = function (config, APP_DIR, BUILD_DIR) {
-  console.log('Using local config');
+  console.log('Using dev config');
 
   config = {
     ...config,
@@ -17,6 +17,7 @@ module.exports = function (config, APP_DIR, BUILD_DIR) {
   config.plugins.push(
     new webpack.DefinePlugin({
       __BUILD_DATE__: JSON.stringify(`LOCAL ${new Date(Date.now()).toUTCString()}`),
+      __INITIAL_ROUTE_PATH__: JSON.stringify('index.html'),
     }),
   );
 

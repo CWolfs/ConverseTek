@@ -4,6 +4,7 @@ module.exports = {
     window: true,
     __BUILD_DATE__: true,
     boundControllerAsync: true,
+    __INITIAL_ROUTE_PATH__: true,
   },
   overrides: [
     {

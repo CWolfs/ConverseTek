@@ -16,7 +16,7 @@ const MainLayout = (): JSX.Element => (
       <Header />
       <div className="main__children">
         <Routes>
-          <Route path="index.html" element={<Conversations />} />
+          <Route path={`${__INITIAL_ROUTE_PATH__}`} element={<Conversations />} />
           <Route path="/test" element={<div>Test area</div>} />
         </Routes>
       </div>

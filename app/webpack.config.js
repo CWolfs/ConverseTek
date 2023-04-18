@@ -3,9 +3,9 @@ const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 // const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 
-const isLocal = process.env.NODE_ENV === 'local';
-const isDev = process.env.NODE_ENV === 'development';
-const isProd = process.env.NODE_ENV === 'production';
+const isLocal = process.env.CT_ENV === 'local';
+const isDev = process.env.CT_ENV === 'development';
+const isProd = process.env.CT_ENV === 'production';
 
 const APP_DIR = path.resolve(__dirname, 'src');
 const BUILD_DIR = path.resolve(__dirname, '../dist');
@@ -67,7 +67,7 @@ let config = {
 
 // Loader hooks
 config = cssLoader(config, APP_DIR);
-config = jsxLoader(config, APP_DIR);
+config = jsxLoader(config, APP_DIR, isLocal);
 config = lessLoader(config, APP_DIR);
 config = postcssLoader(config, APP_DIR);
 config = imageLoader(config, APP_DIR);

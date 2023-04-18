@@ -4,9 +4,9 @@
   "description": "Conversation editor for Battletech",
   "main": "index.js",
   "scripts": {
-    "start": "cross-env NODE_ENV=local webpack-dev-server --open",
-    "build": "cross-env NODE_ENV=development webpack",
-    "prod": "cross-env NODE_ENV=production webpack",
+    "start": "cross-env NODE_ENV=development CT_ENV=local webpack-dev-server --open",
+    "build": "cross-env NODE_ENV=development CT_ENV=development webpack",
+    "prod": "cross-env NODE_ENV=production CT_ENV=production webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Richard Griffiths [CWolf] (cwolfs@gmail.com)",
@@ -25,6 +25,7 @@
     "@babel/preset-env": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
     "@babel/preset-typescript": "^7.21.4",
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.10",
     "@types/lodash": "^4.14.194",
     "@types/lodash.capitalize": "^4.2.7",
     "@types/lodash.debounce": "^4.0.7",
@@ -71,6 +72,7 @@
     "postcss-nested": "^6.0.1",
     "postcss-nested-ancestors": "^3.0.0",
     "postcss-simple-vars": "^7.0.1",
+    "react-refresh": "^0.14.0",
     "speed-measure-webpack-plugin": "^1.5.0",
     "style-loader": "^2.0.0",
     "ts-node": "^10.9.1",
@@ -110,7 +112,6 @@
     "react-contexify": "^6.0.0",
     "react-custom-scroll": "^5.0.0",
     "react-dom": "^16.14.0",
-    "react-hot-loader": "^4.2.0",
     "react-router-dom": "^6.10.0",
     "react-sortable-tree": "^2.8.0",
     "uuid": "^9.0.0"

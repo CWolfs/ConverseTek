@@ -17,6 +17,7 @@ module.exports = function (config) {
     new webpack.DefinePlugin({
       __BUILD_DATE__: '',
       'process.env.NODE_ENV': JSON.stringify('production'),
+      __INITIAL_ROUTE_PATH__: JSON.stringify('index.html'),
     }),
   );
 
