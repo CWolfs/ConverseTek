@@ -157,7 +157,6 @@ export function FileSystemPicker() {
   });
 
   const items = [...directories, ...files];
-  // const quickLinkPairs = quickLinks ? toPairs(quickLinks) : [];
 
   return (
     <div className="file-system-picker">
@@ -165,7 +164,7 @@ export function FileSystemPicker() {
         <Icon type="desktop" style={{ fontSize: 20 }} />
         {quickLinks &&
           quickLinks.map(({ title, path }) => (
-            <Tooltip title={title}>
+            <Tooltip title={title} placement="left">
               <div onClick={() => onDirectNavigation(path)}>
                 <Icon type="book" style={{ fontSize: 20 }} />
               </div>
