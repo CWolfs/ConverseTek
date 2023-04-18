@@ -127,7 +127,7 @@ export function FileSystemPicker() {
 
   const setupModal = () => {
     modalStore.setOnOk(onOk);
-    modalStore.setTitle(`Select a conversation ${fileMode ? '' : 'directory'}`);
+    modalStore.setTitle(`Select a conversation ${fileMode ? '' : 'directory'}${selectedItem ? ' - ' + selectedItem.name : ''}`);
     modalStore.setOkLabel('Load');
     modalStore.setLoadingLabel('Loading');
   };
