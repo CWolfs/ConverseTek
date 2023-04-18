@@ -83,6 +83,7 @@
     "@babel/polyfill": "^7.0.0",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
+    "ahooks": "^3.7.6",
     "antd": "^3.26.20",
     "classnames": "^2.3.2",
     "lodash.capitalize": "^4.2.1",
