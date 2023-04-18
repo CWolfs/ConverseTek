@@ -33,7 +33,7 @@ function ConversationTree() {
 
   return (
     <div className="conversation-tree">
-      <FileTree title="Conversations" data={data} onSelected={onNodeSelected} selectedKeys={selectedKeys} />
+      <FileTree title="Conversations" data={data} onSelected={onNodeSelected} selectedKeys={selectedKeys || []} />
     </div>
   );
 }
