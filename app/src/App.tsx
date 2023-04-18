@@ -1,5 +1,5 @@
 import React, { createContext } from 'react';
-import { Route, BrowserRouter as Router } from 'react-router-dom';
+import { Routes, Route, BrowserRouter as Router } from 'react-router-dom';
 import { Provider, observer } from 'mobx-react';
 
 import stores from './stores';
@@ -13,9 +13,9 @@ export const storeContext = createContext(stores);
 const App = () => (
   <Provider {...stores}>
     <Router>
-      <Route>
-        <MainLayout />
-      </Route>
+      <Routes>
+        <Route path="/*" element={<MainLayout />} />
+      </Routes>
     </Router>
   </Provider>
 );
