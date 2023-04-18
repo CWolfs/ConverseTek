@@ -5,7 +5,6 @@ import classnames from 'classnames';
 import remove from 'lodash.remove';
 import sortBy from 'lodash.sortby';
 import debounce from 'lodash.debounce';
-import toPairs from 'lodash.topairs';
 import type { DebouncedFunc } from 'lodash';
 
 import { getRootDrives, getDirectories, getQuickLinks, saveWorkingDirectory, getConversations, importConversation } from 'services/api';
@@ -181,17 +180,16 @@ export function FileSystemPicker() {
             });
 
             return (
-              // <div onClick={() => onDirectoryClicked(item)} onDoubleClick={() => item.isDirectory && onDirectoryDoubleClicked(item)}>
-              <ListItem
-                key={item.path}
-                className={itemClasses}
-                onClick={() => onDirectoryClicked(item)}
-                onDoubleClick={() => item.isDirectory && onDirectoryDoubleClicked(item)}
-              >
-                {getItemIcon(item)}
-                <span className="file-system-picker__directory-name">{item.name}</span>
+              <ListItem key={item.path} className={itemClasses}>
+                <div
+                  className="file-system-picker__directory-item-subcontainer"
+                  onClick={() => onDirectoryClicked(item)}
+                  onDoubleClick={() => item.isDirectory && onDirectoryDoubleClicked(item)}
+                >
+                  {getItemIcon(item)}
+                  <span className="file-system-picker__directory-name">{item.name}</span>
+                </div>
               </ListItem>
-              // </div>
             );
           }}
         />
