@@ -77,6 +77,7 @@ class NodeStore {
       addNodeByParentId: action,
       addRoot: action,
       setRoots: action,
+      getChildrenFromRoots: action,
       addNode: action,
       addResponse: action,
       setResponses: action,
@@ -119,10 +120,12 @@ class NodeStore {
   setRebuild(flag: boolean) {
     this.rebuild = flag;
     if (this.rebuild) {
-      defer(() => {
-        this.rebuild = false;
-        if (this.activeNode) this.updateActiveNode(this.activeNode);
-      });
+      defer(
+        action(() => {
+          this.rebuild = false;
+          if (this.activeNode) this.updateActiveNode(this.activeNode);
+        }),
+      );
     }
   }
 
