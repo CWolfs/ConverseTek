@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React from 'react';
 import { observer } from 'mobx-react';
 import { Switch, Route } from 'react-router-dom';
 
@@ -10,16 +10,17 @@ import { Footer } from '../../containers/Footer';
 
 import './Main.css';
 
-const Layout = ({ children }: { children: React.ReactNode }): ReactElement => (
+const MainLayout = (): JSX.Element => (
   <div className="main">
     <div className="main__content">
       <Header />
       <div className="main__children">
         <Switch>
-          <Route exact path="/(|index.html)" component={Conversations} />
+          <Route exact path="/(|index.html)">
+            <Conversations />
+          </Route>
           <Route exact path="/test" component={() => <div>Test</div>} />
         </Switch>
-        {children}
       </div>
       <Footer />
       <GlobalModal />
@@ -27,4 +28,4 @@ const Layout = ({ children }: { children: React.ReactNode }): ReactElement => (
   </div>
 );
 
-export default observer(Layout);
+export const ObservingMainLayout = observer(MainLayout);

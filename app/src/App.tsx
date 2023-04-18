@@ -4,7 +4,7 @@ import { Provider, observer } from 'mobx-react';
 
 import stores from './stores';
 
-import Main from './layouts/Main';
+import { MainLayout } from './layouts/MainLayout';
 
 import './css/styles.css';
 
@@ -13,7 +13,9 @@ export const storeContext = createContext(stores);
 const App = () => (
   <Provider {...stores}>
     <Router>
-      <Route component={Main} />
+      <Route>
+        <MainLayout />
+      </Route>
     </Router>
   </Provider>
 );
