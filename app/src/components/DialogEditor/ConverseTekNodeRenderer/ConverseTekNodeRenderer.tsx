@@ -274,8 +274,8 @@ export const ConverseTekNodeRenderer = observer(
         {!isLink && (
           <section>
             <div className="node-renderer__row-contents-logic">
-              {hasConditions && <Icon type="question-circle" style={logicStyle} />}
-              {hasActions && <Icon type="right-circle" style={actionsIconStyle} />}
+              {hasConditions && <Icon type="question-circle" theme="filled" style={logicStyle} />}
+              {hasActions && <Icon type="right-circle" theme="filled" style={actionsIconStyle} />}
             </div>
 
             <div className={labelClasses}>
