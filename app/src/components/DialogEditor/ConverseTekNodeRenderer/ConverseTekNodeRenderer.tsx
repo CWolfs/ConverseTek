@@ -58,13 +58,13 @@ function hasActionsAndConditions(node: NodeType | NodeLinkType | null): { hasAct
   let hasActions = false;
   let hasConditions = false;
 
-  if (!node) return { hasActions, hasConditions };
+  if (node == null) return { hasActions, hasConditions };
 
   const { type } = node;
   if (type === 'node') {
     const { actions } = node;
     hasActions = !!actions;
-  } else if (type === 'response') {
+  } else if (type === 'root' || type === 'response') {
     const { actions, conditions } = node;
     hasActions = !!actions;
     hasConditions = !!conditions;
