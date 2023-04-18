@@ -3,15 +3,16 @@ import React from 'react';
 import { Tree } from 'antd';
 import CustomScroll from 'react-custom-scroll';
 
+import { AntTreeNodeSelectedEvent } from 'antd/lib/tree';
+
 import 'react-custom-scroll/dist/customScroll.css';
 
 import './FileTree.css';
-import { AntTreeNodeEvent } from 'antd/lib/tree';
 
 type Props = {
   title: string;
   data: { key: string; label: string }[] | null;
-  onSelected: (selectedKeys: string[], e: AntTreeNodeEvent) => void;
+  onSelected: (selectedKeys: string[], e: AntTreeNodeSelectedEvent) => void;
   selectedKeys: string[];
 };
 
