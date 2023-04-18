@@ -6,14 +6,16 @@ namespace ConverseTek.Data {
     public string[] Types { get; set; }
     public string Scope { get; set; }
     public OperationInputValue[] Values { get; set; }
+    public object DefaultValue { get; set; }
 
-    public OperationInput(string label, string viewlabel, string tooltip, string[] types, string scope, OperationInputValue[] values) {
+    public OperationInput(string label, string viewlabel, string tooltip, string[] types, string scope, OperationInputValue[] values, object defaultValue) {
       this.Label = label;
       this.Viewlabel = viewlabel;
       this.Tooltip = tooltip;
       this.Types = types;
       this.Scope = scope;
       this.Values = values;
+      this.DefaultValue = defaultValue;
     }
   }
 }

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { ChangeEvent, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react';
@@ -10,19 +10,27 @@ import { detectType } from 'utils/node-utils';
 import { useStore } from 'hooks/useStore';
 import { DialogEditor } from 'components/DialogEditor';
 import { DialogTextArea } from 'components/DialogTextArea';
+import { NodeStore } from 'stores/nodeStore/node-store';
+import { DataStore } from 'stores/dataStore/data-store';
 
+import { ConversationAssetType } from 'types/ConversationAssetType';
 import { ConversationGeneral } from '../ConversationGeneral';
 import { ConversationConditions } from '../ConversationConditions';
 import { ConversationActions } from '../ConversationActions';
 
 import './ConversationEditor.css';
+import { NodeLinkType } from 'types/NodeLinkType';
 
 const FormItem = Form.Item;
 const { TabPane } = Tabs;
 
-function ConversationEditor({ conversationAsset }) {
-  const nodeStore = useStore('node');
-  const dataStore = useStore('data');
+type Props = {
+  conversationAsset: ConversationAssetType;
+};
+
+function ConversationEditor({ conversationAsset }: Props) {
+  const nodeStore = useStore<NodeStore>('node');
+  const dataStore = useStore<DataStore>('data');
 
   const { unsavedActiveConversationAsset } = dataStore;
   const { activeNode, rebuild } = nodeStore;
@@ -33,28 +41,37 @@ function ConversationEditor({ conversationAsset }) {
   };
 
   const onSaveButtonClicked = () => {
-    createNewUnsavedConversation(unsavedActiveConversationAsset);
+    if (unsavedActiveConversationAsset == null) {
+      message.error('Save failed');
+      return;
+    }
 
-    updateConversation(unsavedActiveConversationAsset.conversation.idRef.id, unsavedActiveConversationAsset).then(() => {
+    void updateConversation(unsavedActiveConversationAsset.conversation.idRef.id, unsavedActiveConversationAsset).then(() => {
       message.success('Save successful');
     });
     dataStore.updateActiveConversation(unsavedActiveConversationAsset); // local update for speed
+    createNewUnsavedConversation();
   };
 
   const onRegenerateNodeIdsButtonClicked = () => {
+    if (unsavedActiveConversationAsset == null) throw Error('unsavedActiveConversationAsset is null or undefined.');
+
     regenerateNodeIds(unsavedActiveConversationAsset);
     nodeStore.setRebuild(true);
   };
 
   const onRegenerateConversationIdButtonClicked = () => {
+    if (unsavedActiveConversationAsset == null) throw Error('unsavedActiveConversationAsset is null or undefined.');
+
     regenerateConversationId(unsavedActiveConversationAsset);
   };
 
-  const handleIdChange = (event) => {
+  const handleIdChange = (event: ChangeEvent<HTMLInputElement>) => {
     dataStore.setUnsavedConversationId(event.target.value.trim());
   };
 
-  const handleNameChange = (event) => {
+  const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
+    event.target;
     dataStore.setUnsavedConversationUIName(event.target.value.trim());
   };
 
@@ -66,8 +83,10 @@ function ConversationEditor({ conversationAsset }) {
 
   // onConversationChanged
   useEffect(() => {
-    createNewUnsavedConversation(conversationAsset);
+    createNewUnsavedConversation();
   }, [conversationAsset]);
+
+  if (unsavedActiveConversationAsset == null) return null;
 
   const { conversation } = unsavedActiveConversationAsset;
   const conversationId = conversation.idRef.id;
@@ -151,7 +170,7 @@ function ConversationEditor({ conversationAsset }) {
                 </TabPane>
                 {(isRoot || isResponse) && (
                   <TabPane tab="Conditions" key="2">
-                    <ConversationConditions node={activeNode} />
+                    <ConversationConditions node={activeNode as NodeLinkType} />
                   </TabPane>
                 )}
                 <TabPane tab="Actions" key="3">

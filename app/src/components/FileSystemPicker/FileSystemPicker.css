@@ -22,8 +22,12 @@
 
   &__directory-item {
     cursor: pointer;
-    padding-left: 8px;
-    padding-right: 8px;
+    padding: 0;
+  }
+
+  &__directory-item-subcontainer {
+    padding: 12px 8px;
+    width: 100%
   }
 
   &__directory-item:hover,

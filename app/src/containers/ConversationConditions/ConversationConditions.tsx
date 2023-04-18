@@ -1,5 +1,4 @@
-import React, { useRef } from 'react';
-import PropTypes from 'prop-types';
+import React, { useRef, MouseEvent } from 'react';
 import { observer } from 'mobx-react';
 import { Button, Icon, Collapse, Popconfirm } from 'antd';
 import classnames from 'classnames';
@@ -10,14 +9,18 @@ import 'react-custom-scroll/dist/customScroll.css';
 import { ViewableLogic } from 'components/ViewableLogic';
 import { EditableLogic } from 'components/EditableLogic';
 import { useStore } from 'hooks/useStore';
+import { NodeStore } from 'stores/nodeStore/node-store';
+import { DefStore } from 'stores/defStore/def-store';
+import { NodeLinkType } from 'types/NodeLinkType';
+import { OperationCallType } from 'types/OperationCallType';
 
 import './ConversationConditions.css';
 
 const { Panel } = Collapse;
 
-function ConversationConditions({ node }) {
-  const nodeStore = useStore('node');
-  const defStore = useStore('def');
+function ConversationConditions({ node }: { node: NodeLinkType }) {
+  const nodeStore = useStore<NodeStore>('node');
+  const defStore = useStore<DefStore>('def');
 
   const dataSize = useRef(0);
   const { conditions } = node;
@@ -36,14 +39,16 @@ function ConversationConditions({ node }) {
     }
   };
 
-  const onDeleteCondition = (event, index) => {
+  const onDeleteCondition = (event: MouseEvent, index: number) => {
+    if (!conditions || !conditions.ops) return;
+
     remove(conditions.ops, (value, i) => i === index);
     if (conditions.ops.length <= 0) nodeStore.setNodeConditions(node, null);
 
     event.stopPropagation();
   };
 
-  const renderPanel = (condition, index) => {
+  const renderPanel = (condition: OperationCallType, index: number) => {
     const key = index;
 
     const classes = classnames('conversation-conditions__panel', {
@@ -59,15 +64,15 @@ function ConversationConditions({ node }) {
         <Popconfirm
           title="Are you sure you want to delete this condition?"
           placement="topLeft"
-          onConfirm={(event) => onDeleteCondition(event, index)}
+          onConfirm={(event: MouseEvent) => onDeleteCondition(event, index)}
           okText="Yes"
           cancelText="No"
         >
           <Button
             size="small"
-            type="caution"
+            type="caution" // FIXME: Passing custom types works but TS hates it. Use only the provided type and override the style where needed
             className="conversation-conditions__panel-header-delete-button"
-            onClick={(event) => event.stopPropagation()}
+            onClick={(event: MouseEvent) => event.stopPropagation()}
           >
             <Icon type="delete" />
           </Button>
@@ -76,13 +81,12 @@ function ConversationConditions({ node }) {
     );
 
     return (
-      <Panel key={key} className={classes} header={header}>
+      <Panel key={`${key}`} className={classes} header={header}>
         <EditableLogic key={condition.functionName} logic={condition} category="primary" scope="condition" />
       </Panel>
     );
   };
-
-  const displayConditions = conditions === null ? [] : conditions.ops;
+  const displayConditions = conditions === null || !conditions.ops ? [] : conditions.ops;
   dataSize.current = displayConditions.length;
   const height = window.document.getElementsByClassName('conversation-editor__details')[0].clientHeight - 22;
 
@@ -90,6 +94,7 @@ function ConversationConditions({ node }) {
     <div className="conversation-conditions" style={{ height }}>
       <Collapse>{displayConditions.map((condition, index) => renderPanel(condition, index))}</Collapse>
       <div className="conversation-conditions__buttons">
+        {/* FIXME: Passing custom types works but TS hates it. Use only the provided type and override the style where needed */}
         <Button type="secondary" size="small" onClick={onAddCondition}>
           <Icon type="plus" />
         </Button>
@@ -97,9 +102,5 @@ function ConversationConditions({ node }) {
     </div>
   );
 }
-
-ConversationConditions.propTypes = {
-  node: PropTypes.object.isRequired,
-};
 
 export const ObservingConversationConditions = observer(ConversationConditions);

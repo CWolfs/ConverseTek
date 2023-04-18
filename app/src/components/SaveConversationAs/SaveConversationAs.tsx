@@ -1,20 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ChangeEvent } from 'react';
 import { observer } from 'mobx-react';
 import { message, Input } from 'antd';
 
 import { updateConversation } from 'services/api';
 import { useStore } from 'hooks/useStore';
+import { DataStore } from 'stores/dataStore/data-store';
+import { ModalStore } from 'stores/modalStore/modal-store';
 
 import './SaveConversationAs.css';
 
 function SaveConversationAs() {
-  const dataStore = useStore('data');
-  const modalStore = useStore('modal');
+  const dataStore = useStore<DataStore>('data');
+  const modalStore = useStore<ModalStore>('modal');
 
   const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+  if (!conversationAsset) return null;
 
   const [suggestedFileName] = useState(`${conversationAsset.conversation.idRef.id}.convo.bytes`);
-  const [modifiedFileName, setModifiedFileName] = useState(null);
+  const [modifiedFileName, setModifiedFileName] = useState<string | null>(null);
 
   const onOk = () => {
     const { filename: previousFileName, filepath: previousFilePath } = conversationAsset;
@@ -22,7 +25,7 @@ function SaveConversationAs() {
     conversationAsset.filename = (modifiedFileName || suggestedFileName).replace('.bytes', '');
     conversationAsset.filepath = previousFilePath.replace(previousFileName, conversationAsset.filename);
 
-    updateConversation(conversationAsset.conversation.idRef.id, conversationAsset).then(() => {
+    void updateConversation(conversationAsset.conversation.idRef.id, conversationAsset).then(() => {
       message.success('Save successful');
     });
     dataStore.updateActiveConversation(conversationAsset); // local update for speed
@@ -39,7 +42,7 @@ function SaveConversationAs() {
     modalStore.setShowCancelButton(true);
   };
 
-  const handleFileNameChange = (event) => {
+  const handleFileNameChange = (event: ChangeEvent<HTMLInputElement>) => {
     const newFileName = event.target.value.trim();
     setModifiedFileName(newFileName);
   };

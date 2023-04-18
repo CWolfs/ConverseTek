@@ -17,26 +17,35 @@ import {
   updateNode,
   updateResponse,
   setResponses,
-  addNodes,
+  // addNodes,
 } from '../../utils/conversation-utils';
 
 import { dataStore } from '../dataStore';
-import { detectType } from '../../utils/node-utils';
+// import { detectType, isNodeLinkType, isNodeType } from '../../utils/node-utils';
+import { NodeType } from 'types/NodeType';
+import { NodeLinkType } from 'types/NodeLinkType';
+import { ConversationAssetType } from 'types/ConversationAssetType';
+import { OperationCallType } from 'types/OperationCallType';
+import { ClipboardType } from 'types/ClipboardType';
 
 /* eslint-disable no-return-assign, no-param-reassign, class-methods-use-this */
 class NodeStore {
-  activeNode;
+  static deleteDeferred = false;
 
-  focusedNode;
-
+  activeNode: NodeType | NodeLinkType | null = null;
+  focusedTreeNode: RSTNode | null = null;
+  ownerId: string | null = null;
+  takenNodeIndexes: number[] = [];
+  expandMap = new Map<string, boolean>();
+  clipboard: ClipboardType | null = null;
+  nodeIdToTreeIndexMap = new Map<string, number>();
   dirtyActiveNode = false;
-
   rebuild = false;
 
   constructor() {
     makeObservable(this, {
       activeNode: observable,
-      focusedNode: observable,
+      focusedTreeNode: observable,
       dirtyActiveNode: observable,
       rebuild: observable,
       setRebuild: action,
@@ -46,13 +55,14 @@ class NodeStore {
       setActiveNodeByIndex: action,
       clearActiveNode: action,
       scrollToNode: action,
-      setFocusedNode: action,
+      setFocusedTreeNode: action,
       clearFocusedNode: action,
-      setClipboard: action,
+      // setClipboard: action,
       clearClipboard: action,
-      pasteAsLinkFromClipboard: action,
-      pasteAsCopyFromClipboard: action,
+      // pasteAsLinkFromClipboard: action,
+      // pasteAsCopyFromClipboard: action,
       setNode: action,
+      setNodeText: action,
       setNodeActions: action,
       addNodeAction: action,
       setNodeConditions: action,
@@ -61,6 +71,7 @@ class NodeStore {
       addNodeByParentId: action,
       addRoot: action,
       setRoots: action,
+      getChildrenFromRoots: action,
       addNode: action,
       addResponse: action,
       setResponses: action,
@@ -71,53 +82,40 @@ class NodeStore {
       deleteLink: action,
       reset: action,
     });
-
-    this.ownerId = null;
-    this.activeNode = null;
-    this.focusedNode = null;
-    this.takenNodeIndexes = [];
-    this.expandMap = new Map();
-    this.clipboard = {
-      node: null,
-      originalNodeId: null,
-      originalNodeIndex: null,
-      nodes: [],
-      nodeIdMap: new Map(),
-    };
-    this.nodeIdToTreeIndexMap = new Map();
-
-    this.processDeletes = this.processDeletes.bind(this);
   }
 
   generateNextNodeIndex() {
     this.takenNodeIndexes = sortBy(this.takenNodeIndexes, (index) => index);
-    const nextNodeIndex = last(this.takenNodeIndexes) + 1 || 0;
+    const lastIndex = last(this.takenNodeIndexes);
+    const nextNodeIndex = lastIndex ? lastIndex + 1 : 0;
     this.takenNodeIndexes.push(nextNodeIndex);
     return nextNodeIndex;
   }
 
-  addNodeIdAndTreeIndexPair(nodeId, index) {
+  addNodeIdAndTreeIndexPair(nodeId: string, index: number) {
     this.nodeIdToTreeIndexMap.set(nodeId, index);
   }
 
-  getTreeIndex(nodeId) {
+  getTreeIndex(nodeId: string) {
     if (this.nodeIdToTreeIndexMap.has(nodeId)) {
       return this.nodeIdToTreeIndexMap.get(nodeId);
     }
     return null;
   }
 
-  setRebuild(flag) {
+  setRebuild(flag: boolean) {
     this.rebuild = flag;
     if (this.rebuild) {
-      defer(() => {
-        this.rebuild = false;
-        if (this.activeNode) this.updateActiveNode(this.activeNode);
-      });
+      defer(
+        action(() => {
+          this.rebuild = false;
+          if (this.activeNode) this.updateActiveNode(this.activeNode);
+        }),
+      );
     }
   }
 
-  init(conversationAsset) {
+  init(conversationAsset: ConversationAssetType) {
     const nextOwnerId = getId(conversationAsset.conversation);
 
     // save the active node if it's the same conversation
@@ -137,15 +135,15 @@ class NodeStore {
    * || ACTIVE NODE METHODS ||
    * =========================
    */
-  updateActiveNode(node) {
-    this.setActiveNode(getId(node), node.type);
+  updateActiveNode(node: NodeType | NodeLinkType) {
+    this.setActiveNode(getId(node));
   }
 
-  setActiveNode(nodeId) {
+  setActiveNode(nodeId: string) {
     this.activeNode = this.getNode(nodeId);
   }
 
-  setActiveNodeByIndex(nodeIndex) {
+  setActiveNodeByIndex(nodeIndex: number) {
     this.activeNode = this.getNodeByIndex(nodeIndex);
   }
 
@@ -163,17 +161,19 @@ class NodeStore {
    * || SCROLL TO  NODE METHODS ||
    * =============================
    */
-  scrollToNode(nodeId, direction, cachedTree) {
+  scrollToNode(nodeId: string, direction: 'up' | 'down', cachedTree?: HTMLElement) {
     // Quickly scroll in the given direction to force the virtual tree to load
     // At the same time check for the required node
     const tree = cachedTree || window.document.querySelector('.ReactVirtualized__Grid');
-    const element = window.document.querySelector(`[data-node-id="${nodeId}"]`);
+    const element = window.document.querySelector(`[data-node-id="${nodeId}"]`) as HTMLElement;
+
+    if (tree == null) throw Error('Tree not found for autoscroll to node. This should not happen.');
 
     // TODO: Stop the scrolling it the top or bottom has been reached
 
     if (element) {
-      const scrollTop = element.offsetParent.offsetParent.offsetTop;
-      const scrollLeft = element.offsetParent.offsetLeft - 50;
+      const scrollTop = ((element.offsetParent as HTMLElement)?.offsetParent as HTMLElement)?.offsetTop;
+      const scrollLeft = (element.offsetParent as HTMLElement)?.offsetLeft - 50;
       tree.scrollTop = scrollTop;
       tree.scrollLeft = scrollLeft;
     } else if (!element) {
@@ -182,7 +182,7 @@ class NodeStore {
       } else if (direction === 'down') {
         tree.scrollTop += 200;
       }
-      defer(() => this.scrollToNode(nodeId, direction, tree));
+      defer(() => this.scrollToNode(nodeId, direction, tree as HTMLElement));
     }
   }
 
@@ -191,12 +191,12 @@ class NodeStore {
    * || FOCUS NODE METHODS ||
    * ========================
    */
-  setFocusedNode(node) {
-    this.focusedNode = node;
+  setFocusedTreeNode(node: RSTNode) {
+    this.focusedTreeNode = node;
   }
 
   clearFocusedNode() {
-    this.focusedNode = null;
+    this.focusedTreeNode = null;
   }
 
   /*
@@ -204,138 +204,156 @@ class NodeStore {
    * || NODE CLIPBOARD METHODS ||
    * ============================
    */
-  setClipboard(nodeId) {
-    const node = toJS(this.getNode(nodeId));
-    const { type } = node;
-    this.clipboard.originalNodeId = nodeId;
-    this.clipboard.originalNodeIndex = node.index;
+  // FIXME: Rewrite copy/pasting/linking
+  // setClipboard(nodeId: string) {
+  //   const tempClipboard: Partial<ClipboardType> = {
+  //     nodeIdMap: new Map<number, number>(),
+  //   };
 
-    const newNodeId = generateId();
-    node.idRef.id = newNodeId;
+  //   const node = toJS(this.getNode(nodeId));
+  //   if (node === null) return;
 
-    const { isNode } = detectType(type);
+  //   tempClipboard.originalNodeId = nodeId;
+  //   tempClipboard.originalNodeIndex = (isNodeType(node) && node.index) || null;
 
-    if (isNode) {
-      const newNodeIndex = this.generateNextNodeIndex();
-      this.clipboard.nodeIdMap.set(node.index, newNodeIndex);
-      node.index = newNodeIndex;
-    }
+  //   const newNodeId = generateId();
+  //   node.idRef.id = newNodeId;
 
-    this.clipboard.node = node;
-    const branches = isNode ? node.branches : [node];
+  //   if (isNodeType(node)) {
+  //     const newNodeIndex = this.generateNextNodeIndex();
+  //     tempClipboard.nodeIdMap?.set(node.index, newNodeIndex);
+  //     node.index = newNodeIndex;
+  //   }
 
-    this.clipboard.nodes = flattenDeep(
-      branches.map((branch) => {
-        const { nextNodeIndex, auxiliaryLink } = branch;
-        const newBranchId = generateId();
-        branch.idRef.id = newBranchId;
-        branch.parentId = newNodeId;
+  //   tempClipboard.node = node;
+  //   const branches = isNodeType(node) ? node.branches : [node];
 
-        // Change link indexes
-        if (nextNodeIndex !== -1 && auxiliaryLink) {
-          const copiedAndUpdatedNodeId = this.clipboard.nodeIdMap.get(branch.nextNodeIndex);
-          if (copiedAndUpdatedNodeId) branch.nextNodeIndex = copiedAndUpdatedNodeId;
-        }
+  //   tempClipboard.nodes = flattenDeep(
+  //     branches.map((branch) => {
+  //       const { nextNodeIndex, auxiliaryLink } = branch;
+  //       const newBranchId = generateId();
+  //       branch.idRef.id = newBranchId;
+  //       branch.parentId = newNodeId;
 
-        if (nextNodeIndex === -1 || auxiliaryLink) return [];
+  //       // Change link indexes
+  //       if (nextNodeIndex !== -1 && auxiliaryLink) {
+  //         const copiedAndUpdatedNodeId = tempClipboard.nodeIdMap?.get(branch.nextNodeIndex);
+  //         if (copiedAndUpdatedNodeId) branch.nextNodeIndex = copiedAndUpdatedNodeId;
+  //       }
 
-        const newNextNodeIndex = this.generateNextNodeIndex();
-        branch.nextNodeIndex = newNextNodeIndex;
-        return this.copyNodesRecursive(nextNodeIndex, newNextNodeIndex, newBranchId);
-      }),
-    );
-  }
+  //       if (nextNodeIndex === -1 || auxiliaryLink) return [];
 
-  copyNodesRecursive(nodeIndex, newNextNodeIndex, newNodeParentId) {
-    const node = toJS(this.getNodeByIndex(nodeIndex));
-    const newNodeId = generateId();
-    node.idRef.id = newNodeId;
+  //       const newNextNodeIndex = this.generateNextNodeIndex();
+  //       branch.nextNodeIndex = newNextNodeIndex;
+  //       return this.copyNodesRecursive(nextNodeIndex, newNextNodeIndex, newBranchId);
+  //     }),
+  //   );
 
-    this.clipboard.nodeIdMap.set(node.index, newNextNodeIndex);
-    node.index = newNextNodeIndex;
-    node.parentId = newNodeParentId;
+  //   this.clipboard = tempClipboard as Clipboard;
+  // }
 
-    const nodes = [
-      node,
-      ...node.branches.map((branch) => {
-        const { nextNodeIndex, auxiliaryLink } = branch;
-        const newBranchId = generateId();
-        branch.idRef.id = newBranchId;
-        branch.parentId = newNodeId;
+  // FIXME: Rewrite copy/pasting/linking as there are known bugs and I can't resolve this type mess
 
-        // Change link indexes
-        if (nextNodeIndex !== -1 && auxiliaryLink) {
-          const linkedNextNodeIndex = this.clipboard.nodeIdMap.get(branch.nextNodeIndex);
+  // copyNodesRecursive(nodeIndex: number, newNextNodeIndex: number, newNodeParentId: string): (NodeType | NodeLinkType)[] {
+  //   if (this.clipboard == null) throw Error('Clipboard is null or undefined. Cannot copy nodes with no clipboard');
 
-          // If the index exists in the copied branch then link to the new node,
-          // otherwise keep the existing link
-          if (linkedNextNodeIndex) {
-            branch.nextNodeIndex = linkedNextNodeIndex;
-          }
-        }
+  //   const node = toJS(this.getNodeByIndex(nodeIndex));
+  //   if (!node) return [];
 
-        if (nextNodeIndex === -1 || auxiliaryLink) return [];
+  //   const newNodeId = generateId();
+  //   node.idRef.id = newNodeId;
 
-        const newNodeIndex = this.generateNextNodeIndex();
-        branch.nextNodeIndex = newNodeIndex;
-        return this.copyNodesRecursive(nextNodeIndex, newNodeIndex, newBranchId);
-      }),
-    ];
-    return nodes;
-  }
+  //   this.clipboard.nodeIdMap.set(node.index, newNextNodeIndex);
+  //   node.index = newNextNodeIndex;
+  //   node.parentId = newNodeParentId;
+
+  //   const nodes: (NodeType | NodeLinkType)[] = [
+  //     node,
+  //     ...node.branches.map((branch: NodeLinkType) => {
+  //       const { nextNodeIndex, auxiliaryLink } = branch;
+  //       const newBranchId = generateId();
+  //       branch.idRef.id = newBranchId;
+  //       branch.parentId = newNodeId;
+
+  //       // Change link indexes
+  //       if (nextNodeIndex !== -1 && auxiliaryLink) {
+  //         const linkedNextNodeIndex = this.clipboard.nodeIdMap.get(branch.nextNodeIndex);
+
+  //         // If the index exists in the copied branch then link to the new node,
+  //         // otherwise keep the existing link
+  //         if (linkedNextNodeIndex) {
+  //           branch.nextNodeIndex = linkedNextNodeIndex;
+  //         }
+  //       }
+
+  //       if (nextNodeIndex === -1 || auxiliaryLink) return [];
+
+  //       const newNodeIndex = this.generateNextNodeIndex();
+  //       branch.nextNodeIndex = newNodeIndex;
+  //       return this.copyNodesRecursive(nextNodeIndex, newNodeIndex, newBranchId);
+  //     }),
+  //   ];
+  //   return nodes;
+  // }
 
   clearClipboard() {
-    this.clipboard = {
-      node: null,
-      originalNodeId: null,
-      originalNodeIndex: null,
-      nodes: null,
-      nodeIdMap: new Map(),
-    };
+    this.clipboard = null;
   }
 
-  pasteAsLinkFromClipboard(nodeId) {
-    const response = this.getNode(nodeId);
-    const { originalNodeIndex } = this.clipboard;
+  // FIXME: Rewrite copy/pasting/linking
+  // pasteAsLinkFromClipboard(nodeId: string) {
+  //   const response = this.getNode(nodeId);
+  //   if (response === null) return;
 
-    response.nextNodeIndex = originalNodeIndex;
-    response.auxiliaryLink = true;
+  //   if (this.clipboard == null) throw Error('Clipboard is null or undefined. Cannot paste as link from clipboard.');
 
-    this.clearClipboard();
-    this.setRebuild(true);
-  }
+  //   const { originalNodeIndex } = this.clipboard;
 
-  pasteAsCopyFromClipboard(nodeId) {
-    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+  //   if ('nextNodeIndex' in response) {
+  //     if (originalNodeIndex) response.nextNodeIndex = originalNodeIndex;
+  //     response.auxiliaryLink = true;
 
-    const node = this.getNode(nodeId);
-    const { node: clipboardNode, nodes: clipboardNodes } = this.clipboard;
-    const { isRoot, isNode, isResponse } = detectType(node.type);
-    const { isNode: clipboardIsNode, isResponse: clipboardIsResponse } = detectType(clipboardNode.type);
+  //     this.clearClipboard();
+  //     this.setRebuild(true);
+  //   }
+  // }
 
-    if (isRoot || isResponse) {
-      // Only allow nodes to be copied in if target is a root or response
-      if (clipboardIsNode) {
-        node.nextNodeIndex = clipboardNode.index;
-        clipboardNode.parentId = nodeId;
-        addNodes(conversationAsset, [clipboardNode, ...clipboardNodes]);
-      } else {
-        console.error('[NodeStore] Cannot copy - wrong node types');
-      }
-    } else if (isNode) {
-      // Only allow response to be copied in
-      if (clipboardIsResponse) {
-        clipboardNode.parentId = nodeId;
-        updateResponse(conversationAsset, node, clipboardNode);
-        addNodes(conversationAsset, clipboardNodes);
-      } else {
-        console.error('[NodeStore] Cannot copy - wrong node types');
-      }
-    }
+  // FIXME: Rewrite copy/pasting/linking
+  // pasteAsCopyFromClipboard(nodeId: string) {
+  //   const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+  //   if (this.clipboard == null) throw Error('Clipboard is null or undefined. Cannot paste as copy from clipboard.');
+  //   if (conversationAsset == null) throw Error('Conversation is null. Cannot paste as copy from cipboard');
 
-    this.clearClipboard();
-    this.setRebuild(true);
-  }
+  //   const node = this.getNode(nodeId);
+  //   if (node == null) throw Error('Node is null.');
+
+  //   const { node: clipboardNode, nodes: clipboardNodes } = this.clipboard;
+  //   const { isRoot, isNode, isResponse } = detectType(node.type);
+
+  //   if (isRoot || isResponse) {
+  //     // Only allow nodes to be copied in if target is a root or response
+  //     if (isNodeType(clipboardNode)) {
+  //       if (!isNodeLinkType(node)) throw Error('Target node for paste as copy is not a NodeLink. It must be a NodeLink.');
+  //       node.nextNodeIndex = clipboardNode.index;
+  //       clipboardNode.parentId = nodeId;
+  //       addNodes(conversationAsset, [clipboardNode, ...(clipboardNodes as NodeType[])]);
+  //     } else {
+  //       console.error('[NodeStore] Cannot copy - wrong node types');
+  //     }
+  //   } else if (isNode) {
+  //     // Only allow response to be copied in
+  //     if (isNodeLinkType(clipboardNode)) {
+  //       clipboardNode.parentId = nodeId;
+  //       updateResponse(conversationAsset, node as NodeType, clipboardNode);
+  //       addNodes(conversationAsset, clipboardNodes as NodeType[]);
+  //     } else {
+  //       console.error('[NodeStore] Cannot copy - wrong node types');
+  //     }
+  //   }
+
+  //   this.clearClipboard();
+  //   this.setRebuild(true);
+  // }
 
   /*
    * ==================
@@ -343,21 +361,34 @@ class NodeStore {
    * ==================
    */
 
-  setNode(node) {
+  setNode(node: NodeType | NodeLinkType) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     const { type } = node;
+
+    if (conversationAsset === null) return;
 
     if (type === 'root') {
       updateRoot(conversationAsset, node);
     } else if (type === 'node') {
       updateNode(conversationAsset, node);
     } else if (type === 'response') {
-      const parentNode = this.getNode(node.parentId);
+      const parentNode = this.getNode(node.parentId) as NodeType;
       updateResponse(conversationAsset, parentNode, node);
     }
   }
 
-  setNodeActions(node, actions) {
+  setNodeText(node: NodeType | NodeLinkType, text: string) {
+    const { type } = node;
+    if (type === 'node') {
+      // FIXME: Implement immutability for nodes
+      node.text = text;
+    } else {
+      // FIXME: Implement immutability for nodes
+      node.responseText = text;
+    }
+  }
+
+  setNodeActions(node: NodeType | NodeLinkType, actions: OperationCallType[] | null) {
     if (actions === null) node.actions = null;
 
     node.actions = {
@@ -365,12 +396,17 @@ class NodeStore {
     };
   }
 
-  addNodeAction(node, nodeAction) {
+  addNodeAction(node: NodeType | NodeLinkType, nodeAction: OperationCallType) {
     const { actions } = node;
-    this.setNodeActions(node, [...actions.ops, nodeAction]);
+
+    if (actions) {
+      this.setNodeActions(node, [...(actions.ops || []), nodeAction]);
+    } else {
+      this.setNodeActions(node, [nodeAction]);
+    }
   }
 
-  setNodeConditions(node, conditions) {
+  setNodeConditions(node: NodeLinkType, conditions: OperationCallType[] | null) {
     if (conditions === null) node.conditions = null;
 
     node.conditions = {
@@ -378,13 +414,22 @@ class NodeStore {
     };
   }
 
-  addNodeCondition(node, nodeCondition) {
+  addNodeCondition(node: NodeLinkType, nodeCondition: OperationCallType) {
     const { conditions } = node;
-    this.setNodeConditions(node, [...conditions.ops, nodeCondition]);
+
+    if (conditions) {
+      this.setNodeConditions(node, [...(conditions.ops || []), nodeCondition]);
+    } else {
+      this.setNodeConditions(node, [nodeCondition]);
+    }
   }
 
-  getNode(nodeId) {
+  getNode(nodeId: string | undefined): NodeType | NodeLinkType | null {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+    if (!conversationAsset) {
+      throw Error('Unsaved conversation is null or undefined');
+    }
+
     const { roots, nodes } = conversationAsset.conversation;
 
     const root = roots.find((r) => getId(r) === nodeId);
@@ -397,23 +442,29 @@ class NodeStore {
       if (branch) return true;
       return false;
     });
+
     if (branch) return branch;
     if (node) return node;
 
     return null;
   }
 
-  getNodeByIndex(index) {
+  getNodeByIndex(index: number) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+    if (conversationAsset === null) return null;
+
     const { nodes } = conversationAsset.conversation;
 
     const node = nodes.find((n) => n.index === index);
     if (node) return node;
+
     return null;
   }
 
-  removeNode(node, immediate = false) {
+  removeNode(node: NodeType | NodeLinkType, immediate = false) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+    if (conversationAsset === null) return;
+
     const { roots, nodes } = conversationAsset.conversation;
     const { type } = node;
     const nodeId = getId(node);
@@ -446,8 +497,10 @@ class NodeStore {
     }
   }
 
-  processDeletes() {
+  processDeletes = () => {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+    if (conversationAsset === null) return;
+
     const { roots, nodes } = conversationAsset.conversation;
 
     nodes.forEach((n) => {
@@ -461,9 +514,9 @@ class NodeStore {
       NodeStore.deleteDeferred = false;
       this.setRebuild(true);
     });
-  }
+  };
 
-  addNodeByParentId(parentId) {
+  addNodeByParentId(parentId: string) {
     const parent = this.getNode(parentId);
 
     if (parent === undefined || parent === null) {
@@ -483,24 +536,29 @@ class NodeStore {
 
   addRoot() {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+    if (conversationAsset === null) return;
 
     const root = createRoot();
-    root.parentId = 0;
+    root.parentId = '0';
     updateRoot(conversationAsset, root);
 
     this.updateActiveNode(root);
     this.setRebuild(true);
   }
 
-  setRoots(rootIds) {
+  setRoots(rootIds: string[]) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+    if (conversationAsset === null) return;
+
     const roots = rootIds.map((rootId) => this.getNode(rootId));
-    setRootsUtil(conversationAsset, roots);
+    setRootsUtil(conversationAsset, roots as NodeLinkType[]);
   }
 
-  addNode(parent) {
+  addNode(parent: NodeLinkType) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     const { nextNodeIndex: existingNextNodeIndex } = parent;
+
+    if (conversationAsset === null) return;
 
     if (existingNextNodeIndex === -1) {
       const nextNodeIndex = this.generateNextNodeIndex();
@@ -511,7 +569,7 @@ class NodeStore {
       if (parent.type === 'root') {
         updateRoot(conversationAsset, parent);
       } else if (parent.type === 'response') {
-        const grandParentNode = this.getNode(parent.parentId);
+        const grandParentNode = this.getNode(parent.parentId) as NodeType;
         updateResponse(conversationAsset, grandParentNode, parent);
       }
 
@@ -524,8 +582,9 @@ class NodeStore {
     }
   }
 
-  addResponse(parent) {
+  addResponse(parent: NodeType) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+    if (conversationAsset === null) return;
 
     const response = createResponse();
     response.parentId = getId(parent);
@@ -535,14 +594,16 @@ class NodeStore {
     this.setRebuild(true);
   }
 
-  setResponses(parentId, responseIds) {
+  setResponses(parentId: string, responseIds: string[]) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-    const responses = responseIds.map((responseId) => this.getNode(responseId));
-    const parent = this.getNode(parentId);
+    if (conversationAsset === null) return;
+
+    const responses = responseIds.map((responseId) => this.getNode(responseId)) as NodeLinkType[];
+    const parent = this.getNode(parentId) as NodeType;
     setResponses(conversationAsset, parent, responses);
   }
 
-  deleteNodeCascadeById(id) {
+  deleteNodeCascadeById(id: string) {
     const node = this.getNode(id);
     if (node) {
       this.deleteNodeCascade(node);
@@ -553,13 +614,15 @@ class NodeStore {
   /*
    * Ensures that any node that refers to an id specified now points to 'END OF DIALOG' (-1)
    */
-  cleanUpDanglingResponseIndexes(idToClean) {
+  cleanUpDanglingResponseIndexes(indexToClean: number) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+    if (conversationAsset === null) return;
+
     const { roots, nodes } = conversationAsset.conversation;
 
     roots.forEach((root) => {
       const { nextNodeIndex } = root;
-      if (nextNodeIndex === idToClean) {
+      if (nextNodeIndex === indexToClean) {
         root.nextNodeIndex = -1;
       }
     });
@@ -569,14 +632,14 @@ class NodeStore {
 
       branches.forEach((branch) => {
         const { nextNodeIndex } = branch;
-        if (nextNodeIndex === idToClean) {
+        if (nextNodeIndex === indexToClean) {
           branch.nextNodeIndex = -1;
         }
       });
     });
   }
 
-  deleteNodeCascade(node) {
+  deleteNodeCascade(node: NodeType | NodeLinkType) {
     if (node.type === 'node') {
       const { index, branches } = node;
       branches.forEach((branch) => {
@@ -598,7 +661,7 @@ class NodeStore {
     }
   }
 
-  deleteBranchCascade(branch) {
+  deleteBranchCascade(branch: NodeLinkType) {
     const { auxiliaryLink } = branch;
 
     if (!auxiliaryLink) {
@@ -610,14 +673,14 @@ class NodeStore {
     this.removeNode(branch);
   }
 
-  deleteLink(parentId) {
-    const node = this.getNode(parentId);
+  deleteLink(parentId: string) {
+    const node = this.getNode(parentId) as NodeLinkType;
     node.nextNodeIndex = -1;
     node.auxiliaryLink = false;
     this.setRebuild(true);
   }
 
-  getChildrenFromRoots(roots) {
+  getChildrenFromRoots(roots: NodeLinkType[]) {
     return roots.map((root) => {
       const rootId = getId(root);
       const isExpanded = this.isNodeExpanded(rootId);
@@ -634,22 +697,26 @@ class NodeStore {
     });
   }
 
-  setNodeExpansion(nodeId, flag) {
+  setNodeExpansion(nodeId: string | undefined, flag: boolean) {
+    if (!nodeId) return;
+
     this.expandMap.set(nodeId, flag);
   }
 
-  isNodeExpanded(nodeId) {
+  isNodeExpanded(nodeId: string | undefined) {
+    if (!nodeId) return false;
+
     const isNodeExpanded = this.expandMap.get(nodeId);
     if (isNodeExpanded === undefined) return true;
     return isNodeExpanded;
   }
 
-  getNodeResponseIdsFromNodeId(nodeId) {
-    const node = this.getNode(nodeId);
+  getNodeResponseIdsFromNodeId(nodeId: string) {
+    const node = this.getNode(nodeId) as NodeType;
     return this.getNodeResponseIds(node);
   }
 
-  getNodeResponseIds(node) {
+  getNodeResponseIds(node: NodeType) {
     return node.branches.map((branch) => getId(branch));
   }
 
@@ -658,7 +725,7 @@ class NodeStore {
    * || DIALOG TREE DATA BUILDING METHODS ||
    * =======================================
    */
-  getChildren(node) {
+  getChildren(node: NodeLinkType): RSTNode[] | null {
     const { nextNodeIndex } = node; // root or response/branch
 
     // GUARD - End of branch so this would be tagged as a DIALOG END node
@@ -687,7 +754,7 @@ class NodeStore {
         type: 'node',
         expanded: isChildExpanded,
 
-        children: childNode.branches.map((branch) => {
+        children: childNode.branches.map((branch): RSTNode => {
           const { auxiliaryLink } = branch;
           const branchNodeId = getId(branch);
           const isBranchExpanded = this.isNodeExpanded(branchNodeId);
@@ -696,15 +763,17 @@ class NodeStore {
           branch.parentId = childNodeId;
 
           const isValidLink = auxiliaryLink && branch.nextNodeIndex !== -1;
-          let branchChildren = [];
+          let branchChildren: RSTNode[] | null = [];
 
           if (auxiliaryLink) {
             if (isValidLink) {
+              const linkNode = this.getNodeByIndex(branch.nextNodeIndex);
+
               branchChildren = [
                 {
                   title: `[Link to NODE ${branch.nextNodeIndex}]`,
                   type: 'link',
-                  linkId: getId(this.getNodeByIndex(branch.nextNodeIndex)),
+                  linkId: linkNode ? getId(linkNode) : null,
                   linkIndex: branch.nextNodeIndex,
                   canDrag: false,
                   parentId: branchNodeId,
@@ -729,14 +798,11 @@ class NodeStore {
   }
 
   reset = () => {
-    this.focusedNode = null;
+    this.focusedTreeNode = null;
     this.takenNodeIndexes = [];
     this.nodeIdToTreeIndexMap.clear();
   };
 }
-
-/* Statics */
-NodeStore.deleteDeferred = false;
 
 export const nodeStore = new NodeStore();
 

@@ -4,17 +4,18 @@ import React, { useEffect } from 'react';
 import packageJson from 'package.json';
 
 import { useStore } from 'hooks/useStore';
+import { ModalStore } from 'stores/modalStore/modal-store';
 
 import './About.css';
 
 export function About() {
-  const modalStore = useStore('modal');
+  const modalStore = useStore<ModalStore>('modal');
 
-  const onOk = () => {
+  const onOk = (): void => {
     modalStore.closeModal();
   };
 
-  const setupModal = () => {
+  const setupModal = (): void => {
     modalStore.setOnOk(onOk);
     modalStore.setTitle('About ConverseTek');
     modalStore.setOkLabel('Ok');

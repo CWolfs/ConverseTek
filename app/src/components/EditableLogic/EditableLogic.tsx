@@ -3,26 +3,61 @@
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable operator-linebreak */
 import React from 'react';
-import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Icon, Tooltip } from 'antd';
+import { SelectValue } from 'antd/lib/select';
 
 import { useStore } from 'hooks/useStore';
+import { DefStore } from 'stores/defStore/def-store';
+import { OperationCallType } from 'types/OperationCallType';
+import { InputType, InputTypeType, InputTypeTypes, InputValueType, OperationDefinitionType } from 'types/OperationDefinition';
+import { OperationArgType } from 'types/OperationArgType';
+import { tryParseInt } from 'utils/number-utils';
 
 import { EditableSelect } from '../EditableSelect';
 import { EditableInput } from '../EditbleInput';
 
 import './EditableLogic.css';
 
-function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInput, parentArg }) {
-  const defStore = useStore('def');
+type Props = {
+  scope?: 'all' | 'action' | 'condition';
+  category: 'primary' | 'secondary';
+  logic: OperationCallType;
+  isEven?: boolean;
+  parentLogic?: OperationCallType | null;
+  parentInput?: InputType | null;
+  parentArg?: OperationArgType | null;
+};
 
-  const renderLogic = (logicDef) => {
+type ValueProps = {
+  optionLabelProp: string | null;
+  options: ({ text: string; value: string | number } | string)[] | null;
+};
+
+function getValueProps(values: InputValueType[] | undefined): ValueProps {
+  const valueProps: ValueProps = {
+    optionLabelProp: null,
+    options: null,
+  };
+
+  if (values) {
+    valueProps.optionLabelProp = 'value';
+    valueProps.options = values.map((value) => ({ text: value.text, value: value.value })) || null;
+  }
+
+  return valueProps;
+}
+
+function EditableLogic({ scope = 'all', category, logic, isEven = false, parentLogic = null, parentInput = null, parentArg = null }: Props) {
+  const defStore = useStore<DefStore>('def');
+
+  const renderLogic = (logicDef: OperationDefinitionType) => {
     const operations = defStore.getOperations(category, scope);
     const { functionName } = logic;
+    const { tooltip } = logicDef;
+
     const parentArgValue = defStore.getArgValue(parentArg);
-    const { Tooltip: tooltip } = logicDef;
 
     const tooltipContent = tooltip ? (
       <Tooltip title={tooltip}>
@@ -33,12 +68,14 @@ function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInpu
     const typeSelector =
       parentInput && parentArg ? (
         <EditableSelect
-          value={parentArgValue.type}
-          options={parentInput.Types}
+          value={parentArgValue ? parentArgValue.type : parentArgValue}
+          options={parentInput.types}
           placeholder="Select a type"
           style={{ width: 120 }}
-          onChange={(value) => {
-            defStore.setArgType(parentLogic, parentArg, value);
+          onChange={(value: SelectValue) => {
+            if (typeof value === 'string' && InputTypeTypes.includes(value as InputTypeType)) {
+              if (parentLogic) defStore.setArgType(parentLogic, parentArg, value as InputTypeType);
+            }
           }}
         />
       ) : null;
@@ -48,8 +85,8 @@ function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInpu
         value={functionName}
         options={operations}
         placeholder="Select an operation"
-        onChange={(value) => {
-          defStore.setOperation(logic, value);
+        onChange={(value: SelectValue) => {
+          if (typeof value === 'string') defStore.setOperation(logic, value);
         }}
       />
     );
@@ -63,17 +100,21 @@ function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInpu
     );
   };
 
-  const renderInputsAndArgs = (logicDef) => {
+  const renderInputsAndArgs = (logicDef: OperationDefinitionType) => {
     const { functionName, args } = logic;
-    const { Key: logicDefKey, Inputs: inputs } = logicDef;
+    const { key: logicDefKey, inputs } = logicDef;
 
     return inputs.map((input, index) => {
-      const { Label: label, Types: types, Values: values, Tooltip: tooltip } = input;
-      const arg = args.length > index ? args[index] : null;
+      const { label, types, values, tooltip, defaultValue = null } = input;
+      const arg = args.length > index ? args[index] : defStore.createNewArg(types[0], defaultValue);
       const argValue = defStore.getArgValue(arg);
       let content = null;
 
+      if (argValue == null) throw Error('Arg value is null or undefined');
+
       const { type: argType, value: argVal } = argValue;
+
+      if (argVal == null) throw Error("Arg value is null or undefined. This shouldn't be the case");
 
       let argsContainerClasses = classnames('editable-logic__args-container');
       argsContainerClasses = classnames(argsContainerClasses, {
@@ -92,26 +133,20 @@ function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInpu
         <EditableSelect
           key={key}
           value={argValue.type}
-          options={input.Types}
+          options={input.types}
           placeholder="Select a type"
           style={{ width: 120 }}
-          onChange={(value) => {
-            defStore.setArgType(logic, arg, value);
+          onChange={(value: SelectValue) => {
+            if (typeof value === 'string' && InputTypeTypes.includes(value as InputTypeType)) {
+              defStore.setArgType(logic, arg, value as InputTypeType);
+            }
           }}
         />
       ) : null;
 
       if (argType === 'operation' && types.includes('operation')) {
         content = (
-          <EditableLogic
-            defStore={defStore}
-            logic={argVal}
-            category="secondary"
-            isEven={!isEven}
-            parentLogic={logic}
-            parentInput={input}
-            parentArg={arg}
-          />
+          <ObservingEditableLogic logic={argVal} category="secondary" isEven={!isEven} parentLogic={logic} parentInput={input} parentArg={arg} />
         );
       } else if (argType === 'operation' && !types.includes('operation')) {
         console.error(`[EditableLogic] Argument and input type mismatch for ${label}`);
@@ -121,6 +156,8 @@ function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInpu
         if (argVal !== null) {
           if (argType === 'string' && types.includes('string')) {
             if (logicDefKey.includes('Preset')) {
+              if (parentLogic == null) throw Error('parentLogic is null or undefined. This should not happen');
+
               const presetKey = `${parentLogic.functionName}-${functionName}`.replace(/\s/g, '');
               content = (
                 <section className="editable-logic__arg">
@@ -130,18 +167,13 @@ function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInpu
                     value={argVal}
                     options={defStore.getPresetKeys()}
                     onChange={(value) => {
-                      defStore.setArgValue(logic, arg, value);
+                      defStore.setArgValue(logic, arg, value as string);
                     }}
                   />
                 </section>
               );
             } else {
-              const valueProps = {};
-
-              if (values) {
-                valueProps.optionLabelProp = 'value';
-                valueProps.options = values.map((value) => ({ text: value.Text, value: value.Value }));
-              }
+              const valueProps = getValueProps(values);
 
               content = (
                 <section className="editable-logic__arg">
@@ -149,7 +181,7 @@ function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInpu
                   <EditableInput
                     value={argVal}
                     onChange={(value) => {
-                      defStore.setArgValue(logic, arg, value);
+                      defStore.setArgValue(logic, arg, value as string);
                     }}
                     {...valueProps}
                   />
@@ -160,6 +192,9 @@ function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInpu
             if (logicDefKey.includes('Preset')) {
               const presetArg = args[0];
               const presetArgValue = defStore.getArgValue(presetArg);
+
+              if (presetArgValue == null) throw Error('Present Arg Value is null or undefined');
+
               const { value: presetValue } = presetArgValue;
 
               content = (
@@ -167,22 +202,22 @@ function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInpu
                   {content}
                   <EditableInput
                     value={typeof argVal === 'number' ? argVal.toString() : argVal}
-                    options={defStore.getPresetValuesForOptions(presetValue)}
+                    options={defStore.getPresetValuesForOptions(presetValue as string)}
                     onChange={(value) => {
-                      defStore.setArgValue(logic, arg, value);
+                      if (typeof value === 'string') {
+                        const parsedValue = tryParseInt(value, 0);
+                        defStore.setArgValue(logic, arg, parsedValue);
+                      } else {
+                        defStore.setArgValue(logic, arg, value as number);
+                      }
                     }}
                     optionLabelProp="value"
-                    valueLabel={defStore.getPresetValue(presetValue, argVal)}
+                    valueLabel={defStore.getPresetValue(presetValue as string, argVal)}
                   />
                 </section>
               );
             } else {
-              const valueProps = {};
-
-              if (values) {
-                valueProps.optionLabelProp = 'value';
-                valueProps.options = values.map((value) => ({ text: value.Text, value: value.Value }));
-              }
+              const valueProps = getValueProps(values);
 
               content = (
                 <section className="editable-logic__arg">
@@ -190,7 +225,12 @@ function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInpu
                   <EditableInput
                     value={typeof argVal === 'number' ? argVal.toString() : argVal}
                     onChange={(value) => {
-                      defStore.setArgValue(logic, arg, value);
+                      if (typeof value === 'string') {
+                        const parsedValue = tryParseInt(value, 0);
+                        defStore.setArgValue(logic, arg, parsedValue);
+                      } else {
+                        defStore.setArgValue(logic, arg, value as number);
+                      }
                     }}
                     {...valueProps}
                   />
@@ -205,7 +245,7 @@ function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInpu
         }
       }
 
-      if (!content) content = <div>Unprocessed Input: {input.Label}</div>;
+      if (!content) content = <div>Unprocessed Input: {input.label}</div>;
 
       return (
         <div className={argsContainerClasses} key={index}>
@@ -243,23 +283,5 @@ function EditableLogic({ scope, category, logic, isEven, parentLogic, parentInpu
     </div>
   );
 }
-
-EditableLogic.defaultProps = {
-  scope: 'all',
-  isEven: false,
-  parentLogic: null,
-  parentInput: null,
-  parentArg: null,
-};
-
-EditableLogic.propTypes = {
-  parentLogic: PropTypes.object,
-  parentInput: PropTypes.object,
-  parentArg: PropTypes.object,
-  logic: PropTypes.object.isRequired,
-  scope: PropTypes.string,
-  category: PropTypes.string.isRequired,
-  isEven: PropTypes.bool,
-};
 
 export const ObservingEditableLogic = observer(EditableLogic);

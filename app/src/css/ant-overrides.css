@@ -192,6 +192,10 @@
   border-top-color: gold;
 }
 
+.ant-tooltip-placement-left .ant-tooltip-arrow {
+  border-left-color: gold;
+}
+
 .ant-input::-webkit-input-placeholder {
   font-style: italic;
   color: #ffffff2e;

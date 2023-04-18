@@ -2,9 +2,13 @@ import { consolidateSpeaker, fillIndexGaps } from 'utils/conversation-utils';
 
 import { get, post } from './rest';
 
-import { dataStore, defStore } from '../stores';
-import { fullConversationAssetMapping, mapToType } from './mappings/mapping';
 import { ConversationAssetType } from 'types/ConversationAssetType';
+import { DefinitionsType } from 'types/DefinitionsType';
+
+import { dataStore, defStore } from '../stores';
+import { JsonValue, fullConversationAssetMapping, lowercasePropertyNames, mapToType, reversedFullConversationAssetMapping } from './mappings/mapping';
+import { FileSystemItemType } from 'types/FileSystemItemType';
+import { QuickLinkType } from 'types/QuickLinkType';
 
 /*
  * CHROMELY DOESN'T SUPPORT PUTS SO PUTS AND DELETES ARE CURRENTLY POSTS WITH method DATA
@@ -28,7 +32,6 @@ export default function noop() {
 export function getConversations(): Promise<any> {
   return get('/conversations').then((conversations: object[]): ConversationAssetType[] => {
     const typedConversations = conversations.map((conversation) => mapToType<ConversationAssetType>(conversation, fullConversationAssetMapping));
-    console.log('typed conversations are: ', typedConversations);
     dataStore.setConversations(typedConversations);
     return typedConversations;
   });
@@ -37,11 +40,16 @@ export function getConversations(): Promise<any> {
 export function updateConversation(id: string, conversationAsset: ConversationAssetType): Promise<any> {
   consolidateSpeaker(conversationAsset);
   fillIndexGaps(conversationAsset);
-  return post('/conversations/put', { id }, { method: 'PUT', conversationAsset }).then((conversations: object[]): ConversationAssetType[] => {
-    const typedConversations = conversations.map((conversation) => mapToType<ConversationAssetType>(conversation, fullConversationAssetMapping));
-    dataStore.setConversations(typedConversations);
-    return typedConversations;
-  });
+
+  const apiMappedConversation = mapToType<object>(conversationAsset, reversedFullConversationAssetMapping);
+
+  return post('/conversations/put', { id }, { method: 'PUT', conversationAsset: apiMappedConversation }).then(
+    (conversations: object[]): ConversationAssetType[] => {
+      const typedConversations = conversations.map((conversation) => mapToType<ConversationAssetType>(conversation, fullConversationAssetMapping));
+      dataStore.setConversations(typedConversations);
+      return typedConversations;
+    },
+  );
 }
 
 export function exportConversation(id: string, conversationAsset: ConversationAssetType): Promise<any> {
@@ -66,15 +74,21 @@ export function importConversation(path: string): Promise<any> {
  =========================
 */
 export function getRootDrives(): Promise<any> {
-  return get('/filesystem');
+  return get('/filesystem').then((directories: JsonValue): FileSystemItemType[] => lowercasePropertyNames(directories, true) as FileSystemItemType[]);
 }
 
 export function getDirectories(path: string, includeFiles = false): Promise<any> {
-  return get('/directories', { path, includeFiles });
+  return get('/directories', { path, includeFiles }).then((directories: JsonValue) => lowercasePropertyNames(directories, true));
 }
 
 export function getQuickLinks() {
-  return get('/quicklinks');
+  return get('/quicklinks').then((quickLinks: [string, string]) => {
+    const entries: QuickLinkType[] = [];
+    for (const [key, value] of Object.entries(quickLinks)) {
+      entries.push({ title: key, path: value } as QuickLinkType);
+    }
+    return entries;
+  });
 }
 
 export function saveWorkingDirectory(path: string) {
@@ -88,8 +102,9 @@ export function saveWorkingDirectory(path: string) {
  =========================
 */
 export function getDefinitions(): Promise<any> {
-  return get('/definitions').then((definitions): any[] => {
-    defStore.setDefinitions(definitions);
-    return definitions;
+  return get('/definitions').then((definitions: JsonValue): DefinitionsType => {
+    const typedDefinitions = lowercasePropertyNames(definitions) as DefinitionsType;
+    defStore.setDefinitions(typedDefinitions);
+    return typedDefinitions;
   });
 }

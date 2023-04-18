@@ -5,12 +5,18 @@ import values from 'lodash.values';
 import { createArg } from 'utils/def-utils';
 import { tryParseInt, tryParseFloat } from 'utils/number-utils';
 import { ConversationAssetType } from 'types/ConversationAssetType';
+import { OperationCallType } from 'types/OperationCallType';
+import { OperationArgType } from 'types/OperationArgType';
+import { DefinitionsType } from 'types/DefinitionsType';
+import { DefaultInputValueType, InputType, InputTypeType, OperationDefinitionType } from 'types/OperationDefinition';
+import { PresetDefinitionType } from 'types/PresetDefinition';
+import { TagDefinitionType } from 'types/TagDefinition';
 
 /* eslint-disable class-methods-use-this, no-param-reassign */
 class DefStore {
-  public operations = [];
-  public presets = [];
-  public tags = [];
+  public operations: OperationDefinitionType[] = [];
+  public presets: PresetDefinitionType[] = [];
+  public tags: TagDefinitionType[] = [];
   public definitionCount = 0;
 
   constructor() {
@@ -33,7 +39,7 @@ class DefStore {
     });
   }
 
-  setLogicTypeByConversation(conversationAsset: ConversationAssetType) {
+  setLogicTypeByConversation(conversationAsset: ConversationAssetType): void {
     const { conversation } = conversationAsset;
     const { roots, nodes } = conversation;
 
@@ -41,7 +47,7 @@ class DefStore {
       // Root Operations
       if (root.conditions && root.conditions.ops) {
         const operations = root.conditions.ops;
-        operations.forEach((operation) => {
+        operations.forEach((operation): void => {
           this.setLogicTypeByOperation(operation);
         });
       }
@@ -49,7 +55,7 @@ class DefStore {
       // Root Actions
       if (root.actions && root.actions.ops) {
         const operations = root.actions.ops;
-        operations.forEach((operation) => {
+        operations.forEach((operation): void => {
           this.setLogicTypeByOperation(operation);
         });
       }
@@ -59,7 +65,7 @@ class DefStore {
       // Node Actions
       if (node.actions && node.actions.ops) {
         const operations = node.actions.ops;
-        operations.forEach((operation) => {
+        operations.forEach((operation): void => {
           this.setLogicTypeByOperation(operation);
         });
       }
@@ -71,7 +77,7 @@ class DefStore {
           // Branch Conditions
           if (response.conditions && response.conditions.ops) {
             const operations = response.conditions.ops;
-            operations.forEach((operation) => {
+            operations.forEach((operation): void => {
               this.setLogicTypeByOperation(operation);
             });
           }
@@ -79,7 +85,7 @@ class DefStore {
           // Branch Actions
           if (response.actions && response.actions.ops) {
             const operations = response.actions.ops;
-            operations.forEach((operation) => {
+            operations.forEach((operation): void => {
               this.setLogicTypeByOperation(operation);
             });
           }
@@ -88,15 +94,20 @@ class DefStore {
     });
   }
 
-  setLogicTypeByOperation(operation) {
+  setLogicTypeByOperation(operation: OperationCallType): void {
     const { args } = operation;
     const logicDef = this.getDefinition(operation);
-    const { Inputs: inputs } = logicDef;
+
+    if (!logicDef) {
+      throw Error(`Operation Definition not found for operation: ${operation.functionName}`);
+    }
+
+    const { inputs } = logicDef;
 
     args.forEach((arg, index) => {
       let rawType = this.getRawArgType(arg);
       const input = inputs[index];
-      const { Types: types } = input;
+      const { types } = input;
 
       types.some((type) => {
         if (type === 'operation') {
@@ -165,7 +176,7 @@ class DefStore {
     });
   }
 
-  setDefinitions(definitions) {
+  setDefinitions(definitions: DefinitionsType): void {
     const { operations, presets, tags } = definitions;
 
     this.reset();
@@ -177,24 +188,25 @@ class DefStore {
     this.definitionCount = this.operations.length + this.presets.length + this.tags.length;
   }
 
-  getDefinition(condition) {
+  getDefinition(condition: OperationCallType): OperationDefinitionType | null {
     const { functionName } = condition;
     return this.getDefinitionByName(functionName);
   }
 
-  getDefinitionByName(functionName) {
-    const definition = this.operations.find((operation) => operation.Key === functionName);
+  getDefinitionByName(functionName: string): OperationDefinitionType | null {
+    const definition = this.operations.find((operation) => operation.key === functionName);
     if (!definition) {
       console.error(`No operation definition found with functionName '${functionName}'`);
+      return null;
     }
     return definition;
   }
 
-  getOperations(category, scope = 'all') {
-    return this.operations.filter((operation) => operation.Category === category && (operation.Scope === scope || scope === 'all'));
+  getOperations(category: 'primary' | 'secondary', scope = 'all'): OperationDefinitionType[] {
+    return this.operations.filter((operation) => operation.category === category && (operation.scope === scope || scope === 'all'));
   }
 
-  getRawArgType(arg) {
+  getRawArgType(arg: OperationArgType): 'operation' | 'string' | 'float' | 'int' {
     const { intValue, boolValue, floatValue, stringValue, callValue, variableRefValue } = arg;
 
     // Use same logic BT uses
@@ -204,8 +216,8 @@ class DefStore {
     return 'int';
   }
 
-  getArgValue(arg) {
-    if (arg === null || arg === undefined) return { type: null, value: null };
+  getArgValue(arg: OperationArgType | null) {
+    if (arg == null) return { type: null, value: null };
 
     const { intValue, boolValue, floatValue, stringValue, callValue, variableRefValue, type } = arg;
 
@@ -216,14 +228,32 @@ class DefStore {
       if (type === 'int') return { type, value: intValue };
     }
 
-    return null;
+    return { type: null, value: null };
   }
 
-  setArgType(logic, arg, type) {
+  createNewArg(type: InputTypeType, defaultValue: DefaultInputValueType = null) {
+    return {
+      boolValue: false,
+      callValue: null,
+      floatValue: type === 'float' && defaultValue != null ? Number(defaultValue) : 0,
+      intValue: type === 'int' && defaultValue != null ? Number(defaultValue) : 0,
+      stringValue: type === 'string' && defaultValue != null ? defaultValue : '',
+      type,
+      variableRefValue: null,
+    };
+  }
+
+  setArgType(logic: OperationCallType, arg: OperationArgType, type: InputTypeType) {
     const { args } = logic;
     const argValue = this.getArgValue(arg);
+
+    if (argValue === null) {
+      throw Error('ArgValue is null. This is an error.');
+    }
+
     const { type: previousType, value: previousValue } = argValue;
 
+    // FIXME: Consider better immutability instead of modifying existing props
     if (previousType !== type) {
       if (previousType === 'operation') arg.callValue = null;
       if (previousType === 'string') arg.stringValue = '';
@@ -235,39 +265,53 @@ class DefStore {
         this.setOperation(arg.callValue, arg.callValue.functionName);
       }
 
-      if (type === 'string') arg.stringValue = previousValue && !previousValue.functionName ? previousValue.toString() : '';
+      if (type === 'string') arg.stringValue = previousValue && !(typeof previousValue === 'object') ? previousValue.toString() : '';
 
       if (previousType === 'float' || previousType === 'int' || previousType === 'string') {
-        if (type === 'float') arg.floatValue = tryParseFloat(previousValue, 0.0);
-        if (type === 'int') arg.intValue = tryParseInt(previousValue, 0);
+        if (type === 'float') arg.floatValue = tryParseFloat(previousValue as string, 0.0);
+        if (type === 'int') arg.intValue = tryParseInt(previousValue as string, 0);
       }
 
       arg.type = type;
-
-      logic.args.replace(args);
+      logic.args = [...args];
     }
   }
 
-  setArgValue(logic, arg, value) {
+  setArgValue(logic: OperationCallType, arg: OperationArgType, value: OperationCallType | string | number) {
     const { args } = logic;
     const argValue = this.getArgValue(arg);
+
+    if (!argValue) {
+      throw Error('ArgValue is null');
+    }
+
     const { type } = argValue;
 
-    if (type === 'operation') arg.callValue = value;
-    if (type === 'string') arg.stringValue = value;
-    if (type === 'float') arg.floatValue = value;
-    if (type === 'int') arg.intValue = value;
+    // FIXME: Consider better immutability instead of modifying existing props
+    if (type === 'operation') arg.callValue = value as OperationCallType;
+    if (type === 'string') arg.stringValue = value as string;
+    if (type === 'float') arg.floatValue = value as number;
+    if (type === 'int') arg.intValue = value as number;
 
     arg.type = type;
 
-    logic.args.replace(args);
+    // Workaround for bad code design in CT. Lack of immutability causes problems for newly introduced args
+    if (!logic.args.find((storedArg) => storedArg === arg)) {
+      args.push(arg);
+    }
+
+    logic.args = [...args];
   }
 
-  setOperation(logic, value) {
+  setOperation(logic: OperationCallType, value: string) {
     const { args } = logic;
     const logicDef = this.getDefinitionByName(value);
-    const { Inputs: inputs } = logicDef;
 
+    if (!logicDef) {
+      throw Error(`Operation Definition not found for name '${value}'`);
+    }
+
+    const { inputs } = logicDef;
     logic.functionName = value;
 
     if (args.length > inputs.length) {
@@ -276,7 +320,7 @@ class DefStore {
       inputs.forEach((input, index) => {
         if (args.length <= index) {
           const newArg = createArg();
-          const { Types: types } = input;
+          const { types } = input;
 
           if (types.includes('operation')) {
             // favour: operation, string, float, int
@@ -304,8 +348,8 @@ class DefStore {
     return logic;
   }
 
-  resetArg(input, arg) {
-    const { Types: types } = input;
+  resetArg(input: InputType, arg: OperationArgType) {
+    const { types } = input;
 
     arg.callValue = null;
     arg.stringValue = '';
@@ -325,44 +369,50 @@ class DefStore {
     }
   }
 
-  getPresetValue(key, value) {
-    const preset = this.presets.find((p) => p.Key === key);
+  getPresetValue(key: string, value: string | number): string {
+    const preset = this.presets.find((p) => p.key === key);
     if (preset === undefined) return '[BAD PRESET VALUE]';
-    return preset.Values[value.toString()];
+    return preset.values[value.toString()];
   }
 
-  getPresetValuePairs(key) {
-    const preset = this.presets.find((p) => p.Key === key);
+  getPresetValuePairs(key: string): {
+    [key: string]: string;
+  } | null {
+    const preset = this.presets.find((p) => p.key === key);
     if (preset === undefined) return null;
-    return preset.Values;
+    return preset.values;
   }
 
-  getPresetValues(key) {
-    const preset = this.presets.find((p) => p.Key === key);
+  getPresetValues(key: string): string[] | null {
+    const preset = this.presets.find((p) => p.key === key);
     if (preset === undefined) return null;
-    return values(preset.Values);
+    return values(preset.values);
   }
 
-  getPresetValuesForOptions(key) {
-    const preset = this.presets.find((p) => p.Key === key);
+  getPresetValuesForOptions(key: string): { text: string; value: string }[] | null {
+    const preset = this.presets.find((p) => p.key === key);
     if (preset === undefined) return null;
 
-    const presetKeys = keys(preset.Values);
-    const presetValues = values(preset.Values);
+    const presetKeys = keys(preset.values);
+    const presetValues = values(preset.values);
 
     const options = presetKeys.map((k, index) => ({ text: presetValues[index], value: k }));
 
     return options;
   }
 
-  getPresetKeys() {
-    return this.presets.map((p) => p.Key);
+  getPresetKeys(): string[] {
+    return this.presets.map((p) => p.key);
   }
 
   reset = () => {
-    this.operations.clear();
-    this.presets.clear();
-    this.tags.clear();
+    // this.operations.clear();
+    // this.presets.clear();
+    // this.tags.clear();
+    // TODO: Watch this for breaking reactivity
+    this.operations = [];
+    this.presets = [];
+    this.tags = [];
     this.definitionCount = 0;
   };
 }

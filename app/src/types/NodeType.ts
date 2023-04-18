@@ -1,5 +1,5 @@
 import { NodeLinkType } from './NodeLinkType';
-import { OperationType } from './OperationType';
+import { OperationCallType } from './OperationCallType';
 
 /** NodeLinks are spoken by the NPCs/game description */
 export type NodeType = {
@@ -8,6 +8,7 @@ export type NodeType = {
     id: string;
   };
   index: number;
+  parentId: string;
   text: string;
   branches: NodeLinkType[];
   nodeType: number;
@@ -16,11 +17,16 @@ export type NodeType = {
   inputMaxLength: number;
   sourceTopicRef: null; // Not used in BT
   subjectTopicRefs: [] | null; // Not used in BT
-  sourceInSceneRef: null;
+  sourceInSceneRef: {
+    id: string;
+  } | null;
   sourceWithTagInScene: null; // Not used in BT
-  speakerType: 'speakerId' | null;
+  speakerType: 'speakerId' | 'castId' | null;
   overrideSpeaker: null; // Not used in BT
   speakerOverrideId: string;
-  actions: OperationType[] | null;
+  actions: {
+    ops: OperationCallType[] | null;
+  } | null;
   comment: string | null;
+  deleting?: boolean;
 };

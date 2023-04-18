@@ -19,11 +19,11 @@ namespace ConverseTek.Data {
     }
 
     public void AddInput(string label, string viewlabel, string tooltip, string[] types) {
-      AddInput(label, viewlabel, tooltip, types, null, null);
+      AddInput(label, viewlabel, tooltip, types, null, null, null);
     }
 
-    public void AddInput(string label, string viewlabel, string tooltip, string[] types, string scope, OperationInputValue[] values) {
-      Inputs.Add(new OperationInput(label, viewlabel, tooltip, types, scope, values));
+    public void AddInput(string label, string viewlabel, string tooltip, string[] types, string scope, OperationInputValue[] values, object defaultValue) {
+      Inputs.Add(new OperationInput(label, viewlabel, tooltip, types, scope, values, defaultValue));
     }
   }
 }
