@@ -17,9 +17,11 @@ export type NodeType = {
   inputMaxLength: number;
   sourceTopicRef: null; // Not used in BT
   subjectTopicRefs: [] | null; // Not used in BT
-  sourceInSceneRef: null;
+  sourceInSceneRef: {
+    id: string;
+  } | null;
   sourceWithTagInScene: null; // Not used in BT
-  speakerType: 'speakerId' | null;
+  speakerType: 'speakerId' | 'castId' | null;
   overrideSpeaker: null; // Not used in BT
   speakerOverrideId: string;
   actions: {

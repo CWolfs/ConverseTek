@@ -163,7 +163,7 @@ export function FileSystemPicker() {
         <Icon type="desktop" style={{ fontSize: 20 }} />
         {quickLinks &&
           quickLinks.map(({ title, path }) => (
-            <Tooltip title={title} placement="left">
+            <Tooltip key={title} title={title} placement="left">
               <div onClick={() => onDirectNavigation(path)}>
                 <Icon type="book" style={{ fontSize: 20 }} />
               </div>

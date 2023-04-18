@@ -1,11 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ChangeEvent } from 'react';
 import PropTypes from 'prop-types';
 import { Card, Row, Col, Input, Select, Tooltip, Icon, Checkbox } from 'antd';
+import { SelectValue } from 'antd/lib/select';
+import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import { observer } from 'mobx-react';
 import capitalize from 'lodash.capitalize';
 
 import { getId, createId } from 'utils/conversation-utils';
 import { useStore } from 'hooks/useStore';
+import { NodeType } from 'types/NodeType';
+import { NodeLinkType } from 'types/NodeLinkType';
+import { NodeStore } from 'stores/nodeStore/node-store';
 
 import './ConversationGeneral.css';
 
@@ -27,18 +32,29 @@ const colTwoLayout = {
   xxl: { span: 24 - colOneLayout.xxl.span },
 };
 
-function ConversationGeneral({ node }) {
-  const nodeStore = useStore('node');
+type Props = {
+  node: NodeType | NodeLinkType;
+};
 
-  const { idRef, speakerOverrideId, sourceInSceneRef, type } = node;
-  const sceneRefCastId = sourceInSceneRef && sourceInSceneRef.id ? sourceInSceneRef.id : null;
+function ConversationGeneral({ node }: Props) {
+  const nodeStore = useStore<NodeStore>('node');
+
+  const { idRef, type } = node;
+
+  let speakerOverrideId = null;
+  let sourceInSceneRef = null;
+  if (type === 'node') {
+    ({ speakerOverrideId, sourceInSceneRef } = node);
+  }
+
+  const sceneRefCastId: string | null = sourceInSceneRef && sourceInSceneRef.id ? sourceInSceneRef.id : null;
   const nodeSpeakerId = speakerOverrideId !== '' ? speakerOverrideId : null;
   const defaultSpeaker = sceneRefCastId !== null || nodeSpeakerId === null ? 'castId' : 'speakerId';
   const isRootOrResponse = type !== 'node';
 
-  const [nodeId, setNodeId] = useState(idRef);
-  const [selectedSpeaker, setSelectedSpeaker] = useState(defaultSpeaker);
-  const [castId, setCastId] = useState(sceneRefCastId);
+  const [nodeId, setNodeId] = useState<string>(getId(idRef));
+  const [selectedSpeaker, setSelectedSpeaker] = useState<string>(defaultSpeaker);
+  const [castId, setCastId] = useState<string | null>(sceneRefCastId);
   const [speakerId, setSpeakerId] = useState(nodeSpeakerId);
 
   const populateState = () => {
@@ -54,7 +70,7 @@ function ConversationGeneral({ node }) {
     populateState();
   }, [node]);
 
-  const handleIdChange = (event) => {
+  const handleIdChange = (event: ChangeEvent<HTMLInputElement>) => {
     setNodeId(event.target.value.trim());
   };
 
@@ -64,13 +80,21 @@ function ConversationGeneral({ node }) {
     nodeStore.setRebuild(true);
   };
 
-  const handleSpeakerChange = (value) => {
+  const handleSpeakerChange = (value: SelectValue) => {
+    const { type } = node;
+    if (type !== 'node') return;
+
+    if (value !== 'speakerId' && value !== 'castId') throw Error(`Invalid speaker change with value ${value as string}`);
+
     // FIXME: Add immutability
     node.speakerType = value;
     setSelectedSpeaker(value);
   };
 
-  const handleCastIdChange = (event) => {
+  const handleCastIdChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { type } = node;
+    if (type !== 'node') return;
+
     const newCastId = event.target.value.trim();
 
     if (!node.sourceInSceneRef) {
@@ -84,7 +108,10 @@ function ConversationGeneral({ node }) {
     setCastId(newCastId);
   };
 
-  const handleSpeakerIdChange = (event) => {
+  const handleSpeakerIdChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { type } = node;
+    if (type !== 'node') return;
+
     const newSpeakerId = event.target.value.trim();
     // FIXME: Add immutability
     node.speakerOverrideId = newSpeakerId;
@@ -92,19 +119,25 @@ function ConversationGeneral({ node }) {
     setSpeakerId(newSpeakerId);
   };
 
-  const handleCommentChange = (event) => {
+  const handleCommentChange = (event: ChangeEvent<HTMLInputElement>) => {
     const newComment = event.target.value;
     // FIXME: Add immutability
     node.comment = newComment;
   };
 
-  const handleAvailbleOnceChange = (event) => {
+  const handleAvailbleOnceChange = (event: CheckboxChangeEvent) => {
+    const { type } = node;
+    if (type === 'node') return;
+
     const newAvailableOnlyOnce = event.target.checked;
     // FIXME: Add immutability
     node.onlyOnce = newAvailableOnlyOnce;
   };
 
-  const handleHideIfUnavailableChange = (event) => {
+  const handleHideIfUnavailableChange = (event: CheckboxChangeEvent) => {
+    const { type } = node;
+    if (type === 'node') return;
+
     const newAlwaysShow = event.target.checked;
     // FIXME: Add immutability
     node.hideIfUnavailable = !newAlwaysShow;
@@ -148,9 +181,14 @@ function ConversationGeneral({ node }) {
                 <Option value="speakerId">Speaker Id</Option>
               </Select>
               {selectedSpeaker === 'castId' && (
-                <Input value={castId} onChange={handleCastIdChange} placeholder="e.g. DariusDefault (without 'castDef_')" spellCheck="false" />
+                <Input
+                  value={castId || undefined}
+                  onChange={handleCastIdChange}
+                  placeholder="e.g. DariusDefault (without 'castDef_')"
+                  spellCheck="false"
+                />
               )}
-              {selectedSpeaker === 'speakerId' && <Input value={speakerId} onChange={handleSpeakerIdChange} spellCheck="false" />}
+              {selectedSpeaker === 'speakerId' && <Input value={speakerId || undefined} onChange={handleSpeakerIdChange} spellCheck="false" />}
             </div>
           </Col>
         </Row>
@@ -183,7 +221,7 @@ function ConversationGeneral({ node }) {
           <div className="conversation-general__label last">Comment</div>
         </Col>
         <Col {...colTwoLayout}>
-          <Input value={node.comment} onChange={handleCommentChange} spellCheck="false" />
+          <Input value={node.comment || undefined} onChange={handleCommentChange} spellCheck="false" />
         </Col>
       </Row>
     </Card>

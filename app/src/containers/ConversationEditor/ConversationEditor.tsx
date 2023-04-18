@@ -19,6 +19,7 @@ import { ConversationConditions } from '../ConversationConditions';
 import { ConversationActions } from '../ConversationActions';
 
 import './ConversationEditor.css';
+import { NodeLinkType } from 'types/NodeLinkType';
 
 const FormItem = Form.Item;
 const { TabPane } = Tabs;
@@ -165,7 +166,7 @@ function ConversationEditor({ conversationAsset }: Props) {
                 </TabPane>
                 {(isRoot || isResponse) && (
                   <TabPane tab="Conditions" key="2">
-                    <ConversationConditions node={activeNode} />
+                    <ConversationConditions node={activeNode as NodeLinkType} />
                   </TabPane>
                 )}
                 <TabPane tab="Actions" key="3">
