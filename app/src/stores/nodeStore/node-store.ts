@@ -21,7 +21,7 @@ import {
 } from '../../utils/conversation-utils';
 
 import { dataStore } from '../dataStore';
-import { detectType } from '../../utils/node-utils';
+import { detectType, isNodeLinkType, isNodeType } from '../../utils/node-utils';
 import { NodeType } from 'types/NodeType';
 import { NodeLinkType } from 'types/NodeLinkType';
 import { ConversationAssetType } from 'types/ConversationAssetType';
@@ -30,7 +30,7 @@ import { OperationCallType } from 'types/OperationCallType';
 export type Clipboard = {
   node: NodeType | NodeLinkType;
   originalNodeId: string;
-  originalNodeIndex: number;
+  originalNodeIndex: number | null;
   nodes: (NodeType | NodeLinkType)[];
   nodeIdMap: Map<number, number>;
 };
@@ -220,28 +220,29 @@ class NodeStore {
    * ============================
    */
   setClipboard(nodeId: string) {
+    const tempClipboard: Partial<Clipboard> = {
+      nodeIdMap: new Map<number, number>(),
+    };
+
     const node = toJS(this.getNode(nodeId));
     if (node === null) return;
 
-    const { type } = node;
-    this.clipboard.originalNodeId = nodeId;
-    this.clipboard.originalNodeIndex = node.index;
+    tempClipboard.originalNodeId = nodeId;
+    tempClipboard.originalNodeIndex = (isNodeType(node) && node.index) || null;
 
     const newNodeId = generateId();
     node.idRef.id = newNodeId;
 
-    const { isNode } = detectType(type);
-
-    if (isNode) {
+    if (isNodeType(node)) {
       const newNodeIndex = this.generateNextNodeIndex();
-      this.clipboard.nodeIdMap.set(node.index, newNodeIndex);
+      tempClipboard.nodeIdMap?.set(node.index, newNodeIndex);
       node.index = newNodeIndex;
     }
 
-    this.clipboard.node = node;
-    const branches = isNode ? node.branches : [node];
+    tempClipboard.node = node;
+    const branches = isNodeType(node) ? node.branches : [node];
 
-    this.clipboard.nodes = flattenDeep(
+    tempClipboard.nodes = flattenDeep(
       branches.map((branch) => {
         const { nextNodeIndex, auxiliaryLink } = branch;
         const newBranchId = generateId();
@@ -250,7 +251,7 @@ class NodeStore {
 
         // Change link indexes
         if (nextNodeIndex !== -1 && auxiliaryLink) {
-          const copiedAndUpdatedNodeId = this.clipboard.nodeIdMap.get(branch.nextNodeIndex);
+          const copiedAndUpdatedNodeId = tempClipboard.nodeIdMap?.get(branch.nextNodeIndex);
           if (copiedAndUpdatedNodeId) branch.nextNodeIndex = copiedAndUpdatedNodeId;
         }
 
@@ -262,13 +263,12 @@ class NodeStore {
       }),
     );
 
-    // this.clipboard = {
-    //   originalNodeId: clipboardNodeId;
-    //   originalNodeIndex: clipboardNodeIndex;
-    // }
+    this.clipboard = tempClipboard as Clipboard;
   }
 
   copyNodesRecursive(nodeIndex: number, newNextNodeIndex: number, newNodeParentId: string): (NodeType | NodeLinkType)[] {
+    if (this.clipboard == null) throw Error('Clipboard is null or undefined. Cannot copy nodes with no clipboard');
+
     const node = toJS(this.getNodeByIndex(nodeIndex));
     if (!node) return [];
 
@@ -309,13 +309,6 @@ class NodeStore {
   }
 
   clearClipboard() {
-    // this.clipboard = {
-    //   node: null,
-    //   originalNodeId: null,
-    //   originalNodeIndex: null,
-    //   nodes: [],
-    //   nodeIdMap: new Map(),
-    // };
     this.clipboard = null;
   }
 
@@ -323,10 +316,12 @@ class NodeStore {
     const response = this.getNode(nodeId);
     if (response === null) return;
 
+    if (this.clipboard == null) throw Error('Clipboard is null or undefined. Cannot paste as link from clipboard.');
+
     const { originalNodeIndex } = this.clipboard;
 
     if ('nextNodeIndex' in response) {
-      response.nextNodeIndex = originalNodeIndex;
+      if (originalNodeIndex) response.nextNodeIndex = originalNodeIndex;
       response.auxiliaryLink = true;
 
       this.clearClipboard();
@@ -336,27 +331,31 @@ class NodeStore {
 
   pasteAsCopyFromClipboard(nodeId: string) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+    if (this.clipboard == null) throw Error('Clipboard is null or undefined. Cannot paste as copy from clipboard.');
+    if (conversationAsset == null) throw Error('Conversation is null. Cannot paste as copy from cipboard');
 
     const node = this.getNode(nodeId);
+    if (node == null) throw Error('Node is null.');
+
     const { node: clipboardNode, nodes: clipboardNodes } = this.clipboard;
     const { isRoot, isNode, isResponse } = detectType(node.type);
-    const { isNode: clipboardIsNode, isResponse: clipboardIsResponse } = detectType(clipboardNode.type);
 
     if (isRoot || isResponse) {
       // Only allow nodes to be copied in if target is a root or response
-      if (clipboardIsNode) {
+      if (isNodeType(clipboardNode)) {
+        if (!isNodeLinkType(node)) throw Error('Target node for paste as copy is not a NodeLink. It must be a NodeLink.');
         node.nextNodeIndex = clipboardNode.index;
         clipboardNode.parentId = nodeId;
-        addNodes(conversationAsset, [clipboardNode, ...clipboardNodes]);
+        addNodes(conversationAsset, [clipboardNode, ...(clipboardNodes as NodeType[])]);
       } else {
         console.error('[NodeStore] Cannot copy - wrong node types');
       }
     } else if (isNode) {
       // Only allow response to be copied in
-      if (clipboardIsResponse) {
+      if (isNodeLinkType(clipboardNode)) {
         clipboardNode.parentId = nodeId;
-        updateResponse(conversationAsset, node, clipboardNode);
-        addNodes(conversationAsset, clipboardNodes);
+        updateResponse(conversationAsset, node as NodeType, clipboardNode);
+        addNodes(conversationAsset, clipboardNodes as NodeType[]);
       } else {
         console.error('[NodeStore] Cannot copy - wrong node types');
       }

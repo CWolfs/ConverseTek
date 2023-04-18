@@ -1,4 +1,6 @@
+import { NodeType } from 'types/NodeType';
 import { nodeStore } from '../stores';
+import { NodeLinkType } from 'types/NodeLinkType';
 
 export type NodeTypeDetectionResult = {
   isRoot: boolean;
@@ -12,6 +14,14 @@ export type MockClipboard = {
     type: string;
   };
 };
+
+export function isNodeType(node: NodeType | NodeLinkType): node is NodeType {
+  return node.type === 'node';
+}
+
+export function isNodeLinkType(node: NodeType | NodeLinkType): node is NodeLinkType {
+  return node.type !== 'node';
+}
 
 export function detectType(type: string | null): NodeTypeDetectionResult {
   if (type == null) return { isRoot: false, isNode: false, isResponse: false, isLink: false };
