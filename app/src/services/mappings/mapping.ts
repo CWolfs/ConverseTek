@@ -11,6 +11,10 @@ type PropertyMapping = {
   [apiProperty: string]: string;
 };
 
+type ReversedPropertyMapping = {
+  [K in keyof PropertyMapping as PropertyMapping[K]]: K;
+};
+
 // CONVERSATIONS
 
 /**
@@ -43,6 +47,8 @@ export const fullConversationAssetMapping: PropertyMapping = {
   ...conversationMapping,
   ...operationMapping,
 };
+
+export const reversedFullConversationAssetMapping = reverseMapping(fullConversationAssetMapping);
 
 // PROCESSING
 
@@ -97,4 +103,18 @@ export function mapToType<T>(obj: object, mapping: PropertyMapping): T {
     }
   }
   return result as T;
+}
+
+function reverseMapping(mapping: PropertyMapping): ReversedPropertyMapping {
+  const reversedMapping: Partial<ReversedPropertyMapping> = {};
+
+  for (const key in mapping) {
+    // eslint-disable-next-line no-prototype-builtins
+    if (mapping.hasOwnProperty(key)) {
+      const value = mapping[key];
+      reversedMapping[value] = key;
+    }
+  }
+
+  return reversedMapping as ReversedPropertyMapping;
 }

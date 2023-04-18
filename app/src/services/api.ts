@@ -6,7 +6,7 @@ import { ConversationAssetType } from 'types/ConversationAssetType';
 import { DefinitionsType } from 'types/DefinitionsType';
 
 import { dataStore, defStore } from '../stores';
-import { JsonValue, fullConversationAssetMapping, lowercasePropertyNames, mapToType } from './mappings/mapping';
+import { JsonValue, fullConversationAssetMapping, lowercasePropertyNames, mapToType, reversedFullConversationAssetMapping } from './mappings/mapping';
 import { FileSystemItemType } from 'types/FileSystemItemType';
 import { QuickLinkType } from 'types/QuickLinkType';
 
@@ -40,11 +40,16 @@ export function getConversations(): Promise<any> {
 export function updateConversation(id: string, conversationAsset: ConversationAssetType): Promise<any> {
   consolidateSpeaker(conversationAsset);
   fillIndexGaps(conversationAsset);
-  return post('/conversations/put', { id }, { method: 'PUT', conversationAsset }).then((conversations: object[]): ConversationAssetType[] => {
-    const typedConversations = conversations.map((conversation) => mapToType<ConversationAssetType>(conversation, fullConversationAssetMapping));
-    dataStore.setConversations(typedConversations);
-    return typedConversations;
-  });
+
+  const apiMappedConversation = mapToType<object>(conversationAsset, reversedFullConversationAssetMapping);
+
+  return post('/conversations/put', { id }, { method: 'PUT', conversationAsset: apiMappedConversation }).then(
+    (conversations: object[]): ConversationAssetType[] => {
+      const typedConversations = conversations.map((conversation) => mapToType<ConversationAssetType>(conversation, fullConversationAssetMapping));
+      dataStore.setConversations(typedConversations);
+      return typedConversations;
+    },
+  );
 }
 
 export function exportConversation(id: string, conversationAsset: ConversationAssetType): Promise<any> {

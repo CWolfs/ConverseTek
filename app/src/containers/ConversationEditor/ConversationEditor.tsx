@@ -41,12 +41,16 @@ function ConversationEditor({ conversationAsset }: Props) {
   };
 
   const onSaveButtonClicked = () => {
-    createNewUnsavedConversation();
+    if (unsavedActiveConversationAsset == null) {
+      message.error('Save failed');
+      return;
+    }
 
-    void updateConversation(conversationAsset.conversation.idRef.id, conversationAsset).then(() => {
+    void updateConversation(unsavedActiveConversationAsset.conversation.idRef.id, unsavedActiveConversationAsset).then(() => {
       message.success('Save successful');
     });
-    dataStore.updateActiveConversation(conversationAsset); // local update for speed
+    dataStore.updateActiveConversation(unsavedActiveConversationAsset); // local update for speed
+    createNewUnsavedConversation();
   };
 
   const onRegenerateNodeIdsButtonClicked = () => {
