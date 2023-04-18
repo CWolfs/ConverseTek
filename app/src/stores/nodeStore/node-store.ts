@@ -25,7 +25,6 @@ import { detectType } from '../../utils/node-utils';
 import { NodeType } from 'types/NodeType';
 import { NodeLinkType } from 'types/NodeLinkType';
 import { ConversationAssetType } from 'types/ConversationAssetType';
-import { OperationArgType } from 'types/OperationArgType';
 import { OperationCallType } from 'types/OperationCallType';
 
 export type Clipboard = {
@@ -38,6 +37,8 @@ export type Clipboard = {
 
 /* eslint-disable no-return-assign, no-param-reassign, class-methods-use-this */
 class NodeStore {
+  static deleteDeferred = false;
+
   activeNode: NodeType | NodeLinkType | null = null;
   focusedTreeNode: RSTNode | null = null;
   ownerId: string | null = null;
@@ -181,11 +182,13 @@ class NodeStore {
     const tree = cachedTree || window.document.querySelector('.ReactVirtualized__Grid');
     const element = window.document.querySelector(`[data-node-id="${nodeId}"]`) as HTMLElement;
 
+    if (tree == null) throw Error('Tree not found for autoscroll to node. This should not happen.');
+
     // TODO: Stop the scrolling it the top or bottom has been reached
 
     if (element) {
-      const scrollTop = element.offsetParent.offsetParent.offsetTop;
-      const scrollLeft = element.offsetParent.offsetLeft - 50;
+      const scrollTop = ((element.offsetParent as HTMLElement)?.offsetParent as HTMLElement)?.offsetTop;
+      const scrollLeft = (element.offsetParent as HTMLElement)?.offsetLeft - 50;
       tree.scrollTop = scrollTop;
       tree.scrollLeft = scrollLeft;
     } else if (!element) {
@@ -194,7 +197,7 @@ class NodeStore {
       } else if (direction === 'down') {
         tree.scrollTop += 200;
       }
-      defer(() => this.scrollToNode(nodeId, direction, tree));
+      defer(() => this.scrollToNode(nodeId, direction, tree as HTMLElement));
     }
   }
 
@@ -380,7 +383,7 @@ class NodeStore {
     } else if (type === 'node') {
       updateNode(conversationAsset, node);
     } else if (type === 'response') {
-      const parentNode = this.getNode(node.parentId);
+      const parentNode = this.getNode(node.parentId) as NodeType;
       updateResponse(conversationAsset, parentNode, node);
     }
   }
@@ -547,7 +550,7 @@ class NodeStore {
     if (conversationAsset === null) return;
 
     const root = createRoot();
-    root.parentId = 0;
+    root.parentId = '0';
     updateRoot(conversationAsset, root);
 
     this.updateActiveNode(root);
@@ -559,7 +562,7 @@ class NodeStore {
     if (conversationAsset === null) return;
 
     const roots = rootIds.map((rootId) => this.getNode(rootId));
-    setRootsUtil(conversationAsset, roots);
+    setRootsUtil(conversationAsset, roots as NodeLinkType[]);
   }
 
   addNode(parent: NodeLinkType) {
@@ -811,9 +814,6 @@ class NodeStore {
     this.nodeIdToTreeIndexMap.clear();
   };
 }
-
-/* Statics */
-NodeStore.deleteDeferred = false;
 
 export const nodeStore = new NodeStore();
 

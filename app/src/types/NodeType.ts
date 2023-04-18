@@ -28,4 +28,5 @@ export type NodeType = {
     ops: OperationCallType[] | null;
   } | null;
   comment: string | null;
+  deleting?: boolean;
 };

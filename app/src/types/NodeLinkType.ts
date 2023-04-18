@@ -20,4 +20,5 @@ export type NodeLinkType = {
   inputBypass: boolean;
   auxiliaryLink: boolean;
   comment: string | null;
+  deleting?: boolean;
 };
