@@ -28,7 +28,7 @@ function ViewableLogic({ logic }: Props) {
     if (key == null || value == null) throw Error('renderResult key and/or value are null or undefined');
 
     if (typeof key !== 'string') throw Error('Investigate: key should be a string');
-    if (typeof value !== 'string') throw Error('Investigate: value should be a string');
+    if (typeof value !== 'string' && typeof value !== 'number') throw Error('Investigate: value should be a string or number');
 
     const presetValue = defStore.getPresetValue(key, value);
     return <span>{presetValue} </span>;
