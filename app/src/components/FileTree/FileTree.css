@@ -13,7 +13,13 @@
 
     &__conversation {
       .anticon {
-        color: gold;
+        color: gold !important;
+      }
+    }
+
+    &__conversation_header--no-data {
+      .anticon {
+        color: grey;
       }
     }
   }
