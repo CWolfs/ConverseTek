@@ -75,6 +75,7 @@ class NodeStore {
       addNode: action,
       addResponse: action,
       setResponses: action,
+      moveResponse: action,
       deleteNodeCascadeById: action,
       cleanUpDanglingResponseIndexes: action,
       deleteNodeCascade: action,
@@ -430,6 +431,8 @@ class NodeStore {
       throw Error('Unsaved conversation is null or undefined');
     }
 
+    // if (nodeId === '0') return null;
+
     const { roots, nodes } = conversationAsset.conversation;
 
     const root = roots.find((r) => getId(r) === nodeId);
@@ -601,6 +604,30 @@ class NodeStore {
     const responses = responseIds.map((responseId) => this.getNode(responseId)) as NodeLinkType[];
     const parent = this.getNode(parentId) as NodeType;
     setResponses(conversationAsset, parent, responses);
+  }
+
+  moveResponse(
+    responseToMoveId: string,
+    newParentNodeId: string,
+    newParentResponseOrder: {
+      id: string;
+    }[],
+  ) {
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+    if (conversationAsset === null) return;
+
+    // Get Response, Old Parent Node and New Parent Node
+    const responseNode = this.getNode(responseToMoveId) as NodeLinkType;
+    const newParentNode = this.getNode(newParentNodeId) as NodeType;
+    const oldParentNode = this.getNode(responseNode.parentId) as NodeType;
+
+    responseNode.parentId = newParentNodeId;
+
+    const updatedNewParentBranches = [...newParentResponseOrder.map((responseId) => this.getNode(responseId.id))] as NodeLinkType[];
+    newParentNode.branches = updatedNewParentBranches;
+
+    const updatedOldParentBranches = oldParentNode.branches.filter((response: NodeLinkType) => getId(response) !== responseToMoveId);
+    oldParentNode.branches = updatedOldParentBranches;
   }
 
   deleteNodeCascadeById(id: string) {

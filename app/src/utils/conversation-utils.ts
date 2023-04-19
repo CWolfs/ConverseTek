@@ -38,9 +38,7 @@ export function regenerateConversationId(conversationAsset: ConversationAssetTyp
 */
 export function getId(idContainer: IdRef | { idRef: IdRef }): string {
   let id: string | null = null;
-
-  // TODO: Keep an eye on the difference from the old method that used to return -1 for no ids
-  // With TS it might no longe be required, or it needs to be added back in with a null or {} incoming type
+  if (idContainer == null) return '-1';
 
   if (typeof idContainer === 'object' && 'id' in idContainer) {
     id = idContainer.id;
@@ -50,18 +48,6 @@ export function getId(idContainer: IdRef | { idRef: IdRef }): string {
 
   return id.split(':')[1] || id;
 }
-
-// let id = null;
-// ({ id } = idContainer);
-// if (id === undefined) {
-//   if (!idContainer.idRef) {
-//     id = '-1';
-//   } else {
-//     ({ id } = idContainer.idRef);
-//   }
-// }
-// return id.split(':')[1] || id;
-// }
 
 export function createId(idRef: IdRef, newId: string): string {
   const { id } = idRef;
@@ -263,4 +249,8 @@ export function setResponses(conversationAsset: ConversationAssetType, parentNod
   // TODO: Keep an eye on this. It might break something related to mobx reactions
   // nodes[parentNodeIndex].branches.replace(responses);
   nodes[parentNodeIndex].branches = [...responses];
+}
+
+export function getIndexFromId(values: (IdRef | { idRef: IdRef })[], value: string) {
+  return findIndex(values, (n) => getId(n) === value);
 }
