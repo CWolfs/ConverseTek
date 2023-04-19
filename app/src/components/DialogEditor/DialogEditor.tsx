@@ -102,9 +102,10 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
     const { isRoot, isNode, isResponse } = detectType(nodeType);
 
     const { type: nextParentType, id: parentId } = nextParent;
-    const nextNode = nodeStore.getNode(parentId);
+    if (parentId == null) return false;
 
     let allowDrop = true;
+    const nextNode = nodeStore.getNode(parentId);
 
     // Don't allow nodes to be moved under the same type
     if (nodeType === nextParentType) allowDrop = false;
@@ -125,6 +126,11 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
         }
       } else if (isNode) {
         const parent = nodeStore.getNode(parentId) as NodeLinkType;
+        if (parent == null) {
+          console.error(`Checking drop target Response '${parentId}' but it is null`);
+          return false;
+        }
+
         const { nextNodeIndex } = parent;
         if (nextNodeIndex !== -1) allowDrop = false;
       }

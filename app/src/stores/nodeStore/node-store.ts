@@ -626,8 +626,11 @@ class NodeStore {
     const updatedNewParentBranches = [...newParentResponseOrder.map((responseId) => this.getNode(responseId.id))] as NodeLinkType[];
     newParentNode.branches = updatedNewParentBranches;
 
-    const updatedOldParentBranches = oldParentNode.branches.filter((response: NodeLinkType) => getId(response) !== responseToMoveId);
-    oldParentNode.branches = updatedOldParentBranches;
+    // Don't remove if within the same parent Node
+    if (responseNode.parentId !== newParentNodeId) {
+      const updatedOldParentBranches = oldParentNode.branches.filter((response: NodeLinkType) => getId(response) !== responseToMoveId);
+      oldParentNode.branches = updatedOldParentBranches;
+    }
   }
 
   deleteNodeCascadeById(id: string) {
