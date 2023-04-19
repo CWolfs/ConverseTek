@@ -14,7 +14,7 @@ import { ConversationAssetType } from 'types/ConversationAssetType';
 import { useStore } from 'hooks/useStore';
 import { NodeType } from 'types/NodeType';
 import { NodeLinkType } from 'types/NodeLinkType';
-import { detectType } from 'utils/node-utils';
+import { detectType, isNodeType } from 'utils/node-utils';
 
 import { ConverseTekNodeRenderer } from './ConverseTekNodeRenderer';
 import { DialogEditorContextMenu } from '../DialogEditorContextMenu';
@@ -59,6 +59,7 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
     const { node, nextParentNode } = nodeContainer;
     const { id: nodeId, type: nodeType, parentId: nodeParentId } = node;
     const { id: parentNodeId, children: parentChildren } = nextParentNode;
+
     const { isRoot, isNode, isResponse } = detectType(nodeType);
 
     if (isRoot) {
@@ -70,21 +71,17 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
 
       // Set new root/response parent 'nextNodeIndex' to node 'index'
       const nextParent = nodeStore.getNode(parentNodeId) as NodeLinkType;
-      if (!nextParent) throw Error(`nextParent '${parentNodeId}' not found`);
+      if (nextParent == null) throw Error(`nextParent '${parentNodeId}' not found`);
       nextParent.nextNodeIndex = nodeIndex;
 
       // Set previous root/response parent 'nextNodeIndex' to -1
       const previousParent = nodeStore.getNode(nodeParentId) as NodeLinkType;
-      if (!previousParent) throw Error(`previousParent '${nodeParentId}' not found`);
+      if (previousParent == null) throw Error(`previousParent '${nodeParentId}' not found`);
       previousParent.nextNodeIndex = -1;
     } else if (isResponse) {
-      // FIXME: This causes key clash if moving a response to another node
-      // FIXME: Disabled moving responses to another node for now
-      // const previousResponseIds = nodeStore.getNodeResponseIdsFromNodeId(nodeParentId);
-      // nodeStore.setResponses(nodeParentId, previousResponseIds);
+      if (nodeId == null) return;
 
-      const responseIds = parentChildren.map((child) => child.id);
-      nodeStore.setResponses(parentNodeId, responseIds);
+      nodeStore.moveResponse(nodeId, parentNodeId, parentChildren);
     }
   };
 
@@ -102,15 +99,18 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
     if (nextParent === null) return false;
 
     const { type: nodeType, parentId: nodeParentId } = node;
-    const { type: nextParentType, id: parentId } = nextParent;
     const { isRoot, isNode, isResponse } = detectType(nodeType);
+
+    const { type: nextParentType, id: parentId } = nextParent;
+    const nextNode = nodeStore.getNode(parentId);
+
     let allowDrop = true;
 
     // Don't allow nodes to be moved under the same type
     if (nodeType === nextParentType) allowDrop = false;
 
     // Only allow roots to be moved around under the top level node
-    if (allowDrop) allowDrop = !((isNode || isResponse) && nextParent.id === '0');
+    if (allowDrop) allowDrop = (isRoot && nextParent.id === '0') || ((isNode || isResponse) && nextParent.id !== '0');
 
     // Only allow dragging within the same parent for roots and responses,
     // for nodes, only allow if the target response is empty
@@ -118,7 +118,11 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
       if (isRoot) {
         allowDrop = parentId === null || parentId === '0';
       } else if (isResponse) {
-        allowDrop = nodeParentId === parentId;
+        if (nextNode != null) {
+          allowDrop = isNodeType(nextNode);
+        } else {
+          allowDrop = false;
+        }
       } else if (isNode) {
         const parent = nodeStore.getNode(parentId) as NodeLinkType;
         const { nextNodeIndex } = parent;
