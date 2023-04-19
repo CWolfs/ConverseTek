@@ -50,6 +50,7 @@ function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string; onVis
 
   const onAddClicked = ({ props }: ItemParams<EventProps>) => {
     if (!props) return;
+    console.log('addNodeByParentId', props.id);
     nodeStore.addNodeByParentId(props.id);
   };
 

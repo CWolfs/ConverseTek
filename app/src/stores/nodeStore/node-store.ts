@@ -86,8 +86,8 @@ class NodeStore {
 
   generateNextNodeIndex() {
     this.takenNodeIndexes = sortBy(this.takenNodeIndexes, (index) => index);
-    const lastIndex = last(this.takenNodeIndexes);
-    const nextNodeIndex = lastIndex ? lastIndex + 1 : 0;
+    const lastIndex = last(this.takenNodeIndexes) ?? -1;
+    const nextNodeIndex = lastIndex + 1;
     this.takenNodeIndexes.push(nextNodeIndex);
     return nextNodeIndex;
   }
@@ -519,7 +519,7 @@ class NodeStore {
   addNodeByParentId(parentId: string) {
     const parent = this.getNode(parentId);
 
-    if (parent === undefined || parent === null) {
+    if (parent == null) {
       if (parentId === '0') {
         this.addRoot();
       }
