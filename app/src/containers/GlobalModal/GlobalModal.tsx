@@ -11,13 +11,13 @@ function GlobalModal() {
   const modalStore = useStore<ModalStore>('modal');
   const [confirmLoading] = useState(false);
 
-  const { title, isVisible, ModalContent, onOk, okLabel, onCancel, showCancelButton, isLoading, loadingLabel, width } = modalStore;
+  const { title, isVisible, ModalContent, onOk, okLabel, onCancel, cancelLabel, showCancelButton, isLoading, loadingLabel, width } = modalStore;
   const content = ModalContent || undefined;
 
   const footer = [
     showCancelButton ? (
       <Button key="cancel" onClick={onCancel || undefined}>
-        Cancel
+        {cancelLabel ? cancelLabel : 'Cancel'}
       </Button>
     ) : null,
     // Button should have prop 'disabled' but it's missing. Probably old broken Ant typedefs from Ant 3. loading={isLoading} disables the button though

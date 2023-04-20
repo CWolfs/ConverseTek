@@ -1,0 +1,36 @@
+@import '../../css/constants.css';
+
+.modal-confirmation {
+  h3 {
+    color: $textColourTertiary;
+  }
+
+  &__icon {
+    &--warning {
+      color: orange;
+      font-size: 24px;
+      margin-right: 8px;
+      vertical-align: bottom;
+    }
+  }
+
+  &__content {
+    /* &-warning {
+      background-image: resolve('cwolf-avatar.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      width: 2vw;
+      height: 24px;
+      display: inline-block;
+      vertical-align: bottom;
+    } */
+
+    &-body {
+      display: inline-block;
+      vertical-align: top;
+      margin-top: $tinySpace;
+      font-size: $promoFontSizeLarge;
+      line-height: $promoLineHeightLargest;
+    }
+  }
+}

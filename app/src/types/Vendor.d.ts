@@ -1,5 +1,10 @@
 declare module 'react-sortable-tree';
 
+declare module '@ungap/structured-clone' {
+  const structuredClone: <T>(input: T) => T;
+  export = structuredClone;
+}
+
 type RSTNodeOnMoveContainer = {
   treeData: object[];
   node: RSTNode;

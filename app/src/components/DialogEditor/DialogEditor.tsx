@@ -12,7 +12,7 @@ import { NodeStore } from 'stores/nodeStore/node-store';
 import { ConversationAssetType, ElementNodeType } from 'types';
 
 import { useStore } from 'hooks/useStore';
-import { detectType, isNodeType } from 'utils/node-utils';
+import { detectType, isPromptNodeType } from 'utils/node-utils';
 
 import { ConverseTekNodeRenderer } from './ConverseTekNodeRenderer';
 import { DialogEditorContextMenu } from '../DialogEditorContextMenu';
@@ -109,7 +109,7 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
         allowDrop = parentId === null || parentId === '0';
       } else if (isResponse) {
         if (nextNode != null) {
-          allowDrop = isNodeType(nextNode);
+          allowDrop = isPromptNodeType(nextNode);
         } else {
           allowDrop = false;
         }

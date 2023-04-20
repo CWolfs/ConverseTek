@@ -12,13 +12,14 @@ export type FSModalProps = {
 
 class ModalStore {
   ModalContent: ElementType | JSX.Element | null = null;
-  title = '';
+  title: string | JSX.Element = '';
   isVisible = false;
   onOk: OnOkType = null;
   disableOk = true;
   okLabel = 'Ok';
   loadingLabel = 'Loading';
   onCancel: OnCancelType = null;
+  cancelLabel = 'Cancel';
   isLoading = false;
   width = '70vw';
   showCancelButton = true;
@@ -34,6 +35,7 @@ class ModalStore {
       okLabel: observable,
       loadingLabel: observable,
       onCancel: observable,
+      cancelLabel: observable,
       isLoading: observable,
       width: observable,
       showCancelButton: observable,
@@ -42,8 +44,10 @@ class ModalStore {
       setWidth: action,
       setShowCancelButton: action,
       setOnOk: action,
+      setOnCancel: action,
       setDisableOk: action,
       setOkLabel: action,
+      setCancelLabel: action,
       setIsLoading: action,
       setLoadingLabel: action,
       showModal: action,
@@ -56,12 +60,12 @@ class ModalStore {
   }
 
   setModelContent(ModalContent: ElementType, props = {}, show = true): void {
-    this.ModalContent = <ModalContent />;
+    this.ModalContent = <ModalContent {...props} />;
     this.props = props;
     if (show) this.showModal(true);
   }
 
-  setTitle(title: string): void {
+  setTitle(title: string | JSX.Element): void {
     this.title = title;
   }
 
@@ -77,12 +81,23 @@ class ModalStore {
     this.onOk = onOk;
   }
 
+  setOnCancel(onCancel: OnCancelType): void {
+    this.onCancel = (event) => {
+      if (onCancel) onCancel(event);
+      this.closeModal();
+    };
+  }
+
   setDisableOk(flag: boolean): void {
     this.disableOk = flag;
   }
 
   setOkLabel(label: string): void {
     this.okLabel = label;
+  }
+
+  setCancelLabel(label: string): void {
+    this.cancelLabel = label;
   }
 
   setIsLoading(flag: boolean): void {

@@ -4,6 +4,7 @@ import defer from 'lodash.defer';
 import remove from 'lodash.remove';
 import sortBy from 'lodash.sortby';
 import last from 'lodash.last';
+import structuredClone from '@ungap/structured-clone';
 
 import {
   getId,
@@ -19,8 +20,11 @@ import {
   // addNodes,
 } from 'utils/conversation-utils';
 import { ClipboardType, ConversationAssetType, ElementNodeType, OperationCallType, PromptNodeType } from 'types';
+import { isElementNodeType, isPromptNodeType } from 'utils/node-utils';
 
 import { dataStore } from '../dataStore';
+import { modalStore } from '../modalStore';
+import { ModalConfirmation } from 'components/ModalConfirmation';
 
 /* eslint-disable no-return-assign, no-param-reassign, class-methods-use-this */
 class NodeStore {
@@ -51,9 +55,9 @@ class NodeStore {
       scrollToNode: action,
       setFocusedTreeNode: action,
       clearFocusedNode: action,
-      // setClipboard: action,
+      setClipboard: action,
       clearClipboard: action,
-      // pasteAsLinkFromClipboard: action,
+      pasteAsLinkFromClipboard: action,
       // pasteAsCopyFromClipboard: action,
       setNode: action,
       setNodeText: action,
@@ -200,121 +204,172 @@ class NodeStore {
    * || NODE CLIPBOARD METHODS ||
    * ============================
    */
-  // setClipboard(promptId: string) {}
 
-  // FIXME: Rewrite copy/pasting/linking
-  // setClipboard(nodeId: string) {
-  //   const tempClipboard: Partial<ClipboardType> = {
-  //     nodeIdMap: new Map<number, number>(),
-  //   };
+  /**
+   * Copy all nodes, responses and links starting from the selected node
+   * Make real copies with new ids so if the user copies, then deletes a branch/node(s) then they can still paste the copies untouched
+   * @param nodeId node id to start copying from
+   * @returns
+   */
+  setClipboard(nodeId: string) {
+    const tempClipboard: Partial<ClipboardType> = {
+      nodeIdMap: new Map<number, number>(),
+    };
 
-  //   const node = toJS(this.getNode(nodeId));
-  //   if (node === null) return;
+    const node = structuredClone<PromptNodeType | ElementNodeType | null>(toJS(this.getNode(nodeId)));
+    if (node === null) return;
 
-  //   tempClipboard.originalNodeId = nodeId;
-  //   tempClipboard.originalNodeIndex = (isNodeType(node) && node.index) || null;
+    tempClipboard.originalNodeId = nodeId;
 
-  //   const newNodeId = generateId();
-  //   node.idRef.id = newNodeId;
+    // Operating on the copied node so no need to worry about reused references
+    const newNodeId = generateId();
+    node.idRef.id = newNodeId;
 
-  //   if (isNodeType(node)) {
-  //     const newNodeIndex = this.generateNextNodeIndex();
-  //     tempClipboard.nodeIdMap?.set(node.index, newNodeIndex);
-  //     node.index = newNodeIndex;
-  //   }
+    if (isPromptNodeType(node)) {
+      const { index } = node;
 
-  //   tempClipboard.node = node;
-  //   const branches = isNodeType(node) ? node.branches : [node];
+      tempClipboard.originalNodeIndex = index;
 
-  //   tempClipboard.nodes = flattenDeep(
-  //     branches.map((branch) => {
-  //       const { nextNodeIndex, auxiliaryLink } = branch;
-  //       const newBranchId = generateId();
-  //       branch.idRef.id = newBranchId;
-  //       branch.parentId = newNodeId;
+      // Creates a new index for the deep copied prompt node
+      const newNodeIndex = this.generateNextPromptNodeIndex();
+      tempClipboard.nodeIdMap?.set(index, newNodeIndex);
 
-  //       // Change link indexes
-  //       if (nextNodeIndex !== -1 && auxiliaryLink) {
-  //         const copiedAndUpdatedNodeId = tempClipboard.nodeIdMap?.get(branch.nextNodeIndex);
-  //         if (copiedAndUpdatedNodeId) branch.nextNodeIndex = copiedAndUpdatedNodeId;
-  //       }
+      // Set the new index on the new prompt node
+      node.index = newNodeIndex;
+    }
 
-  //       if (nextNodeIndex === -1 || auxiliaryLink) return [];
+    tempClipboard.copiedNode = node;
 
-  //       const newNextNodeIndex = this.generateNextNodeIndex();
-  //       branch.nextNodeIndex = newNextNodeIndex;
-  //       return this.copyNodesRecursive(nextNodeIndex, newNextNodeIndex, newBranchId);
-  //     }),
-  //   );
+    // If a PromptNodeType then iterate over the branches and copy the ElementNodeTypes too
+    // This effectively builds a flat array of nodes (ElementNodeTypes and the follow resolved PromptNodeTypes)
+    const branches = isPromptNodeType(node) ? node.branches : [node];
+    tempClipboard.nodes = branches.reduce((result: PromptNodeType[], elementNode: ElementNodeType) => {
+      const { nextNodeIndex } = elementNode;
 
-  //   this.clipboard = tempClipboard as Clipboard;
-  // }
+      const shouldTraverseNextNodeIndex = this.updateResponseNodesDuringCopy(tempClipboard as ClipboardType, elementNode, newNodeId);
 
-  // FIXME: Rewrite copy/pasting/linking as there are known bugs and I can't resolve this type mess
+      if (shouldTraverseNextNodeIndex) {
+        const { nextNodeIndex: newNextPromptNodeIndex } = elementNode;
+        this.copyPromptNodesRecursiveIntoResult(result, tempClipboard as ClipboardType, nextNodeIndex, newNextPromptNodeIndex, elementNode.idRef.id);
+      }
 
-  // copyNodesRecursive(nodeIndex: number, newNextNodeIndex: number, newNodeParentId: string): (NodeType | NodeLinkType)[] {
-  //   if (this.clipboard == null) throw Error('Clipboard is null or undefined. Cannot copy nodes with no clipboard');
+      return result;
+    }, [] as PromptNodeType[]);
 
-  //   const node = toJS(this.getNodeByIndex(nodeIndex));
-  //   if (!node) return [];
+    console.log('copy finished', tempClipboard);
+    this.clipboard = tempClipboard as ClipboardType;
+  }
 
-  //   const newNodeId = generateId();
-  //   node.idRef.id = newNodeId;
+  /**
+   *
+   * @param tempClipboard
+   * @param elementNode
+   * @param newNodeId
+   * @returns shouldTraverseNextNodeIndex
+   */
+  updateResponseNodesDuringCopy(tempClipboard: ClipboardType, elementNode: ElementNodeType, newNodeId: string): boolean {
+    const { nextNodeIndex, auxiliaryLink } = elementNode;
 
-  //   this.clipboard.nodeIdMap.set(node.index, newNextNodeIndex);
-  //   node.index = newNextNodeIndex;
-  //   node.parentId = newNodeParentId;
+    // Operating on the copied node's branches so no need to run a deep copy on these ElementNodeTypes
+    const newElementNodeId = generateId();
+    elementNode.idRef.id = newElementNodeId;
+    elementNode.parentId = newNodeId;
 
-  //   const nodes: (NodeType | NodeLinkType)[] = [
-  //     node,
-  //     ...node.branches.map((branch: NodeLinkType) => {
-  //       const { nextNodeIndex, auxiliaryLink } = branch;
-  //       const newBranchId = generateId();
-  //       branch.idRef.id = newBranchId;
-  //       branch.parentId = newNodeId;
+    // Change link indexes
+    if (nextNodeIndex !== -1 && auxiliaryLink) {
+      // If any response node is a link to a prompt node that has been copied (and has a cached new prompt node index) - use the new cached prompt node index
+      const copiedAndUpdatedNodeId = tempClipboard.nodeIdMap?.get(elementNode.nextNodeIndex);
+      if (copiedAndUpdatedNodeId) elementNode.nextNodeIndex = copiedAndUpdatedNodeId;
+    }
 
-  //       // Change link indexes
-  //       if (nextNodeIndex !== -1 && auxiliaryLink) {
-  //         const linkedNextNodeIndex = this.clipboard.nodeIdMap.get(branch.nextNodeIndex);
+    // If the response goes nowhere (-1) or is a link to another node (don't follow the link for a copy) then continue on the main reduce
+    if (nextNodeIndex === -1 || auxiliaryLink) return false;
 
-  //         // If the index exists in the copied branch then link to the new node,
-  //         // otherwise keep the existing link
-  //         if (linkedNextNodeIndex) {
-  //           branch.nextNodeIndex = linkedNextNodeIndex;
-  //         }
-  //       }
+    // No more links exist at this point onward so generate a new index for the next prompt node on the response node
+    const newNextPromptNodeIndex = this.generateNextPromptNodeIndex();
+    elementNode.nextNodeIndex = newNextPromptNodeIndex;
 
-  //       if (nextNodeIndex === -1 || auxiliaryLink) return [];
+    return true;
+  }
 
-  //       const newNodeIndex = this.generateNextNodeIndex();
-  //       branch.nextNodeIndex = newNodeIndex;
-  //       return this.copyNodesRecursive(nextNodeIndex, newNodeIndex, newBranchId);
-  //     }),
-  //   ];
-  //   return nodes;
-  // }
+  copyPromptNodesRecursiveIntoResult(
+    result: PromptNodeType[],
+    tempClipboard: ClipboardType,
+    nodeIndex: number,
+    newNextNodeIndex: number,
+    newNodeParentId: string,
+  ): void {
+    if (tempClipboard == null) throw Error('Clipboard is null or undefined. Cannot copy nodes with no clipboard');
+
+    const promptNode = structuredClone<PromptNodeType | null>(toJS(this.getPromptNodeByIndex(nodeIndex)));
+    if (!promptNode) return;
+
+    const { index } = promptNode;
+
+    // Cache the new prompt node index for possible reuse later for responses that might point or link to it
+    tempClipboard.nodeIdMap.set(index, newNextNodeIndex);
+
+    // Operating on the copied node so no need to worry about reused references
+    const newNodeId = generateId();
+    promptNode.idRef.id = newNodeId;
+    promptNode.index = newNextNodeIndex;
+    promptNode.parentId = newNodeParentId;
+
+    // Store the node
+    result.push(promptNode);
+
+    // ...and follow its responses into their nodes recursively
+    promptNode.branches.forEach((elementNode: ElementNodeType) => {
+      const { nextNodeIndex } = elementNode;
+
+      const shouldTraverseNextNodeIndex = this.updateResponseNodesDuringCopy(tempClipboard, elementNode, newNodeId);
+
+      if (shouldTraverseNextNodeIndex) {
+        const { nextNodeIndex: newNextPromptNodeIndex } = elementNode;
+        this.copyPromptNodesRecursiveIntoResult(result, tempClipboard, nextNodeIndex, newNextPromptNodeIndex, elementNode.idRef.id);
+      }
+    });
+  }
+
+  pasteAsLinkFromClipboard(nodeId: string) {
+    const responseNode = this.getNode(nodeId);
+    if (responseNode === null) return;
+
+    if (this.clipboard == null) throw Error('Clipboard is null or undefined. Cannot paste as link from clipboard.');
+
+    const { originalNodeIndex } = this.clipboard;
+
+    if (isElementNodeType(responseNode)) {
+      // Ask the user to confirm pasting a link if the response already points to a node
+      if (responseNode.nextNodeIndex !== -1) {
+        const buttons = {
+          positiveLabel: 'Confirm',
+          onPositive: () => {
+            if (originalNodeIndex) responseNode.nextNodeIndex = originalNodeIndex;
+            responseNode.auxiliaryLink = true;
+
+            console.log('Pasted link for: ', responseNode);
+            this.clearClipboard();
+            this.setRebuild(true);
+          },
+          negativeLabel: 'Cancel',
+        };
+
+        const title = 'Response node points to an existing Prompt node';
+        modalStore.setModelContent(ModalConfirmation, {
+          type: 'warning',
+          title,
+          body: 'The response node you are attempting to link into already points or links to a prompt node. Are you sure you want to overwrite this?,',
+          width: '30rem',
+          buttons,
+        });
+      }
+    }
+  }
 
   clearClipboard() {
     this.clipboard = null;
   }
-
-  // FIXME: Rewrite copy/pasting/linking
-  // pasteAsLinkFromClipboard(nodeId: string) {
-  //   const response = this.getNode(nodeId);
-  //   if (response === null) return;
-
-  //   if (this.clipboard == null) throw Error('Clipboard is null or undefined. Cannot paste as link from clipboard.');
-
-  //   const { originalNodeIndex } = this.clipboard;
-
-  //   if ('nextNodeIndex' in response) {
-  //     if (originalNodeIndex) response.nextNodeIndex = originalNodeIndex;
-  //     response.auxiliaryLink = true;
-
-  //     this.clearClipboard();
-  //     this.setRebuild(true);
-  //   }
-  // }
 
   // FIXME: Rewrite copy/pasting/linking
   // pasteAsCopyFromClipboard(nodeId: string) {
