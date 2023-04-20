@@ -20,9 +20,11 @@ import {
   // addNodes,
 } from 'utils/conversation-utils';
 import { ClipboardType, ConversationAssetType, ElementNodeType, OperationCallType, PromptNodeType } from 'types';
-import { isPromptNodeType } from 'utils/node-utils';
+import { isElementNodeType, isPromptNodeType } from 'utils/node-utils';
 
 import { dataStore } from '../dataStore';
+import { modalStore } from '../modalStore';
+import { ModalConfirmation } from 'components/ModalConfirmation';
 
 /* eslint-disable no-return-assign, no-param-reassign, class-methods-use-this */
 class NodeStore {
@@ -55,7 +57,7 @@ class NodeStore {
       clearFocusedNode: action,
       setClipboard: action,
       clearClipboard: action,
-      // pasteAsLinkFromClipboard: action,
+      pasteAsLinkFromClipboard: action,
       // pasteAsCopyFromClipboard: action,
       setNode: action,
       setNodeText: action,
@@ -329,27 +331,45 @@ class NodeStore {
     });
   }
 
+  pasteAsLinkFromClipboard(nodeId: string) {
+    const responseNode = this.getNode(nodeId);
+    if (responseNode === null) return;
+
+    if (this.clipboard == null) throw Error('Clipboard is null or undefined. Cannot paste as link from clipboard.');
+
+    const { originalNodeIndex } = this.clipboard;
+
+    if (isElementNodeType(responseNode)) {
+      // Ask the user to confirm pasting a link if the response already points to a node
+      if (responseNode.nextNodeIndex !== -1) {
+        const buttons = {
+          positiveLabel: 'Confirm',
+          onPositive: () => {
+            if (originalNodeIndex) responseNode.nextNodeIndex = originalNodeIndex;
+            responseNode.auxiliaryLink = true;
+
+            console.log('Pasted link for: ', responseNode);
+            this.clearClipboard();
+            this.setRebuild(true);
+          },
+          negativeLabel: 'Cancel',
+        };
+
+        const title = 'Response node points to an existing Prompt node';
+        modalStore.setModelContent(ModalConfirmation, {
+          type: 'warning',
+          title,
+          body: 'The response node you are attempting to link into already points or links to a prompt node. Are you sure you want to overwrite this?,',
+          width: '30rem',
+          buttons,
+        });
+      }
+    }
+  }
+
   clearClipboard() {
     this.clipboard = null;
   }
-
-  // FIXME: Rewrite copy/pasting/linking
-  // pasteAsLinkFromClipboard(nodeId: string) {
-  //   const response = this.getNode(nodeId);
-  //   if (response === null) return;
-
-  //   if (this.clipboard == null) throw Error('Clipboard is null or undefined. Cannot paste as link from clipboard.');
-
-  //   const { originalNodeIndex } = this.clipboard;
-
-  //   if ('nextNodeIndex' in response) {
-  //     if (originalNodeIndex) response.nextNodeIndex = originalNodeIndex;
-  //     response.auxiliaryLink = true;
-
-  //     this.clearClipboard();
-  //     this.setRebuild(true);
-  //   }
-  // }
 
   // FIXME: Rewrite copy/pasting/linking
   // pasteAsCopyFromClipboard(nodeId: string) {
