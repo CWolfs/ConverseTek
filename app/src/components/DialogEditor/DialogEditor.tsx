@@ -58,7 +58,7 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
   const onMove = (nodeContainer: RSTNodeOnMoveContainer) => {
     const { node, nextParentNode } = nodeContainer;
     const { id: nodeId, type: nodeType, parentId: nodeParentId } = node;
-    const { id: parentNodeId, children: parentChildren } = nextParentNode;
+    const { id: nextParentNodeId, children: parentChildren } = nextParentNode;
 
     const { isRoot, isNode, isResponse } = detectType(nodeType);
 
@@ -66,22 +66,13 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
       const rootIds = parentChildren.map((child) => child.id);
       nodeStore.setRoots(rootIds);
     } else if (isNode) {
-      const convoNode = nodeStore.getNode(nodeId) as NodeType;
-      const { index: nodeIndex } = convoNode;
+      if (nodeId == null) return;
 
-      // Set new root/response parent 'nextNodeIndex' to node 'index'
-      const nextParent = nodeStore.getNode(parentNodeId) as NodeLinkType;
-      if (nextParent == null) throw Error(`nextParent '${parentNodeId}' not found`);
-      nextParent.nextNodeIndex = nodeIndex;
-
-      // Set previous root/response parent 'nextNodeIndex' to -1
-      const previousParent = nodeStore.getNode(nodeParentId) as NodeLinkType;
-      if (previousParent == null) throw Error(`previousParent '${nodeParentId}' not found`);
-      previousParent.nextNodeIndex = -1;
+      nodeStore.moveNode(nodeId, nextParentNodeId, nodeParentId);
     } else if (isResponse) {
       if (nodeId == null) return;
 
-      nodeStore.moveResponse(nodeId, parentNodeId, parentChildren);
+      nodeStore.moveResponse(nodeId, nextParentNodeId, parentChildren);
     }
   };
 

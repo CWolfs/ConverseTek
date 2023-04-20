@@ -76,6 +76,7 @@ class NodeStore {
       addResponse: action,
       setResponses: action,
       moveResponse: action,
+      moveNode: action,
       deleteNodeCascadeById: action,
       cleanUpDanglingResponseIndexes: action,
       deleteNodeCascade: action,
@@ -612,7 +613,7 @@ class NodeStore {
     newParentResponseOrder: {
       id: string;
     }[],
-  ) {
+  ): void {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     if (conversationAsset === null) return;
 
@@ -631,6 +632,21 @@ class NodeStore {
       const updatedOldParentBranches = oldParentNode.branches.filter((response: NodeLinkType) => getId(response) !== responseToMoveId);
       oldParentNode.branches = updatedOldParentBranches;
     }
+  }
+
+  moveNode(nodeToMoveId: string, nextParentResponseId: string, previousParentResponseId: string) {
+    const nodeBeingMoved = nodeStore.getNode(nodeToMoveId) as NodeType;
+    const { index: nodeIndex } = nodeBeingMoved;
+
+    // Set new root/response parent 'nextNodeIndex' to node 'index'
+    const nextParent = nodeStore.getNode(nextParentResponseId) as NodeLinkType;
+    if (nextParent == null) throw Error(`Next parent response '${nextParentResponseId}' not found`);
+    nextParent.nextNodeIndex = nodeIndex;
+
+    // Set previous root/response parent 'nextNodeIndex' to -1
+    const previousParent = nodeStore.getNode(previousParentResponseId) as NodeLinkType;
+    if (previousParent == null) throw Error(`Previous parent response '${previousParentResponseId}' not found`);
+    previousParent.nextNodeIndex = -1;
   }
 
   deleteNodeCascadeById(id: string) {
