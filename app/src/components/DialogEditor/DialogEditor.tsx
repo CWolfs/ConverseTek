@@ -12,8 +12,7 @@ import { NodeStore } from 'stores/nodeStore/node-store';
 import { ConversationAssetType } from 'types/ConversationAssetType';
 
 import { useStore } from 'hooks/useStore';
-import { NodeType } from 'types/NodeType';
-import { NodeLinkType } from 'types/NodeLinkType';
+import { NodeElementType } from 'types/NodeElementType';
 import { detectType, isNodeType } from 'utils/node-utils';
 
 import { ConverseTekNodeRenderer } from './ConverseTekNodeRenderer';
@@ -64,15 +63,15 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
 
     if (isRoot) {
       const rootIds = parentChildren.map((child) => child.id);
-      nodeStore.setRoots(rootIds);
+      nodeStore.setRootNodeIds(rootIds);
     } else if (isNode) {
-      if (nodeId == null) return;
+      if (nodeId == null || nodeParentId == null) return;
 
-      nodeStore.moveNode(nodeId, nextParentNodeId, nodeParentId);
+      nodeStore.movePromptNode(nodeId, nextParentNodeId, nodeParentId);
     } else if (isResponse) {
       if (nodeId == null) return;
 
-      nodeStore.moveResponse(nodeId, nextParentNodeId, parentChildren);
+      nodeStore.moveResponseNode(nodeId, nextParentNodeId, parentChildren);
     }
   };
 
@@ -116,7 +115,7 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
           allowDrop = false;
         }
       } else if (isNode) {
-        const parent = nodeStore.getNode(parentId) as NodeLinkType;
+        const parent = nodeStore.getNode(parentId) as NodeElementType;
         if (parent == null) {
           console.error(`Checking drop target Response '${parentId}' but it is null`);
           return false;

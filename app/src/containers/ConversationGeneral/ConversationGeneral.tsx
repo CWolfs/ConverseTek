@@ -8,8 +8,8 @@ import capitalize from 'lodash.capitalize';
 
 import { getId, createId } from 'utils/conversation-utils';
 import { useStore } from 'hooks/useStore';
-import { NodeType } from 'types/NodeType';
-import { NodeLinkType } from 'types/NodeLinkType';
+import { NodePromptType } from 'types/NodePromptType';
+import { NodeElementType } from 'types/NodeElementType';
 import { NodeStore } from 'stores/nodeStore/node-store';
 
 import './ConversationGeneral.css';
@@ -33,7 +33,7 @@ const colTwoLayout = {
 };
 
 type Props = {
-  node: NodeType | NodeLinkType;
+  node: NodePromptType | NodeElementType;
 };
 
 function ConversationGeneral({ node }: Props) {

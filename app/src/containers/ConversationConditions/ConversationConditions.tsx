@@ -12,14 +12,14 @@ import { EditableLogic } from 'components/EditableLogic';
 import { useStore } from 'hooks/useStore';
 import { NodeStore } from 'stores/nodeStore/node-store';
 import { DefStore } from 'stores/defStore/def-store';
-import { NodeLinkType } from 'types/NodeLinkType';
+import { NodeElementType } from 'types/NodeElementType';
 import { OperationCallType } from 'types/OperationCallType';
 
 import './ConversationConditions.css';
 
 const { Panel } = Collapse;
 
-function ConversationConditions({ node }: { node: NodeLinkType }) {
+function ConversationConditions({ node }: { node: NodeElementType }) {
   const nodeStore = useStore<NodeStore>('node');
   const defStore = useStore<DefStore>('def');
   const update = useUpdate();
@@ -49,7 +49,7 @@ function ConversationConditions({ node }: { node: NodeLinkType }) {
     if (conditions) {
       nodeStore.addNodeCondition(node, newCondition);
     } else {
-      nodeStore.setNodeConditions(node, [newCondition]);
+      nodeStore.setElementNodeConditions(node, [newCondition]);
     }
   };
 
@@ -57,7 +57,7 @@ function ConversationConditions({ node }: { node: NodeLinkType }) {
     if (!conditions || !conditions.ops) return;
 
     remove(conditions.ops, (value, i) => i === index);
-    if (conditions.ops.length <= 0) nodeStore.setNodeConditions(node, null);
+    if (conditions.ops.length <= 0) nodeStore.setElementNodeConditions(node, null);
 
     event.stopPropagation();
   };

@@ -8,8 +8,8 @@ import difference from 'lodash.difference';
 import forEachRight from 'lodash.foreachright';
 
 import { ConversationAssetType, IdRef } from 'types/ConversationAssetType';
-import { NodeType } from 'types/NodeType';
-import { NodeLinkType } from 'types/NodeLinkType';
+import { NodePromptType } from 'types/NodePromptType';
+import { NodeElementType } from 'types/NodeElementType';
 
 import { dataStore } from '../stores';
 
@@ -86,9 +86,10 @@ export function createConversation(filePath: string): ConversationAssetType {
   return conversation;
 }
 
-export function createRoot(): NodeLinkType {
+export function createRootNode(): NodeElementType {
   return {
     type: 'root',
+    parentId: '-1',
     responseText: '',
     conditions: null,
     actions: null,
@@ -104,12 +105,13 @@ export function createRoot(): NodeLinkType {
   };
 }
 
-export function createNode(index: number): NodeType {
+export function createPromptNode(index: number): NodePromptType {
   return {
     type: 'node',
     idRef: {
       id: generateId(),
     },
+    parentId: '-1',
     index,
     text: '',
     branches: [],
@@ -129,9 +131,10 @@ export function createNode(index: number): NodeType {
   };
 }
 
-export function createResponse(): NodeLinkType {
+export function createResponseNode(): NodeElementType {
   return {
     type: 'response',
+    parentId: '-1',
     responseText: '',
     conditions: null,
     actions: null,
@@ -183,11 +186,11 @@ export function fillIndexGaps(conversationAsset: ConversationAssetType): void {
   const indexGaps = difference(rangeIndexes, sortedIndexes);
 
   indexGaps.forEach((index) => {
-    nodes.splice(index, 0, createNode(-1));
+    nodes.splice(index, 0, createPromptNode(-1));
   });
 }
 
-export function updateRoot(conversationAsset: ConversationAssetType, root: NodeLinkType): void {
+export function updateRootNode(conversationAsset: ConversationAssetType, root: NodeElementType): void {
   const { roots } = conversationAsset.conversation;
   const index = findIndex(roots, (r) => getId(r) === getId(root));
 
@@ -198,7 +201,7 @@ export function updateRoot(conversationAsset: ConversationAssetType, root: NodeL
   }
 }
 
-export function updateNode(conversationAsset: ConversationAssetType, node: NodeType): void {
+export function updatePromptNode(conversationAsset: ConversationAssetType, node: NodePromptType): void {
   const { nodes } = conversationAsset.conversation;
   const index = findIndex(nodes, (n) => getId(n) === getId(node));
 
@@ -209,12 +212,12 @@ export function updateNode(conversationAsset: ConversationAssetType, node: NodeT
   }
 }
 
-export function addNodes(conversationAsset: ConversationAssetType, newNodes: NodeType[]): void {
+export function addNodes(conversationAsset: ConversationAssetType, newNodes: NodePromptType[]): void {
   const { nodes } = conversationAsset.conversation;
   newNodes.forEach((node) => nodes.push(node));
 }
 
-export function updateResponse(conversationAsset: ConversationAssetType, parentNode: NodeType, response: NodeLinkType): void {
+export function updateResponseNode(conversationAsset: ConversationAssetType, parentNode: NodePromptType, response: NodeElementType): void {
   const { nodes } = conversationAsset.conversation;
 
   const branchIndex = findIndex(parentNode.branches, (b) => getId(b) === getId(response));
@@ -232,7 +235,7 @@ export function updateResponse(conversationAsset: ConversationAssetType, parentN
   }
 }
 
-export function setRoots(conversationAsset: ConversationAssetType, roots: NodeLinkType[]): void {
+export function setRoots(conversationAsset: ConversationAssetType, roots: NodeElementType[]): void {
   // const { roots: conversationRoots } = conversationAsset.conversation;
   // // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   // conversationRoots.replace(roots);
@@ -242,7 +245,7 @@ export function setRoots(conversationAsset: ConversationAssetType, roots: NodeLi
   conversation.roots = [...roots];
 }
 
-export function setResponses(conversationAsset: ConversationAssetType, parentNode: NodeType, responses: NodeLinkType[]): void {
+export function setResponses(conversationAsset: ConversationAssetType, parentNode: NodePromptType, responses: NodeElementType[]): void {
   const { nodes } = conversationAsset.conversation;
   const parentNodeIndex = findIndex(nodes, (n) => getId(n) === getId(parentNode));
 

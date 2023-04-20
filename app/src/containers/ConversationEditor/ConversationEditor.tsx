@@ -12,6 +12,7 @@ import { DialogEditor } from 'components/DialogEditor';
 import { DialogTextArea } from 'components/DialogTextArea';
 import { NodeStore } from 'stores/nodeStore/node-store';
 import { DataStore } from 'stores/dataStore/data-store';
+import { NodeElementType } from 'types/NodeElementType';
 
 import { ConversationAssetType } from 'types/ConversationAssetType';
 import { ConversationGeneral } from '../ConversationGeneral';
@@ -19,7 +20,6 @@ import { ConversationConditions } from '../ConversationConditions';
 import { ConversationActions } from '../ConversationActions';
 
 import './ConversationEditor.css';
-import { NodeLinkType } from 'types/NodeLinkType';
 
 const FormItem = Form.Item;
 const { TabPane } = Tabs;
@@ -42,12 +42,12 @@ function ConversationEditor({ conversationAsset }: Props) {
 
   const onSaveButtonClicked = () => {
     if (unsavedActiveConversationAsset == null) {
-      message.error('Save failed');
+      void message.error('Save failed');
       return;
     }
 
     void updateConversation(unsavedActiveConversationAsset.conversation.idRef.id, unsavedActiveConversationAsset).then(() => {
-      message.success('Save successful');
+      void message.success('Save successful');
     });
     dataStore.updateActiveConversation(unsavedActiveConversationAsset); // local update for speed
     createNewUnsavedConversation();
@@ -170,7 +170,7 @@ function ConversationEditor({ conversationAsset }: Props) {
                 </TabPane>
                 {(isRoot || isResponse) && (
                   <TabPane tab="Conditions" key="2">
-                    <ConversationConditions node={activeNode as NodeLinkType} />
+                    <ConversationConditions node={activeNode as NodeElementType} />
                   </TabPane>
                 )}
                 <TabPane tab="Actions" key="3">

@@ -6,8 +6,8 @@ import { observer } from 'mobx-react';
 import { Icon } from 'antd';
 
 import { OnNodeContextMenuProps } from '../DialogEditor';
-import { NodeType } from 'types/NodeType';
-import { NodeLinkType } from 'types/NodeLinkType';
+import { NodePromptType } from 'types/NodePromptType';
+import { NodeElementType } from 'types/NodeElementType';
 
 import { isDescendant } from 'utils/tree-data-utils';
 import { detectType } from 'utils/node-utils';
@@ -54,7 +54,7 @@ type Props = {
   rowDirection: string;
 };
 
-function hasActionsAndConditions(node: NodeType | NodeLinkType | null): { hasActions: boolean; hasConditions: boolean } {
+function hasActionsAndConditions(node: NodePromptType | NodeElementType | null): { hasActions: boolean; hasConditions: boolean } {
   let hasActions = false;
   let hasConditions = false;
 

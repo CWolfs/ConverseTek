@@ -1,10 +1,10 @@
-import { NodeLinkType } from './NodeLinkType';
-import { NodeType } from './NodeType';
+import { NodeElementType } from './NodeElementType';
+import { NodePromptType } from './NodePromptType';
 
 export type ClipboardType = {
-  node: NodeType | NodeLinkType;
+  node: NodePromptType | NodeElementType;
   originalNodeId: string;
   originalNodeIndex: number | null;
-  nodes: (NodeType | NodeLinkType)[];
+  nodes: (NodePromptType | NodeElementType)[];
   nodeIdMap: Map<number, number>;
 };

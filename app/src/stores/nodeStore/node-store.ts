@@ -9,21 +9,21 @@ import flattenDeep from 'lodash.flattendeep';
 import {
   getId,
   generateId,
-  createNode,
-  createResponse,
-  createRoot,
-  updateRoot,
+  createPromptNode,
+  createResponseNode,
+  createRootNode,
+  updateRootNode,
   setRoots as setRootsUtil,
-  updateNode,
-  updateResponse,
+  updatePromptNode,
+  updateResponseNode,
   setResponses,
   // addNodes,
 } from '../../utils/conversation-utils';
 
 import { dataStore } from '../dataStore';
 // import { detectType, isNodeLinkType, isNodeType } from '../../utils/node-utils';
-import { NodeType } from 'types/NodeType';
-import { NodeLinkType } from 'types/NodeLinkType';
+import { NodePromptType } from 'types/NodePromptType';
+import { NodeElementType } from 'types/NodeElementType';
 import { ConversationAssetType } from 'types/ConversationAssetType';
 import { OperationCallType } from 'types/OperationCallType';
 import { ClipboardType } from 'types/ClipboardType';
@@ -32,10 +32,10 @@ import { ClipboardType } from 'types/ClipboardType';
 class NodeStore {
   static deleteDeferred = false;
 
-  activeNode: NodeType | NodeLinkType | null = null;
+  activeNode: NodePromptType | NodeElementType | null = null;
   focusedTreeNode: RSTNode | null = null;
   ownerId: string | null = null;
-  takenNodeIndexes: number[] = [];
+  takenPromptNodeIndexes: number[] = [];
   expandMap = new Map<string, boolean>();
   clipboard: ClipboardType | null = null;
   nodeIdToTreeIndexMap = new Map<string, number>();
@@ -65,18 +65,18 @@ class NodeStore {
       setNodeText: action,
       setNodeActions: action,
       addNodeAction: action,
-      setNodeConditions: action,
+      setElementNodeConditions: action,
       addNodeCondition: action,
       processDeletes: action,
       addNodeByParentId: action,
-      addRoot: action,
-      setRoots: action,
+      addRootNode: action,
+      setRootNodeIds: action,
       getChildrenFromRoots: action,
-      addNode: action,
-      addResponse: action,
-      setResponses: action,
-      moveResponse: action,
-      moveNode: action,
+      addPromptNode: action,
+      addResponseNode: action,
+      setResponseNodeIds: action,
+      moveResponseNode: action,
+      movePromptNode: action,
       deleteNodeCascadeById: action,
       cleanUpDanglingResponseIndexes: action,
       deleteNodeCascade: action,
@@ -86,12 +86,12 @@ class NodeStore {
     });
   }
 
-  generateNextNodeIndex() {
-    this.takenNodeIndexes = sortBy(this.takenNodeIndexes, (index) => index);
-    const lastIndex = last(this.takenNodeIndexes) ?? -1;
-    const nextNodeIndex = lastIndex + 1;
-    this.takenNodeIndexes.push(nextNodeIndex);
-    return nextNodeIndex;
+  generateNextPromptNodeIndex() {
+    this.takenPromptNodeIndexes = sortBy(this.takenPromptNodeIndexes, (index) => index);
+    const lastIndex = last(this.takenPromptNodeIndexes) ?? -1;
+    const nextPromptNodeIndex = lastIndex + 1;
+    this.takenPromptNodeIndexes.push(nextPromptNodeIndex);
+    return nextPromptNodeIndex;
   }
 
   addNodeIdAndTreeIndexPair(nodeId: string, index: number) {
@@ -137,7 +137,7 @@ class NodeStore {
    * || ACTIVE NODE METHODS ||
    * =========================
    */
-  updateActiveNode(node: NodeType | NodeLinkType) {
+  updateActiveNode(node: NodePromptType | NodeElementType) {
     this.setActiveNode(getId(node));
   }
 
@@ -146,7 +146,7 @@ class NodeStore {
   }
 
   setActiveNodeByIndex(nodeIndex: number) {
-    this.activeNode = this.getNodeByIndex(nodeIndex);
+    this.activeNode = this.getPromptNodeByIndex(nodeIndex);
   }
 
   getActiveNodeId() {
@@ -206,6 +206,8 @@ class NodeStore {
    * || NODE CLIPBOARD METHODS ||
    * ============================
    */
+  // setClipboard(promptId: string) {}
+
   // FIXME: Rewrite copy/pasting/linking
   // setClipboard(nodeId: string) {
   //   const tempClipboard: Partial<ClipboardType> = {
@@ -363,34 +365,32 @@ class NodeStore {
    * ==================
    */
 
-  setNode(node: NodeType | NodeLinkType) {
+  setNode(node: NodePromptType | NodeElementType) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     const { type } = node;
 
     if (conversationAsset === null) return;
 
     if (type === 'root') {
-      updateRoot(conversationAsset, node);
+      updateRootNode(conversationAsset, node);
     } else if (type === 'node') {
-      updateNode(conversationAsset, node);
+      updatePromptNode(conversationAsset, node);
     } else if (type === 'response') {
-      const parentNode = this.getNode(node.parentId) as NodeType;
-      updateResponse(conversationAsset, parentNode, node);
+      const parentPromptNode = this.getNode(node.parentId) as NodePromptType;
+      updateResponseNode(conversationAsset, parentPromptNode, node);
     }
   }
 
-  setNodeText(node: NodeType | NodeLinkType, text: string) {
+  setNodeText(node: NodePromptType | NodeElementType, text: string) {
     const { type } = node;
     if (type === 'node') {
-      // FIXME: Implement immutability for nodes
       node.text = text;
     } else {
-      // FIXME: Implement immutability for nodes
       node.responseText = text;
     }
   }
 
-  setNodeActions(node: NodeType | NodeLinkType, actions: OperationCallType[] | null) {
+  setNodeActions(node: NodePromptType | NodeElementType, actions: OperationCallType[] | null) {
     if (actions === null) node.actions = null;
 
     node.actions = {
@@ -398,7 +398,7 @@ class NodeStore {
     };
   }
 
-  addNodeAction(node: NodeType | NodeLinkType, nodeAction: OperationCallType) {
+  addNodeAction(node: NodePromptType | NodeElementType, nodeAction: OperationCallType) {
     const { actions } = node;
 
     if (actions) {
@@ -408,31 +408,29 @@ class NodeStore {
     }
   }
 
-  setNodeConditions(node: NodeLinkType, conditions: OperationCallType[] | null) {
-    if (conditions === null) node.conditions = null;
+  setElementNodeConditions(elementNode: NodeElementType, conditions: OperationCallType[] | null) {
+    if (conditions === null) elementNode.conditions = null;
 
-    node.conditions = {
+    elementNode.conditions = {
       ops: conditions,
     };
   }
 
-  addNodeCondition(node: NodeLinkType, nodeCondition: OperationCallType) {
-    const { conditions } = node;
+  addNodeCondition(elementNode: NodeElementType, elementNodeCondition: OperationCallType) {
+    const { conditions } = elementNode;
 
     if (conditions) {
-      this.setNodeConditions(node, [...(conditions.ops || []), nodeCondition]);
+      this.setElementNodeConditions(elementNode, [...(conditions.ops || []), elementNodeCondition]);
     } else {
-      this.setNodeConditions(node, [nodeCondition]);
+      this.setElementNodeConditions(elementNode, [elementNodeCondition]);
     }
   }
 
-  getNode(nodeId: string | undefined): NodeType | NodeLinkType | null {
+  getNode(nodeId: string | undefined): NodePromptType | NodeElementType | null {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     if (!conversationAsset) {
       throw Error('Unsaved conversation is null or undefined');
     }
-
-    // if (nodeId === '0') return null;
 
     const { roots, nodes } = conversationAsset.conversation;
 
@@ -453,7 +451,7 @@ class NodeStore {
     return null;
   }
 
-  getNodeByIndex(index: number) {
+  getPromptNodeByIndex(index: number): NodePromptType | null {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     if (conversationAsset === null) return null;
 
@@ -465,7 +463,7 @@ class NodeStore {
     return null;
   }
 
-  removeNode(node: NodeType | NodeLinkType, immediate = false) {
+  removeNode(node: NodePromptType | NodeElementType, immediate = false): void {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     if (conversationAsset === null) return;
 
@@ -501,7 +499,7 @@ class NodeStore {
     }
   }
 
-  processDeletes = () => {
+  processDeletes = (): void => {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     if (conversationAsset === null) return;
 
@@ -520,64 +518,64 @@ class NodeStore {
     });
   };
 
-  addNodeByParentId(parentId: string) {
+  addNodeByParentId(parentId: string): void {
     const parent = this.getNode(parentId);
 
     if (parent == null) {
       if (parentId === '0') {
-        this.addRoot();
+        this.addRootNode();
       }
     } else {
       const { type } = parent;
 
       if (type === 'node') {
-        this.addResponse(parent);
+        this.addResponseNode(parent);
       } else if (type === 'root' || type === 'response') {
-        this.addNode(parent);
+        this.addPromptNode(parent);
       }
     }
   }
 
-  addRoot() {
+  addRootNode(): void {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     if (conversationAsset === null) return;
 
-    const root = createRoot();
-    root.parentId = '0';
-    updateRoot(conversationAsset, root);
+    const rootNode = createRootNode();
+    rootNode.parentId = '0';
+    updateRootNode(conversationAsset, rootNode);
 
-    this.updateActiveNode(root);
+    this.updateActiveNode(rootNode);
     this.setRebuild(true);
   }
 
-  setRoots(rootIds: string[]) {
+  setRootNodeIds(rootNodeIds: string[]) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     if (conversationAsset === null) return;
 
-    const roots = rootIds.map((rootId) => this.getNode(rootId));
-    setRootsUtil(conversationAsset, roots as NodeLinkType[]);
+    const rootNodes = rootNodeIds.map((rootNodeId: string) => this.getNode(rootNodeId));
+    setRootsUtil(conversationAsset, rootNodes as NodeElementType[]);
   }
 
-  addNode(parent: NodeLinkType) {
+  addPromptNode(parentElementNode: NodeElementType) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-    const { nextNodeIndex: existingNextNodeIndex } = parent;
+    const { nextNodeIndex: existingNextPromptNodeIndex } = parentElementNode;
 
     if (conversationAsset === null) return;
 
-    if (existingNextNodeIndex === -1) {
-      const nextNodeIndex = this.generateNextNodeIndex();
-      const node = createNode(nextNodeIndex);
-      node.parentId = getId(parent);
-      parent.nextNodeIndex = node.index;
+    if (existingNextPromptNodeIndex === -1) {
+      const nextPromptNodeIndex = this.generateNextPromptNodeIndex();
+      const node = createPromptNode(nextPromptNodeIndex);
+      node.parentId = getId(parentElementNode);
+      parentElementNode.nextNodeIndex = node.index;
 
-      if (parent.type === 'root') {
-        updateRoot(conversationAsset, parent);
-      } else if (parent.type === 'response') {
-        const grandParentNode = this.getNode(parent.parentId) as NodeType;
-        updateResponse(conversationAsset, grandParentNode, parent);
+      if (parentElementNode.type === 'root') {
+        updateRootNode(conversationAsset, parentElementNode);
+      } else if (parentElementNode.type === 'response') {
+        const grandParentNode = this.getNode(parentElementNode.parentId) as NodePromptType;
+        updateResponseNode(conversationAsset, grandParentNode, parentElementNode);
       }
 
-      updateNode(conversationAsset, node);
+      updatePromptNode(conversationAsset, node);
 
       this.updateActiveNode(node);
       this.setRebuild(true);
@@ -586,28 +584,28 @@ class NodeStore {
     }
   }
 
-  addResponse(parent: NodeType) {
+  addResponseNode(parentPromptNode: NodePromptType) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     if (conversationAsset === null) return;
 
-    const response = createResponse();
-    response.parentId = getId(parent);
-    updateResponse(conversationAsset, parent, response);
+    const responseNode = createResponseNode();
+    responseNode.parentId = getId(parentPromptNode);
+    updateResponseNode(conversationAsset, parentPromptNode, responseNode);
 
-    this.updateActiveNode(response);
+    this.updateActiveNode(responseNode);
     this.setRebuild(true);
   }
 
-  setResponses(parentId: string, responseIds: string[]) {
+  setResponseNodeIds(parentId: string, responseIds: string[]) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     if (conversationAsset === null) return;
 
-    const responses = responseIds.map((responseId) => this.getNode(responseId)) as NodeLinkType[];
-    const parent = this.getNode(parentId) as NodeType;
-    setResponses(conversationAsset, parent, responses);
+    const responseNodes = responseIds.map((responseId) => this.getNode(responseId)) as NodeElementType[];
+    const parentPromptNode = this.getNode(parentId) as NodePromptType;
+    setResponses(conversationAsset, parentPromptNode, responseNodes);
   }
 
-  moveResponse(
+  moveResponseNode(
     responseToMoveId: string,
     newParentNodeId: string,
     newParentResponseOrder: {
@@ -618,38 +616,40 @@ class NodeStore {
     if (conversationAsset === null) return;
 
     // Get Response, Old Parent Node and New Parent Node
-    const responseNode = this.getNode(responseToMoveId) as NodeLinkType;
-    const newParentNode = this.getNode(newParentNodeId) as NodeType;
-    const oldParentNode = this.getNode(responseNode.parentId) as NodeType;
+    const responseNode = this.getNode(responseToMoveId) as NodeElementType;
+    const newParentPromptNode = this.getNode(newParentNodeId) as NodePromptType;
+    const oldParentPromptNode = this.getNode(responseNode.parentId) as NodePromptType;
 
     responseNode.parentId = newParentNodeId;
 
-    const updatedNewParentBranches = [...newParentResponseOrder.map((responseId) => this.getNode(responseId.id))] as NodeLinkType[];
-    newParentNode.branches = updatedNewParentBranches;
+    const updatedNewParentBranches = [...newParentResponseOrder.map((responseNodeId) => this.getNode(responseNodeId.id))] as NodeElementType[];
+    newParentPromptNode.branches = updatedNewParentBranches;
 
     // Don't remove if within the same parent Node
     if (responseNode.parentId !== newParentNodeId) {
-      const updatedOldParentBranches = oldParentNode.branches.filter((response: NodeLinkType) => getId(response) !== responseToMoveId);
-      oldParentNode.branches = updatedOldParentBranches;
+      const updatedOldParentBranches = oldParentPromptNode.branches.filter(
+        (responseNode: NodeElementType) => getId(responseNode) !== responseToMoveId,
+      );
+      oldParentPromptNode.branches = updatedOldParentBranches;
     }
   }
 
-  moveNode(nodeToMoveId: string, nextParentResponseId: string, previousParentResponseId: string) {
-    const nodeBeingMoved = nodeStore.getNode(nodeToMoveId) as NodeType;
+  movePromptNode(nodeToMoveId: string, nextParentResponseId: string, previousParentResponseId: string): void {
+    const nodeBeingMoved = nodeStore.getNode(nodeToMoveId) as NodePromptType;
     const { index: nodeIndex } = nodeBeingMoved;
 
     // Set new root/response parent 'nextNodeIndex' to node 'index'
-    const nextParent = nodeStore.getNode(nextParentResponseId) as NodeLinkType;
-    if (nextParent == null) throw Error(`Next parent response '${nextParentResponseId}' not found`);
-    nextParent.nextNodeIndex = nodeIndex;
+    const nextParentElementNode = nodeStore.getNode(nextParentResponseId) as NodeElementType;
+    if (nextParentElementNode == null) throw Error(`Next parent root/response '${nextParentResponseId}' not found`);
+    nextParentElementNode.nextNodeIndex = nodeIndex;
 
     // Set previous root/response parent 'nextNodeIndex' to -1
-    const previousParent = nodeStore.getNode(previousParentResponseId) as NodeLinkType;
-    if (previousParent == null) throw Error(`Previous parent response '${previousParentResponseId}' not found`);
-    previousParent.nextNodeIndex = -1;
+    const previousParentElementNode = nodeStore.getNode(previousParentResponseId) as NodeElementType;
+    if (previousParentElementNode == null) throw Error(`Previous parent root/response '${previousParentResponseId}' not found`);
+    previousParentElementNode.nextNodeIndex = -1;
   }
 
-  deleteNodeCascadeById(id: string) {
+  deleteNodeCascadeById(id: string): void {
     const node = this.getNode(id);
     if (node) {
       this.deleteNodeCascade(node);
@@ -660,39 +660,39 @@ class NodeStore {
   /*
    * Ensures that any node that refers to an id specified now points to 'END OF DIALOG' (-1)
    */
-  cleanUpDanglingResponseIndexes(indexToClean: number) {
+  cleanUpDanglingResponseIndexes(indexToClean: number): void {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     if (conversationAsset === null) return;
 
     const { roots, nodes } = conversationAsset.conversation;
 
-    roots.forEach((root) => {
-      const { nextNodeIndex } = root;
+    roots.forEach((rootNode: NodeElementType) => {
+      const { nextNodeIndex } = rootNode;
       if (nextNodeIndex === indexToClean) {
-        root.nextNodeIndex = -1;
+        rootNode.nextNodeIndex = -1;
       }
     });
 
-    nodes.forEach((node) => {
-      const { branches } = node;
+    nodes.forEach((promptNode: NodePromptType) => {
+      const { branches } = promptNode;
 
-      branches.forEach((branch) => {
-        const { nextNodeIndex } = branch;
+      branches.forEach((elementNode: NodeElementType) => {
+        const { nextNodeIndex } = elementNode;
         if (nextNodeIndex === indexToClean) {
-          branch.nextNodeIndex = -1;
+          elementNode.nextNodeIndex = -1;
         }
       });
     });
   }
 
-  deleteNodeCascade(node: NodeType | NodeLinkType) {
+  deleteNodeCascade(node: NodePromptType | NodeElementType): void {
     if (node.type === 'node') {
       const { index, branches } = node;
       branches.forEach((branch) => {
         this.deleteBranchCascade(branch);
       });
 
-      remove(this.takenNodeIndexes, (i) => i === index);
+      remove(this.takenPromptNodeIndexes, (i) => i === index);
       this.removeNode(node);
 
       if (this.activeNode && getId(this.activeNode) === getId(node)) this.clearActiveNode();
@@ -707,49 +707,51 @@ class NodeStore {
     }
   }
 
-  deleteBranchCascade(branch: NodeLinkType) {
-    const { auxiliaryLink } = branch;
+  deleteBranchCascade(elementNode: NodeElementType): void {
+    const { auxiliaryLink } = elementNode;
 
     if (!auxiliaryLink) {
-      const nextNode = this.getNodeByIndex(branch.nextNodeIndex);
+      const nextNode = this.getPromptNodeByIndex(elementNode.nextNodeIndex);
       if (nextNode) this.deleteNodeCascade(nextNode);
     }
 
-    if (this.activeNode && getId(this.activeNode) === getId(branch)) this.clearActiveNode();
-    this.removeNode(branch);
+    if (this.activeNode && getId(this.activeNode) === getId(elementNode)) this.clearActiveNode();
+    this.removeNode(elementNode);
   }
 
-  deleteLink(parentId: string) {
-    const node = this.getNode(parentId) as NodeLinkType;
-    node.nextNodeIndex = -1;
-    node.auxiliaryLink = false;
+  deleteLink(parentId: string): void {
+    const elementNode = this.getNode(parentId) as NodeElementType;
+    elementNode.nextNodeIndex = -1;
+    elementNode.auxiliaryLink = false;
     this.setRebuild(true);
   }
 
-  getChildrenFromRoots(roots: NodeLinkType[]) {
-    return roots.map((root) => {
-      const rootId = getId(root);
+  getChildrenFromRoots(rootNodes: NodeElementType[]): RSTNode[] {
+    return rootNodes.map((rootNode) => {
+      const rootId = getId(rootNode);
       const isExpanded = this.isNodeExpanded(rootId);
 
-      root.type = 'root';
+      // FIXME: Preprocess data for setting things like rootNode.type instead of setting it in a getter
+      rootNode.type = 'root';
+
       return {
-        title: root.responseText,
-        id: getId(root),
+        title: rootNode.responseText,
+        id: getId(rootNode),
         parentId: null,
         type: 'root',
         expanded: isExpanded,
-        children: this.getChildren(root),
+        children: this.getChildrenFromElementNode(rootNode),
       };
     });
   }
 
-  setNodeExpansion(nodeId: string | undefined, flag: boolean) {
+  setNodeExpansion(nodeId: string | undefined, flag: boolean): void {
     if (!nodeId) return;
 
     this.expandMap.set(nodeId, flag);
   }
 
-  isNodeExpanded(nodeId: string | undefined) {
+  isNodeExpanded(nodeId: string | undefined): boolean {
     if (!nodeId) return false;
 
     const isNodeExpanded = this.expandMap.get(nodeId);
@@ -757,12 +759,12 @@ class NodeStore {
     return isNodeExpanded;
   }
 
-  getNodeResponseIdsFromNodeId(nodeId: string) {
-    const node = this.getNode(nodeId) as NodeType;
-    return this.getNodeResponseIds(node);
+  getNodeResponseIdsFromNodeId(nodeId: string): string[] {
+    const promptNode = this.getNode(nodeId) as NodePromptType;
+    return this.getNodeResponseIds(promptNode);
   }
 
-  getNodeResponseIds(node: NodeType) {
+  getNodeResponseIds(node: NodePromptType): string[] {
     return node.branches.map((branch) => getId(branch));
   }
 
@@ -771,72 +773,72 @@ class NodeStore {
    * || DIALOG TREE DATA BUILDING METHODS ||
    * =======================================
    */
-  getChildren(node: NodeLinkType): RSTNode[] | null {
-    const { nextNodeIndex } = node; // root or response/branch
+  getChildrenFromElementNode(elementNode: NodeElementType): RSTNode[] | null {
+    const { nextNodeIndex } = elementNode; // root or response/branch
 
     // GUARD - End of branch so this would be tagged as a DIALOG END node
     if (nextNodeIndex === -1) return null;
 
     // GUARD - Error if there's a mistake in the file and
     //         no node exists of the index being looked for
-    const childNode = this.getNodeByIndex(nextNodeIndex);
-    if (!childNode) {
-      console.error(`[Conversation Editor] Failed trying to find node ${nextNodeIndex}`);
+    const childPromptNode = this.getPromptNodeByIndex(nextNodeIndex);
+    if (!childPromptNode) {
+      console.error(`[Conversation Editor] Failed trying to find prompt node ${nextNodeIndex}`);
       return null;
     }
 
-    const { index: childIndex } = childNode;
-    const childNodeId = getId(childNode);
+    const { index: childPromptIndex } = childPromptNode;
+    const childNodeId = getId(childPromptNode);
     const isChildExpanded = this.isNodeExpanded(childNodeId);
-    childNode.type = 'node';
-    childNode.parentId = getId(node);
-    this.takenNodeIndexes.push(childIndex);
+    childPromptNode.type = 'node';
+    childPromptNode.parentId = getId(elementNode);
+    this.takenPromptNodeIndexes.push(childPromptIndex);
 
     return [
       {
-        title: childNode.text,
+        title: childPromptNode.text,
         id: childNodeId,
-        parentId: getId(node),
+        parentId: getId(elementNode),
         type: 'node',
         expanded: isChildExpanded,
 
-        children: childNode.branches.map((branch): RSTNode => {
-          const { auxiliaryLink } = branch;
-          const branchNodeId = getId(branch);
-          const isBranchExpanded = this.isNodeExpanded(branchNodeId);
+        children: childPromptNode.branches.map((elementNode: NodeElementType): RSTNode => {
+          const { auxiliaryLink } = elementNode;
+          const elementNodeId = getId(elementNode);
+          const isElementNodeExpanded = this.isNodeExpanded(elementNodeId);
 
-          branch.type = 'response';
-          branch.parentId = childNodeId;
+          elementNode.type = 'response';
+          elementNode.parentId = childNodeId;
 
-          const isValidLink = auxiliaryLink && branch.nextNodeIndex !== -1;
-          let branchChildren: RSTNode[] | null = [];
+          const isValidLink = auxiliaryLink && elementNode.nextNodeIndex !== -1;
+          let elementNodeChildren: RSTNode[] | null = [];
 
           if (auxiliaryLink) {
             if (isValidLink) {
-              const linkNode = this.getNodeByIndex(branch.nextNodeIndex);
+              const linkNode = this.getPromptNodeByIndex(elementNode.nextNodeIndex);
 
-              branchChildren = [
+              elementNodeChildren = [
                 {
-                  title: `[Link to NODE ${branch.nextNodeIndex}]`,
+                  title: `[Link to NODE ${elementNode.nextNodeIndex}]`,
                   type: 'link',
                   linkId: linkNode ? getId(linkNode) : null,
-                  linkIndex: branch.nextNodeIndex,
+                  linkIndex: elementNode.nextNodeIndex,
                   canDrag: false,
-                  parentId: branchNodeId,
+                  parentId: elementNodeId,
                 },
               ];
             }
           } else {
-            branchChildren = this.getChildren(branch);
+            elementNodeChildren = this.getChildrenFromElementNode(elementNode);
           }
 
           return {
-            title: branch.responseText,
-            id: branchNodeId,
+            title: elementNode.responseText,
+            id: elementNodeId,
             parentId: childNodeId,
             type: 'response',
-            expanded: isBranchExpanded,
-            children: branchChildren,
+            expanded: isElementNodeExpanded,
+            children: elementNodeChildren,
           };
         }),
       },
@@ -845,7 +847,7 @@ class NodeStore {
 
   reset = () => {
     this.focusedTreeNode = null;
-    this.takenNodeIndexes = [];
+    this.takenPromptNodeIndexes = [];
     this.nodeIdToTreeIndexMap.clear();
   };
 }

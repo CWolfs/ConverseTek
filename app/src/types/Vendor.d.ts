@@ -32,7 +32,7 @@ type RSTNodeCanDragContainer = {
 type RSTNode = {
   id?: string;
   type: 'root' | 'node' | 'response' | 'link';
-  parentId: string;
+  parentId: string | null;
   expanded?: boolean;
   children?: RSTNode[] | null;
   title: string;
