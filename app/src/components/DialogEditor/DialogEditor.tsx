@@ -12,7 +12,7 @@ import { NodeStore } from 'stores/nodeStore/node-store';
 import { ConversationAssetType } from 'types/ConversationAssetType';
 
 import { useStore } from 'hooks/useStore';
-import { NodeElementType } from 'types/NodeElementType';
+import { ElementNodeType } from 'types/ElementNodeType';
 import { detectType, isNodeType } from 'utils/node-utils';
 
 import { ConverseTekNodeRenderer } from './ConverseTekNodeRenderer';
@@ -115,7 +115,7 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
           allowDrop = false;
         }
       } else if (isNode) {
-        const parent = nodeStore.getNode(parentId) as NodeElementType;
+        const parent = nodeStore.getNode(parentId) as ElementNodeType;
         if (parent == null) {
           console.error(`Checking drop target Response '${parentId}' but it is null`);
           return false;

@@ -13,15 +13,15 @@ import { EditableLogic } from 'components/EditableLogic';
 import { useStore } from 'hooks/useStore';
 import { NodeStore } from 'stores/nodeStore/node-store';
 import { DefStore } from 'stores/defStore/def-store';
-import { NodePromptType } from 'types/NodePromptType';
-import { NodeElementType } from 'types/NodeElementType';
+import { PromptNodeType } from 'types/PromptNodeType';
+import { ElementNodeType } from 'types/ElementNodeType';
 import { OperationCallType } from 'types/OperationCallType';
 
 import './ConversationActions.css';
 
 const { Panel } = Collapse;
 
-function ConversationActions({ node }: { node: NodePromptType | NodeElementType }) {
+function ConversationActions({ node }: { node: PromptNodeType | ElementNodeType }) {
   const nodeStore = useStore<NodeStore>('node');
   const defStore = useStore<DefStore>('def');
   const dataSize = useRef(0);

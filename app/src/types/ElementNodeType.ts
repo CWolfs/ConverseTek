@@ -1,7 +1,7 @@
 import { OperationCallType } from './OperationCallType';
 
 /** NodeLinks are either roots or branches spoken by the Player */
-export type NodeElementType = {
+export type ElementNodeType = {
   type: 'root' | 'response';
   idRef: {
     id: string;

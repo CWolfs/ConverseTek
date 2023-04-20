@@ -2,14 +2,14 @@ import React, { ChangeEvent } from 'react';
 import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
 import { Input } from 'antd';
-import { NodePromptType } from 'types/NodePromptType';
-import { NodeElementType } from 'types/NodeElementType';
+import { PromptNodeType } from 'types/PromptNodeType';
+import { ElementNodeType } from 'types/ElementNodeType';
 import { useStore } from 'hooks/useStore';
 import { NodeStore } from 'stores/nodeStore/node-store';
 
 const { TextArea } = Input;
 
-function DialogTextArea({ node }: { node: NodePromptType | NodeElementType }) {
+function DialogTextArea({ node }: { node: PromptNodeType | ElementNodeType }) {
   const { type } = node;
   const nodeStore = useStore<NodeStore>('node');
 

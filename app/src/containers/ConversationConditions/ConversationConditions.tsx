@@ -12,14 +12,14 @@ import { EditableLogic } from 'components/EditableLogic';
 import { useStore } from 'hooks/useStore';
 import { NodeStore } from 'stores/nodeStore/node-store';
 import { DefStore } from 'stores/defStore/def-store';
-import { NodeElementType } from 'types/NodeElementType';
+import { ElementNodeType } from 'types/ElementNodeType';
 import { OperationCallType } from 'types/OperationCallType';
 
 import './ConversationConditions.css';
 
 const { Panel } = Collapse;
 
-function ConversationConditions({ node }: { node: NodeElementType }) {
+function ConversationConditions({ node }: { node: ElementNodeType }) {
   const nodeStore = useStore<NodeStore>('node');
   const defStore = useStore<DefStore>('def');
   const update = useUpdate();

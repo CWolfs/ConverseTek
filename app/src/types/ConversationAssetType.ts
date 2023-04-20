@@ -1,5 +1,5 @@
-import { NodeElementType } from './NodeElementType';
-import { NodePromptType } from './NodePromptType';
+import { ElementNodeType } from './ElementNodeType';
+import { PromptNodeType } from './PromptNodeType';
 
 export type IdRef = {
   id: string;
@@ -12,9 +12,9 @@ export type ConversationAssetType = {
     idRef: IdRef;
     uiName: string;
     /** NodeLinks are either roots or branches spoken by the Player */
-    roots: NodeElementType[];
+    roots: ElementNodeType[];
     /** NodeLinks are spoken by the NPCs/game description */
-    nodes: NodePromptType[];
+    nodes: PromptNodeType[];
     defaultSpeakerId: string;
     defaultSpeakerOverride: string | null;
     persistentConversation: false;

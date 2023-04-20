@@ -1,8 +1,8 @@
-import { NodeElementType } from './NodeElementType';
+import { ElementNodeType } from './ElementNodeType';
 import { OperationCallType } from './OperationCallType';
 
 /** NodeLinks are spoken by the NPCs/game description */
-export type NodePromptType = {
+export type PromptNodeType = {
   type: 'node';
   idRef: {
     id: string;
@@ -10,7 +10,7 @@ export type NodePromptType = {
   index: number;
   parentId: string;
   text: string;
-  branches: NodeElementType[];
+  branches: ElementNodeType[];
   nodeType: number;
   truthValue: boolean;
   autoFollowBranchDelay: number;

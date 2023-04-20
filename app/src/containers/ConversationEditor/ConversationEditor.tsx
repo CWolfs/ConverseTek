@@ -12,7 +12,7 @@ import { DialogEditor } from 'components/DialogEditor';
 import { DialogTextArea } from 'components/DialogTextArea';
 import { NodeStore } from 'stores/nodeStore/node-store';
 import { DataStore } from 'stores/dataStore/data-store';
-import { NodeElementType } from 'types/NodeElementType';
+import { ElementNodeType } from 'types/ElementNodeType';
 
 import { ConversationAssetType } from 'types/ConversationAssetType';
 import { ConversationGeneral } from '../ConversationGeneral';
@@ -170,7 +170,7 @@ function ConversationEditor({ conversationAsset }: Props) {
                 </TabPane>
                 {(isRoot || isResponse) && (
                   <TabPane tab="Conditions" key="2">
-                    <ConversationConditions node={activeNode as NodeElementType} />
+                    <ConversationConditions node={activeNode as ElementNodeType} />
                   </TabPane>
                 )}
                 <TabPane tab="Actions" key="3">

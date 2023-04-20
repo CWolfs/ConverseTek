@@ -21,8 +21,8 @@ import {
 
 import { dataStore } from '../dataStore';
 // import { detectType, isNodeLinkType, isNodeType } from '../../utils/node-utils';
-import { NodePromptType } from 'types/NodePromptType';
-import { NodeElementType } from 'types/NodeElementType';
+import { PromptNodeType } from 'types/PromptNodeType';
+import { ElementNodeType } from 'types/ElementNodeType';
 import { ConversationAssetType } from 'types/ConversationAssetType';
 import { OperationCallType } from 'types/OperationCallType';
 import { ClipboardType } from 'types/ClipboardType';
@@ -31,7 +31,7 @@ import { ClipboardType } from 'types/ClipboardType';
 class NodeStore {
   static deleteDeferred = false;
 
-  activeNode: NodePromptType | NodeElementType | null = null;
+  activeNode: PromptNodeType | ElementNodeType | null = null;
   focusedTreeNode: RSTNode | null = null;
   ownerId: string | null = null;
   takenPromptNodeIndexes: number[] = [];
@@ -136,7 +136,7 @@ class NodeStore {
    * || ACTIVE NODE METHODS ||
    * =========================
    */
-  updateActiveNode(node: NodePromptType | NodeElementType) {
+  updateActiveNode(node: PromptNodeType | ElementNodeType) {
     this.setActiveNode(getId(node));
   }
 
@@ -364,7 +364,7 @@ class NodeStore {
    * ==================
    */
 
-  setNode(node: NodePromptType | NodeElementType) {
+  setNode(node: PromptNodeType | ElementNodeType) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     const { type } = node;
 
@@ -375,12 +375,12 @@ class NodeStore {
     } else if (type === 'node') {
       updatePromptNode(conversationAsset, node);
     } else if (type === 'response') {
-      const parentPromptNode = this.getNode(node.parentId) as NodePromptType;
+      const parentPromptNode = this.getNode(node.parentId) as PromptNodeType;
       updateResponseNode(conversationAsset, parentPromptNode, node);
     }
   }
 
-  setNodeText(node: NodePromptType | NodeElementType, text: string) {
+  setNodeText(node: PromptNodeType | ElementNodeType, text: string) {
     const { type } = node;
     if (type === 'node') {
       node.text = text;
@@ -389,7 +389,7 @@ class NodeStore {
     }
   }
 
-  setNodeActions(node: NodePromptType | NodeElementType, actions: OperationCallType[] | null) {
+  setNodeActions(node: PromptNodeType | ElementNodeType, actions: OperationCallType[] | null) {
     if (actions === null) node.actions = null;
 
     node.actions = {
@@ -397,7 +397,7 @@ class NodeStore {
     };
   }
 
-  addNodeAction(node: NodePromptType | NodeElementType, nodeAction: OperationCallType) {
+  addNodeAction(node: PromptNodeType | ElementNodeType, nodeAction: OperationCallType) {
     const { actions } = node;
 
     if (actions) {
@@ -407,7 +407,7 @@ class NodeStore {
     }
   }
 
-  setElementNodeConditions(elementNode: NodeElementType, conditions: OperationCallType[] | null) {
+  setElementNodeConditions(elementNode: ElementNodeType, conditions: OperationCallType[] | null) {
     if (conditions === null) elementNode.conditions = null;
 
     elementNode.conditions = {
@@ -415,7 +415,7 @@ class NodeStore {
     };
   }
 
-  addNodeCondition(elementNode: NodeElementType, elementNodeCondition: OperationCallType) {
+  addNodeCondition(elementNode: ElementNodeType, elementNodeCondition: OperationCallType) {
     const { conditions } = elementNode;
 
     if (conditions) {
@@ -425,7 +425,7 @@ class NodeStore {
     }
   }
 
-  getNode(nodeId: string | undefined): NodePromptType | NodeElementType | null {
+  getNode(nodeId: string | undefined): PromptNodeType | ElementNodeType | null {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     if (!conversationAsset) {
       throw Error('Unsaved conversation is null or undefined');
@@ -450,7 +450,7 @@ class NodeStore {
     return null;
   }
 
-  getPromptNodeByIndex(index: number): NodePromptType | null {
+  getPromptNodeByIndex(index: number): PromptNodeType | null {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     if (conversationAsset === null) return null;
 
@@ -462,7 +462,7 @@ class NodeStore {
     return null;
   }
 
-  removeNode(node: NodePromptType | NodeElementType, immediate = false): void {
+  removeNode(node: PromptNodeType | ElementNodeType, immediate = false): void {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     if (conversationAsset === null) return;
 
@@ -552,10 +552,10 @@ class NodeStore {
     if (conversationAsset === null) return;
 
     const rootNodes = rootNodeIds.map((rootNodeId: string) => this.getNode(rootNodeId));
-    setRootNodes(conversationAsset, rootNodes as NodeElementType[]);
+    setRootNodes(conversationAsset, rootNodes as ElementNodeType[]);
   }
 
-  addPromptNode(parentElementNode: NodeElementType) {
+  addPromptNode(parentElementNode: ElementNodeType) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     const { nextNodeIndex: existingNextPromptNodeIndex } = parentElementNode;
 
@@ -570,7 +570,7 @@ class NodeStore {
       if (parentElementNode.type === 'root') {
         updateRootNode(conversationAsset, parentElementNode);
       } else if (parentElementNode.type === 'response') {
-        const grandParentNode = this.getNode(parentElementNode.parentId) as NodePromptType;
+        const grandParentNode = this.getNode(parentElementNode.parentId) as PromptNodeType;
         updateResponseNode(conversationAsset, grandParentNode, parentElementNode);
       }
 
@@ -583,7 +583,7 @@ class NodeStore {
     }
   }
 
-  addResponseNode(parentPromptNode: NodePromptType) {
+  addResponseNode(parentPromptNode: PromptNodeType) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     if (conversationAsset === null) return;
 
@@ -599,8 +599,8 @@ class NodeStore {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     if (conversationAsset === null) return;
 
-    const responseNodes = responseIds.map((responseId) => this.getNode(responseId)) as NodeElementType[];
-    const parentPromptNode = this.getNode(parentId) as NodePromptType;
+    const responseNodes = responseIds.map((responseId) => this.getNode(responseId)) as ElementNodeType[];
+    const parentPromptNode = this.getNode(parentId) as PromptNodeType;
     setResponseNodes(conversationAsset, parentPromptNode, responseNodes);
   }
 
@@ -615,35 +615,35 @@ class NodeStore {
     if (conversationAsset === null) return;
 
     // Get Response, Old Parent Node and New Parent Node
-    const responseNode = this.getNode(responseToMoveId) as NodeElementType;
-    const newParentPromptNode = this.getNode(newParentNodeId) as NodePromptType;
-    const oldParentPromptNode = this.getNode(responseNode.parentId) as NodePromptType;
+    const responseNode = this.getNode(responseToMoveId) as ElementNodeType;
+    const newParentPromptNode = this.getNode(newParentNodeId) as PromptNodeType;
+    const oldParentPromptNode = this.getNode(responseNode.parentId) as PromptNodeType;
 
     responseNode.parentId = newParentNodeId;
 
-    const updatedNewParentBranches = [...newParentResponseOrder.map((responseNodeId) => this.getNode(responseNodeId.id))] as NodeElementType[];
+    const updatedNewParentBranches = [...newParentResponseOrder.map((responseNodeId) => this.getNode(responseNodeId.id))] as ElementNodeType[];
     newParentPromptNode.branches = updatedNewParentBranches;
 
     // Don't remove if within the same parent Node
     if (responseNode.parentId !== newParentNodeId) {
       const updatedOldParentBranches = oldParentPromptNode.branches.filter(
-        (responseNode: NodeElementType) => getId(responseNode) !== responseToMoveId,
+        (responseNode: ElementNodeType) => getId(responseNode) !== responseToMoveId,
       );
       oldParentPromptNode.branches = updatedOldParentBranches;
     }
   }
 
   movePromptNode(nodeToMoveId: string, nextParentResponseId: string, previousParentResponseId: string): void {
-    const nodeBeingMoved = nodeStore.getNode(nodeToMoveId) as NodePromptType;
+    const nodeBeingMoved = nodeStore.getNode(nodeToMoveId) as PromptNodeType;
     const { index: nodeIndex } = nodeBeingMoved;
 
     // Set new root/response parent 'nextNodeIndex' to node 'index'
-    const nextParentElementNode = nodeStore.getNode(nextParentResponseId) as NodeElementType;
+    const nextParentElementNode = nodeStore.getNode(nextParentResponseId) as ElementNodeType;
     if (nextParentElementNode == null) throw Error(`Next parent root/response '${nextParentResponseId}' not found`);
     nextParentElementNode.nextNodeIndex = nodeIndex;
 
     // Set previous root/response parent 'nextNodeIndex' to -1
-    const previousParentElementNode = nodeStore.getNode(previousParentResponseId) as NodeElementType;
+    const previousParentElementNode = nodeStore.getNode(previousParentResponseId) as ElementNodeType;
     if (previousParentElementNode == null) throw Error(`Previous parent root/response '${previousParentResponseId}' not found`);
     previousParentElementNode.nextNodeIndex = -1;
   }
@@ -665,17 +665,17 @@ class NodeStore {
 
     const { roots, nodes } = conversationAsset.conversation;
 
-    roots.forEach((rootNode: NodeElementType) => {
+    roots.forEach((rootNode: ElementNodeType) => {
       const { nextNodeIndex } = rootNode;
       if (nextNodeIndex === indexToClean) {
         rootNode.nextNodeIndex = -1;
       }
     });
 
-    nodes.forEach((promptNode: NodePromptType) => {
+    nodes.forEach((promptNode: PromptNodeType) => {
       const { branches } = promptNode;
 
-      branches.forEach((elementNode: NodeElementType) => {
+      branches.forEach((elementNode: ElementNodeType) => {
         const { nextNodeIndex } = elementNode;
         if (nextNodeIndex === indexToClean) {
           elementNode.nextNodeIndex = -1;
@@ -684,7 +684,7 @@ class NodeStore {
     });
   }
 
-  deleteNodeCascade(node: NodePromptType | NodeElementType): void {
+  deleteNodeCascade(node: PromptNodeType | ElementNodeType): void {
     if (node.type === 'node') {
       const { index, branches } = node;
       branches.forEach((branch) => {
@@ -706,7 +706,7 @@ class NodeStore {
     }
   }
 
-  deleteBranchCascade(elementNode: NodeElementType): void {
+  deleteBranchCascade(elementNode: ElementNodeType): void {
     const { auxiliaryLink } = elementNode;
 
     if (!auxiliaryLink) {
@@ -719,13 +719,13 @@ class NodeStore {
   }
 
   deleteLink(parentId: string): void {
-    const elementNode = this.getNode(parentId) as NodeElementType;
+    const elementNode = this.getNode(parentId) as ElementNodeType;
     elementNode.nextNodeIndex = -1;
     elementNode.auxiliaryLink = false;
     this.setRebuild(true);
   }
 
-  getChildrenFromRoots(rootNodes: NodeElementType[]): RSTNode[] {
+  getChildrenFromRoots(rootNodes: ElementNodeType[]): RSTNode[] {
     return rootNodes.map((rootNode) => {
       const rootId = getId(rootNode);
       const isExpanded = this.isNodeExpanded(rootId);
@@ -759,11 +759,11 @@ class NodeStore {
   }
 
   getNodeResponseIdsFromNodeId(nodeId: string): string[] {
-    const promptNode = this.getNode(nodeId) as NodePromptType;
+    const promptNode = this.getNode(nodeId) as PromptNodeType;
     return this.getNodeResponseIds(promptNode);
   }
 
-  getNodeResponseIds(node: NodePromptType): string[] {
+  getNodeResponseIds(node: PromptNodeType): string[] {
     return node.branches.map((branch) => getId(branch));
   }
 
@@ -772,7 +772,7 @@ class NodeStore {
    * || DIALOG TREE DATA BUILDING METHODS ||
    * =======================================
    */
-  getChildrenFromElementNode(elementNode: NodeElementType): RSTNode[] | null {
+  getChildrenFromElementNode(elementNode: ElementNodeType): RSTNode[] | null {
     const { nextNodeIndex } = elementNode; // root or response/branch
 
     // GUARD - End of branch so this would be tagged as a DIALOG END node
@@ -801,7 +801,7 @@ class NodeStore {
         type: 'node',
         expanded: isChildExpanded,
 
-        children: childPromptNode.branches.map((elementNode: NodeElementType): RSTNode => {
+        children: childPromptNode.branches.map((elementNode: ElementNodeType): RSTNode => {
           const { auxiliaryLink } = elementNode;
           const elementNodeId = getId(elementNode);
           const isElementNodeExpanded = this.isNodeExpanded(elementNodeId);

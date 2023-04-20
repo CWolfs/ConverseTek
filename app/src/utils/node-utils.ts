@@ -1,6 +1,6 @@
-import { NodePromptType } from 'types/NodePromptType';
+import { PromptNodeType } from 'types/PromptNodeType';
 import { nodeStore } from '../stores';
-import { NodeElementType } from 'types/NodeElementType';
+import { ElementNodeType } from 'types/ElementNodeType';
 import { ClipboardType } from 'types/ClipboardType';
 
 export type NodeTypeDetectionResult = {
@@ -10,11 +10,11 @@ export type NodeTypeDetectionResult = {
   isLink: boolean;
 };
 
-export function isNodeType(node: NodePromptType | NodeElementType): node is NodePromptType {
+export function isNodeType(node: PromptNodeType | ElementNodeType): node is PromptNodeType {
   return node.type === 'node';
 }
 
-export function isNodeLinkType(node: NodePromptType | NodeElementType): node is NodeElementType {
+export function isNodeLinkType(node: PromptNodeType | ElementNodeType): node is ElementNodeType {
   return node.type !== 'node';
 }
 
