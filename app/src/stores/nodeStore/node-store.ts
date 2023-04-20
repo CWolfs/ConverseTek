@@ -4,7 +4,6 @@ import defer from 'lodash.defer';
 import remove from 'lodash.remove';
 import sortBy from 'lodash.sortby';
 import last from 'lodash.last';
-import flattenDeep from 'lodash.flattendeep';
 
 import {
   getId,
@@ -13,10 +12,10 @@ import {
   createResponseNode,
   createRootNode,
   updateRootNode,
-  setRoots as setRootsUtil,
   updatePromptNode,
   updateResponseNode,
-  setResponses,
+  setResponseNodes,
+  setRootNodes,
   // addNodes,
 } from '../../utils/conversation-utils';
 
@@ -70,11 +69,11 @@ class NodeStore {
       processDeletes: action,
       addNodeByParentId: action,
       addRootNode: action,
-      setRootNodeIds: action,
+      setRootNodesByIds: action,
       getChildrenFromRoots: action,
       addPromptNode: action,
       addResponseNode: action,
-      setResponseNodeIds: action,
+      setResponseNodesByIds: action,
       moveResponseNode: action,
       movePromptNode: action,
       deleteNodeCascadeById: action,
@@ -548,12 +547,12 @@ class NodeStore {
     this.setRebuild(true);
   }
 
-  setRootNodeIds(rootNodeIds: string[]) {
+  setRootNodesByIds(rootNodeIds: string[]) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     if (conversationAsset === null) return;
 
     const rootNodes = rootNodeIds.map((rootNodeId: string) => this.getNode(rootNodeId));
-    setRootsUtil(conversationAsset, rootNodes as NodeElementType[]);
+    setRootNodes(conversationAsset, rootNodes as NodeElementType[]);
   }
 
   addPromptNode(parentElementNode: NodeElementType) {
@@ -596,13 +595,13 @@ class NodeStore {
     this.setRebuild(true);
   }
 
-  setResponseNodeIds(parentId: string, responseIds: string[]) {
+  setResponseNodesByIds(parentId: string, responseIds: string[]) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     if (conversationAsset === null) return;
 
     const responseNodes = responseIds.map((responseId) => this.getNode(responseId)) as NodeElementType[];
     const parentPromptNode = this.getNode(parentId) as NodePromptType;
-    setResponses(conversationAsset, parentPromptNode, responseNodes);
+    setResponseNodes(conversationAsset, parentPromptNode, responseNodes);
   }
 
   moveResponseNode(

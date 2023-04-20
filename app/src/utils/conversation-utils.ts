@@ -235,7 +235,7 @@ export function updateResponseNode(conversationAsset: ConversationAssetType, par
   }
 }
 
-export function setRoots(conversationAsset: ConversationAssetType, roots: NodeElementType[]): void {
+export function setRootNodes(conversationAsset: ConversationAssetType, roots: NodeElementType[]): void {
   // const { roots: conversationRoots } = conversationAsset.conversation;
   // // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   // conversationRoots.replace(roots);
@@ -245,7 +245,7 @@ export function setRoots(conversationAsset: ConversationAssetType, roots: NodeEl
   conversation.roots = [...roots];
 }
 
-export function setResponses(conversationAsset: ConversationAssetType, parentNode: NodePromptType, responses: NodeElementType[]): void {
+export function setResponseNodes(conversationAsset: ConversationAssetType, parentNode: NodePromptType, responses: NodeElementType[]): void {
   const { nodes } = conversationAsset.conversation;
   const parentNodeIndex = findIndex(nodes, (n) => getId(n) === getId(parentNode));
 

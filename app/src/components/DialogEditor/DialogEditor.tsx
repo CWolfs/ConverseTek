@@ -63,7 +63,7 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
 
     if (isRoot) {
       const rootIds = parentChildren.map((child) => child.id);
-      nodeStore.setRootNodeIds(rootIds);
+      nodeStore.setRootNodesByIds(rootIds);
     } else if (isNode) {
       if (nodeId == null || nodeParentId == null) return;
 
