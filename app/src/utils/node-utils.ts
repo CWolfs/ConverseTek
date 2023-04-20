@@ -8,11 +8,11 @@ export type NodeTypeDetectionResult = {
   isLink: boolean;
 };
 
-export function isNodeType(node: PromptNodeType | ElementNodeType): node is PromptNodeType {
+export function isPromptNodeType(node: PromptNodeType | ElementNodeType): node is PromptNodeType {
   return node.type === 'node';
 }
 
-export function isNodeLinkType(node: PromptNodeType | ElementNodeType): node is ElementNodeType {
+export function isElementNodeType(node: PromptNodeType | ElementNodeType): node is ElementNodeType {
   return node.type !== 'node';
 }
 
@@ -54,11 +54,13 @@ export function isAllowedToPasteCopy(nodeId: string | undefined, clipboard: Clip
 
   // GUARD
   if (node == null || clipboard == null) return false;
+  const { type: nodeType } = node;
 
-  const { node: clipboardNode } = clipboard;
+  const { copiedNode } = clipboard;
+  const { type: copiedNodeType } = copiedNode;
 
-  const { isRoot, isNode, isResponse } = detectType(node.type);
-  const { isNode: clipboardIsNode, isResponse: clipboardIsResponse } = detectType(clipboardNode.type);
+  const { isRoot, isNode, isResponse } = detectType(nodeType);
+  const { isNode: clipboardIsNode, isResponse: clipboardIsResponse } = detectType(copiedNodeType);
 
   if (isRoot || isResponse) {
     // Only allow nodes to be copied in if target is a root or response
@@ -81,7 +83,7 @@ export function isAllowedToPasteLink(nodeId: string | undefined, clipboard: Clip
   // GUARD
   if (node == null || clipboard == null) return false;
 
-  const { node: clipboardNode } = clipboard;
+  const { copiedNode: clipboardNode } = clipboard;
 
   const { type } = node;
   const { type: clipboardType } = clipboardNode;
