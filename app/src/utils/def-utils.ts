@@ -1,4 +1,4 @@
-import { OperationArgType } from 'types/OperationArgType';
+import { OperationArgType } from 'types';
 
 export function createArg(): OperationArgType {
   return {

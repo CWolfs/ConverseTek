@@ -1,7 +1,5 @@
-import { PromptNodeType } from 'types/PromptNodeType';
+import { ElementNodeType, PromptNodeType, ClipboardType } from 'types';
 import { nodeStore } from '../stores';
-import { ElementNodeType } from 'types/ElementNodeType';
-import { ClipboardType } from 'types/ClipboardType';
 
 export type NodeTypeDetectionResult = {
   isRoot: boolean;

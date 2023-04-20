@@ -10,9 +10,7 @@ import { SelectValue } from 'antd/lib/select';
 
 import { useStore } from 'hooks/useStore';
 import { DefStore } from 'stores/defStore/def-store';
-import { OperationCallType } from 'types/OperationCallType';
-import { InputType, InputTypeType, InputTypeTypes, InputValueType, OperationDefinitionType } from 'types/OperationDefinition';
-import { OperationArgType } from 'types/OperationArgType';
+import { OperationCallType, OperationArgType, InputType, InputTypeType, InputTypeTypes, InputValueType, OperationDefinitionType } from 'types';
 import { tryParseInt } from 'utils/number-utils';
 
 import { EditableSelect } from '../EditableSelect';

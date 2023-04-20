@@ -12,8 +12,7 @@ import { EditableLogic } from 'components/EditableLogic';
 import { useStore } from 'hooks/useStore';
 import { NodeStore } from 'stores/nodeStore/node-store';
 import { DefStore } from 'stores/defStore/def-store';
-import { ElementNodeType } from 'types/ElementNodeType';
-import { OperationCallType } from 'types/OperationCallType';
+import { ElementNodeType, OperationCallType } from 'types';
 
 import './ConversationConditions.css';
 

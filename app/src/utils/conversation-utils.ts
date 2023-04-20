@@ -7,9 +7,7 @@ import range from 'lodash.range';
 import difference from 'lodash.difference';
 import forEachRight from 'lodash.foreachright';
 
-import { ConversationAssetType, IdRef } from 'types/ConversationAssetType';
-import { PromptNodeType } from 'types/PromptNodeType';
-import { ElementNodeType } from 'types/ElementNodeType';
+import { ElementNodeType, PromptNodeType, ConversationAssetType, IdRef } from 'types';
 
 import { dataStore } from '../stores';
 

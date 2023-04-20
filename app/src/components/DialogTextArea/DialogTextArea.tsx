@@ -2,8 +2,7 @@ import React, { ChangeEvent } from 'react';
 import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
 import { Input } from 'antd';
-import { PromptNodeType } from 'types/PromptNodeType';
-import { ElementNodeType } from 'types/ElementNodeType';
+import { ElementNodeType, PromptNodeType } from 'types';
 import { useStore } from 'hooks/useStore';
 import { NodeStore } from 'stores/nodeStore/node-store';
 

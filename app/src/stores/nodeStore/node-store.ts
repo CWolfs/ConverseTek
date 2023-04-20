@@ -17,15 +17,10 @@ import {
   setResponseNodes,
   setRootNodes,
   // addNodes,
-} from '../../utils/conversation-utils';
+} from 'utils/conversation-utils';
+import { ClipboardType, ConversationAssetType, ElementNodeType, OperationCallType, PromptNodeType } from 'types';
 
 import { dataStore } from '../dataStore';
-// import { detectType, isNodeLinkType, isNodeType } from '../../utils/node-utils';
-import { PromptNodeType } from 'types/PromptNodeType';
-import { ElementNodeType } from 'types/ElementNodeType';
-import { ConversationAssetType } from 'types/ConversationAssetType';
-import { OperationCallType } from 'types/OperationCallType';
-import { ClipboardType } from 'types/ClipboardType';
 
 /* eslint-disable no-return-assign, no-param-reassign, class-methods-use-this */
 class NodeStore {

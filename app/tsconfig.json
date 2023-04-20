@@ -24,6 +24,7 @@
          "stores/*": ["src/stores/*"],
          "utils/*": ["src/utils/*"],
          "types/*": ["src/types/*"],
+         "types": ["src/types"],
      }
     }
   }

@@ -1,7 +1,7 @@
 /* eslint-disable class-methods-use-this */
 import { observable, action, makeObservable } from 'mobx';
 
-import type { ConversationAssetType } from 'types/ConversationAssetType';
+import type { ConversationAssetType } from 'types';
 
 import { createConversation } from 'utils/conversation-utils';
 import { defStore } from '../defStore';
@@ -93,12 +93,10 @@ class DataStore {
   }
 
   setConversationId(conversationAsset: ConversationAssetType, id: string): void {
-    // FIXME: Implement immutability
     conversationAsset.conversation.idRef.id = id;
   }
 
   setUnsavedConversationId(id: string): void {
-    // FIXME: Implement immutability
     if (this.unsavedActiveConversationAsset) {
       this.unsavedActiveConversationAsset.conversation.idRef.id = id;
     } else {

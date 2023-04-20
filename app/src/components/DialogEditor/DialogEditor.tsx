@@ -9,10 +9,9 @@ import { useContextMenu } from 'react-contexify';
 import 'react-sortable-tree/style.css';
 
 import { NodeStore } from 'stores/nodeStore/node-store';
-import { ConversationAssetType } from 'types/ConversationAssetType';
+import { ConversationAssetType, ElementNodeType } from 'types';
 
 import { useStore } from 'hooks/useStore';
-import { ElementNodeType } from 'types/ElementNodeType';
 import { detectType, isNodeType } from 'utils/node-utils';
 
 import { ConverseTekNodeRenderer } from './ConverseTekNodeRenderer';

@@ -2,13 +2,12 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import sortBy from 'lodash.sortby';
 
+import { ConversationAssetType } from 'types';
 import { useStore } from 'hooks/useStore';
 import { DataStore } from 'stores/dataStore/data-store';
-
 import { FileTree } from 'components/FileTree';
 
 import './ConversationTree.css';
-import { ConversationAssetType } from 'types/ConversationAssetType';
 
 function remapConversationData(conversationAssets: Map<string, ConversationAssetType>) {
   return sortBy(

@@ -1,14 +1,10 @@
+import { ConversationAssetType, DefinitionsType, FileSystemItemType, QuickLinkType } from 'types';
 import { consolidateSpeaker, fillIndexGaps } from 'utils/conversation-utils';
 
 import { get, post } from './rest';
 
-import { ConversationAssetType } from 'types/ConversationAssetType';
-import { DefinitionsType } from 'types/DefinitionsType';
-
 import { dataStore, defStore } from '../stores';
 import { JsonValue, fullConversationAssetMapping, lowercasePropertyNames, mapToType, reversedFullConversationAssetMapping } from './mappings/mapping';
-import { FileSystemItemType } from 'types/FileSystemItemType';
-import { QuickLinkType } from 'types/QuickLinkType';
 
 /*
  * CHROMELY DOESN'T SUPPORT PUTS SO PUTS AND DELETES ARE CURRENTLY POSTS WITH method DATA

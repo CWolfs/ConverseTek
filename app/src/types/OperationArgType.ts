@@ -1,5 +1,5 @@
 import { OperationCallType } from './OperationCallType';
-import { InputTypeType } from './OperationDefinition';
+import { InputTypeType } from './OperationDefinitionType';
 
 export type OperationArgType = {
   type?: InputTypeType | null;

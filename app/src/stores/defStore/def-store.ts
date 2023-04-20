@@ -4,13 +4,18 @@ import values from 'lodash.values';
 
 import { createArg } from 'utils/def-utils';
 import { tryParseInt, tryParseFloat } from 'utils/number-utils';
-import { ConversationAssetType } from 'types/ConversationAssetType';
-import { OperationCallType } from 'types/OperationCallType';
-import { OperationArgType } from 'types/OperationArgType';
-import { DefinitionsType } from 'types/DefinitionsType';
-import { DefaultInputValueType, InputType, InputTypeType, OperationDefinitionType } from 'types/OperationDefinition';
-import { PresetDefinitionType } from 'types/PresetDefinition';
-import { TagDefinitionType } from 'types/TagDefinition';
+import {
+  ConversationAssetType,
+  DefaultInputValueType,
+  DefinitionsType,
+  InputType,
+  InputTypeType,
+  OperationArgType,
+  OperationCallType,
+  OperationDefinitionType,
+  PresetDefinitionType,
+  TagDefinitionType,
+} from 'types';
 
 /* eslint-disable class-methods-use-this, no-param-reassign */
 class DefStore {
@@ -71,20 +76,20 @@ class DefStore {
       }
 
       if (node.branches) {
-        const responses = node.branches;
+        const responseNodes = node.branches;
 
-        responses.forEach((response) => {
+        responseNodes.forEach((responseNode) => {
           // Branch Conditions
-          if (response.conditions && response.conditions.ops) {
-            const operations = response.conditions.ops;
+          if (responseNode.conditions && responseNode.conditions.ops) {
+            const operations = responseNode.conditions.ops;
             operations.forEach((operation): void => {
               this.setLogicTypeByOperation(operation);
             });
           }
 
           // Branch Actions
-          if (response.actions && response.actions.ops) {
-            const operations = response.actions.ops;
+          if (responseNode.actions && responseNode.actions.ops) {
+            const operations = responseNode.actions.ops;
             operations.forEach((operation): void => {
               this.setLogicTypeByOperation(operation);
             });
@@ -406,10 +411,6 @@ class DefStore {
   }
 
   reset = () => {
-    // this.operations.clear();
-    // this.presets.clear();
-    // this.tags.clear();
-    // TODO: Watch this for breaking reactivity
     this.operations = [];
     this.presets = [];
     this.tags = [];

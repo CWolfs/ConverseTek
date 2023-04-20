@@ -8,8 +8,7 @@ import capitalize from 'lodash.capitalize';
 
 import { getId, createId } from 'utils/conversation-utils';
 import { useStore } from 'hooks/useStore';
-import { PromptNodeType } from 'types/PromptNodeType';
-import { ElementNodeType } from 'types/ElementNodeType';
+import { ElementNodeType, PromptNodeType } from 'types';
 import { NodeStore } from 'stores/nodeStore/node-store';
 
 import './ConversationGeneral.css';

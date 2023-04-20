@@ -3,8 +3,7 @@ import { observer } from 'mobx-react';
 
 import { useStore } from 'hooks/useStore';
 import { DefStore } from 'stores/defStore/def-store';
-import { OperationCallType } from 'types/OperationCallType';
-import { OperationArgType } from 'types/OperationArgType';
+import { OperationCallType, OperationArgType } from 'types';
 
 type Props = {
   logic: OperationCallType;

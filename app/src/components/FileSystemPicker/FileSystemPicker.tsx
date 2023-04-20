@@ -10,10 +10,9 @@ import type { DebouncedFunc } from 'lodash';
 import { getRootDrives, getDirectories, getQuickLinks, saveWorkingDirectory, getConversations, importConversation } from 'services/api';
 import { useStore } from 'hooks/useStore';
 import { FSModalProps, ModalStore } from 'stores/modalStore/modal-store';
-import { DirectoryItemType, FileSystemItemType } from 'types/FileSystemItemType';
+import { DirectoryItemType, FileSystemItemType, QuickLinkType } from 'types';
 
 import './FileSystemPicker.css';
-import { QuickLinkType } from 'types/QuickLinkType';
 
 const ListItem = List.Item;
 

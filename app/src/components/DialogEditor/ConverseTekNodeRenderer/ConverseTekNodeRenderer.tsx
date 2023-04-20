@@ -6,8 +6,7 @@ import { observer } from 'mobx-react';
 import { Icon } from 'antd';
 
 import { OnNodeContextMenuProps } from '../DialogEditor';
-import { PromptNodeType } from 'types/PromptNodeType';
-import { ElementNodeType } from 'types/ElementNodeType';
+import { PromptNodeType, ElementNodeType } from 'types';
 
 import { isDescendant } from 'utils/tree-data-utils';
 import { detectType } from 'utils/node-utils';

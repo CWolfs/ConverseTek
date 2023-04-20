@@ -13,9 +13,7 @@ import { EditableLogic } from 'components/EditableLogic';
 import { useStore } from 'hooks/useStore';
 import { NodeStore } from 'stores/nodeStore/node-store';
 import { DefStore } from 'stores/defStore/def-store';
-import { PromptNodeType } from 'types/PromptNodeType';
-import { ElementNodeType } from 'types/ElementNodeType';
-import { OperationCallType } from 'types/OperationCallType';
+import { PromptNodeType, ElementNodeType, OperationCallType } from 'types';
 
 import './ConversationActions.css';
 

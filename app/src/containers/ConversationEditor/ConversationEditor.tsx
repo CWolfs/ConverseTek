@@ -12,9 +12,8 @@ import { DialogEditor } from 'components/DialogEditor';
 import { DialogTextArea } from 'components/DialogTextArea';
 import { NodeStore } from 'stores/nodeStore/node-store';
 import { DataStore } from 'stores/dataStore/data-store';
-import { ElementNodeType } from 'types/ElementNodeType';
+import { ElementNodeType, ConversationAssetType } from 'types';
 
-import { ConversationAssetType } from 'types/ConversationAssetType';
 import { ConversationGeneral } from '../ConversationGeneral';
 import { ConversationConditions } from '../ConversationConditions';
 import { ConversationActions } from '../ConversationActions';
