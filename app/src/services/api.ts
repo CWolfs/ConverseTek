@@ -50,7 +50,10 @@ export function updateConversation(id: string, conversationAsset: ConversationAs
 
 export function exportConversation(id: string, conversationAsset: ConversationAssetType): Promise<any> {
   consolidateSpeaker(conversationAsset);
-  return post('/conversations/export', { id }, { method: 'PUT', conversationAsset });
+
+  const apiMappedConversation = mapToType<object>(conversationAsset, reversedFullConversationAssetMapping);
+
+  return post('/conversations/export', { id }, { method: 'PUT', conversationAsset: apiMappedConversation });
 }
 
 export function exportAllConversations(id: string, conversationAsset: ConversationAssetType): Promise<any> {

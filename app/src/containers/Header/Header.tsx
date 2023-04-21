@@ -38,7 +38,7 @@ export function Header() {
                 if (!conversationAsset) return;
 
                 void updateConversation(conversationAsset.conversation.idRef.id, conversationAsset).then(() => {
-                  message.success('Save successful');
+                  void message.success('Save successful');
                 });
                 dataStore.updateActiveConversation(conversationAsset); // local update for speed
               }}
@@ -60,7 +60,7 @@ export function Header() {
                 if (!conversationAsset) return;
 
                 void exportConversation(conversationAsset.conversation.idRef.id, conversationAsset).then(() => {
-                  message.success('Export successful');
+                  void message.success('Export successful');
                 });
               }}
             >
@@ -75,7 +75,7 @@ export function Header() {
                 if (!conversationAsset) return;
 
                 void exportAllConversations(conversationAsset ? conversationAsset.conversation.idRef.id : '-1', conversationAsset).then(() => {
-                  message.success('Export successful');
+                  void message.success('Export successful');
                 });
               }}
             >
