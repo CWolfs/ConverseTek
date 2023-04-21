@@ -11,10 +11,11 @@
     "prod": "cross-env NODE_ENV=production CT_ENV=production webpack",
     "test": "echo \"Error: no test specified\" && exit 1",
     "ts-watch": "tsc --watch",
-    "ts-check": "tsc"
+    "ts-check": "tsc",
+    "generate:hooks": "npx simple-git-hooks"
   },
   "simple-git-hooks": {
-    "pre-commit": "tsc-check"
+    "pre-commit": "npm --prefix ./app run ts-check"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
