@@ -23,7 +23,7 @@ export type OnNodeContextMenuProps = {
   event: MouseEvent<HTMLDivElement>;
   contextMenuId: string;
   type: 'node' | 'response' | 'root' | 'link';
-  parentId: string;
+  parentId: string | null;
 };
 
 function buildTreeData(nodeStore: NodeStore, conversationAsset: ConversationAssetType) {

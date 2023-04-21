@@ -3,8 +3,8 @@ import React, { MouseEvent, ElementType } from 'react';
 import { observable, action, makeObservable } from 'mobx';
 import defer from 'lodash.defer';
 
-export type OnOkType = ((event: MouseEvent<HTMLAnchorElement>) => void) | null;
-export type OnCancelType = ((event: MouseEvent<HTMLButtonElement>) => void) | null;
+export type OnOkType = ((event: MouseEvent<HTMLElement>) => void) | null;
+export type OnCancelType = ((event: MouseEvent<HTMLElement>) => void) | null;
 
 export type FSModalProps = {
   fileMode?: boolean;

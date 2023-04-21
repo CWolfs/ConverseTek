@@ -11,9 +11,8 @@
        "noImplicitAny": true,
        "skipLibCheck": true,
        "allowJs": true,
-       "declaration": true,
-       "emitDeclarationOnly": true,
        "isolatedModules": true,
+       "noEmit": true,
        "jsx": "react", // change to "react-jsx" when upgrading to React 18
        "baseUrl": "./",
        "paths": {

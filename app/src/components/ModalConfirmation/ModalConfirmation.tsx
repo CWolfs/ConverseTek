@@ -33,7 +33,7 @@ function renderTitleWithType(title: string, type: string) {
 export function ModalConfirmation({ type, title, header, body, width, buttons }: Props) {
   const modalStore = useStore<ModalStore>('modal');
 
-  const onOk = (event: MouseEvent<HTMLAnchorElement>): void => {
+  const onOk = (event: MouseEvent<HTMLElement>): void => {
     if (buttons.onPositive) buttons.onPositive(event);
     modalStore.closeModal();
   };

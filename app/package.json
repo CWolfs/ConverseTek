@@ -7,7 +7,8 @@
     "start": "cross-env NODE_ENV=development CT_ENV=local webpack-dev-server --open",
     "build": "cross-env NODE_ENV=development CT_ENV=development webpack",
     "prod": "cross-env NODE_ENV=production CT_ENV=production webpack",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "ts-check": "tsc"
   },
   "author": "Richard Griffiths [CWolf] (cwolfs@gmail.com)",
   "license": "GPL-3.0",
