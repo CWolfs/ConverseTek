@@ -15,6 +15,7 @@ type Props = {
   data: { key: string; label: string }[] | null;
   onSelected: (selectedKeys: string[], e: AntTreeNodeSelectedEvent) => void;
   selectedKeys: string[];
+  selectedDirectoryName: string | null;
 };
 
 const { TreeNode } = Tree;
@@ -24,7 +25,7 @@ function renderTreeNodes(data: { key: string; label: string }[] | null): JSX.Ele
   return undefined;
 }
 
-export const FileTree = ({ title, data = null, onSelected = () => {}, selectedKeys = [] }: Props) => {
+export const FileTree = ({ title, data = null, onSelected = () => {}, selectedKeys = [], selectedDirectoryName }: Props) => {
   const headerClasses = classnames('file-tree__tree__conversation_header', {
     'file-tree__tree__conversation_header--no-data': data == null || data.length <= 0,
   });
@@ -35,8 +36,9 @@ export const FileTree = ({ title, data = null, onSelected = () => {}, selectedKe
       <div className="file-tree__tree">
         <CustomScroll heightRelativeToParent="calc(100% - 1px)">
           <Tree showIcon showLine defaultExpandedKeys={['0']} onSelect={onSelected} selectedKeys={selectedKeys}>
-            {(!data || data.length <= 0) && <TreeNode className={headerClasses} title={'No Conversations'} key="0" />}
-            {renderTreeNodes(data)}
+            <TreeNode className={headerClasses} title={data && data.length ? selectedDirectoryName : 'No Conversations'} key="0">
+              {renderTreeNodes(data)}
+            </TreeNode>
           </Tree>
         </CustomScroll>
       </div>

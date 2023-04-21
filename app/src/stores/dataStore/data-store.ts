@@ -8,6 +8,7 @@ import { defStore } from '../defStore';
 
 class DataStore {
   public workingDirectory: string | null;
+  public workingDirectoryName: string | null;
   public conversationAssets = observable.map<string, ConversationAssetType>(new Map(), { deep: false });
   public activeConversationAsset: ConversationAssetType | null;
   public unsavedActiveConversationAsset: ConversationAssetType | null;
@@ -15,6 +16,7 @@ class DataStore {
   constructor() {
     makeObservable(this, {
       workingDirectory: observable,
+      workingDirectoryName: observable,
       conversationAssets: observable,
       activeConversationAsset: observable,
       unsavedActiveConversationAsset: observable,
@@ -36,11 +38,13 @@ class DataStore {
     this.activeConversationAsset = null;
     this.unsavedActiveConversationAsset = null;
     this.workingDirectory = null;
+    this.workingDirectoryName = null;
   }
 
-  setWorkingDirectory(directoryPath: string): void {
+  setWorkingDirectory(directoryPath: string, directoryName: string): void {
     if (directoryPath !== this.workingDirectory) this.clearActiveConversation();
     this.workingDirectory = directoryPath;
+    this.workingDirectoryName = directoryName;
   }
 
   createNewConversation(): void {

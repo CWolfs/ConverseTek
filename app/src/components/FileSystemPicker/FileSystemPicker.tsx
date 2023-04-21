@@ -51,7 +51,7 @@ export function FileSystemPicker() {
           return modalStore.closeModal();
         });
     } else {
-      void saveWorkingDirectory(selectedItem.path)
+      void saveWorkingDirectory(selectedItem.path, selectedItem.name)
         .then(() => getConversations())
         .then(() => {
           selectedItem.active = false;

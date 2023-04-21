@@ -22,7 +22,7 @@ function remapConversationData(conversationAssets: Map<string, ConversationAsset
 function ConversationTree() {
   const dataStore = useStore<DataStore>('data');
 
-  const { conversationAssets, activeConversationAsset } = dataStore;
+  const { conversationAssets, activeConversationAsset, workingDirectoryName } = dataStore;
   const data = remapConversationData(conversationAssets);
   const selectedKeys = activeConversationAsset ? [activeConversationAsset.conversation.idRef.id] : undefined;
 
@@ -32,7 +32,13 @@ function ConversationTree() {
 
   return (
     <div className="conversation-tree">
-      <FileTree title="Conversations" data={data} onSelected={onNodeSelected} selectedKeys={selectedKeys || []} />
+      <FileTree
+        title="Conversations"
+        data={data}
+        onSelected={onNodeSelected}
+        selectedKeys={selectedKeys || []}
+        selectedDirectoryName={workingDirectoryName}
+      />
     </div>
   );
 }
