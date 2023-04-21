@@ -2,16 +2,20 @@
   "name": "conversetek",
   "version": "1.4.0",
   "description": "Conversation editor for Battletech",
+  "author": "Richard Griffiths [CWolf] (cwolfs@gmail.com)",
+  "license": "GPL-3.0",
   "main": "index.js",
   "scripts": {
     "start": "cross-env NODE_ENV=development CT_ENV=local webpack-dev-server --open",
     "build": "cross-env NODE_ENV=development CT_ENV=development webpack",
     "prod": "cross-env NODE_ENV=production CT_ENV=production webpack",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "ts-watch": "tsc --watch",
     "ts-check": "tsc"
   },
-  "author": "Richard Griffiths [CWolf] (cwolfs@gmail.com)",
-  "license": "GPL-3.0",
+  "simple-git-hooks": {
+    "pre-commit": "tsc-check"
+  },
   "devDependencies": {
     "@babel/core": "^7.0.0",
     "@babel/plugin-proposal-class-properties": "^7.0.0",
@@ -74,8 +78,10 @@
     "postcss-nested-ancestors": "^3.0.0",
     "postcss-simple-vars": "^7.0.1",
     "react-refresh": "^0.14.0",
+    "simple-git-hooks": "^2.8.1",
     "speed-measure-webpack-plugin": "^1.5.0",
     "style-loader": "^2.0.0",
+    "ts-loader": "^9.4.2",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4",
     "webpack": "^5.78.0",
