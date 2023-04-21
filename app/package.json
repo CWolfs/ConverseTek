@@ -7,15 +7,16 @@
   "main": "index.js",
   "scripts": {
     "start": "cross-env NODE_ENV=development CT_ENV=local webpack-dev-server --open",
-    "build": "cross-env NODE_ENV=development CT_ENV=development webpack",
+    "build": "npm run verify && cross-env NODE_ENV=development CT_ENV=development webpack",
     "prod": "cross-env NODE_ENV=production CT_ENV=production webpack",
+    "verify": "npm run ts-check",
     "test": "echo \"Error: no test specified\" && exit 1",
     "ts-watch": "tsc --watch",
     "ts-check": "tsc",
     "generate:hooks": "npx simple-git-hooks"
   },
   "simple-git-hooks": {
-    "pre-commit": "npm --prefix ./app run ts-check"
+    "pre-push": "npm --prefix ./app run verify"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
