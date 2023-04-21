@@ -23,7 +23,7 @@
   }
 }
 
-.ant-btn-secondary {
+.button-secondary {
   color: #fff;
   background-color: $backgroundSecondary;
   border-color: $backgroundSecondary;
@@ -69,7 +69,7 @@
   }
 }
 
-.ant-btn-caution {
+.ant-btn-danger {
   color: white;
   background-color: #f5222d;
   border-color: #f5222d;

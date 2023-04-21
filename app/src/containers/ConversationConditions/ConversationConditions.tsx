@@ -83,7 +83,7 @@ function ConversationConditions({ node }: { node: ElementNodeType }) {
         >
           <Button
             size="small"
-            type="caution" // FIXME: Passing custom types works but TS hates it. Use only the provided type and override the style where needed
+            type="danger"
             className="conversation-conditions__panel-header-delete-button"
             onClick={(event: MouseEvent) => event.stopPropagation()}
           >
@@ -107,8 +107,7 @@ function ConversationConditions({ node }: { node: ElementNodeType }) {
     <div className="conversation-conditions" style={{ height }}>
       <Collapse>{displayConditions.map((condition, index) => renderPanel(condition, index))}</Collapse>
       <div className="conversation-conditions__buttons">
-        {/* FIXME: Passing custom types works but TS hates it. Use only the provided type and override the style where needed */}
-        <Button type="secondary" size="small" onClick={onAddCondition}>
+        <Button className="button-secondary" size="small" onClick={onAddCondition}>
           <Icon type="plus" />
         </Button>
       </div>

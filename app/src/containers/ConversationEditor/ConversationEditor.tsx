@@ -118,7 +118,7 @@ function ConversationEditor({ conversationAsset }: Props) {
             okText="Yes"
             cancelText="No"
           >
-            <Button className="conversation-editor__regenerate-ids-button" type="secondary" size="small">
+            <Button className="conversation-editor__regenerate-ids-button button-secondary" type="primary" size="small">
               <Icon type="retweet" />
             </Button>
           </Popconfirm>
@@ -140,7 +140,7 @@ function ConversationEditor({ conversationAsset }: Props) {
                 okText="Yes"
                 cancelText="No"
               >
-                <Button className="conversation-editor__regenerate-ids-button" type="secondary" size="small">
+                <Button className="conversation-editor__regenerate-ids-button button-secondary" size="small">
                   <Icon type="retweet" />
                 </Button>
               </Popconfirm>
