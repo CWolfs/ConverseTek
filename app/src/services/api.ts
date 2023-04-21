@@ -87,8 +87,8 @@ export function getQuickLinks() {
   });
 }
 
-export function saveWorkingDirectory(path: string) {
-  dataStore.setWorkingDirectory(path);
+export function saveWorkingDirectory(path: string, name: string) {
+  dataStore.setWorkingDirectory(path, name);
   return post('/working-directory', { path });
 }
 
