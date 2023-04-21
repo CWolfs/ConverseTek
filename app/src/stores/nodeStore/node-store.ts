@@ -17,6 +17,7 @@ import {
   updateResponseNode,
   setResponseNodes,
   setRootNodes,
+  addNodes,
   // addNodes,
 } from 'utils/conversation-utils';
 import { ClipboardType, ConversationAssetType, ElementNodeType, OperationCallType, PromptNodeType } from 'types';
@@ -58,7 +59,7 @@ class NodeStore {
       setClipboard: action,
       clearClipboard: action,
       pasteAsLinkFromClipboard: action,
-      // pasteAsCopyFromClipboard: action,
+      pasteAsCopyFromClipboard: action,
       setNode: action,
       setNodeText: action,
       setNodeActions: action,
@@ -331,8 +332,8 @@ class NodeStore {
     });
   }
 
-  pasteAsLinkFromClipboard(nodeId: string) {
-    const responseNode = this.getNode(nodeId);
+  pasteAsLinkFromClipboard(targetResponseId: string) {
+    const responseNode = this.getNode(targetResponseId);
     if (responseNode === null) return;
 
     if (this.clipboard == null) throw Error('Clipboard is null or undefined. Cannot paste as link from clipboard.');
@@ -347,6 +348,8 @@ class NodeStore {
           onPositive: () => {
             if (originalNodeIndex) responseNode.nextNodeIndex = originalNodeIndex;
             responseNode.auxiliaryLink = true;
+
+            // TODO: Cleanup of nodes that are overwritten and possibly orphaned
 
             console.log('Pasted link for: ', responseNode);
             this.clearClipboard();
@@ -367,46 +370,57 @@ class NodeStore {
     }
   }
 
+  pasteAsCopyFromClipboard(targetNodeId: string) {
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+    if (this.clipboard == null) throw Error('Clipboard is null or undefined. Cannot paste as copy from clipboard.');
+    if (conversationAsset == null) throw Error('Conversation is null. Cannot paste as copy from cipboard');
+
+    const targetNode = this.getNode(targetNodeId);
+    if (targetNode == null) throw Error('Node is null');
+
+    const { copiedNode: clipboardNode, nodes: clipboardNodes } = this.clipboard;
+
+    if (isElementNodeType(targetNode)) {
+      if (isPromptNodeType(clipboardNode)) {
+        // If the target node is a ElementNode and the copied node is a PromptNode then we know we can copy the data in under the target node without issue
+        // e.g. end result would be: ResponseNode --> PromptNode
+
+        // TODO: Check if this overwrites existing nodes - if so then a user confirmation step is required and cleanup of nodes that are overwritten and possibly orphaned
+
+        // point the target node to the copied node
+        targetNode.nextNodeIndex = clipboardNode.index;
+
+        // ...and set the parent of the copied node to the target node
+        clipboardNode.parentId = targetNodeId;
+
+        // Add the copied node, and all associated nodes from the clipboard into the conversation
+        addNodes(conversationAsset, [clipboardNode, ...clipboardNodes]);
+      } else {
+        console.error('[NodeStore] Cannot paste. Wrong node types. Cannot paste a ResponseNode into another ResponseNode');
+      }
+    } else if (isPromptNodeType(targetNode)) {
+      if (isElementNodeType(clipboardNode)) {
+        // If the target node is a PromptNode and the copied node is a ResponseNode then we know we can copy the data in under the target node without issue
+        // e.g. end result would be: PromptNode --> ResponseNode
+        clipboardNode.parentId = targetNodeId;
+
+        // Add the ResponseNode as a branch in the PromptNode
+        updateResponseNode(conversationAsset, targetNode, clipboardNode);
+
+        // Add all associated nodes from the clipboard into the conversation
+        addNodes(conversationAsset, clipboardNodes);
+      } else {
+        console.error('[NodeStore] Cannot paste. Wrong node types. Cannot paste a PromptNode into another PromptNode');
+      }
+    }
+
+    this.clearClipboard();
+    this.setRebuild(true);
+  }
+
   clearClipboard() {
     this.clipboard = null;
   }
-
-  // FIXME: Rewrite copy/pasting/linking
-  // pasteAsCopyFromClipboard(nodeId: string) {
-  //   const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-  //   if (this.clipboard == null) throw Error('Clipboard is null or undefined. Cannot paste as copy from clipboard.');
-  //   if (conversationAsset == null) throw Error('Conversation is null. Cannot paste as copy from cipboard');
-
-  //   const node = this.getNode(nodeId);
-  //   if (node == null) throw Error('Node is null.');
-
-  //   const { node: clipboardNode, nodes: clipboardNodes } = this.clipboard;
-  //   const { isRoot, isNode, isResponse } = detectType(node.type);
-
-  //   if (isRoot || isResponse) {
-  //     // Only allow nodes to be copied in if target is a root or response
-  //     if (isNodeType(clipboardNode)) {
-  //       if (!isNodeLinkType(node)) throw Error('Target node for paste as copy is not a NodeLink. It must be a NodeLink.');
-  //       node.nextNodeIndex = clipboardNode.index;
-  //       clipboardNode.parentId = nodeId;
-  //       addNodes(conversationAsset, [clipboardNode, ...(clipboardNodes as NodeType[])]);
-  //     } else {
-  //       console.error('[NodeStore] Cannot copy - wrong node types');
-  //     }
-  //   } else if (isNode) {
-  //     // Only allow response to be copied in
-  //     if (isNodeLinkType(clipboardNode)) {
-  //       clipboardNode.parentId = nodeId;
-  //       updateResponse(conversationAsset, node as NodeType, clipboardNode);
-  //       addNodes(conversationAsset, clipboardNodes as NodeType[]);
-  //     } else {
-  //       console.error('[NodeStore] Cannot copy - wrong node types');
-  //     }
-  //   }
-
-  //   this.clearClipboard();
-  //   this.setRebuild(true);
-  // }
 
   /*
    * ==================

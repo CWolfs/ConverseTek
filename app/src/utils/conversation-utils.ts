@@ -212,17 +212,17 @@ export function updatePromptNode(conversationAsset: ConversationAssetType, node:
 
 export function addNodes(conversationAsset: ConversationAssetType, newNodes: PromptNodeType[]): void {
   const { nodes } = conversationAsset.conversation;
-  newNodes.forEach((node) => nodes.push(node));
+  newNodes.forEach((node: PromptNodeType) => nodes.push(node));
 }
 
-export function updateResponseNode(conversationAsset: ConversationAssetType, parentNode: PromptNodeType, response: ElementNodeType): void {
+export function updateResponseNode(conversationAsset: ConversationAssetType, parentNode: PromptNodeType, responseNode: ElementNodeType): void {
   const { nodes } = conversationAsset.conversation;
 
-  const branchIndex = findIndex(parentNode.branches, (b) => getId(b) === getId(response));
+  const branchIndex = findIndex(parentNode.branches, (b) => getId(b) === getId(responseNode));
   if (branchIndex === -1) {
-    parentNode.branches.push(response);
+    parentNode.branches.push(responseNode);
   } else {
-    parentNode.branches[branchIndex] = response;
+    parentNode.branches[branchIndex] = responseNode;
   }
 
   const parentNodeIndex = findIndex(nodes, (n) => getId(n) === getId(parentNode));
