@@ -35,9 +35,8 @@ export const FileTree = ({ title, data = null, onSelected = () => {}, selectedKe
       <div className="file-tree__tree">
         <CustomScroll heightRelativeToParent="calc(100% - 1px)">
           <Tree showIcon showLine defaultExpandedKeys={['0']} onSelect={onSelected} selectedKeys={selectedKeys}>
-            <TreeNode className={headerClasses} title={data && data.length ? 'simGameConversations' : 'No Conversations'} key="0">
-              {renderTreeNodes(data)}
-            </TreeNode>
+            {(!data || data.length <= 0) && <TreeNode className={headerClasses} title={'No Conversations'} key="0" />}
+            {renderTreeNodes(data)}
           </Tree>
         </CustomScroll>
       </div>
