@@ -340,13 +340,21 @@ class NodeStore {
     const { originalNodeIndex } = this.clipboard;
 
     if (isElementNodeType(responseNode)) {
-      const proceedWithCopyAsLink = () => {
+      const proceedWithPasteAsLink = () => {
+        const { nextNodeIndex, auxiliaryLink: previousNodeAuxiliaryLink } = responseNode;
+
+        // Create the link by setting the new nextNodeIndex and setting aux link
         if (originalNodeIndex != null) responseNode.nextNodeIndex = originalNodeIndex;
         responseNode.auxiliaryLink = true;
 
-        // TODO: Cleanup of nodes that are overwritten and possibly orphaned
+        // Since the old node is being replaced it effectively is being orphaned
+        // The node and all it's childen need to be deleted
+        // Additionally, any links to nodes in that deleting branch need to be removed
+        if (!previousNodeAuxiliaryLink) {
+          console.log('About to cascade delete prompt node due to link overwriting existing node');
+          this.deletePromptNodeCascadeByIndex(nextNodeIndex, false);
+        }
 
-        console.log('Pasted link for: ', responseNode);
         this.clearClipboard();
         this.setRebuild(true);
       };
@@ -355,7 +363,7 @@ class NodeStore {
       if (responseNode.nextNodeIndex !== -1) {
         const buttons = {
           positiveLabel: 'Confirm',
-          onPositive: proceedWithCopyAsLink,
+          onPositive: proceedWithPasteAsLink,
           negativeLabel: 'Cancel',
         };
 
@@ -368,7 +376,7 @@ class NodeStore {
           buttons,
         });
       } else {
-        proceedWithCopyAsLink();
+        proceedWithPasteAsLink();
       }
     } else {
       console.error('Type mismatch on paste as link. You cannot paste a node into anything other than a ElementtNode');
@@ -389,17 +397,52 @@ class NodeStore {
       if (isPromptNodeType(clipboardNode)) {
         // If the target node is a ElementNode and the copied node is a PromptNode then we know we can copy the data in under the target node without issue
         // e.g. end result would be: ResponseNode --> PromptNode
+        const proceedWithPasteAsCopy = () => {
+          const { nextNodeIndex, auxiliaryLink: previousNodeAuxiliaryLink } = targetNode;
 
-        // TODO: Check if this overwrites existing nodes - if so then a user confirmation step is required and cleanup of nodes that are overwritten and possibly orphaned
+          // point the target node to the copied node
+          targetNode.nextNodeIndex = clipboardNode.index;
 
-        // point the target node to the copied node
-        targetNode.nextNodeIndex = clipboardNode.index;
+          // if the previous Response was linking elsewhere, mark it as no longer an aux link
+          targetNode.auxiliaryLink = false;
 
-        // ...and set the parent of the copied node to the target node
-        clipboardNode.parentId = targetNodeId;
+          // ...and set the parent of the copied node to the target node
+          clipboardNode.parentId = targetNodeId;
 
-        // Add the copied node, and all associated nodes from the clipboard into the conversation
-        addNodes(conversationAsset, [clipboardNode, ...clipboardNodes]);
+          // Add the copied node, and all associated nodes from the clipboard into the conversation
+          addNodes(conversationAsset, [clipboardNode, ...clipboardNodes]);
+
+          // Since the old node is being replaced it effectively is being orphaned
+          // The node and all it's childen need to be deleted
+          // Additionally, any links to nodes in that deleting branch need to be removed
+          if (!previousNodeAuxiliaryLink) {
+            console.log('About to cascade delete prompt node due to copy overwriting existing node');
+            this.deletePromptNodeCascadeByIndex(nextNodeIndex, false);
+          }
+
+          this.clearClipboard();
+          this.setRebuild(true);
+        };
+
+        // Ask the user to confirm pasting a copy if the response already points to a node
+        if (targetNode.nextNodeIndex !== -1) {
+          const buttons = {
+            positiveLabel: 'Confirm',
+            onPositive: proceedWithPasteAsCopy,
+            negativeLabel: 'Cancel',
+          };
+
+          const title = 'Response node points to an existing Prompt node';
+          modalStore.setModelContent(ModalConfirmation, {
+            type: 'warning',
+            title,
+            body: 'The response node you are attempting to paste as copy into already points or links to a prompt node. Are you sure you want to overwrite this?,',
+            width: '30rem',
+            buttons,
+          });
+        } else {
+          proceedWithPasteAsCopy();
+        }
       } else {
         console.error('[NodeStore] Cannot paste. Wrong node types. Cannot paste a ResponseNode into another ResponseNode');
       }
@@ -731,6 +774,14 @@ class NodeStore {
     if (node) {
       this.deleteNodeCascade(node);
       this.setRebuild(true);
+    }
+  }
+
+  deletePromptNodeCascadeByIndex(index: number, rebuild = true): void {
+    const node = this.getPromptNodeByIndex(index);
+    if (node) {
+      this.deleteNodeCascade(node);
+      this.setRebuild(rebuild);
     }
   }
 
