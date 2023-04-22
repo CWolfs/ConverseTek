@@ -77,7 +77,7 @@ class NodeStore {
       moveResponseNode: action,
       movePromptNode: action,
       deleteNodeCascadeById: action,
-      cleanUpDanglingResponseIndexes: action,
+      cleanUpDanglingResponseNodeIndexes: action,
       deleteNodeCascade: action,
       deleteBranchCascade: action,
       deleteLink: action,
@@ -517,6 +517,7 @@ class NodeStore {
   getPromptNodeByIndex(index: number): PromptNodeType | null {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     if (conversationAsset === null) return null;
+    if (index === -1) return null;
 
     const { nodes } = conversationAsset.conversation;
 
@@ -529,6 +530,9 @@ class NodeStore {
   removeNode(node: PromptNodeType | ElementNodeType, immediate = false): void {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     if (conversationAsset === null) return;
+
+    // No need to mark for deletion if it's already marked to be deleted
+    if (node.deleting) return;
 
     const { roots, nodes } = conversationAsset.conversation;
     const { type } = node;
@@ -723,7 +727,7 @@ class NodeStore {
   /*
    * Ensures that any node that refers to an id specified now points to 'END OF DIALOG' (-1)
    */
-  cleanUpDanglingResponseIndexes(indexToClean: number): void {
+  cleanUpDanglingResponseNodeIndexes(indexToClean: number): void {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     if (conversationAsset === null) return;
 
@@ -743,6 +747,7 @@ class NodeStore {
         const { nextNodeIndex } = elementNode;
         if (nextNodeIndex === indexToClean) {
           elementNode.nextNodeIndex = -1;
+          elementNode.auxiliaryLink = false;
         }
       });
     });
@@ -751,8 +756,9 @@ class NodeStore {
   deleteNodeCascade(node: PromptNodeType | ElementNodeType): void {
     if (node.type === 'node') {
       const { index, branches } = node;
-      branches.forEach((branch) => {
-        this.deleteBranchCascade(branch);
+
+      branches.forEach((responseNode: ElementNodeType) => {
+        this.deleteBranchCascade(responseNode);
       });
 
       remove(this.takenPromptNodeIndexes, (i) => i === index);
@@ -760,7 +766,7 @@ class NodeStore {
 
       if (this.activeNode && getId(this.activeNode) === getId(node)) this.clearActiveNode();
 
-      this.cleanUpDanglingResponseIndexes(index);
+      this.cleanUpDanglingResponseNodeIndexes(index);
     } else if (node.type === 'response') {
       this.deleteBranchCascade(node);
     } else if (node.type === 'root') {
@@ -773,6 +779,8 @@ class NodeStore {
   deleteBranchCascade(elementNode: ElementNodeType): void {
     const { auxiliaryLink } = elementNode;
 
+    // Follow any ResponseNodes pointing to their next PromptNode
+    // BUT, do not follow links!
     if (!auxiliaryLink) {
       const nextNode = this.getPromptNodeByIndex(elementNode.nextNodeIndex);
       if (nextNode) this.deleteNodeCascade(nextNode);
