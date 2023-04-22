@@ -18,7 +18,6 @@ import {
   setResponseNodes,
   setRootNodes,
   addNodes,
-  // addNodes,
 } from 'utils/conversation-utils';
 import { ClipboardType, ConversationAssetType, ElementNodeType, OperationCallType, PromptNodeType } from 'types';
 import { isElementNodeType, isPromptNodeType } from 'utils/node-utils';
@@ -341,20 +340,22 @@ class NodeStore {
     const { originalNodeIndex } = this.clipboard;
 
     if (isElementNodeType(responseNode)) {
+      const proceedWithCopyAsLink = () => {
+        if (originalNodeIndex != null) responseNode.nextNodeIndex = originalNodeIndex;
+        responseNode.auxiliaryLink = true;
+
+        // TODO: Cleanup of nodes that are overwritten and possibly orphaned
+
+        console.log('Pasted link for: ', responseNode);
+        this.clearClipboard();
+        this.setRebuild(true);
+      };
+
       // Ask the user to confirm pasting a link if the response already points to a node
       if (responseNode.nextNodeIndex !== -1) {
         const buttons = {
           positiveLabel: 'Confirm',
-          onPositive: () => {
-            if (originalNodeIndex) responseNode.nextNodeIndex = originalNodeIndex;
-            responseNode.auxiliaryLink = true;
-
-            // TODO: Cleanup of nodes that are overwritten and possibly orphaned
-
-            console.log('Pasted link for: ', responseNode);
-            this.clearClipboard();
-            this.setRebuild(true);
-          },
+          onPositive: proceedWithCopyAsLink,
           negativeLabel: 'Cancel',
         };
 
@@ -366,7 +367,11 @@ class NodeStore {
           width: '30rem',
           buttons,
         });
+      } else {
+        proceedWithCopyAsLink();
       }
+    } else {
+      console.error('Type mismatch on paste as link. You cannot paste a node into anything other than a ElementtNode');
     }
   }
 
@@ -546,8 +551,13 @@ class NodeStore {
       });
     } else if (type === 'node') {
       nodes.forEach((n) => {
+        const { index } = n;
         const toDelete = getId(n) === nodeId;
-        if (toDelete) n.deleting = true;
+
+        if (toDelete) {
+          n.deleting = true;
+          this.cleanUpDanglingResponseNodeIndexes(index);
+        }
       });
     } else if (type === 'response') {
       nodes.forEach((n) => {
@@ -737,6 +747,7 @@ class NodeStore {
       const { nextNodeIndex } = rootNode;
       if (nextNodeIndex === indexToClean) {
         rootNode.nextNodeIndex = -1;
+        rootNode.auxiliaryLink = false;
       }
     });
 
@@ -765,8 +776,6 @@ class NodeStore {
       this.removeNode(node);
 
       if (this.activeNode && getId(this.activeNode) === getId(node)) this.clearActiveNode();
-
-      this.cleanUpDanglingResponseNodeIndexes(index);
     } else if (node.type === 'response') {
       this.deleteBranchCascade(node);
     } else if (node.type === 'root') {
