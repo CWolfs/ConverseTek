@@ -1,5 +1,5 @@
 import { ConversationAssetType, DefinitionsType, FileSystemItemType, QuickLinkType } from 'types';
-import { consolidateSpeaker, fillIndexGaps } from 'utils/conversation-utils';
+import { consolidateSpeaker, rebuildNodeIndexes, removeAllOldFillerNodes } from 'utils/conversation-utils';
 
 import { get, post } from './rest';
 
@@ -35,7 +35,8 @@ export function getConversations(): Promise<any> {
 
 export function updateConversation(id: string, conversationAsset: ConversationAssetType): Promise<any> {
   consolidateSpeaker(conversationAsset);
-  fillIndexGaps(conversationAsset);
+  removeAllOldFillerNodes(conversationAsset); // This only exists to fix old conversations pre-v1.4
+  rebuildNodeIndexes(conversationAsset);
 
   const apiMappedConversation = mapToType<object>(conversationAsset, reversedFullConversationAssetMapping);
 
@@ -50,6 +51,8 @@ export function updateConversation(id: string, conversationAsset: ConversationAs
 
 export function exportConversation(id: string, conversationAsset: ConversationAssetType): Promise<any> {
   consolidateSpeaker(conversationAsset);
+  removeAllOldFillerNodes(conversationAsset); // This only exists to fix old conversations pre-v1.4
+  rebuildNodeIndexes(conversationAsset);
 
   const apiMappedConversation = mapToType<object>(conversationAsset, reversedFullConversationAssetMapping);
 
@@ -57,7 +60,12 @@ export function exportConversation(id: string, conversationAsset: ConversationAs
 }
 
 export function exportAllConversations(id: string, conversationAsset: ConversationAssetType): Promise<any> {
-  if (conversationAsset) consolidateSpeaker(conversationAsset);
+  if (conversationAsset) {
+    consolidateSpeaker(conversationAsset);
+    removeAllOldFillerNodes(conversationAsset); // This only exists to fix old conversations pre-v1.4
+    rebuildNodeIndexes(conversationAsset);
+  }
+
   return post('/conversations/export-all', { id }, { method: 'PUT', conversationAsset });
 }
 

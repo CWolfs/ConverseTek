@@ -158,9 +158,59 @@ export function consolidateSpeaker(conversationAsset: ConversationAssetType): vo
   });
 }
 
-export function fillIndexGaps(conversationAsset: ConversationAssetType): void {
+/**
+ * Scan through all the nodes (roots, prompt nodes and their response branche nodes) and their respective indexes in the node array
+ * Reassign the node index to match their order in the conversatio node array and update all nextNodeIndex in ElementNodeTypes to reflect this change
+ * @param conversationAsset
+ */
+export function rebuildNodeIndexes(conversationAsset: ConversationAssetType) {
+  const oldPromptNodeIndexToNewIndex = new Map<number, number>();
+  const { nodes, roots } = conversationAsset.conversation;
+
+  // scan through all nodes are process them
+  nodes.forEach((node: PromptNodeType, nodeArrayIndex: number) => {
+    if (!oldPromptNodeIndexToNewIndex.has(node.index)) {
+      const { index: previousNodeIndex } = node;
+
+      oldPromptNodeIndexToNewIndex.set(previousNodeIndex, nodeArrayIndex);
+      node.index = nodeArrayIndex;
+    }
+  });
+
+  // Now that all prompt nodes are rebuilt, reassign them to the branches
+  nodes.forEach((node: PromptNodeType) => {
+    const { branches } = node;
+
+    branches.forEach((responseNode: ElementNodeType) => {
+      const { nextNodeIndex } = responseNode;
+
+      if (oldPromptNodeIndexToNewIndex.has(nextNodeIndex)) {
+        responseNode.nextNodeIndex = oldPromptNodeIndexToNewIndex.get(nextNodeIndex) as number;
+      } else {
+        console.error('Response node', responseNode, ' has no mapped nextNodeIndex. This should not happen when saving.');
+      }
+    });
+  });
+
+  // scan through all roots and process them
+  roots.forEach((rootNode: ElementNodeType) => {
+    const { nextNodeIndex } = rootNode;
+
+    if (oldPromptNodeIndexToNewIndex.has(nextNodeIndex)) {
+      rootNode.nextNodeIndex = oldPromptNodeIndexToNewIndex.get(nextNodeIndex) as number;
+    } else {
+      console.error('Root node ', rootNode, ' has no mapped nextNodeIndex. This should not happen when saving.');
+    }
+  });
+}
+
+/**
+ * This method exists to fix old conversations created with v1.3.3 or older of ConverseTek
+ * It removes the old filler nodes that were an attempt to fix the old save issue
+ * @param conversationAsset
+ */
+export function removeAllOldFillerNodes(conversationAsset: ConversationAssetType): void {
   const { nodes } = conversationAsset.conversation;
-  const usedIndexes: number[] = [];
   const nodesToRemove: number[] = [];
 
   // Remove all padding nodes first
@@ -171,20 +221,6 @@ export function fillIndexGaps(conversationAsset: ConversationAssetType): void {
 
   forEachRight(nodesToRemove, (position) => {
     nodes.splice(position, 1);
-  });
-
-  // Fill gaps as reqiured with new padding
-  nodes.forEach((node) => {
-    const { index } = node;
-    usedIndexes.push(index);
-  });
-
-  const sortedIndexes = sortBy(usedIndexes);
-  const rangeIndexes = range(sortedIndexes[sortedIndexes.length - 1]);
-  const indexGaps = difference(rangeIndexes, sortedIndexes);
-
-  indexGaps.forEach((index) => {
-    nodes.splice(index, 0, createPromptNode(-1));
   });
 }
 
