@@ -5,6 +5,6 @@ export type ClipboardType = {
   copiedNode: PromptNodeType | ElementNodeType;
   originalNodeId: string;
   originalNodeIndex: number | null;
-  nodes: (PromptNodeType | ElementNodeType)[];
+  nodes: PromptNodeType[];
   nodeIdMap: Map<number, number>; // <original node index, new node index>
 };

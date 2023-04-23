@@ -17,7 +17,7 @@ import {
   updateResponseNode,
   setResponseNodes,
   setRootNodes,
-  // addNodes,
+  addNodes,
 } from 'utils/conversation-utils';
 import { ClipboardType, ConversationAssetType, ElementNodeType, OperationCallType, PromptNodeType } from 'types';
 import { isElementNodeType, isPromptNodeType } from 'utils/node-utils';
@@ -58,7 +58,7 @@ class NodeStore {
       setClipboard: action,
       clearClipboard: action,
       pasteAsLinkFromClipboard: action,
-      // pasteAsCopyFromClipboard: action,
+      pasteAsCopyFromClipboard: action,
       setNode: action,
       setNodeText: action,
       setNodeActions: action,
@@ -76,7 +76,7 @@ class NodeStore {
       moveResponseNode: action,
       movePromptNode: action,
       deleteNodeCascadeById: action,
-      cleanUpDanglingResponseIndexes: action,
+      cleanUpDanglingResponseNodeIndexes: action,
       deleteNodeCascade: action,
       deleteBranchCascade: action,
       deleteLink: action,
@@ -331,8 +331,8 @@ class NodeStore {
     });
   }
 
-  pasteAsLinkFromClipboard(nodeId: string) {
-    const responseNode = this.getNode(nodeId);
+  pasteAsLinkFromClipboard(targetResponseId: string) {
+    const responseNode = this.getNode(targetResponseId);
     if (responseNode === null) return;
 
     if (this.clipboard == null) throw Error('Clipboard is null or undefined. Cannot paste as link from clipboard.');
@@ -340,18 +340,30 @@ class NodeStore {
     const { originalNodeIndex } = this.clipboard;
 
     if (isElementNodeType(responseNode)) {
+      const proceedWithPasteAsLink = () => {
+        const { nextNodeIndex, auxiliaryLink: previousNodeAuxiliaryLink } = responseNode;
+
+        // Create the link by setting the new nextNodeIndex and setting aux link
+        if (originalNodeIndex != null) responseNode.nextNodeIndex = originalNodeIndex;
+        responseNode.auxiliaryLink = true;
+
+        // Since the old node is being replaced it effectively is being orphaned
+        // The node and all it's childen need to be deleted
+        // Additionally, any links to nodes in that deleting branch need to be removed
+        if (!previousNodeAuxiliaryLink) {
+          console.log('About to cascade delete prompt node due to link overwriting existing node');
+          this.deletePromptNodeCascadeByIndex(nextNodeIndex, false);
+        }
+
+        this.clearClipboard();
+        this.setRebuild(true);
+      };
+
       // Ask the user to confirm pasting a link if the response already points to a node
       if (responseNode.nextNodeIndex !== -1) {
         const buttons = {
           positiveLabel: 'Confirm',
-          onPositive: () => {
-            if (originalNodeIndex) responseNode.nextNodeIndex = originalNodeIndex;
-            responseNode.auxiliaryLink = true;
-
-            console.log('Pasted link for: ', responseNode);
-            this.clearClipboard();
-            this.setRebuild(true);
-          },
+          onPositive: proceedWithPasteAsLink,
           negativeLabel: 'Cancel',
         };
 
@@ -363,50 +375,100 @@ class NodeStore {
           width: '30rem',
           buttons,
         });
+      } else {
+        proceedWithPasteAsLink();
+      }
+    } else {
+      console.error('Type mismatch on paste as link. You cannot paste a node into anything other than a ElementtNode');
+    }
+  }
+
+  pasteAsCopyFromClipboard(targetNodeId: string) {
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+    if (this.clipboard == null) throw Error('Clipboard is null or undefined. Cannot paste as copy from clipboard.');
+    if (conversationAsset == null) throw Error('Conversation is null. Cannot paste as copy from cipboard');
+
+    const targetNode = this.getNode(targetNodeId);
+    if (targetNode == null) throw Error('Node is null');
+
+    const { copiedNode: clipboardNode, nodes: clipboardNodes } = this.clipboard;
+
+    if (isElementNodeType(targetNode)) {
+      if (isPromptNodeType(clipboardNode)) {
+        // If the target node is a ElementNode and the copied node is a PromptNode then we know we can copy the data in under the target node without issue
+        // e.g. end result would be: ResponseNode --> PromptNode
+        const proceedWithPasteAsCopy = () => {
+          const { nextNodeIndex, auxiliaryLink: previousNodeAuxiliaryLink } = targetNode;
+
+          // point the target node to the copied node
+          targetNode.nextNodeIndex = clipboardNode.index;
+
+          // if the previous Response was linking elsewhere, mark it as no longer an aux link
+          targetNode.auxiliaryLink = false;
+
+          // ...and set the parent of the copied node to the target node
+          clipboardNode.parentId = targetNodeId;
+
+          // Add the copied node, and all associated nodes from the clipboard into the conversation
+          addNodes(conversationAsset, [clipboardNode, ...clipboardNodes]);
+
+          // Since the old node is being replaced it effectively is being orphaned
+          // The node and all it's childen need to be deleted
+          // Additionally, any links to nodes in that deleting branch need to be removed
+          if (!previousNodeAuxiliaryLink) {
+            console.log('About to cascade delete prompt node due to copy overwriting existing node');
+            this.deletePromptNodeCascadeByIndex(nextNodeIndex, false);
+          }
+
+          this.clearClipboard();
+          this.setRebuild(true);
+        };
+
+        // Ask the user to confirm pasting a copy if the response already points to a node
+        if (targetNode.nextNodeIndex !== -1) {
+          const buttons = {
+            positiveLabel: 'Confirm',
+            onPositive: proceedWithPasteAsCopy,
+            negativeLabel: 'Cancel',
+          };
+
+          const title = 'Response node points to an existing Prompt node';
+          modalStore.setModelContent(ModalConfirmation, {
+            type: 'warning',
+            title,
+            body: 'The response node you are attempting to paste as copy into already points or links to a prompt node. Are you sure you want to overwrite this?,',
+            width: '30rem',
+            buttons,
+          });
+        } else {
+          proceedWithPasteAsCopy();
+        }
+      } else {
+        console.error('[NodeStore] Cannot paste. Wrong node types. Cannot paste a ResponseNode into another ResponseNode');
+      }
+    } else if (isPromptNodeType(targetNode)) {
+      if (isElementNodeType(clipboardNode)) {
+        // If the target node is a PromptNode and the copied node is a ResponseNode then we know we can copy the data in under the target node without issue
+        // e.g. end result would be: PromptNode --> ResponseNode
+        clipboardNode.parentId = targetNodeId;
+
+        // Add the ResponseNode as a branch in the PromptNode
+        updateResponseNode(conversationAsset, targetNode, clipboardNode);
+
+        // Add all associated nodes from the clipboard into the conversation
+        addNodes(conversationAsset, clipboardNodes);
+      } else {
+        console.error('[NodeStore] Cannot paste. Wrong node types. Cannot paste a PromptNode into another PromptNode');
       }
     }
+
+    this.clearClipboard();
+    this.setRebuild(true);
   }
 
   clearClipboard() {
     this.clipboard = null;
   }
-
-  // FIXME: Rewrite copy/pasting/linking
-  // pasteAsCopyFromClipboard(nodeId: string) {
-  //   const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-  //   if (this.clipboard == null) throw Error('Clipboard is null or undefined. Cannot paste as copy from clipboard.');
-  //   if (conversationAsset == null) throw Error('Conversation is null. Cannot paste as copy from cipboard');
-
-  //   const node = this.getNode(nodeId);
-  //   if (node == null) throw Error('Node is null.');
-
-  //   const { node: clipboardNode, nodes: clipboardNodes } = this.clipboard;
-  //   const { isRoot, isNode, isResponse } = detectType(node.type);
-
-  //   if (isRoot || isResponse) {
-  //     // Only allow nodes to be copied in if target is a root or response
-  //     if (isNodeType(clipboardNode)) {
-  //       if (!isNodeLinkType(node)) throw Error('Target node for paste as copy is not a NodeLink. It must be a NodeLink.');
-  //       node.nextNodeIndex = clipboardNode.index;
-  //       clipboardNode.parentId = nodeId;
-  //       addNodes(conversationAsset, [clipboardNode, ...(clipboardNodes as NodeType[])]);
-  //     } else {
-  //       console.error('[NodeStore] Cannot copy - wrong node types');
-  //     }
-  //   } else if (isNode) {
-  //     // Only allow response to be copied in
-  //     if (isNodeLinkType(clipboardNode)) {
-  //       clipboardNode.parentId = nodeId;
-  //       updateResponse(conversationAsset, node as NodeType, clipboardNode);
-  //       addNodes(conversationAsset, clipboardNodes as NodeType[]);
-  //     } else {
-  //       console.error('[NodeStore] Cannot copy - wrong node types');
-  //     }
-  //   }
-
-  //   this.clearClipboard();
-  //   this.setRebuild(true);
-  // }
 
   /*
    * ==================
@@ -503,6 +565,7 @@ class NodeStore {
   getPromptNodeByIndex(index: number): PromptNodeType | null {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     if (conversationAsset === null) return null;
+    if (index === -1) return null;
 
     const { nodes } = conversationAsset.conversation;
 
@@ -516,6 +579,9 @@ class NodeStore {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     if (conversationAsset === null) return;
 
+    // No need to mark for deletion if it's already marked to be deleted
+    if (node.deleting) return;
+
     const { roots, nodes } = conversationAsset.conversation;
     const { type } = node;
     const nodeId = getId(node);
@@ -528,8 +594,13 @@ class NodeStore {
       });
     } else if (type === 'node') {
       nodes.forEach((n) => {
+        const { index } = n;
         const toDelete = getId(n) === nodeId;
-        if (toDelete) n.deleting = true;
+
+        if (toDelete) {
+          n.deleting = true;
+          this.cleanUpDanglingResponseNodeIndexes(index);
+        }
       });
     } else if (type === 'response') {
       nodes.forEach((n) => {
@@ -706,10 +777,18 @@ class NodeStore {
     }
   }
 
+  deletePromptNodeCascadeByIndex(index: number, rebuild = true): void {
+    const node = this.getPromptNodeByIndex(index);
+    if (node) {
+      this.deleteNodeCascade(node);
+      this.setRebuild(rebuild);
+    }
+  }
+
   /*
    * Ensures that any node that refers to an id specified now points to 'END OF DIALOG' (-1)
    */
-  cleanUpDanglingResponseIndexes(indexToClean: number): void {
+  cleanUpDanglingResponseNodeIndexes(indexToClean: number): void {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     if (conversationAsset === null) return;
 
@@ -719,6 +798,7 @@ class NodeStore {
       const { nextNodeIndex } = rootNode;
       if (nextNodeIndex === indexToClean) {
         rootNode.nextNodeIndex = -1;
+        rootNode.auxiliaryLink = false;
       }
     });
 
@@ -729,6 +809,7 @@ class NodeStore {
         const { nextNodeIndex } = elementNode;
         if (nextNodeIndex === indexToClean) {
           elementNode.nextNodeIndex = -1;
+          elementNode.auxiliaryLink = false;
         }
       });
     });
@@ -737,16 +818,15 @@ class NodeStore {
   deleteNodeCascade(node: PromptNodeType | ElementNodeType): void {
     if (node.type === 'node') {
       const { index, branches } = node;
-      branches.forEach((branch) => {
-        this.deleteBranchCascade(branch);
+
+      branches.forEach((responseNode: ElementNodeType) => {
+        this.deleteBranchCascade(responseNode);
       });
 
       remove(this.takenPromptNodeIndexes, (i) => i === index);
       this.removeNode(node);
 
       if (this.activeNode && getId(this.activeNode) === getId(node)) this.clearActiveNode();
-
-      this.cleanUpDanglingResponseIndexes(index);
     } else if (node.type === 'response') {
       this.deleteBranchCascade(node);
     } else if (node.type === 'root') {
@@ -759,6 +839,8 @@ class NodeStore {
   deleteBranchCascade(elementNode: ElementNodeType): void {
     const { auxiliaryLink } = elementNode;
 
+    // Follow any ResponseNodes pointing to their next PromptNode
+    // BUT, do not follow links!
     if (!auxiliaryLink) {
       const nextNode = this.getPromptNodeByIndex(elementNode.nextNodeIndex);
       if (nextNode) this.deleteNodeCascade(nextNode);

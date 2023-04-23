@@ -60,8 +60,7 @@ function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string; onVis
 
   const onPasteAsCopy = ({ props }: ItemParams<EventProps>) => {
     if (!props) return;
-    console.log('Pasting as copy is disabled for now pending a rewrite');
-    // nodeStore.pasteAsCopyFromClipboard(props.id);
+    nodeStore.pasteAsCopyFromClipboard(props.id);
   };
 
   const onPasteAsLink = ({ props }: ItemParams<EventProps>) => {
