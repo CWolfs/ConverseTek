@@ -26,7 +26,7 @@ function SaveConversationAs() {
     conversationAsset.filepath = previousFilePath.replace(previousFileName, conversationAsset.filename);
 
     void updateConversation(conversationAsset.conversation.idRef.id, conversationAsset).then(() => {
-      message.success('Save successful');
+      void message.success('Save successful');
     });
     dataStore.updateActiveConversation(conversationAsset); // local update for speed
 
