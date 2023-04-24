@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
 import SortableTree from 'react-sortable-tree';
 import { useContextMenu } from 'react-contexify';
+import { useSize } from 'ahooks';
 
 import 'react-sortable-tree/style.css';
 
@@ -12,7 +13,10 @@ import { NodeStore } from 'stores/nodeStore/node-store';
 import { ConversationAssetType, ElementNodeType } from 'types';
 
 import { useStore } from 'hooks/useStore';
+import { useControlWheel } from 'hooks/useControlWheel';
 import { detectType, isPromptNodeType } from 'utils/node-utils';
+
+import { ScalableScrollbar } from 'components/ScalableScrollbar';
 
 import { ConverseTekNodeRenderer } from './ConverseTekNodeRenderer';
 import { DialogEditorContextMenu } from '../DialogEditorContextMenu';
@@ -40,11 +44,17 @@ function buildTreeData(nodeStore: NodeStore, conversationAsset: ConversationAsse
   return data;
 }
 
+const zoomLevelIncrement = 0.05;
+
 function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: ConversationAssetType; rebuild: boolean }) {
   const nodeStore = useStore<NodeStore>('node');
 
+  const dialogEditorRef = useRef<HTMLDivElement>(null);
+  const dialogEditorSize = useSize(dialogEditorRef);
+
   const [treeData, setTreeData] = useState<object[] | null>(null);
   const [treeWidth, setTreeWidth] = useState(0);
+  const [zoomLevel, setZoomLevel] = useState(1);
   const [isContextMenuVisible, setIsContextMenuVisible] = useState(false);
   const treeElement = useRef<HTMLDivElement>(null);
   const { show } = useContextMenu({
@@ -143,6 +153,20 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
     setIsContextMenuVisible(isVisible);
   };
 
+  const onControlWheel = (zoomIn: boolean) => {
+    setZoomLevel((oldZoomLevel): number => {
+      let newZoomLevel = zoomIn ? oldZoomLevel + zoomLevelIncrement : oldZoomLevel - zoomLevelIncrement;
+
+      if (newZoomLevel < 0.2) {
+        newZoomLevel = 0.2;
+      } else if (newZoomLevel > 2) {
+        newZoomLevel = 2;
+      }
+
+      return newZoomLevel;
+    });
+  };
+
   // onMount
   useEffect(() => {
     nodeStore.init(conversationAsset);
@@ -175,40 +199,60 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
     }
   });
 
+  // Resize when a new node is selected to fix issue with scrollbar not being in the correct location
+  useEffect(() => {
+    setTimeout(resize, 100);
+  }, [activeNodeId]);
+
+  useControlWheel(treeElement, onControlWheel);
+
   if (treeData === null) return null;
 
   return (
-    <div className="dialog-editor">
-      <div className="dialog-editor__tree" ref={treeElement} onClick={onClicked}>
-        <DialogEditorContextMenu id="dialog-context-menu" onVisibilityChange={onNodeContextMenuVisibilityChange} />
-        <SortableTree
-          treeData={treeData}
-          onChange={(data: object[]) => setTreeData(data)}
-          getNodeKey={({ node, treeIndex }: { node: RSTNode; treeIndex: number }) => {
-            if (node.treeIndex !== treeIndex) {
-              // eslint-disable-next-line no-param-reassign
-              node.treeIndex = treeIndex;
-            }
-            if (!node.id) return treeIndex;
+    <div ref={dialogEditorRef} className="dialog-editor">
+      <DialogEditorContextMenu id="dialog-context-menu" onVisibilityChange={onNodeContextMenuVisibilityChange} />
+      <div
+        className="dialog-editor__tree"
+        ref={treeElement}
+        onClick={onClicked}
+        style={{
+          transformOrigin: '0 0',
+          transform: `scale(${zoomLevel})`,
+          width: dialogEditorSize ? dialogEditorSize.width / zoomLevel : 0,
+          height: (dialogEditorSize ? dialogEditorSize.height / zoomLevel : 0) - 1,
+        }}
+      >
+        <ScalableScrollbar width={10 / zoomLevel}>
+          <SortableTree
+            treeData={treeData}
+            onChange={(data: object[]) => setTreeData(data)}
+            getNodeKey={({ node, treeIndex }: { node: RSTNode; treeIndex: number }) => {
+              if (node.treeIndex !== treeIndex) {
+                // eslint-disable-next-line no-param-reassign
+                node.treeIndex = treeIndex;
+              }
+              if (!node.id) return treeIndex;
 
-            nodeStore.addNodeIdAndTreeIndexPair(node.id, treeIndex);
-            return node.id;
-          }}
-          rowHeight={40}
-          canDrag={(nodeContainer: RSTNodeCanDragContainer) => !(nodeContainer.node.id === '0')}
-          canDrop={canDrop}
-          onMoveNode={onMove}
-          generateNodeProps={() => ({
-            nodeStore,
-            activeNodeId,
-            onNodeContextMenu,
-            isContextMenuVisible,
-          })}
-          nodeContentRenderer={(props: any) => <ConverseTekNodeRenderer {...props} />}
-          reactVirtualizedListProps={{
-            width: treeWidth,
-          }}
-        />
+              nodeStore.addNodeIdAndTreeIndexPair(node.id, treeIndex);
+              return node.id;
+            }}
+            rowHeight={40}
+            canDrag={(nodeContainer: RSTNodeCanDragContainer) => !(nodeContainer.node.id === '0')}
+            canDrop={canDrop}
+            onMoveNode={onMove}
+            generateNodeProps={() => ({
+              nodeStore,
+              activeNodeId,
+              onNodeContextMenu,
+              isContextMenuVisible,
+            })}
+            nodeContentRenderer={(props: any) => <ConverseTekNodeRenderer {...props} />}
+            reactVirtualizedListProps={{
+              width: treeWidth,
+            }}
+            slideRegionSize={100 / zoomLevel}
+          />
+        </ScalableScrollbar>
       </div>
     </div>
   );
