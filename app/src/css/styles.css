@@ -106,8 +106,8 @@ h3[type='secondary'] {
 }
 
 ::-webkit-scrollbar {
-  height: 12px;
-  width: 12px;
+  height: 10px;
+  width: 10px;
   background: $backgroundTertiary;
 }
 

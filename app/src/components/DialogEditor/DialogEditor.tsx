@@ -16,6 +16,8 @@ import { useStore } from 'hooks/useStore';
 import { useControlWheel } from 'hooks/useControlWheel';
 import { detectType, isPromptNodeType } from 'utils/node-utils';
 
+import { ScalableScrollbar } from 'components/ScalableScrollbar';
+
 import { ConverseTekNodeRenderer } from './ConverseTekNodeRenderer';
 import { DialogEditorContextMenu } from '../DialogEditorContextMenu';
 
@@ -215,34 +217,37 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
           height: dialogEditorSize ? dialogEditorSize.height / zoomLevel : 0,
         }}
       >
-        <SortableTree
-          treeData={treeData}
-          onChange={(data: object[]) => setTreeData(data)}
-          getNodeKey={({ node, treeIndex }: { node: RSTNode; treeIndex: number }) => {
-            if (node.treeIndex !== treeIndex) {
-              // eslint-disable-next-line no-param-reassign
-              node.treeIndex = treeIndex;
-            }
-            if (!node.id) return treeIndex;
+        <ScalableScrollbar width={10 / zoomLevel}>
+          <SortableTree
+            treeData={treeData}
+            onChange={(data: object[]) => setTreeData(data)}
+            getNodeKey={({ node, treeIndex }: { node: RSTNode; treeIndex: number }) => {
+              if (node.treeIndex !== treeIndex) {
+                // eslint-disable-next-line no-param-reassign
+                node.treeIndex = treeIndex;
+              }
+              if (!node.id) return treeIndex;
 
-            nodeStore.addNodeIdAndTreeIndexPair(node.id, treeIndex);
-            return node.id;
-          }}
-          rowHeight={40}
-          canDrag={(nodeContainer: RSTNodeCanDragContainer) => !(nodeContainer.node.id === '0')}
-          canDrop={canDrop}
-          onMoveNode={onMove}
-          generateNodeProps={() => ({
-            nodeStore,
-            activeNodeId,
-            onNodeContextMenu,
-            isContextMenuVisible,
-          })}
-          nodeContentRenderer={(props: any) => <ConverseTekNodeRenderer {...props} />}
-          reactVirtualizedListProps={{
-            width: treeWidth,
-          }}
-        />
+              nodeStore.addNodeIdAndTreeIndexPair(node.id, treeIndex);
+              return node.id;
+            }}
+            rowHeight={40}
+            canDrag={(nodeContainer: RSTNodeCanDragContainer) => !(nodeContainer.node.id === '0')}
+            canDrop={canDrop}
+            onMoveNode={onMove}
+            generateNodeProps={() => ({
+              nodeStore,
+              activeNodeId,
+              onNodeContextMenu,
+              isContextMenuVisible,
+            })}
+            nodeContentRenderer={(props: any) => <ConverseTekNodeRenderer {...props} />}
+            reactVirtualizedListProps={{
+              width: treeWidth,
+            }}
+            slideRegionSize={100 / zoomLevel}
+          />
+        </ScalableScrollbar>
       </div>
     </div>
   );
