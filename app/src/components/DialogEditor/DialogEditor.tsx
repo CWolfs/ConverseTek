@@ -199,6 +199,11 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
     }
   });
 
+  // Resize when a new node is selected to fix issue with scrollbar not being in the correct location
+  useEffect(() => {
+    setTimeout(resize, 100);
+  }, [activeNodeId]);
+
   useControlWheel(treeElement, onControlWheel);
 
   if (treeData === null) return null;
