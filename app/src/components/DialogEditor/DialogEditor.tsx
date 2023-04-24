@@ -214,7 +214,7 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
           transformOrigin: '0 0',
           transform: `scale(${zoomLevel})`,
           width: dialogEditorSize ? dialogEditorSize.width / zoomLevel : 0,
-          height: dialogEditorSize ? dialogEditorSize.height / zoomLevel : 0,
+          height: (dialogEditorSize ? dialogEditorSize.height / zoomLevel : 0) - 1,
         }}
       >
         <ScalableScrollbar width={10 / zoomLevel}>
