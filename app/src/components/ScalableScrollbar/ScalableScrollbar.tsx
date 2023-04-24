@@ -1,24 +1,43 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 type Props = {
   children: React.ReactNode;
   width: number;
+  hideScrollOnScale?: boolean;
 };
 
-export const ScalableScrollbar = ({ children, width }: Props) => {
-  useEffect(() => {
-    const style = document.createElement('style');
-    style.id = 'scalable-scrollbar-styles';
-    style.innerHTML = `
+function createScrollBarStyling(width: number, hideScroll: boolean): HTMLStyleElement {
+  const style = document.createElement('style');
+  const id = `scalable-scrollbar-styles-${Math.random() * 1000}`;
+  style.id = id;
+  style.innerHTML = `
     .scalable-scrollbar::-webkit-scrollbar, .scalable-scrollbar *::-webkit-scrollbar {
-        width: ${width}px;
-        height: ${width}px;
-      }
+      width: ${width}px;
+      height: ${width}px;
+      display: ${hideScroll ? 'none' : 'block'};
+    }
     `;
-    document.head.appendChild(style);
+  document.head.appendChild(style);
+  return style;
+}
+
+export const ScalableScrollbar = ({ children, width, hideScrollOnScale = true }: Props) => {
+  useEffect(() => {
+    const styleElement = createScrollBarStyling(width, hideScrollOnScale);
+    const elementId = styleElement.id;
+
+    if (hideScrollOnScale) {
+      setTimeout(() => {
+        const styleElement = document.getElementById(elementId);
+        if (styleElement) {
+          styleElement.remove();
+          createScrollBarStyling(width, false);
+        }
+      }, 350);
+    }
 
     return () => {
-      const styleElement = document.getElementById('scalable-scrollbar-styles');
+      const styleElement = document.getElementById(elementId);
       if (styleElement) {
         styleElement.remove();
       }
