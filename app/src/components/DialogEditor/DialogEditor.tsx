@@ -12,6 +12,7 @@ import { NodeStore } from 'stores/nodeStore/node-store';
 import { ConversationAssetType, ElementNodeType } from 'types';
 
 import { useStore } from 'hooks/useStore';
+import { useControlWheel } from 'hooks/useControlWheel';
 import { detectType, isPromptNodeType } from 'utils/node-utils';
 
 import { ConverseTekNodeRenderer } from './ConverseTekNodeRenderer';
@@ -40,11 +41,14 @@ function buildTreeData(nodeStore: NodeStore, conversationAsset: ConversationAsse
   return data;
 }
 
+const zoomLevelIncrement = 0.05;
+
 function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: ConversationAssetType; rebuild: boolean }) {
   const nodeStore = useStore<NodeStore>('node');
 
   const [treeData, setTreeData] = useState<object[] | null>(null);
   const [treeWidth, setTreeWidth] = useState(0);
+  const [zoomLevel, setZoomLevel] = useState(1);
   const [isContextMenuVisible, setIsContextMenuVisible] = useState(false);
   const treeElement = useRef<HTMLDivElement>(null);
   const { show } = useContextMenu({
@@ -143,6 +147,20 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
     setIsContextMenuVisible(isVisible);
   };
 
+  const onControlWheel = (zoomIn: boolean) => {
+    setZoomLevel((oldZoomLevel): number => {
+      let newZoomLevel = zoomIn ? oldZoomLevel + zoomLevelIncrement : oldZoomLevel - zoomLevelIncrement;
+
+      if (newZoomLevel < 0.2) {
+        newZoomLevel = 0.2;
+      } else if (newZoomLevel > 2) {
+        newZoomLevel = 2;
+      }
+
+      return newZoomLevel;
+    });
+  };
+
   // onMount
   useEffect(() => {
     nodeStore.init(conversationAsset);
@@ -175,12 +193,14 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
     }
   });
 
+  useControlWheel(treeElement, onControlWheel);
+
   if (treeData === null) return null;
 
   return (
     <div className="dialog-editor">
       <DialogEditorContextMenu id="dialog-context-menu" onVisibilityChange={onNodeContextMenuVisibilityChange} />
-      <div className="dialog-editor__tree" ref={treeElement} onClick={onClicked} style={{ zoom: 0.5 }}>
+      <div className="dialog-editor__tree" ref={treeElement} onClick={onClicked} style={{ zoom: zoomLevel }}>
         <SortableTree
           treeData={treeData}
           onChange={(data: object[]) => setTreeData(data)}
