@@ -179,8 +179,8 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
 
   return (
     <div className="dialog-editor">
-      <div className="dialog-editor__tree" ref={treeElement} onClick={onClicked}>
-        <DialogEditorContextMenu id="dialog-context-menu" onVisibilityChange={onNodeContextMenuVisibilityChange} />
+      <DialogEditorContextMenu id="dialog-context-menu" onVisibilityChange={onNodeContextMenuVisibilityChange} />
+      <div className="dialog-editor__tree" ref={treeElement} onClick={onClicked} style={{ zoom: 0.5 }}>
         <SortableTree
           treeData={treeData}
           onChange={(data: object[]) => setTreeData(data)}
