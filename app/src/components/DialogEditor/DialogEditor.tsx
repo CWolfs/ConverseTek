@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
 import SortableTree from 'react-sortable-tree';
 import { useContextMenu } from 'react-contexify';
+import { useSize } from 'ahooks';
 
 import 'react-sortable-tree/style.css';
 
@@ -45,6 +46,9 @@ const zoomLevelIncrement = 0.05;
 
 function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: ConversationAssetType; rebuild: boolean }) {
   const nodeStore = useStore<NodeStore>('node');
+
+  const dialogEditorRef = useRef<HTMLDivElement>(null);
+  const dialogEditorSize = useSize(dialogEditorRef);
 
   const [treeData, setTreeData] = useState<object[] | null>(null);
   const [treeWidth, setTreeWidth] = useState(0);
@@ -198,9 +202,19 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
   if (treeData === null) return null;
 
   return (
-    <div className="dialog-editor">
+    <div ref={dialogEditorRef} className="dialog-editor">
       <DialogEditorContextMenu id="dialog-context-menu" onVisibilityChange={onNodeContextMenuVisibilityChange} />
-      <div className="dialog-editor__tree" ref={treeElement} onClick={onClicked} style={{ zoom: zoomLevel }}>
+      <div
+        className="dialog-editor__tree"
+        ref={treeElement}
+        onClick={onClicked}
+        style={{
+          transformOrigin: '0 0',
+          transform: `scale(${zoomLevel})`,
+          width: dialogEditorSize ? dialogEditorSize.width / zoomLevel : 0,
+          height: dialogEditorSize ? dialogEditorSize.height / zoomLevel : 0,
+        }}
+      >
         <SortableTree
           treeData={treeData}
           onChange={(data: object[]) => setTreeData(data)}

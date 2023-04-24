@@ -1,6 +1,7 @@
 @import '../../css/constants.css';
 
 .dialog-editor {
+  position: relative;
   background-color: $backgroundTertiary;
   border: 1px solid white;
   border-radius: 2px;
@@ -8,6 +9,9 @@
   flex-grow: 1;
 
   &__tree {
+    position: absolute;
+    top: 0;
+    left: 0;
     font-size: $fontSizeSmall;
     line-height: $lineHeightSmall;
     flex-grow: 1;
