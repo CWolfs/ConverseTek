@@ -10,5 +10,6 @@ export type { PresetDefinitionType } from './PresetDefinitionType';
 export type { PromptNodeType } from './PromptNodeType';
 export type { QuickLinkType } from './QuickLinkType';
 export type { TagDefinitionType } from './TagDefinitionType';
+export type { DependencyStatusType } from './DependencyStatusType';
 
 export { InputTypeTypes } from './OperationDefinitionType';

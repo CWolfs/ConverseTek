@@ -19,6 +19,7 @@ type Props = {
     onNegative: OnCancelType;
     onPositive: OnOkType;
   };
+  closable: boolean;
 };
 
 function renderTitleWithType(title: string, type: string) {
@@ -30,7 +31,7 @@ function renderTitleWithType(title: string, type: string) {
   );
 }
 
-export function ModalConfirmation({ type, title, header, body, width, buttons }: Props) {
+export function ModalConfirmation({ type, title, header, body, width, buttons, closable = true }: Props) {
   const modalStore = useStore<ModalStore>('modal');
 
   const onOk = (event: MouseEvent<HTMLElement>): void => {
@@ -41,10 +42,15 @@ export function ModalConfirmation({ type, title, header, body, width, buttons }:
   const setupModal = (): void => {
     modalStore.setTitle(renderTitleWithType(title, type));
 
-    modalStore.setOkLabel(buttons.positiveLabel);
-    modalStore.setOnOk(onOk);
+    if (buttons?.positiveLabel) {
+      modalStore.setOkLabel(buttons.positiveLabel);
+      modalStore.setOnOk(onOk);
+      modalStore.setShowOkButton(true);
+    } else {
+      modalStore.setShowOkButton(false);
+    }
 
-    if (buttons.negativeLabel) {
+    if (buttons?.negativeLabel) {
       modalStore.setOnCancel(buttons.onNegative);
       modalStore.setCancelLabel(buttons.negativeLabel);
       modalStore.setShowCancelButton(true);
@@ -53,6 +59,7 @@ export function ModalConfirmation({ type, title, header, body, width, buttons }:
     }
 
     modalStore.setWidth(width);
+    modalStore.setClosable(closable);
   };
 
   // onMount

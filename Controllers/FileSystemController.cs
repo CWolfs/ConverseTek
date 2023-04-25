@@ -16,12 +16,14 @@ namespace ConverseTek.Controllers {
 
   [ControllerProperty(Name = "FileSystemController", Route = "filesystem")]
   public class FileSystemController : ChromelyController {
+    private string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
     public FileSystemController() {
       this.RegisterGetRequest("/filesystem", this.GetRootDrives);
       this.RegisterGetRequest("/directories", this.GetDirectories);
       this.RegisterGetRequest("/quicklinks", this.GetQuickLinks);
       this.RegisterPostRequest("/working-directory", this.SetWorkingDirectory);
+      this.RegisterGetRequest("/dependency-status", this.GetDependencyStatus);
     }
 
     private ChromelyResponse GetRootDrives(ChromelyRequest request) {
@@ -88,6 +90,26 @@ namespace ConverseTek.Controllers {
         Log.Error(e);
         return null;
       }
+    }
+
+    private ChromelyResponse GetDependencyStatus(ChromelyRequest request) {
+      List<string> dependencyNames = new List<string> { "ShadowrunDTO.dll", "ShadowrunSerializer.dll" };
+      List<string> missingDependencies = new List<string>();
+
+      foreach (string dependencyName in dependencyNames) {
+        bool dependencyExists = File.Exists($"{baseDirectory}/{dependencyName}");
+        if (!dependencyExists) missingDependencies.Add(dependencyName);
+      }
+
+      Dictionary<string, object> responseData = new Dictionary<string, object>();
+      responseData.Add("status", missingDependencies.Count <= 0 ? "success" : "error");
+      if (missingDependencies.Count > 0) responseData.Add("missingDependencies", missingDependencies);
+
+      string serialisedResponseData = JsonConvert.SerializeObject(responseData);
+
+      ChromelyResponse response = new ChromelyResponse();
+      response.Data = serialisedResponseData;
+      return response;
     }
   }
 }

@@ -1,4 +1,4 @@
-import { ConversationAssetType, DefinitionsType, FileSystemItemType, QuickLinkType } from 'types';
+import { ConversationAssetType, DefinitionsType, FileSystemItemType, QuickLinkType, DependencyStatusType } from 'types';
 import { consolidateSpeaker, rebuildNodeIndexes, removeAllOldFillerNodes } from 'utils/conversation-utils';
 
 import { get, post } from './rest';
@@ -18,6 +18,15 @@ import { JsonValue, fullConversationAssetMapping, lowercasePropertyNames, mapToT
 */
 export default function noop() {
   return {};
+}
+
+/*
+=====================
+ || STATUS METHODS ||
+ ====================
+*/
+export function getDependencyStatus(): Promise<any> {
+  return get('/dependency-status');
 }
 
 /*
