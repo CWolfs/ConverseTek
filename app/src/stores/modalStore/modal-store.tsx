@@ -23,6 +23,8 @@ class ModalStore {
   isLoading = false;
   width = '70vw';
   showCancelButton = true;
+  showOkButton = true;
+  closable = true;
   props = {};
 
   constructor() {
@@ -39,10 +41,12 @@ class ModalStore {
       isLoading: observable,
       width: observable,
       showCancelButton: observable,
+      showOkButton: observable,
       setModelContent: action,
       setTitle: action,
       setWidth: action,
       setShowCancelButton: action,
+      setShowOkButton: action,
       setOnOk: action,
       setOnCancel: action,
       setDisableOk: action,
@@ -50,6 +54,7 @@ class ModalStore {
       setCancelLabel: action,
       setIsLoading: action,
       setLoadingLabel: action,
+      setClosable: action,
       showModal: action,
       closeModal: action,
       setProps: action,
@@ -75,6 +80,10 @@ class ModalStore {
 
   setShowCancelButton(flag: boolean): void {
     this.showCancelButton = flag;
+  }
+
+  setShowOkButton(flag: boolean): void {
+    this.showOkButton = flag;
   }
 
   setOnOk(onOk: OnOkType): void {
@@ -108,6 +117,10 @@ class ModalStore {
     this.loadingLabel = label;
   }
 
+  setClosable(closable: boolean): void {
+    this.closable = closable;
+  }
+
   showModal(flag: boolean): void {
     this.isVisible = flag;
   }
@@ -133,6 +146,8 @@ class ModalStore {
         this.isLoading = false;
         this.width = '70vw';
         this.showCancelButton = true;
+        this.showOkButton = true;
+        this.closable = true;
         this.props = {};
       }),
     );

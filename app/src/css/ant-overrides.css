@@ -177,6 +177,13 @@
   }
 }
 
+.ant-modal-body {
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
 .ant-select-selection {
   background-color: $backgroundTertiary;
   color: $textColourPrimary;
