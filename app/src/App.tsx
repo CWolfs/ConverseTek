@@ -23,7 +23,7 @@ const App = () => {
       if (dependencyStatus.status === 'error') {
         const message = `You are missing dependencies: ${dependencyStatus.missingDependencies.join(
           ', ',
-        )}. Copy them from your 'BATTLETECH/BattleTech_Data/Managed' into the ConverseTek folder.`;
+        )}. Copy them from your 'BATTLETECH/BattleTech_Data/Managed' folder into the ConverseTek folder.`;
 
         const modalTitle = `Missing Dependencies`;
         modalStore.setModelContent(ModalConfirmation, {
