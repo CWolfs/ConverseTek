@@ -1,11 +1,12 @@
 /* eslint-disable operator-linebreak */
-import React, { useState, useEffect, MouseEvent, CSSProperties, Fragment } from 'react';
+import React, { useState, useEffect, MouseEvent, CSSProperties, Fragment, useRef } from 'react';
 import { List, Icon } from 'antd';
 import classnames from 'classnames';
 import remove from 'lodash.remove';
 import sortBy from 'lodash.sortby';
 import debounce from 'lodash.debounce';
 import type { DebouncedFunc } from 'lodash';
+import Item from 'antd/lib/list/Item';
 
 import { getRootDrives, getDirectories, getQuickLinks, saveWorkingDirectory, getConversations, importConversation } from 'services/api';
 import { useStore } from 'hooks/useStore';
@@ -16,6 +17,8 @@ import { IconButton } from 'components/IconButton';
 import './FileSystemPicker.css';
 
 const ListItem = List.Item;
+
+const rootDrivePathPattern = /^[a-zA-Z]:[\\/]{1}$/;
 
 function getItemIcon(item: FileSystemItemType) {
   if (item.isDirectory && item.hasChildren) return <Icon type="folder-add" className="file-system-picker__directory-icon" />;
@@ -35,6 +38,7 @@ export function FileSystemPicker() {
   const [directories, setDirectories] = useState<FileSystemItemType[]>([]);
   const [files, setFiles] = useState<FileSystemItemType[]>([]);
   const [quickLinks, setQuickLinks] = useState<QuickLinkType[]>([]);
+  const listItemRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   const onOk = () => {
     if (selectedItem == null) return;
@@ -136,12 +140,30 @@ export function FileSystemPicker() {
     if (path === 'MyComputer') {
       void getRootDrives().then((updatedDirectories: FileSystemItemType[]) => setDirectories(updatedDirectories));
     } else {
-      void getDirectories(path, false).then(
+      const isSpecialFolder = path === 'Desktop' || path === 'Favourites' || path === 'MyDocuments';
+      const isRootPath = rootDrivePathPattern.test(path);
+      const modifiedPath = !isRootPath && !isSpecialFolder ? path.substring(0, path.lastIndexOf('/') + 1) : path;
+
+      void getDirectories(modifiedPath, false).then(
         ({ directories: updatedDirectories, files: updatedFiles }: { directories: FileSystemItemType[]; files: FileSystemItemType[] }) => {
           setDirectories(updatedDirectories);
           setFiles(updatedFiles);
+
+          updatedDirectories.forEach((fileSystemItem) => {
+            if (fileSystemItem.name === path.substring(path.lastIndexOf('/') + 1)) {
+              fileSystemItem.active = true;
+              setSelectedItem(fileSystemItem);
+              scrollToSelectedItem(fileSystemItem.path);
+            }
+          });
         },
       );
+    }
+  };
+
+  const scrollToSelectedItem = (key: string) => {
+    if (listItemRefs.current[key]) {
+      listItemRefs.current[key]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   };
 
@@ -158,6 +180,10 @@ export function FileSystemPicker() {
     setFileMode(modalProps.fileMode || false);
     setupModal();
   });
+
+  useEffect(() => {
+    listItemRefs.current = {};
+  }, [directories, files]);
 
   const items = [...directories, ...files];
 
@@ -207,6 +233,7 @@ export function FileSystemPicker() {
             return (
               <ListItem key={item.path} className={itemClasses}>
                 <div
+                  ref={(el) => (listItemRefs.current[item.path] = el)}
                   className="file-system-picker__directory-item-subcontainer"
                   onClick={() => onDirectoryClicked(item)}
                   onDoubleClick={() => item.isDirectory && onDirectoryDoubleClicked(item)}
