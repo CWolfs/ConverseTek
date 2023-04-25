@@ -4,7 +4,8 @@
   display: flex;
 
   &__quick-links {
-    margin-right: $mediumLargeSpace;
+    margin-right: 20px;
+    text-align: center;
   }
 
   &__directory-list {

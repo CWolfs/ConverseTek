@@ -1,5 +1,5 @@
 /* eslint-disable operator-linebreak */
-import React, { useState, useEffect, MouseEvent } from 'react';
+import React, { useState, useEffect, MouseEvent, CSSProperties, Fragment } from 'react';
 import { List, Icon } from 'antd';
 import classnames from 'classnames';
 import remove from 'lodash.remove';
@@ -133,12 +133,16 @@ export function FileSystemPicker() {
   };
 
   const onDirectNavigation = (path: string) => {
-    void getDirectories(path, false).then(
-      ({ directories: updatedDirectories, files: updatedFiles }: { directories: FileSystemItemType[]; files: FileSystemItemType[] }) => {
-        setDirectories(updatedDirectories);
-        setFiles(updatedFiles);
-      },
-    );
+    if (path === 'MyComputer') {
+      void getRootDrives().then((updatedDirectories: FileSystemItemType[]) => setDirectories(updatedDirectories));
+    } else {
+      void getDirectories(path, false).then(
+        ({ directories: updatedDirectories, files: updatedFiles }: { directories: FileSystemItemType[]; files: FileSystemItemType[] }) => {
+          setDirectories(updatedDirectories);
+          setFiles(updatedFiles);
+        },
+      );
+    }
   };
 
   // onMount
@@ -157,30 +161,38 @@ export function FileSystemPicker() {
 
   const items = [...directories, ...files];
 
-  const quicklinkButtonStyle = {
-    marginBottom: '6px',
+  const quicklinkButtonStyle: CSSProperties = {
+    marginTop: '12px',
+  };
+
+  const quicklinkLabelStyle: CSSProperties = {
+    marginTop: '4px',
+    fontSize: '8px',
+    textAlign: 'center',
+    fontWeight: '500',
   };
 
   return (
     <div className="file-system-picker">
       <div className="file-system-picker__quick-links">
-        <IconButton
-          style={quicklinkButtonStyle}
-          className="button-primary-pale"
-          icon="desktop"
-          title="Desktop"
-          onClick={(event: MouseEvent) => console.log(event)}
-        />
+        <IconButton style={quicklinkButtonStyle} className="button-primary-pale" icon="desktop" onClick={() => onDirectNavigation('Desktop')} />
+        <div style={quicklinkLabelStyle}>Desktop</div>
+
+        <IconButton style={quicklinkButtonStyle} className="button-primary-pale" icon="desktop" onClick={() => onDirectNavigation('MyComputer')} />
+        <div style={quicklinkLabelStyle}>My Computer</div>
+
+        <IconButton style={quicklinkButtonStyle} className="button-primary-pale" icon="desktop" onClick={() => onDirectNavigation('MyDocuments')} />
+        <div style={quicklinkLabelStyle}>My Documents</div>
+
+        <IconButton style={quicklinkButtonStyle} className="button-primary-pale" icon="desktop" onClick={() => onDirectNavigation('Favourites')} />
+        <div style={quicklinkLabelStyle}>Favourites</div>
+
         {quickLinks &&
           quickLinks.map(({ title, path }) => (
-            <IconButton
-              key={title}
-              className="button-secondary-pale"
-              style={quicklinkButtonStyle}
-              icon="book"
-              title={title}
-              onClick={() => onDirectNavigation(path)}
-            />
+            <Fragment key={title}>
+              <IconButton className="button-secondary-pale" style={quicklinkButtonStyle} icon="book" onClick={() => onDirectNavigation(path)} />
+              <div style={quicklinkLabelStyle}>{title}</div>
+            </Fragment>
           ))}
       </div>
       <div className="file-system-picker__directory-list">

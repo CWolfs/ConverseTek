@@ -43,6 +43,14 @@ namespace ConverseTek.Controllers {
         string path = (string)requestParams["path"];
         bool includeFiles = (bool)requestParams["includeFiles"];
 
+        if (path == "Desktop") {
+          path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+        } else if (path == "MyDocuments") {
+          path = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        } else if (path == "Favourites") {
+          path = Environment.GetFolderPath(Environment.SpecialFolder.Favorites);
+        }
+
         FileSystemService fileSystemService = FileSystemService.getInstance();
         List<FsDirectory> directories = fileSystemService.GetDirectories(path);
         List<FsFile> files = new List<FsFile>();

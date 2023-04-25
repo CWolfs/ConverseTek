@@ -256,7 +256,6 @@ class NodeStore {
       return result;
     }, [] as PromptNodeType[]);
 
-    console.log('copy finished', tempClipboard);
     this.clipboard = tempClipboard as ClipboardType;
   }
 
@@ -351,7 +350,6 @@ class NodeStore {
         // The node and all it's childen need to be deleted
         // Additionally, any links to nodes in that deleting branch need to be removed
         if (!previousNodeAuxiliaryLink) {
-          console.log('About to cascade delete prompt node due to link overwriting existing node');
           this.deletePromptNodeCascadeByIndex(nextNodeIndex, false);
         }
 
@@ -416,7 +414,6 @@ class NodeStore {
           // The node and all it's childen need to be deleted
           // Additionally, any links to nodes in that deleting branch need to be removed
           if (!previousNodeAuxiliaryLink) {
-            console.log('About to cascade delete prompt node due to copy overwriting existing node');
             this.deletePromptNodeCascadeByIndex(nextNodeIndex, false);
           }
 
