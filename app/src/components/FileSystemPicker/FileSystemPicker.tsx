@@ -1,18 +1,19 @@
 /* eslint-disable operator-linebreak */
-import React, { useState, useEffect, MouseEvent, CSSProperties, Fragment, useRef } from 'react';
+import React, { useState, useEffect, CSSProperties, Fragment, useRef } from 'react';
 import { List, Icon } from 'antd';
 import classnames from 'classnames';
 import remove from 'lodash.remove';
 import sortBy from 'lodash.sortby';
 import debounce from 'lodash.debounce';
 import type { DebouncedFunc } from 'lodash';
-import Item from 'antd/lib/list/Item';
+import { useContextMenu } from 'react-contexify';
 
 import { getRootDrives, getDirectories, getQuickLinks, saveWorkingDirectory, getConversations, importConversation } from 'services/api';
 import { useStore } from 'hooks/useStore';
 import { FSModalProps, ModalStore } from 'stores/modalStore/modal-store';
-import { DirectoryItemType, FileSystemItemType, QuickLinkType } from 'types';
+import { DirectoryItemType, FileItemSystemType, FileSystemItemType, QuickLinkType } from 'types';
 import { IconButton } from 'components/IconButton';
+import { FileSystemPickerContextMenu } from 'components/ContextMenus/FileSystemPickerContextMenu';
 
 import './FileSystemPicker.css';
 
@@ -35,10 +36,15 @@ export function FileSystemPicker() {
   const [loading, setLoading] = useState(false);
   const [fileMode, setFileMode] = useState<boolean>(modalProps.fileMode || false);
   const [selectedItem, setSelectedItem] = useState<FileSystemItemType | null>(null);
-  const [directories, setDirectories] = useState<FileSystemItemType[]>([]);
-  const [files, setFiles] = useState<FileSystemItemType[]>([]);
+  const [contextSelectedItem, setContextSelectedItem] = useState<DirectoryItemType | null>(null);
+  const [directories, setDirectories] = useState<DirectoryItemType[]>([]);
+  const [files, setFiles] = useState<FileItemSystemType[]>([]);
   const [quickLinks, setQuickLinks] = useState<QuickLinkType[]>([]);
   const listItemRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+
+  const { show } = useContextMenu({
+    id: 'filesystempicker-context-menu',
+  });
 
   const onOk = () => {
     if (selectedItem == null) return;
@@ -93,8 +99,8 @@ export function FileSystemPicker() {
       modalStore.setDisableOk(!clickedItem.active);
       if (fileMode && clickedItem.isDirectory) modalStore.setDisableOk(true);
 
-      setDirectories(newFsItems.filter((fsItem) => fsItem.isDirectory));
-      setFiles(newFsItems.filter((fsItem) => fsItem.isFile));
+      setDirectories(newFsItems.filter((fsItem) => fsItem.isDirectory) as DirectoryItemType[]);
+      setFiles(newFsItems.filter((fsItem) => fsItem.isFile) as FileItemSystemType[]);
       setSelectedItem(clickedItem.active ? clickedItem : null);
 
       debouncedClickEvents = [];
@@ -121,7 +127,7 @@ export function FileSystemPicker() {
       setSelectedItem(null);
       modalStore.setDisableOk(true);
       void getDirectories(item.path, fileMode).then(
-        ({ directories: updatedDirectories, files: updatedFiles }: { directories: FileSystemItemType[]; files: FileSystemItemType[] }) => {
+        ({ directories: updatedDirectories, files: updatedFiles }: { directories: DirectoryItemType[]; files: FileItemSystemType[] }) => {
           setDirectories(updatedDirectories);
           setFiles(updatedFiles);
         },
@@ -138,14 +144,14 @@ export function FileSystemPicker() {
 
   const onDirectNavigation = (path: string) => {
     if (path === 'MyComputer') {
-      void getRootDrives().then((updatedDirectories: FileSystemItemType[]) => setDirectories(updatedDirectories));
+      void getRootDrives().then((updatedDirectories: DirectoryItemType[]) => setDirectories(updatedDirectories));
     } else {
       const isSpecialFolder = path === 'Desktop' || path === 'Favourites' || path === 'MyDocuments';
       const isRootPath = rootDrivePathPattern.test(path);
       const modifiedPath = !isRootPath && !isSpecialFolder ? path.substring(0, path.lastIndexOf('/') + 1) : path;
 
       void getDirectories(modifiedPath, false).then(
-        ({ directories: updatedDirectories, files: updatedFiles }: { directories: FileSystemItemType[]; files: FileSystemItemType[] }) => {
+        ({ directories: updatedDirectories, files: updatedFiles }: { directories: DirectoryItemType[]; files: FileItemSystemType[] }) => {
           setDirectories(updatedDirectories);
           setFiles(updatedFiles);
 
@@ -167,9 +173,23 @@ export function FileSystemPicker() {
     }
   };
 
+  const setQuicklinkStatus = () => {
+    directories.forEach((directory: DirectoryItemType) => {
+      directory.isQuickLink = false;
+    });
+
+    directories.forEach((directory: DirectoryItemType) => {
+      quickLinks.forEach((quicklink: QuickLinkType) => {
+        if (directory.path.replaceAll('\\', '/') === quicklink.path) {
+          directory.isQuickLink = true;
+        }
+      });
+    });
+  };
+
   // onMount
   useEffect(() => {
-    void getRootDrives().then((updatedDirectories: FileSystemItemType[]) => setDirectories(updatedDirectories));
+    void getRootDrives().then((updatedDirectories: DirectoryItemType[]) => setDirectories(updatedDirectories));
     void getQuickLinks().then((updatedQuickLinks: QuickLinkType[]) => {
       setQuickLinks(updatedQuickLinks);
     });
@@ -188,18 +208,21 @@ export function FileSystemPicker() {
   const items = [...directories, ...files];
 
   const quicklinkButtonStyle: CSSProperties = {
-    marginTop: '12px',
+    marginTop: 12,
   };
 
   const quicklinkLabelStyle: CSSProperties = {
-    marginTop: '4px',
-    fontSize: '8px',
+    marginTop: 4,
+    fontSize: 10,
     textAlign: 'center',
-    fontWeight: '500',
+    fontWeight: 500,
   };
+
+  setQuicklinkStatus();
 
   return (
     <div className="file-system-picker">
+      <FileSystemPickerContextMenu id="filesystempicker-context-menu" selectedItem={contextSelectedItem} />
       <div className="file-system-picker__quick-links">
         <IconButton style={quicklinkButtonStyle} className="button-primary-pale" icon="desktop" onClick={() => onDirectNavigation('Desktop')} />
         <div style={quicklinkLabelStyle}>Desktop</div>
@@ -237,9 +260,16 @@ export function FileSystemPicker() {
                   className="file-system-picker__directory-item-subcontainer"
                   onClick={() => onDirectoryClicked(item)}
                   onDoubleClick={() => item.isDirectory && onDirectoryDoubleClicked(item)}
+                  onContextMenu={(event) => {
+                    if (item.isDirectory) {
+                      setContextSelectedItem(item);
+                      show({ event, props: { item } });
+                    }
+                  }}
                 >
                   {getItemIcon(item)}
                   <span className="file-system-picker__directory-name">{item.name}</span>
+                  {item.isDirectory && item.isQuickLink && <Icon style={{ marginLeft: 8 }} type="book" theme="twoTone" />}
                 </div>
               </ListItem>
             );

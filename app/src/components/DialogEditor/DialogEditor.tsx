@@ -19,7 +19,7 @@ import { detectType, isPromptNodeType } from 'utils/node-utils';
 import { ScalableScrollbar } from 'components/ScalableScrollbar';
 
 import { ConverseTekNodeRenderer } from './ConverseTekNodeRenderer';
-import { DialogEditorContextMenu } from '../DialogEditorContextMenu';
+import { DialogEditorContextMenu } from '../ContextMenus/DialogEditorContextMenu';
 
 import './DialogEditor.css';
 

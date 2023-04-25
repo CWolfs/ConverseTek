@@ -6,7 +6,7 @@ import { ConversationAssetType } from 'types';
 import { useStore } from 'hooks/useStore';
 import { DataStore } from 'stores/dataStore/data-store';
 import { FileTree } from 'components/FileTree';
-import { ConversationTreeContextMenu } from 'components/ConversationTreeContextMenu';
+import { ConversationTreeContextMenu } from 'components/ContextMenus/ConversationTreeContextMenu';
 
 import './ConversationTree.css';
 
