@@ -3,6 +3,7 @@ import { observable, action, makeObservable } from 'mobx';
 
 import type { ConversationAssetType } from 'types';
 
+import { deleteConversation } from 'services/api';
 import { createConversation } from 'utils/conversation-utils';
 import { defStore } from '../defStore';
 
@@ -26,6 +27,7 @@ class DataStore {
       setConversation: action,
       removeConversation: action,
       clearActiveConversation: action,
+      deleteConversation: action,
       updateActiveConversation: action,
       setActiveConversation: action,
       setUnsavedActiveConversation: action,
@@ -74,6 +76,14 @@ class DataStore {
 
   clearActiveConversation(): void {
     this.activeConversationAsset = null;
+  }
+
+  deleteConversation(id: string): void {
+    const conversationAsset = this.conversationAssets.get(id);
+    if (conversationAsset == null) return;
+
+    this.removeConversation(id);
+    void deleteConversation(conversationAsset.filepath);
   }
 
   updateActiveConversation(conversationAsset: ConversationAssetType): void {

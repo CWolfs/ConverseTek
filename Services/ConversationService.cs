@@ -21,7 +21,7 @@ namespace ConverseTek.Services {
       return instance;
     }
 
-    public ConversationService() {}
+    public ConversationService() { }
 
     public List<ConversationAsset> LoadConversations() {
       List<ConversationAsset> conversations = new List<ConversationAsset>();
@@ -80,6 +80,19 @@ namespace ConverseTek.Services {
       return conversationAsset;
     }
 
+    public bool DeleteConversation(string filePath) {
+      try {
+        bool fileExists = File.Exists(filePath);
+        if (fileExists) {
+          File.Delete(filePath);
+          return !File.Exists(filePath);
+        }
+      } catch (Exception error) {
+        Log.Error(error.ToString());
+      }
+      return false;
+    }
+
     public void SaveConversation(ConversationAsset conversationAsset, FileFormat fileFormat) {
       SaveConversation(conversationAsset, fileFormat, conversationAsset.FilePath);
     }
@@ -104,7 +117,7 @@ namespace ConverseTek.Services {
           runtimeTypeModel.Serialize(fileStream, conversationAsset.Conversation);
         }
       } catch (Exception error) {
-          Log.Error(error.ToString());
+        Log.Error(error.ToString());
       }
     }
 
@@ -118,8 +131,8 @@ namespace ConverseTek.Services {
           speakerListAsset = new SpeakerListAsset(filePath, speakerList);
         }
       } catch (Exception error) {
-          Log.Error(error.ToString());
-          return null;
+        Log.Error(error.ToString());
+        return null;
       }
 
       return speakerListAsset;
@@ -145,7 +158,7 @@ namespace ConverseTek.Services {
           runtimeTypeModel.Serialize(fileStream, speakerList.SpeakerList);
         }
       } catch (Exception error) {
-          Log.Error(error.ToString());
+        Log.Error(error.ToString());
       }
     }
   }
