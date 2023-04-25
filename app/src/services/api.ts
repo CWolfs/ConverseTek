@@ -75,6 +75,10 @@ export function importConversation(path: string): Promise<any> {
   return post('/conversations/import', { path });
 }
 
+export function deleteConversation(path: string): Promise<any> {
+  return post('/conversations/delete', { path });
+}
+
 /*
 ==========================
  || FILE SYSTEM METHODS ||

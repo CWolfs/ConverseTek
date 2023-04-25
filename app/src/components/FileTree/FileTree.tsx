@@ -3,8 +3,9 @@ import React from 'react';
 import { Tree } from 'antd';
 import CustomScroll from 'react-custom-scroll';
 import classnames from 'classnames';
+import { useContextMenu } from 'react-contexify';
 
-import { AntTreeNodeSelectedEvent } from 'antd/lib/tree';
+import type { AntTreeNodeMouseEvent, AntTreeNodeSelectedEvent } from 'antd/lib/tree';
 
 import 'react-custom-scroll/dist/customScroll.css';
 
@@ -26,16 +27,24 @@ function renderTreeNodes(data: { key: string; label: string }[] | null): JSX.Ele
 }
 
 export const FileTree = ({ title, data = null, onSelected = () => {}, selectedKeys = [], selectedDirectoryName }: Props) => {
+  const { show } = useContextMenu({
+    id: 'conversation-context-menu',
+  });
+
   const headerClasses = classnames('file-tree__tree__conversation_header', {
     'file-tree__tree__conversation_header--no-data': data == null || data.length <= 0,
   });
+
+  const onRightClickTree = ({ event, node }: AntTreeNodeMouseEvent) => {
+    show({ event, props: { id: node.props.eventKey, title: node.props.title, selected: node.props.selected } });
+  };
 
   return (
     <div className="file-tree">
       {title && <h4 className="file-tree__title">{title}</h4>}
       <div className="file-tree__tree">
         <CustomScroll heightRelativeToParent="calc(100% - 1px)">
-          <Tree showIcon showLine defaultExpandedKeys={['0']} onSelect={onSelected} selectedKeys={selectedKeys}>
+          <Tree showIcon showLine defaultExpandedKeys={['0']} onSelect={onSelected} selectedKeys={selectedKeys} onRightClick={onRightClickTree}>
             <TreeNode className={headerClasses} title={data && data.length ? selectedDirectoryName : 'No Conversations'} key="0">
               {renderTreeNodes(data)}
             </TreeNode>
