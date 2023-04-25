@@ -1,6 +1,6 @@
 /* eslint-disable operator-linebreak */
-import React, { useState, useEffect } from 'react';
-import { List, Icon, Tooltip } from 'antd';
+import React, { useState, useEffect, MouseEvent } from 'react';
+import { List, Icon } from 'antd';
 import classnames from 'classnames';
 import remove from 'lodash.remove';
 import sortBy from 'lodash.sortby';
@@ -11,6 +11,7 @@ import { getRootDrives, getDirectories, getQuickLinks, saveWorkingDirectory, get
 import { useStore } from 'hooks/useStore';
 import { FSModalProps, ModalStore } from 'stores/modalStore/modal-store';
 import { DirectoryItemType, FileSystemItemType, QuickLinkType } from 'types';
+import { IconButton } from 'components/IconButton';
 
 import './FileSystemPicker.css';
 
@@ -156,17 +157,30 @@ export function FileSystemPicker() {
 
   const items = [...directories, ...files];
 
+  const quicklinkButtonStyle = {
+    marginBottom: '6px',
+  };
+
   return (
     <div className="file-system-picker">
       <div className="file-system-picker__quick-links">
-        <Icon type="desktop" style={{ fontSize: 20 }} />
+        <IconButton
+          style={quicklinkButtonStyle}
+          className="button-primary-pale"
+          icon="desktop"
+          title="Desktop"
+          onClick={(event: MouseEvent) => console.log(event)}
+        />
         {quickLinks &&
           quickLinks.map(({ title, path }) => (
-            <Tooltip key={title} title={title} placement="left">
-              <div onClick={() => onDirectNavigation(path)}>
-                <Icon type="book" style={{ fontSize: 20 }} />
-              </div>
-            </Tooltip>
+            <IconButton
+              key={title}
+              className="button-secondary-pale"
+              style={quicklinkButtonStyle}
+              icon="book"
+              title={title}
+              onClick={() => onDirectNavigation(path)}
+            />
           ))}
       </div>
       <div className="file-system-picker__directory-list">

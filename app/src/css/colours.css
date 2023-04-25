@@ -14,13 +14,14 @@ $blue2: #bae7ff;
 $blue3: #91d5ff;
 $blue4: #69c0ff;
 $blue5: #40a9ff;
-$blue6: #1890FF;
-$blue7: #096DD9;
+$blue6: #1890ff;
+$blue7: #096dd9;
 $blue8: #0050b3;
 $blue9: #003a8c;
 $blue10: #002766;
 
 /* ANT green */
+$green3: #3f9714;
 $green6: #52c41a;
 
 /* ANT grey */
@@ -41,9 +42,8 @@ $c1grey6: #b6bbc2;
 
 $c2grey6: #828282;
 
-
 /* CUSTOM blue 1 */
-$c1blue6: #0084C1;
+$c1blue6: #0084c1;
 
 /* CUSTOM blue 2 */
 $c2blue6: #318ce0;
@@ -59,8 +59,9 @@ The palette consists of three colour types (primary, secondary, tertiary). Vario
 These are specific to the app pages.
 */
 
-$backgroundPrimary: #1E1E1E;
+$backgroundPrimary: #1e1e1e;
 $backgroundSecondary: $blue8;
+$backgroundSecondaryPale: #66abff;
 $backgroundTertiary: #2f2f2f;
 $backgroundQuaternary: white;
 
@@ -75,10 +76,10 @@ $linkColourPrimary: $c1blue6;
 $linkColourSecondary: white;
 $linkColourTertiary: $blue8;
 
-$borderPrimary: $grey4;         /* for use on white background */
-$borderSecondary: gold;        /* for use on blue background */
-$borderTertiary: $c2grey6;     /* for use on white or blue background */
-$borderQuaternary: $blue8;      /* for use on blue background */
+$borderPrimary: $grey4; /* for use on white background */
+$borderSecondary: gold; /* for use on blue background */
+$borderTertiary: $c2grey6; /* for use on white or blue background */
+$borderQuaternary: $blue8; /* for use on blue background */
 
 $shadowPrimary: $grey4;
 $shadowSecondary: $grey5;

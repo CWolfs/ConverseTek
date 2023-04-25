@@ -42,8 +42,6 @@ function GlobalModal() {
     ) : null,
   ];
 
-  console.log('closable', closable);
-
   return (
     <Modal
       title={title}

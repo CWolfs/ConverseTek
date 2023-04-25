@@ -33,7 +33,7 @@ function ConversationTree() {
 
   return (
     <div className="conversation-tree">
-      <ConversationTreeContextMenu id="conversation-context-menu" onVisibilityChange={() => console.log('context menu visibility changed')} />
+      <ConversationTreeContextMenu id="conversation-context-menu" />
       <FileTree
         title="Conversations"
         data={data}
