@@ -1,1 +1,1 @@
-export * from './DialogEditorContextMenu';
+export { ObservingDialogEditorContextMenu as DialogEditorContextMenu } from './DialogEditorContextMenu';

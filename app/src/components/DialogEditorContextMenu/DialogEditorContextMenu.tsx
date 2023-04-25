@@ -1,5 +1,6 @@
 import React from 'react';
 import { Menu, Item, ItemParams } from 'react-contexify';
+import { observer } from 'mobx-react';
 
 import 'react-contexify/ReactContexify.css';
 
@@ -90,3 +91,5 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
     </Menu>
   );
 }
+
+export const ObservingDialogEditorContextMenu = observer(DialogEditorContextMenu);
