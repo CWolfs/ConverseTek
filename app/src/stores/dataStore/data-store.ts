@@ -25,6 +25,7 @@ class DataStore {
       createNewConversation: action,
       setConversations: action,
       setConversation: action,
+      getConversationAsset: action,
       removeConversation: action,
       clearActiveConversation: action,
       deleteConversation: action,
@@ -68,6 +69,12 @@ class DataStore {
 
   setConversation(conversationAsset: ConversationAssetType): void {
     this.conversationAssets.set(conversationAsset.conversation.idRef.id, conversationAsset);
+  }
+
+  getConversationAsset(id: string): ConversationAssetType | null {
+    const conversationAsset = this.conversationAssets.get(id);
+    if (conversationAsset == null) return null;
+    return conversationAsset;
   }
 
   removeConversation(id: string): void {

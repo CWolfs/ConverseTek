@@ -36,7 +36,7 @@ export const FileTree = ({ title, data = null, onSelected = () => {}, selectedKe
   });
 
   const onRightClickTree = ({ event, node }: AntTreeNodeMouseEvent) => {
-    show({ event, props: { id: node.props.eventKey } });
+    show({ event, props: { id: node.props.eventKey, title: node.props.title, selected: node.props.selected } });
   };
 
   return (
