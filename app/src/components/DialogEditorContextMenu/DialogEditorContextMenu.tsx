@@ -1,5 +1,4 @@
 import React from 'react';
-import { observer } from 'mobx-react';
 import { Menu, Item, ItemParams } from 'react-contexify';
 
 import 'react-contexify/ReactContexify.css';
@@ -33,7 +32,7 @@ function getAddLabel(type: string) {
   return addItemLabel;
 }
 
-function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string; onVisibilityChange: (flag: boolean) => void }) {
+export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string; onVisibilityChange: (flag: boolean) => void }) {
   const nodeStore = useStore<NodeStore>('node');
 
   const { focusedTreeNode: focusedNode, clipboard } = nodeStore;
@@ -91,5 +90,3 @@ function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string; onVis
     </Menu>
   );
 }
-
-export const ObservingDialogEditorContextMenu = observer(DialogEditorContextMenu);
