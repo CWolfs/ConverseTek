@@ -35,7 +35,7 @@ export function ConversationTreeContextMenu({ id, onVisibilityChange }: { id: st
       negativeLabel: 'Cancel',
     };
 
-    const modalTitle = `Are you sure you want to delete conversation '${title}'?`;
+    const modalTitle = `Are you sure you want to delete this conversation?`;
     modalStore.setModelContent(ModalConfirmation, {
       type: 'warning',
       title: modalTitle,
