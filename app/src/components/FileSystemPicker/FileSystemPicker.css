@@ -6,6 +6,8 @@
   &__quick-links {
     margin-right: 20px;
     text-align: center;
+    max-height: 55vh;
+    overflow: auto;
   }
 
   &__directory-list {

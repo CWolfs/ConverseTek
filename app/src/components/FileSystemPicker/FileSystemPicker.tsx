@@ -222,7 +222,7 @@ export function FileSystemPicker() {
 
   return (
     <div className="file-system-picker">
-      <FileSystemPickerContextMenu id="filesystempicker-context-menu" selectedItem={contextSelectedItem} />
+      <FileSystemPickerContextMenu id="filesystempicker-context-menu" selectedItem={contextSelectedItem} setQuickLinks={setQuickLinks} />
       <div className="file-system-picker__quick-links">
         <IconButton style={quicklinkButtonStyle} className="button-primary-pale" icon="desktop" onClick={() => onDirectNavigation('Desktop')} />
         <div style={quicklinkLabelStyle}>Desktop</div>

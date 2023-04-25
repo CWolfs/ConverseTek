@@ -22,6 +22,8 @@ namespace ConverseTek.Controllers {
       this.RegisterGetRequest("/filesystem", this.GetRootDrives);
       this.RegisterGetRequest("/directories", this.GetDirectories);
       this.RegisterGetRequest("/quicklinks", this.GetQuickLinks);
+      this.RegisterPostRequest("/add-quicklink", this.AddQuickLink);
+      this.RegisterPostRequest("/remove-quicklink", this.RemoveQuickLink);
       this.RegisterPostRequest("/working-directory", this.SetWorkingDirectory);
       this.RegisterGetRequest("/dependency-status", this.GetDependencyStatus);
     }
@@ -82,6 +84,44 @@ namespace ConverseTek.Controllers {
       ChromelyResponse response = new ChromelyResponse();
       response.Data = quickLinksJson;
       return response;
+    }
+
+    private ChromelyResponse AddQuickLink(ChromelyRequest request) {
+      try {
+        ConfigService configService = ConfigService.getInstance();
+        IDictionary<string, object> requestParams = request.Parameters;
+        string title = (string)requestParams["title"];
+        string path = (string)requestParams["path"];
+
+        Dictionary<string, string> quickLinks = configService.AddQuickLink(title, path);
+        string quickLinksJson = JsonConvert.SerializeObject(quickLinks);
+
+        ChromelyResponse response = new ChromelyResponse();
+        response.Data = quickLinksJson;
+        return response;
+      } catch (Exception e) {
+        Log.Error(e);
+        return null;
+      }
+    }
+
+    private ChromelyResponse RemoveQuickLink(ChromelyRequest request) {
+      try {
+        ConfigService configService = ConfigService.getInstance();
+        IDictionary<string, object> requestParams = request.Parameters;
+        string title = (string)requestParams["title"];
+        string path = (string)requestParams["path"];
+
+        Dictionary<string, string> quickLinks = configService.RemoveQuickLink(title, path);
+        string quickLinksJson = JsonConvert.SerializeObject(quickLinks);
+
+        ChromelyResponse response = new ChromelyResponse();
+        response.Data = quickLinksJson;
+        return response;
+      } catch (Exception e) {
+        Log.Error(e);
+        return null;
+      }
     }
 
     private ChromelyResponse SetWorkingDirectory(ChromelyRequest request) {

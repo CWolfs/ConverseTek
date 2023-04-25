@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 namespace ConverseTek.Services {
   public class ConfigService {
     private static ConfigService instance;
+    string BASE_DIRECTORY = AppDomain.CurrentDomain.BaseDirectory;
     private static string CONFIG_PATH = "/config";
 
     public static ConfigService getInstance() {
@@ -19,8 +20,7 @@ namespace ConverseTek.Services {
 
     public Dictionary<string, string> GetQuickLinksConfig() {
       try {
-        string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-        string json = File.ReadAllText($"{baseDirectory}{CONFIG_PATH}/quicklinks.json");
+        string json = File.ReadAllText($"{BASE_DIRECTORY}{CONFIG_PATH}/quicklinks.json");
         Log.Debug("[ConfigService] Quick links are " + json);
         Dictionary<string, string> quickLinks = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
         return quickLinks;
@@ -28,6 +28,20 @@ namespace ConverseTek.Services {
         Log.Error(error.ToString());
         return null;
       }
+    }
+
+    public Dictionary<string, string> AddQuickLink(string title, string path) {
+      Dictionary<string, string> quickLinks = GetQuickLinksConfig();
+      quickLinks.Add(title, path);
+      File.WriteAllText($"{BASE_DIRECTORY}{CONFIG_PATH}/quicklinks.json", JsonConvert.SerializeObject(quickLinks, Formatting.Indented));
+      return quickLinks;
+    }
+
+    public Dictionary<string, string> RemoveQuickLink(string title, string path) {
+      Dictionary<string, string> quickLinks = GetQuickLinksConfig();
+      quickLinks.Remove(title);
+      File.WriteAllText($"{BASE_DIRECTORY}{CONFIG_PATH}/quicklinks.json", JsonConvert.SerializeObject(quickLinks, Formatting.Indented));
+      return quickLinks;
     }
   }
 }

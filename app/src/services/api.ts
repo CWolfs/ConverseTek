@@ -111,6 +111,29 @@ export function getQuickLinks() {
   });
 }
 
+export function addQuickLink(title: string, path: string) {
+  const modifiedPath = path.replaceAll('\\', '/');
+
+  return post('/add-quicklink', { title, path: modifiedPath }).then((quickLinks: [string, string]) => {
+    const entries: QuickLinkType[] = [];
+    for (const [key, value] of Object.entries(quickLinks)) {
+      entries.push({ title: key, path: value } as QuickLinkType);
+    }
+    return entries;
+  });
+}
+
+export function removeQuickLink(title: string, path: string) {
+  const modifiedPath = path.replaceAll('\\', '/');
+  return post('/remove-quicklink', { title, path: modifiedPath }).then((quickLinks: [string, string]) => {
+    const entries: QuickLinkType[] = [];
+    for (const [key, value] of Object.entries(quickLinks)) {
+      entries.push({ title: key, path: value } as QuickLinkType);
+    }
+    return entries;
+  });
+}
+
 export function saveWorkingDirectory(path: string, name: string) {
   dataStore.setWorkingDirectory(path, name);
   return post('/working-directory', { path });
