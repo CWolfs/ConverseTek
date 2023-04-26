@@ -62,6 +62,9 @@ class NodeStore {
       setNode: action,
       setNodeId: action,
       setNodeText: action,
+      setNodeComment: action,
+      setElementNodeOnlyOnce: action,
+      setElementNodeHideIfUnavailable: action,
       setPromptNodeSpeakerType: action,
       setPromptNodeSourceInSceneId: action,
       setPromptNodeSpeakerId: action,
@@ -515,6 +518,18 @@ class NodeStore {
     }
   }
 
+  setNodeComment(node: PromptNodeType | ElementNodeType, comment: string) {
+    node.comment = comment;
+  }
+
+  setElementNodeOnlyOnce(elementNode: ElementNodeType, onlyOnce: boolean) {
+    elementNode.onlyOnce = onlyOnce;
+  }
+
+  setElementNodeHideIfUnavailable(elementNode: ElementNodeType, hideIfUnavailable: boolean) {
+    elementNode.hideIfUnavailable = hideIfUnavailable;
+  }
+
   setPromptNodeSpeakerType(node: PromptNodeType, value: 'castId' | 'speakerId') {
     node.speakerType = value;
     if (value === 'speakerId') node.sourceInSceneRef = null;
@@ -526,7 +541,6 @@ class NodeStore {
     } else {
       node.sourceInSceneRef.id = id;
     }
-    console.log('just set setPromptNodeSourceInSceneId', node);
   }
 
   setPromptNodeSpeakerId(node: PromptNodeType, id: string) {

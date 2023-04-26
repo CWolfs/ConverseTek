@@ -99,8 +99,7 @@ function ConversationGeneral({ node }: Props) {
 
   const handleCommentChange = (event: ChangeEvent<HTMLInputElement>) => {
     const newComment = event.target.value;
-    // FIXME: Add immutability
-    node.comment = newComment;
+    nodeStore.setNodeComment(node, newComment);
   };
 
   const handleAvailbleOnceChange = (event: CheckboxChangeEvent) => {
@@ -108,8 +107,7 @@ function ConversationGeneral({ node }: Props) {
     if (type === 'node') return;
 
     const newAvailableOnlyOnce = event.target.checked;
-    // FIXME: Add immutability
-    node.onlyOnce = newAvailableOnlyOnce;
+    nodeStore.setElementNodeOnlyOnce(node, newAvailableOnlyOnce);
   };
 
   const handleHideIfUnavailableChange = (event: CheckboxChangeEvent) => {
@@ -117,8 +115,7 @@ function ConversationGeneral({ node }: Props) {
     if (type === 'node') return;
 
     const newAlwaysShow = event.target.checked;
-    // FIXME: Add immutability
-    node.hideIfUnavailable = !newAlwaysShow;
+    nodeStore.setElementNodeHideIfUnavailable(node, !newAlwaysShow);
   };
 
   return (
