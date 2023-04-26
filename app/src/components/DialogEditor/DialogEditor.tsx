@@ -140,7 +140,11 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
 
   const onClicked = (event: MouseEvent<HTMLElement>) => {
     const target = event.target as HTMLElement;
-    if (target.className === 'rst__node' || target.className === 'rst__lineBlock' || target.className.includes('ReactVirtualized__Grid')) {
+    if (
+      target.className === 'rst__node' ||
+      target.className === 'rst__lineBlock' ||
+      (target.className.includes && target.className.includes('ReactVirtualized__Grid'))
+    ) {
       nodeStore.clearActiveNode();
     }
   };
