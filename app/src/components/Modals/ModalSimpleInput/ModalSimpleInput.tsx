@@ -98,7 +98,6 @@ export function ModalSimpleInput({ globalModalId, type, title, header, body, wid
                   modalStore.setDisableOk(true, globalModalId);
                 }
 
-                console.log('setting inputvalue from user input', inputValue);
                 setInputValue(value);
               }}
             />

@@ -163,6 +163,7 @@ export function FileSystemPicker() {
             if (fileSystemItem.name === path.substring(path.lastIndexOf('/') + 1)) {
               fileSystemItem.active = true;
               setSelectedItem(fileSystemItem);
+              modalStore.setDisableOk(false, globalModalId);
               scrollToSelectedItem(fileSystemItem.path);
             }
           });
