@@ -15,16 +15,6 @@
   }
 
   &__content {
-    /* &-warning {
-      background-image: resolve('cwolf-avatar.png');
-      background-size: contain;
-      background-repeat: no-repeat;
-      width: 2vw;
-      height: 24px;
-      display: inline-block;
-      vertical-align: bottom;
-    } */
-
     &-body {
       display: inline-block;
       vertical-align: top;

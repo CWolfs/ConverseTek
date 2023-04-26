@@ -25,7 +25,7 @@ type Props = {
   closable: boolean;
 };
 
-function renderTitleWithType(title: string, type: string) {
+function renderTitleWithType(title: string) {
   return (
     <>
       <Icon type="exclamation-circle" theme="twoTone" twoToneColor="orange" className="modal-confirmation__icon--warning" />
@@ -43,7 +43,7 @@ export function ModalConfirmation({ globalModalId, type, title, header, body, wi
   };
 
   const setupModal = (): void => {
-    modalStore.setTitle(renderTitleWithType(title, type), globalModalId);
+    modalStore.setTitle(renderTitleWithType(title), globalModalId);
 
     if (buttons?.positiveLabel) {
       if (buttons.positiveType != null) modalStore.setOkType(buttons.positiveType, globalModalId);

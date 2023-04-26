@@ -44,6 +44,7 @@ export function ConversationTreeContextMenu({ id, onVisibilityChange }: { id: st
         title: modalTitle,
         body: `This action will delete conversation '${title}' with the id '${id}'. This action is irreversible. Are you sure you want to delete it?`,
         width: '30rem',
+        disableOk: false,
         buttons,
       },
       'global1',
