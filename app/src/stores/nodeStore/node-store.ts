@@ -24,7 +24,7 @@ import { isElementNodeType, isPromptNodeType } from 'utils/node-utils';
 
 import { dataStore } from '../dataStore';
 import { modalStore } from '../modalStore';
-import { ModalConfirmation } from 'components/ModalConfirmation';
+import { ModalConfirmation } from 'components/Modals/ModalConfirmation';
 
 /* eslint-disable no-return-assign, no-param-reassign, class-methods-use-this */
 class NodeStore {

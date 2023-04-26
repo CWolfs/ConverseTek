@@ -7,7 +7,7 @@ import { DependencyStatusType } from 'types';
 import { getDependencyStatus } from 'services/api';
 import { useStore } from 'hooks/useStore';
 import { ModalStore } from 'stores/modalStore/modal-store';
-import { ModalConfirmation } from 'components/ModalConfirmation';
+import { ModalConfirmation } from 'components/Modals/ModalConfirmation';
 
 import { MainLayout } from './layouts/MainLayout';
 

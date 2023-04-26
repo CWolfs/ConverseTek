@@ -4,7 +4,7 @@ import { Menu, Item, ItemParams } from 'react-contexify';
 import { useStore } from 'hooks/useStore';
 import { DataStore } from 'stores/dataStore/data-store';
 import { ModalStore } from 'stores/modalStore/modal-store';
-import { ModalConfirmation } from 'components/ModalConfirmation';
+import { ModalConfirmation } from 'components/Modals/ModalConfirmation';
 
 import 'react-contexify/ReactContexify.css';
 
