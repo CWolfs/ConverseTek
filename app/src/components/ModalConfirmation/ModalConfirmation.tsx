@@ -14,7 +14,9 @@ type Props = {
   body: string;
   width: string;
   buttons: {
+    positiveType?: 'link' | 'primary' | 'default' | 'ghost' | 'dashed' | 'danger' | undefined;
     positiveLabel: string;
+    negativeType?: 'link' | 'primary' | 'default' | 'ghost' | 'dashed' | 'danger' | undefined;
     negativeLabel?: string;
     onNegative: OnCancelType;
     onPositive: OnOkType;
@@ -43,6 +45,7 @@ export function ModalConfirmation({ type, title, header, body, width, buttons, c
     modalStore.setTitle(renderTitleWithType(title, type));
 
     if (buttons?.positiveLabel) {
+      if (buttons.positiveType != null) modalStore.setOkType(buttons.positiveType);
       modalStore.setOkLabel(buttons.positiveLabel);
       modalStore.setOnOk(onOk);
       modalStore.setShowOkButton(true);
@@ -51,6 +54,7 @@ export function ModalConfirmation({ type, title, header, body, width, buttons, c
     }
 
     if (buttons?.negativeLabel) {
+      if (buttons.negativeType != null) modalStore.setOkType(buttons.negativeType);
       modalStore.setOnCancel(buttons.onNegative);
       modalStore.setCancelLabel(buttons.negativeLabel);
       modalStore.setShowCancelButton(true);

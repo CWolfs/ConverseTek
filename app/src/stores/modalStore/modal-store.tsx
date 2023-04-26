@@ -2,6 +2,7 @@
 import React, { MouseEvent, ElementType } from 'react';
 import { observable, action, makeObservable } from 'mobx';
 import defer from 'lodash.defer';
+import { ButtonType } from 'antd/lib/button';
 
 export type OnOkType = ((event: MouseEvent<HTMLElement>) => void) | null;
 export type OnCancelType = ((event: MouseEvent<HTMLElement>) => void) | null;
@@ -10,15 +11,19 @@ export type FSModalProps = {
   fileMode?: boolean;
 };
 
+type ModalButtonType = 'link' | 'primary' | 'default' | 'ghost' | 'dashed' | 'danger' | undefined;
+
 class ModalStore {
   ModalContent: ElementType | JSX.Element | null = null;
   title: string | JSX.Element = '';
   isVisible = false;
   onOk: OnOkType = null;
   disableOk = true;
+  okType: ModalButtonType = 'primary';
   okLabel = 'Ok';
   loadingLabel = 'Loading';
   onCancel: OnCancelType = null;
+  cancelType: ModalButtonType | undefined = undefined;
   cancelLabel = 'Cancel';
   isLoading = false;
   width = '70vw';
@@ -34,9 +39,11 @@ class ModalStore {
       isVisible: observable,
       onOk: observable,
       disableOk: observable,
+      okType: observable,
       okLabel: observable,
       loadingLabel: observable,
       onCancel: observable,
+      cancelType: observable,
       cancelLabel: observable,
       isLoading: observable,
       width: observable,
@@ -50,7 +57,9 @@ class ModalStore {
       setOnOk: action,
       setOnCancel: action,
       setDisableOk: action,
+      setOkType: action,
       setOkLabel: action,
+      setCancelType: action,
       setCancelLabel: action,
       setIsLoading: action,
       setLoadingLabel: action,
@@ -101,8 +110,16 @@ class ModalStore {
     this.disableOk = flag;
   }
 
+  setOkType(type: ButtonType): void {
+    this.okType = type;
+  }
+
   setOkLabel(label: string): void {
     this.okLabel = label;
+  }
+
+  setCancelType(type: ButtonType): void {
+    this.cancelType = type;
   }
 
   setCancelLabel(label: string): void {
@@ -140,7 +157,10 @@ class ModalStore {
         this.ModalContent = null;
         this.onOk = null;
         this.disableOk = true;
+        this.okType = 'primary';
         this.okLabel = 'Ok';
+        this.cancelType = undefined;
+        this.cancelLabel = 'Cancel';
         this.loadingLabel = 'Loading';
         this.onCancel = this.closeModal;
         this.isLoading = false;

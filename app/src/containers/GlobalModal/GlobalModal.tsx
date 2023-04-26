@@ -16,8 +16,10 @@ function GlobalModal() {
     isVisible,
     ModalContent,
     onOk,
+    okType,
     okLabel,
     onCancel,
+    cancelType,
     cancelLabel,
     showCancelButton,
     showOkButton,
@@ -30,13 +32,13 @@ function GlobalModal() {
 
   const footer = [
     showCancelButton ? (
-      <Button key="cancel" onClick={onCancel || undefined}>
+      <Button key="cancel" type={cancelType} onClick={onCancel || undefined}>
         {cancelLabel ? cancelLabel : 'Cancel'}
       </Button>
     ) : null,
 
     showOkButton ? (
-      <Button key="submit" type="primary" onClick={onOk || undefined} loading={isLoading}>
+      <Button key="submit" type={okType} onClick={onOk || undefined} loading={isLoading}>
         {isLoading ? loadingLabel : okLabel}
       </Button>
     ) : null,

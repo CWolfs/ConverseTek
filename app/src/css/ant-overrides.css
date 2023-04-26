@@ -121,16 +121,16 @@
   border-color: #f5222d;
 
   &:active {
-    color: #f5222d;
-    background-color: white;
-    border-color: white;
+    color: white;
+    background-color: #ab171f;
+    border-color: #ab171f;
   }
 
   &:focus,
   &:hover {
-    color: #f5222d;
-    background-color: white;
-    border-color: white;
+    color: white;
+    background-color: #ab171f;
+    border-color: #ab171f;
   }
 
   &.ant-btn-clicked:after {

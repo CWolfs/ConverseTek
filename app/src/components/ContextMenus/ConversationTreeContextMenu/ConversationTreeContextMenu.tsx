@@ -27,6 +27,7 @@ export function ConversationTreeContextMenu({ id, onVisibilityChange }: { id: st
     const { id, title, selected } = props;
 
     const buttons = {
+      positiveType: 'danger',
       positiveLabel: 'Confirm',
       onPositive: () => {
         dataStore.deleteConversation(id);
