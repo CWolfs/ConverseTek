@@ -6,7 +6,7 @@ import { ConversationAssetType } from 'types';
 import { useStore } from 'hooks/useStore';
 import { DataStore } from 'stores/dataStore/data-store';
 import { FileTree } from 'components/FileTree';
-import { ConversationTreeContextMenu } from 'components/ConversationTreeContextMenu';
+import { ConversationTreeContextMenu } from 'components/ContextMenus/ConversationTreeContextMenu';
 
 import './ConversationTree.css';
 
@@ -33,7 +33,7 @@ function ConversationTree() {
 
   return (
     <div className="conversation-tree">
-      <ConversationTreeContextMenu id="conversation-context-menu" onVisibilityChange={() => console.log('context menu visibility changed')} />
+      <ConversationTreeContextMenu id="conversation-context-menu" />
       <FileTree
         title="Conversations"
         data={data}

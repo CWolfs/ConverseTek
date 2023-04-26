@@ -5,6 +5,7 @@ export type DirectoryItemType = {
   isFile: false;
   hasChildren: boolean;
   active?: boolean;
+  isQuickLink: boolean;
 };
 
 export type FileItemSystemType = {

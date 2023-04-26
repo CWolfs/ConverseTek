@@ -2,46 +2,51 @@
 import React, { MouseEvent, ElementType } from 'react';
 import { observable, action, makeObservable } from 'mobx';
 import defer from 'lodash.defer';
+import { ButtonType } from 'antd/lib/button';
 
-export type OnOkType = ((event: MouseEvent<HTMLElement>) => void) | null;
+export type OnOkType = ((event: MouseEvent<HTMLElement>, value?: string) => void) | null;
 export type OnCancelType = ((event: MouseEvent<HTMLElement>) => void) | null;
 
 export type FSModalProps = {
   fileMode?: boolean;
 };
 
+type ModalButtonType = 'link' | 'primary' | 'default' | 'ghost' | 'dashed' | 'danger' | undefined;
+
+type ModalOptions = {
+  props: FSModalProps;
+
+  title: string | JSX.Element;
+  width: string;
+
+  showOkButton: boolean;
+  okType: ModalButtonType | undefined;
+  okLabel: string;
+  disableOk: boolean;
+  onOk: OnOkType;
+
+  showCancelButton: boolean;
+  cancelType: ModalButtonType | undefined;
+  cancelLabel: string;
+  onCancel: OnCancelType;
+
+  isLoading: boolean;
+  loadingLabel: string;
+
+  centered: boolean;
+  isVisible: boolean;
+  closable: boolean;
+};
+
 class ModalStore {
-  ModalContent: ElementType | JSX.Element | null = null;
-  title: string | JSX.Element = '';
-  isVisible = false;
-  onOk: OnOkType = null;
-  disableOk = true;
-  okLabel = 'Ok';
-  loadingLabel = 'Loading';
-  onCancel: OnCancelType = null;
-  cancelLabel = 'Cancel';
-  isLoading = false;
-  width = '70vw';
-  showCancelButton = true;
-  showOkButton = true;
-  closable = true;
-  props = {};
+  modals = new Map<string, ElementType | JSX.Element>();
+  options = new Map<string, ModalOptions>();
 
   constructor() {
     makeObservable(this, {
-      ModalContent: observable.shallow,
-      title: observable,
-      isVisible: observable,
-      onOk: observable,
-      disableOk: observable,
-      okLabel: observable,
-      loadingLabel: observable,
-      onCancel: observable,
-      cancelLabel: observable,
-      isLoading: observable,
-      width: observable,
-      showCancelButton: observable,
-      showOkButton: observable,
+      modals: observable.deep,
+      options: observable,
+
       setModelContent: action,
       setTitle: action,
       setWidth: action,
@@ -50,7 +55,9 @@ class ModalStore {
       setOnOk: action,
       setOnCancel: action,
       setDisableOk: action,
+      setOkType: action,
       setOkLabel: action,
+      setCancelType: action,
       setCancelLabel: action,
       setIsLoading: action,
       setLoadingLabel: action,
@@ -59,98 +66,179 @@ class ModalStore {
       closeModal: action,
       setProps: action,
       reset: action,
+      getOptions: action,
     });
-
-    this.onCancel = this.closeModal;
   }
 
-  setModelContent(ModalContent: ElementType, props = {}, show = true): void {
-    this.ModalContent = <ModalContent {...props} />;
-    this.props = props;
-    if (show) this.showModal(true);
+  setModelContent(ModalContent: ElementType, props = {}, globalModalId: string, show = true): void {
+    this.modals.set(globalModalId, <ModalContent globalModalId={globalModalId} {...props} />);
+
+    const options: ModalOptions = {
+      props,
+
+      title: '',
+      width: '70vw',
+
+      showOkButton: true,
+      okType: 'primary',
+      okLabel: 'Ok',
+      disableOk: true,
+      onOk: null,
+
+      showCancelButton: true,
+      cancelType: undefined,
+      cancelLabel: 'Cancel',
+      onCancel: () => this.closeModal(globalModalId),
+
+      isLoading: false,
+      loadingLabel: 'Loading',
+
+      centered: false,
+      isVisible: false,
+      closable: true,
+
+      ...props,
+    };
+
+    this.options.set(globalModalId, options);
+    if (show) this.showModal(true, globalModalId);
   }
 
-  setTitle(title: string | JSX.Element): void {
-    this.title = title;
+  getModal(globalModalId: string): JSX.Element | React.ElementType | undefined {
+    return this.modals.get(globalModalId);
   }
 
-  setWidth(width: string): void {
-    this.width = width;
+  getOptions(globalModalId: string): ModalOptions | undefined {
+    return this.options.get(globalModalId);
   }
 
-  setShowCancelButton(flag: boolean): void {
-    this.showCancelButton = flag;
+  setTitle(title: string | JSX.Element, globalModalId: string): void {
+    const modalOptions = this.options.get(globalModalId);
+    if (modalOptions == null) return;
+
+    modalOptions.title = title;
   }
 
-  setShowOkButton(flag: boolean): void {
-    this.showOkButton = flag;
+  setWidth(width: string, globalModalId: string): void {
+    const modalOptions = this.options.get(globalModalId);
+    if (modalOptions == null) return;
+
+    modalOptions.width = width;
   }
 
-  setOnOk(onOk: OnOkType): void {
-    this.onOk = onOk;
+  setShowCancelButton(flag: boolean, globalModalId: string): void {
+    const modalOptions = this.options.get(globalModalId);
+    if (modalOptions == null) return;
+
+    modalOptions.showCancelButton = flag;
   }
 
-  setOnCancel(onCancel: OnCancelType): void {
-    this.onCancel = (event) => {
+  setShowOkButton(flag: boolean, globalModalId: string): void {
+    const modalOptions = this.options.get(globalModalId);
+    if (modalOptions == null) return;
+
+    modalOptions.showOkButton = flag;
+  }
+
+  setOnOk(onOk: OnOkType, globalModalId: string): void {
+    const modalOptions = this.options.get(globalModalId);
+    if (modalOptions == null) return;
+
+    modalOptions.onOk = onOk;
+  }
+
+  setOnCancel(onCancel: OnCancelType, globalModalId: string): void {
+    const modalOptions = this.options.get(globalModalId);
+    if (modalOptions == null) return;
+
+    modalOptions.onCancel = (event) => {
       if (onCancel) onCancel(event);
-      this.closeModal();
+      this.closeModal(globalModalId);
     };
   }
 
-  setDisableOk(flag: boolean): void {
-    this.disableOk = flag;
+  setDisableOk(flag: boolean, globalModalId: string): void {
+    const modalOptions = this.options.get(globalModalId);
+    if (modalOptions == null) return;
+
+    modalOptions.disableOk = flag;
   }
 
-  setOkLabel(label: string): void {
-    this.okLabel = label;
+  setOkType(type: ButtonType, globalModalId: string): void {
+    const modalOptions = this.options.get(globalModalId);
+    if (modalOptions == null) return;
+
+    modalOptions.okType = type;
   }
 
-  setCancelLabel(label: string): void {
-    this.cancelLabel = label;
+  setOkLabel(label: string, globalModalId: string): void {
+    const modalOptions = this.options.get(globalModalId);
+    if (modalOptions == null) return;
+
+    modalOptions.okLabel = label;
   }
 
-  setIsLoading(flag: boolean): void {
-    this.isLoading = flag;
+  setCancelType(type: ButtonType, globalModalId: string): void {
+    const modalOptions = this.options.get(globalModalId);
+    if (modalOptions == null) return;
+
+    modalOptions.cancelType = type;
   }
 
-  setLoadingLabel(label: string): void {
-    this.loadingLabel = label;
+  setCancelLabel(label: string, globalModalId: string): void {
+    const modalOptions = this.options.get(globalModalId);
+    if (modalOptions == null) return;
+
+    modalOptions.cancelLabel = label;
   }
 
-  setClosable(closable: boolean): void {
-    this.closable = closable;
+  setIsLoading(flag: boolean, globalModalId: string): void {
+    const modalOptions = this.options.get(globalModalId);
+    if (modalOptions == null) return;
+
+    modalOptions.isLoading = flag;
   }
 
-  showModal(flag: boolean): void {
-    this.isVisible = flag;
+  setLoadingLabel(label: string, globalModalId: string): void {
+    const modalOptions = this.options.get(globalModalId);
+    if (modalOptions == null) return;
+
+    modalOptions.loadingLabel = label;
   }
 
-  closeModal = (): void => {
-    this.reset();
+  setClosable(closable: boolean, globalModalId: string): void {
+    const modalOptions = this.options.get(globalModalId);
+    if (modalOptions == null) return;
+
+    modalOptions.closable = closable;
+  }
+
+  showModal(flag: boolean, globalModalId: string): void {
+    const modalOptions = this.options.get(globalModalId);
+    if (modalOptions == null) return;
+
+    modalOptions.isVisible = flag;
+  }
+
+  closeModal = (globalModalId: string): void => {
+    const modalOptions = this.options.get(globalModalId);
+    if (modalOptions == null) return;
+
+    this.reset(globalModalId);
   };
 
-  setProps = (props: object): void => {
-    this.props = props;
+  setProps = (props: object, globalModalId: string): void => {
+    const modalOptions = this.options.get(globalModalId);
+    if (modalOptions == null) return;
+
+    modalOptions.props = props;
   };
 
-  reset = (): void => {
-    this.isVisible = false;
-    defer(
-      action(() => {
-        this.ModalContent = null;
-        this.onOk = null;
-        this.disableOk = true;
-        this.okLabel = 'Ok';
-        this.loadingLabel = 'Loading';
-        this.onCancel = this.closeModal;
-        this.isLoading = false;
-        this.width = '70vw';
-        this.showCancelButton = true;
-        this.showOkButton = true;
-        this.closable = true;
-        this.props = {};
-      }),
-    );
+  reset = (globalModalId: string): void => {
+    const modalOptions = this.options.get(globalModalId);
+    if (modalOptions == null) return;
+
+    modalOptions.isVisible = false;
   };
 }
 

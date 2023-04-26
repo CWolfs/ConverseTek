@@ -4,7 +4,7 @@ import { Menu, Item, ItemParams } from 'react-contexify';
 import { useStore } from 'hooks/useStore';
 import { DataStore } from 'stores/dataStore/data-store';
 import { ModalStore } from 'stores/modalStore/modal-store';
-import { ModalConfirmation } from 'components/ModalConfirmation';
+import { ModalConfirmation } from 'components/Modals/ModalConfirmation';
 
 import 'react-contexify/ReactContexify.css';
 
@@ -27,6 +27,7 @@ export function ConversationTreeContextMenu({ id, onVisibilityChange }: { id: st
     const { id, title, selected } = props;
 
     const buttons = {
+      positiveType: 'danger',
       positiveLabel: 'Confirm',
       onPositive: () => {
         dataStore.deleteConversation(id);
@@ -36,13 +37,17 @@ export function ConversationTreeContextMenu({ id, onVisibilityChange }: { id: st
     };
 
     const modalTitle = `Are you sure you want to delete this conversation?`;
-    modalStore.setModelContent(ModalConfirmation, {
-      type: 'warning',
-      title: modalTitle,
-      body: `This action will delete conversation '${title}' with the id '${id}'. This action is irreversible. Are you sure you want to delete it?`,
-      width: '30rem',
-      buttons,
-    });
+    modalStore.setModelContent(
+      ModalConfirmation,
+      {
+        type: 'warning',
+        title: modalTitle,
+        body: `This action will delete conversation '${title}' with the id '${id}'. This action is irreversible. Are you sure you want to delete it?`,
+        width: '30rem',
+        buttons,
+      },
+      'global1',
+    );
   };
 
   return (

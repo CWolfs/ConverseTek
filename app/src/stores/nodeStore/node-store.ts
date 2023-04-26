@@ -24,7 +24,7 @@ import { isElementNodeType, isPromptNodeType } from 'utils/node-utils';
 
 import { dataStore } from '../dataStore';
 import { modalStore } from '../modalStore';
-import { ModalConfirmation } from 'components/ModalConfirmation';
+import { ModalConfirmation } from 'components/Modals/ModalConfirmation';
 
 /* eslint-disable no-return-assign, no-param-reassign, class-methods-use-this */
 class NodeStore {
@@ -256,7 +256,6 @@ class NodeStore {
       return result;
     }, [] as PromptNodeType[]);
 
-    console.log('copy finished', tempClipboard);
     this.clipboard = tempClipboard as ClipboardType;
   }
 
@@ -351,7 +350,6 @@ class NodeStore {
         // The node and all it's childen need to be deleted
         // Additionally, any links to nodes in that deleting branch need to be removed
         if (!previousNodeAuxiliaryLink) {
-          console.log('About to cascade delete prompt node due to link overwriting existing node');
           this.deletePromptNodeCascadeByIndex(nextNodeIndex, false);
         }
 
@@ -368,13 +366,17 @@ class NodeStore {
         };
 
         const title = 'Response node points to an existing Prompt node';
-        modalStore.setModelContent(ModalConfirmation, {
-          type: 'warning',
-          title,
-          body: 'The response node you are attempting to link into already points or links to a prompt node. Are you sure you want to overwrite this?,',
-          width: '30rem',
-          buttons,
-        });
+        modalStore.setModelContent(
+          ModalConfirmation,
+          {
+            type: 'warning',
+            title,
+            body: 'The response node you are attempting to link into already points or links to a prompt node. Are you sure you want to overwrite this?,',
+            width: '30rem',
+            buttons,
+          },
+          'global1',
+        );
       } else {
         proceedWithPasteAsLink();
       }
@@ -416,7 +418,6 @@ class NodeStore {
           // The node and all it's childen need to be deleted
           // Additionally, any links to nodes in that deleting branch need to be removed
           if (!previousNodeAuxiliaryLink) {
-            console.log('About to cascade delete prompt node due to copy overwriting existing node');
             this.deletePromptNodeCascadeByIndex(nextNodeIndex, false);
           }
 
@@ -433,13 +434,17 @@ class NodeStore {
           };
 
           const title = 'Response node points to an existing Prompt node';
-          modalStore.setModelContent(ModalConfirmation, {
-            type: 'warning',
-            title,
-            body: 'The response node you are attempting to paste as copy into already points or links to a prompt node. Are you sure you want to overwrite this?,',
-            width: '30rem',
-            buttons,
-          });
+          modalStore.setModelContent(
+            ModalConfirmation,
+            {
+              type: 'warning',
+              title,
+              body: 'The response node you are attempting to paste as copy into already points or links to a prompt node. Are you sure you want to overwrite this?,',
+              width: '30rem',
+              buttons,
+            },
+            'global1',
+          );
         } else {
           proceedWithPasteAsCopy();
         }

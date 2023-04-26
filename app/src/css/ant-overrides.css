@@ -23,6 +23,29 @@
   }
 }
 
+.button-primary-pale {
+  color: #fff;
+  background-color: $green6;
+  border-color: $green6;
+
+  &:active {
+    color: #fff;
+    background-color: $green3;
+    border-color: $green3;
+  }
+
+  &:focus,
+  &:hover {
+    color: #fff;
+    background-color: $green3;
+    border-color: $green3;
+  }
+
+  &.ant-btn-clicked:after {
+    border: 0 solid $green6;
+  }
+}
+
 .button-secondary {
   color: #fff;
   background-color: $backgroundSecondary;
@@ -43,6 +66,29 @@
 
   &.ant-btn-clicked:after {
     border: 0 solid $backgroundSecondary;
+  }
+}
+
+.button-secondary-pale {
+  color: #fff;
+  background-color: $backgroundSecondaryPale;
+  border-color: $backgroundSecondaryPale;
+
+  &:active {
+    color: #fff;
+    background-color: $backgroundSecondary;
+    border-color: $backgroundSecondary;
+  }
+
+  &:focus,
+  &:hover {
+    color: #fff;
+    background-color: $backgroundSecondary;
+    border-color: $backgroundSecondary;
+  }
+
+  &.ant-btn-clicked:after {
+    border: 0 solid $backgroundSecondaryPale;
   }
 }
 
@@ -75,16 +121,16 @@
   border-color: #f5222d;
 
   &:active {
-    color: #f5222d;
-    background-color: white;
-    border-color: white;
+    color: white;
+    background-color: #ab171f;
+    border-color: #ab171f;
   }
 
   &:focus,
   &:hover {
-    color: #f5222d;
-    background-color: white;
-    border-color: white;
+    color: white;
+    background-color: #ab171f;
+    border-color: #ab171f;
   }
 
   &.ant-btn-clicked:after {
@@ -115,6 +161,11 @@
 .ant-input {
   background-color: $backgroundTertiary;
   color: $textColourPrimary;
+}
+
+.ant-input.inverse {
+  background-color: $textColourPrimary;
+  color: $backgroundTertiary;
 }
 
 .ant-menu-horizontal {
@@ -227,12 +278,8 @@
   color: black;
 }
 
-.ant-tooltip-placement-top .ant-tooltip-arrow {
-  border-top-color: gold;
-}
-
-.ant-tooltip-placement-left .ant-tooltip-arrow {
-  border-left-color: gold;
+.ant-tooltip-arrow::before {
+  background-color: gold;
 }
 
 .ant-input::-webkit-input-placeholder {

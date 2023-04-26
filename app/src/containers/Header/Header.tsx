@@ -27,7 +27,7 @@ export function Header() {
     <div className="header">
       <Menu mode="horizontal">
         <SubMenu title="File">
-          <MenuItem onClick={() => modalStore.setModelContent(FileSystemPicker)}>Open Folder</MenuItem>
+          <MenuItem onClick={() => modalStore.setModelContent(FileSystemPicker, {}, 'global1')}>Open Folder</MenuItem>
 
           {workingDirectory && <MenuItem onClick={() => dataStore.createNewConversation()}>New Conversation</MenuItem>}
 
@@ -47,10 +47,14 @@ export function Header() {
             </MenuItem>
           )}
 
-          {hasActiveConversation && <MenuItem onClick={() => modalStore.setModelContent(SaveConversationAs)}>Save Conversation As...</MenuItem>}
+          {hasActiveConversation && (
+            <MenuItem onClick={() => modalStore.setModelContent(SaveConversationAs, {}, 'global1')}>Save Conversation As...</MenuItem>
+          )}
 
           {workingDirectory && (
-            <MenuItem onClick={() => modalStore.setModelContent(FileSystemPicker, { fileMode: true })}>Import Conversation from JSON</MenuItem>
+            <MenuItem onClick={() => modalStore.setModelContent(FileSystemPicker, { fileMode: true }, 'global1')}>
+              Import Conversation from JSON
+            </MenuItem>
           )}
 
           {hasActiveConversation && (
@@ -84,7 +88,7 @@ export function Header() {
           )}
         </SubMenu>
         <SubMenu title="Help">
-          <MenuItem onClick={() => modalStore.setModelContent(About)}>About</MenuItem>
+          <MenuItem onClick={() => modalStore.setModelContent(About, {}, 'global1')}>About</MenuItem>
         </SubMenu>
       </Menu>
     </div>

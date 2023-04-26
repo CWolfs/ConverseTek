@@ -21,7 +21,8 @@ const MainLayout = (): JSX.Element => (
         </Routes>
       </div>
       <Footer />
-      <GlobalModal />
+      <GlobalModal id="global1" />
+      <GlobalModal id="global2" />
     </div>
   </div>
 );

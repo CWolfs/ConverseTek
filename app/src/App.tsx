@@ -7,7 +7,7 @@ import { DependencyStatusType } from 'types';
 import { getDependencyStatus } from 'services/api';
 import { useStore } from 'hooks/useStore';
 import { ModalStore } from 'stores/modalStore/modal-store';
-import { ModalConfirmation } from 'components/ModalConfirmation';
+import { ModalConfirmation } from 'components/Modals/ModalConfirmation';
 
 import { MainLayout } from './layouts/MainLayout';
 
@@ -26,13 +26,17 @@ const App = () => {
         )}. Copy them from your 'BATTLETECH/BattleTech_Data/Managed' folder into the ConverseTek folder.`;
 
         const modalTitle = `Missing Dependencies`;
-        modalStore.setModelContent(ModalConfirmation, {
-          type: 'warning',
-          title: modalTitle,
-          body: message,
-          width: '30rem',
-          closable: false,
-        });
+        modalStore.setModelContent(
+          ModalConfirmation,
+          {
+            type: 'warning',
+            title: modalTitle,
+            body: message,
+            width: '30rem',
+            closable: false,
+          },
+          'global1',
+        );
       }
     });
   }, []);

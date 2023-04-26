@@ -7,42 +7,48 @@ import { ModalStore } from 'stores/modalStore/modal-store';
 
 import './GlobalModal.css';
 
-function GlobalModal() {
+function GlobalModal({ id }: { id: string }) {
   const modalStore = useStore<ModalStore>('modal');
   const [confirmLoading] = useState(false);
+
+  const { options: modalOptionsMap } = modalStore;
+  const modalOptions = modalOptionsMap.get(id);
+  if (modalOptions == null) return null;
 
   const {
     title,
     isVisible,
-    ModalContent,
     onOk,
+    okType,
     okLabel,
     onCancel,
+    disableOk,
+    cancelType,
     cancelLabel,
     showCancelButton,
     showOkButton,
     isLoading,
     loadingLabel,
     width,
+    centered,
     closable,
-  } = modalStore;
-  const content = ModalContent || undefined;
+  } = modalOptions;
+
+  const content = modalStore.getModal(id);
 
   const footer = [
     showCancelButton ? (
-      <Button key="cancel" onClick={onCancel || undefined}>
+      <Button key="cancel" type={cancelType} onClick={onCancel || undefined}>
         {cancelLabel ? cancelLabel : 'Cancel'}
       </Button>
     ) : null,
 
     showOkButton ? (
-      <Button key="submit" type="primary" onClick={onOk || undefined} loading={isLoading}>
+      <Button key="submit" type={okType} onClick={onOk || undefined} loading={isLoading} disabled={disableOk}>
         {isLoading ? loadingLabel : okLabel}
       </Button>
     ) : null,
   ];
-
-  console.log('closable', closable);
 
   return (
     <Modal
@@ -55,6 +61,7 @@ function GlobalModal() {
       width={width}
       closable={closable}
       maskClosable={closable}
+      centered={centered}
     >
       {content}
     </Modal>
