@@ -74,19 +74,15 @@ function ConversationGeneral({ node }: Props) {
   };
 
   const handleIdBlur = () => {
-    // FIXME: Add immutability
-    node.idRef.id = createId(node.idRef, nodeId);
-    nodeStore.setRebuild(true);
+    nodeStore.setNodeId(node, createId(node.idRef, nodeId));
   };
 
   const handleSpeakerChange = (value: SelectValue) => {
     const { type } = node;
     if (type !== 'node') return;
-
     if (value !== 'speakerId' && value !== 'castId') throw Error(`Invalid speaker change with value ${value as string}`);
 
-    // FIXME: Add immutability
-    node.speakerType = value;
+    nodeStore.setPromptNodeSpeakerType(node, value);
     setSelectedSpeaker(value);
   };
 
@@ -95,14 +91,7 @@ function ConversationGeneral({ node }: Props) {
     if (type !== 'node') return;
 
     const newCastId = event.target.value.trim();
-
-    if (!node.sourceInSceneRef) {
-      // FIXME: Add immutability
-      node.sourceInSceneRef = { id: newCastId };
-    } else {
-      // FIXME: Add immutability
-      node.sourceInSceneRef.id = newCastId;
-    }
+    nodeStore.setPromptNodeSourceInSceneId(node, newCastId);
 
     setCastId(newCastId);
   };
@@ -112,8 +101,7 @@ function ConversationGeneral({ node }: Props) {
     if (type !== 'node') return;
 
     const newSpeakerId = event.target.value.trim();
-    // FIXME: Add immutability
-    node.speakerOverrideId = newSpeakerId;
+    nodeStore.setPromptNodeSpeakerId(node, newSpeakerId);
 
     setSpeakerId(newSpeakerId);
   };

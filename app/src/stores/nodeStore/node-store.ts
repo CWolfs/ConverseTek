@@ -60,7 +60,11 @@ class NodeStore {
       pasteAsLinkFromClipboard: action,
       pasteAsCopyFromClipboard: action,
       setNode: action,
+      setNodeId: action,
       setNodeText: action,
+      setPromptNodeSpeakerType: action,
+      setPromptNodeSourceInSceneId: action,
+      setPromptNodeSpeakerId: action,
       setNodeActions: action,
       addNodeAction: action,
       setElementNodeConditions: action,
@@ -497,6 +501,11 @@ class NodeStore {
     }
   }
 
+  setNodeId(node: PromptNodeType | ElementNodeType, id: string) {
+    node.idRef.id = id;
+    nodeStore.setRebuild(true);
+  }
+
   setNodeText(node: PromptNodeType | ElementNodeType, text: string) {
     const { type } = node;
     if (type === 'node') {
@@ -504,6 +513,22 @@ class NodeStore {
     } else {
       node.responseText = text;
     }
+  }
+
+  setPromptNodeSpeakerType(node: PromptNodeType, value: 'castId' | 'speakerId') {
+    node.speakerType = value;
+  }
+
+  setPromptNodeSourceInSceneId(node: PromptNodeType, id: string) {
+    if (!node.sourceInSceneRef) {
+      node.sourceInSceneRef = { id };
+    } else {
+      node.sourceInSceneRef.id = id;
+    }
+  }
+
+  setPromptNodeSpeakerId(node: PromptNodeType, id: string) {
+    node.speakerOverrideId = id;
   }
 
   setNodeActions(node: PromptNodeType | ElementNodeType, actions: OperationCallType[] | null) {
