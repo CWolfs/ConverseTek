@@ -184,10 +184,13 @@ export function rebuildNodeIndexes(conversationAsset: ConversationAssetType) {
     branches.forEach((responseNode: ElementNodeType) => {
       const { nextNodeIndex } = responseNode;
 
-      if (oldPromptNodeIndexToNewIndex.has(nextNodeIndex)) {
-        responseNode.nextNodeIndex = oldPromptNodeIndexToNewIndex.get(nextNodeIndex) as number;
-      } else {
-        console.error('Response node', responseNode, ' has no mapped nextNodeIndex. This should not happen when saving.');
+      // No need to rebuild responses that don't connect to anywhere
+      if (nextNodeIndex !== -1) {
+        if (oldPromptNodeIndexToNewIndex.has(nextNodeIndex)) {
+          responseNode.nextNodeIndex = oldPromptNodeIndexToNewIndex.get(nextNodeIndex) as number;
+        } else {
+          console.error('Response node', responseNode, ' has no mapped nextNodeIndex. This should not happen when saving.');
+        }
       }
     });
   });
@@ -196,10 +199,13 @@ export function rebuildNodeIndexes(conversationAsset: ConversationAssetType) {
   roots.forEach((rootNode: ElementNodeType) => {
     const { nextNodeIndex } = rootNode;
 
-    if (oldPromptNodeIndexToNewIndex.has(nextNodeIndex)) {
-      rootNode.nextNodeIndex = oldPromptNodeIndexToNewIndex.get(nextNodeIndex) as number;
-    } else {
-      console.error('Root node ', rootNode, ' has no mapped nextNodeIndex. This should not happen when saving.');
+    // No need to rebuild roots that don't connect to anywhere
+    if (nextNodeIndex !== -1) {
+      if (oldPromptNodeIndexToNewIndex.has(nextNodeIndex)) {
+        rootNode.nextNodeIndex = oldPromptNodeIndexToNewIndex.get(nextNodeIndex) as number;
+      } else {
+        console.error('Root node ', rootNode, ' has no mapped nextNodeIndex. This should not happen when saving.');
+      }
     }
   });
 }
