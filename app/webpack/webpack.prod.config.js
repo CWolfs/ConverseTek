@@ -1,5 +1,5 @@
 /* eslint-disable */
-var webpack = require('webpack');
+const webpack = require('webpack');
 
 module.exports = function (config) {
   console.log('Using prod config');

@@ -82,7 +82,7 @@
       <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
     </Exec>
 
-    <CallTarget Targets="Build"/>  
+    <CallTarget Targets="BuildServer"/>  
   </Target>
 
   <Target Name="BuildRelease" Condition=" '$(Configuration)' == 'Release' ">
@@ -96,6 +96,6 @@
       <Output TaskParameter="ConsoleOutput" PropertyName="OutputOfExec" />
     </Exec>
 
-    <CallTarget Targets="Build" /> 
+    <CallTarget Targets="BuildServer" /> 
   </Target>
 </Project>
