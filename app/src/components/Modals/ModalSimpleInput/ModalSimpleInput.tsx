@@ -39,7 +39,7 @@ export function ModalSimpleInput({ globalModalId, type, title, header, body, wid
   const [inputValue, setInputValue] = useState<string>('');
 
   const onOk = (event: MouseEvent<HTMLElement>): void => {
-    if (buttons.onPositive) buttons.onPositive(event);
+    if (buttons.onPositive) buttons.onPositive(event, inputValue.trim());
     modalStore.closeModal(globalModalId);
   };
 
@@ -74,6 +74,11 @@ export function ModalSimpleInput({ globalModalId, type, title, header, body, wid
     setupModal();
   }, []);
 
+  // update the onOk function when value changes
+  useEffect(() => {
+    modalStore.setOnOk(onOk, globalModalId);
+  }, [inputValue]);
+
   return (
     <div className="modal-simpleinput">
       <div className="modal-simpleinput__content">
@@ -85,7 +90,7 @@ export function ModalSimpleInput({ globalModalId, type, title, header, body, wid
               className="inverse"
               value={inputValue}
               onChange={(event) => {
-                const value = event.target.value.trim();
+                const value = event.target.value;
 
                 if (value.length > 0) {
                   modalStore.setDisableOk(false, globalModalId);
@@ -93,6 +98,7 @@ export function ModalSimpleInput({ globalModalId, type, title, header, body, wid
                   modalStore.setDisableOk(true, globalModalId);
                 }
 
+                console.log('setting inputvalue from user input', inputValue);
                 setInputValue(value);
               }}
             />

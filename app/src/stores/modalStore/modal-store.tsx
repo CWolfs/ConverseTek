@@ -4,7 +4,7 @@ import { observable, action, makeObservable } from 'mobx';
 import defer from 'lodash.defer';
 import { ButtonType } from 'antd/lib/button';
 
-export type OnOkType = ((event: MouseEvent<HTMLElement>) => void) | null;
+export type OnOkType = ((event: MouseEvent<HTMLElement>, value?: string) => void) | null;
 export type OnCancelType = ((event: MouseEvent<HTMLElement>) => void) | null;
 
 export type FSModalProps = {
@@ -71,7 +71,6 @@ class ModalStore {
   }
 
   setModelContent(ModalContent: ElementType, props = {}, globalModalId: string, show = true): void {
-    console.log('setModalContent');
     this.modals.set(globalModalId, <ModalContent globalModalId={globalModalId} {...props} />);
 
     const options: ModalOptions = {

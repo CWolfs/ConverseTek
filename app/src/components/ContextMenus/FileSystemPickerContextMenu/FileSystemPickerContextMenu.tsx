@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { MouseEvent } from 'react';
 import { Menu, Item, ItemParams, useContextMenu } from 'react-contexify';
 
 import { DirectoryItemType } from 'types/FileSystemItemType';
@@ -34,13 +34,13 @@ export function FileSystemPickerContextMenu({
     if (!props) return;
     const { item } = props;
 
-    // void addQuickLink(item.name, item.path).then((updatedQuickLinks: QuickLinkType[]) => {
-    //   setQuickLinks(updatedQuickLinks);
-    // });
-
     const buttons = {
       positiveLabel: 'Confirm',
-      onPositive: () => {},
+      onPositive: (_: MouseEvent<HTMLElement>, quicklinkTitle: string) => {
+        void addQuickLink(quicklinkTitle, item.path).then((updatedQuickLinks: QuickLinkType[]) => {
+          setQuickLinks(updatedQuickLinks);
+        });
+      },
       negativeLabel: 'Cancel',
     };
 
@@ -56,8 +56,6 @@ export function FileSystemPickerContextMenu({
       },
       'global2',
     );
-
-    // hideAll();
   };
 
   const onRemoveQuickLinkClicked = ({ props }: ItemParams<EventProps>) => {
