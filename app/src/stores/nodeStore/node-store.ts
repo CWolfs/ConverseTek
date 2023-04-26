@@ -366,13 +366,17 @@ class NodeStore {
         };
 
         const title = 'Response node points to an existing Prompt node';
-        modalStore.setModelContent(ModalConfirmation, {
-          type: 'warning',
-          title,
-          body: 'The response node you are attempting to link into already points or links to a prompt node. Are you sure you want to overwrite this?,',
-          width: '30rem',
-          buttons,
-        });
+        modalStore.setModelContent(
+          ModalConfirmation,
+          {
+            type: 'warning',
+            title,
+            body: 'The response node you are attempting to link into already points or links to a prompt node. Are you sure you want to overwrite this?,',
+            width: '30rem',
+            buttons,
+          },
+          'global1',
+        );
       } else {
         proceedWithPasteAsLink();
       }
@@ -430,13 +434,17 @@ class NodeStore {
           };
 
           const title = 'Response node points to an existing Prompt node';
-          modalStore.setModelContent(ModalConfirmation, {
-            type: 'warning',
-            title,
-            body: 'The response node you are attempting to paste as copy into already points or links to a prompt node. Are you sure you want to overwrite this?,',
-            width: '30rem',
-            buttons,
-          });
+          modalStore.setModelContent(
+            ModalConfirmation,
+            {
+              type: 'warning',
+              title,
+              body: 'The response node you are attempting to paste as copy into already points or links to a prompt node. Are you sure you want to overwrite this?,',
+              width: '30rem',
+              buttons,
+            },
+            'global1',
+          );
         } else {
           proceedWithPasteAsCopy();
         }

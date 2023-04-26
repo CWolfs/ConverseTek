@@ -44,14 +44,18 @@ export function FileSystemPickerContextMenu({
       negativeLabel: 'Cancel',
     };
 
-    modalStore.setModelContent(ModalSimpleInput, {
-      type: 'warning',
-      title: 'Please give this favourite a title?',
-      body: 'Title',
-      inputLabel: 'Title',
-      width: '30rem',
-      buttons,
-    });
+    modalStore.setModelContent(
+      ModalSimpleInput,
+      {
+        type: 'warning',
+        title: 'Please give this favourite a title?',
+        body: 'Title',
+        inputLabel: 'Title',
+        width: '30rem',
+        buttons,
+      },
+      'global2',
+    );
 
     // hideAll();
   };

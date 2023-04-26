@@ -12,6 +12,7 @@ import './SaveConversationAs.css';
 function SaveConversationAs() {
   const dataStore = useStore<DataStore>('data');
   const modalStore = useStore<ModalStore>('modal');
+  const globalModalId = 'global1';
 
   const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
   if (!conversationAsset) return null;
@@ -30,16 +31,16 @@ function SaveConversationAs() {
     });
     dataStore.updateActiveConversation(conversationAsset); // local update for speed
 
-    modalStore.closeModal();
+    modalStore.closeModal(globalModalId);
   };
 
   const setupModal = () => {
-    modalStore.setOnOk(onOk);
-    modalStore.setTitle('Save Conversation As...');
-    modalStore.setOkLabel('Save');
-    modalStore.setDisableOk(false);
-    modalStore.setWidth('40vw');
-    modalStore.setShowCancelButton(true);
+    modalStore.setOnOk(onOk, globalModalId);
+    modalStore.setTitle('Save Conversation As...', globalModalId);
+    modalStore.setOkLabel('Save', globalModalId);
+    modalStore.setDisableOk(false, globalModalId);
+    modalStore.setWidth('40vw', globalModalId);
+    modalStore.setShowCancelButton(true, globalModalId);
   };
 
   const handleFileNameChange = (event: ChangeEvent<HTMLInputElement>) => {

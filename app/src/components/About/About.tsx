@@ -10,18 +10,19 @@ import './About.css';
 
 export function About() {
   const modalStore = useStore<ModalStore>('modal');
+  const globalModalId = 'global1';
 
   const onOk = (): void => {
-    modalStore.closeModal();
+    modalStore.closeModal(globalModalId);
   };
 
   const setupModal = (): void => {
-    modalStore.setOnOk(onOk);
-    modalStore.setTitle('About ConverseTek');
-    modalStore.setOkLabel('Ok');
-    modalStore.setDisableOk(false);
-    modalStore.setWidth('40vw');
-    modalStore.setShowCancelButton(false);
+    modalStore.setOnOk(onOk, globalModalId);
+    modalStore.setTitle('About ConverseTek', globalModalId);
+    modalStore.setOkLabel('Ok', globalModalId);
+    modalStore.setDisableOk(false, globalModalId);
+    modalStore.setWidth('40vw', globalModalId);
+    modalStore.setShowCancelButton(false, globalModalId);
   };
 
   // onMount

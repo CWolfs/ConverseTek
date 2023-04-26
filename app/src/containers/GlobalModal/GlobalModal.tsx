@@ -7,14 +7,17 @@ import { ModalStore } from 'stores/modalStore/modal-store';
 
 import './GlobalModal.css';
 
-function GlobalModal() {
+function GlobalModal({ id }: { id: string }) {
   const modalStore = useStore<ModalStore>('modal');
   const [confirmLoading] = useState(false);
+
+  const { options: modalOptionsMap } = modalStore;
+  const modalOptions = modalOptionsMap.get(id);
+  if (modalOptions == null) return null;
 
   const {
     title,
     isVisible,
-    ModalContent,
     onOk,
     okType,
     okLabel,
@@ -27,8 +30,9 @@ function GlobalModal() {
     loadingLabel,
     width,
     closable,
-  } = modalStore;
-  const content = ModalContent || undefined;
+  } = modalOptions;
+
+  const content = modalStore.getModal(id);
 
   const footer = [
     showCancelButton ? (

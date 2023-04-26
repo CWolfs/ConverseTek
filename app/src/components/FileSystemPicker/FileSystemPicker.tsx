@@ -31,7 +31,11 @@ let debouncedClickEvents: DebouncedFunc<() => void>[] = [];
 
 export function FileSystemPicker() {
   const modalStore = useStore<ModalStore>('modal');
-  const modalProps: FSModalProps = modalStore.props;
+  const globalModalId = 'global1';
+
+  const modalOptions = modalStore.getOptions(globalModalId);
+  if (modalOptions == null) return null;
+  const modalProps: FSModalProps = modalOptions.props;
 
   const [loading, setLoading] = useState(false);
   const [fileMode, setFileMode] = useState<boolean>(modalProps.fileMode || false);
@@ -50,7 +54,7 @@ export function FileSystemPicker() {
     if (selectedItem == null) return;
 
     setLoading(true);
-    modalStore.setIsLoading(true);
+    modalStore.setIsLoading(true, globalModalId);
 
     if (fileMode) {
       void importConversation(selectedItem.path)
@@ -59,7 +63,7 @@ export function FileSystemPicker() {
           selectedItem.active = false;
           setSelectedItem(null);
           setLoading(false);
-          return modalStore.closeModal();
+          return modalStore.closeModal(globalModalId);
         });
     } else {
       void saveWorkingDirectory(selectedItem.path, selectedItem.name)
@@ -68,7 +72,7 @@ export function FileSystemPicker() {
           selectedItem.active = false;
           setSelectedItem(null);
           setLoading(false);
-          return modalStore.closeModal();
+          return modalStore.closeModal(globalModalId);
         });
     }
   };
@@ -96,8 +100,8 @@ export function FileSystemPicker() {
       newFsItems.push(clickedItem);
       newFsItems = sortBy(newFsItems, (fsItem) => fsItem.name.toLowerCase());
 
-      modalStore.setDisableOk(!clickedItem.active);
-      if (fileMode && clickedItem.isDirectory) modalStore.setDisableOk(true);
+      modalStore.setDisableOk(!clickedItem.active, globalModalId);
+      if (fileMode && clickedItem.isDirectory) modalStore.setDisableOk(true, globalModalId);
 
       setDirectories(newFsItems.filter((fsItem) => fsItem.isDirectory) as DirectoryItemType[]);
       setFiles(newFsItems.filter((fsItem) => fsItem.isFile) as FileItemSystemType[]);
@@ -125,7 +129,7 @@ export function FileSystemPicker() {
 
     if (item.hasChildren || (fileMode && item.isDirectory)) {
       setSelectedItem(null);
-      modalStore.setDisableOk(true);
+      modalStore.setDisableOk(true, globalModalId);
       void getDirectories(item.path, fileMode).then(
         ({ directories: updatedDirectories, files: updatedFiles }: { directories: DirectoryItemType[]; files: FileItemSystemType[] }) => {
           setDirectories(updatedDirectories);
@@ -136,10 +140,10 @@ export function FileSystemPicker() {
   };
 
   const setupModal = () => {
-    modalStore.setOnOk(onOk);
-    modalStore.setTitle(`Select a conversation ${fileMode ? '' : 'directory'}${selectedItem ? ' - ' + selectedItem.name : ''}`);
-    modalStore.setOkLabel('Load');
-    modalStore.setLoadingLabel('Loading');
+    modalStore.setOnOk(onOk, globalModalId);
+    modalStore.setTitle(`Select a conversation ${fileMode ? '' : 'directory'}${selectedItem ? ' - ' + selectedItem.name : ''}`, globalModalId);
+    modalStore.setOkLabel('Load', globalModalId);
+    modalStore.setLoadingLabel('Loading', globalModalId);
   };
 
   const onDirectNavigation = (path: string) => {
@@ -196,7 +200,11 @@ export function FileSystemPicker() {
   }, []);
 
   useEffect(() => {
-    const modalProps: FSModalProps = modalStore.props;
+    const modalOptions = modalStore.getOptions(globalModalId);
+    if (modalOptions == null) return;
+
+    const modalProps = modalOptions.props;
+
     setFileMode(modalProps.fileMode || false);
     setupModal();
   });

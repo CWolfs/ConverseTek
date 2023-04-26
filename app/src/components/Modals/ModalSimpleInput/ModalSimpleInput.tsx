@@ -8,6 +8,7 @@ import { ModalStore, OnCancelType, OnOkType } from 'stores/modalStore/modal-stor
 import './ModalSimpleInput.css';
 
 type Props = {
+  globalModalId: string;
   type: 'info' | 'warning' | 'error';
   title: string;
   header: string;
@@ -33,38 +34,38 @@ function renderTitleWithType(title: string, type: string) {
   );
 }
 
-export function ModalSimpleInput({ type, title, header, body, width, buttons, closable = true }: Props) {
+export function ModalSimpleInput({ globalModalId, type, title, header, body, width, buttons, closable = true }: Props) {
   const modalStore = useStore<ModalStore>('modal');
   const [inputValue, setInputValue] = useState<string>('');
 
   const onOk = (event: MouseEvent<HTMLElement>): void => {
     if (buttons.onPositive) buttons.onPositive(event);
-    modalStore.closeModal();
+    modalStore.closeModal(globalModalId);
   };
 
   const setupModal = (): void => {
-    modalStore.setTitle(renderTitleWithType(title, type));
+    modalStore.setTitle(renderTitleWithType(title, type), globalModalId);
 
     if (buttons?.positiveLabel) {
-      if (buttons.positiveType != null) modalStore.setOkType(buttons.positiveType);
-      modalStore.setOkLabel(buttons.positiveLabel);
-      modalStore.setOnOk(onOk);
-      modalStore.setShowOkButton(true);
+      if (buttons.positiveType != null) modalStore.setOkType(buttons.positiveType, globalModalId);
+      modalStore.setOkLabel(buttons.positiveLabel, globalModalId);
+      modalStore.setOnOk(onOk, globalModalId);
+      modalStore.setShowOkButton(true, globalModalId);
     } else {
-      modalStore.setShowOkButton(false);
+      modalStore.setShowOkButton(false, globalModalId);
     }
 
     if (buttons?.negativeLabel) {
-      if (buttons.negativeType != null) modalStore.setOkType(buttons.negativeType);
-      modalStore.setOnCancel(buttons.onNegative);
-      modalStore.setCancelLabel(buttons.negativeLabel);
-      modalStore.setShowCancelButton(true);
+      if (buttons.negativeType != null) modalStore.setOkType(buttons.negativeType, globalModalId);
+      modalStore.setOnCancel(buttons.onNegative, globalModalId);
+      modalStore.setCancelLabel(buttons.negativeLabel, globalModalId);
+      modalStore.setShowCancelButton(true, globalModalId);
     } else {
-      modalStore.setShowCancelButton(false);
+      modalStore.setShowCancelButton(false, globalModalId);
     }
 
-    modalStore.setWidth(width);
-    modalStore.setClosable(closable);
+    modalStore.setWidth(width, globalModalId);
+    modalStore.setClosable(closable, globalModalId);
   };
 
   // onMount
