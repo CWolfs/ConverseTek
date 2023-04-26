@@ -33,6 +33,7 @@ type ModalOptions = {
   isLoading: boolean;
   loadingLabel: string;
 
+  centered: boolean;
   isVisible: boolean;
   closable: boolean;
 };
@@ -93,6 +94,7 @@ class ModalStore {
       isLoading: false,
       loadingLabel: 'Loading',
 
+      centered: false,
       isVisible: false,
       closable: true,
 
@@ -238,25 +240,6 @@ class ModalStore {
     if (modalOptions == null) return;
 
     modalOptions.isVisible = false;
-    defer(
-      action(() => {
-        // this.ModalContent = null;
-        modalOptions.onOk = null;
-        modalOptions.disableOk = true;
-        modalOptions.okType = 'primary';
-        modalOptions.okLabel = 'Ok';
-        modalOptions.cancelType = undefined;
-        modalOptions.cancelLabel = 'Cancel';
-        modalOptions.loadingLabel = 'Loading';
-        modalOptions.onCancel = () => this.closeModal(globalModalId);
-        modalOptions.isLoading = false;
-        modalOptions.width = '70vw';
-        modalOptions.showCancelButton = true;
-        modalOptions.showOkButton = true;
-        modalOptions.closable = true;
-        modalOptions.props = {};
-      }),
-    );
   };
 }
 

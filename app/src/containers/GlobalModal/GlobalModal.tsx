@@ -22,6 +22,7 @@ function GlobalModal({ id }: { id: string }) {
     okType,
     okLabel,
     onCancel,
+    disableOk,
     cancelType,
     cancelLabel,
     showCancelButton,
@@ -29,6 +30,7 @@ function GlobalModal({ id }: { id: string }) {
     isLoading,
     loadingLabel,
     width,
+    centered,
     closable,
   } = modalOptions;
 
@@ -42,7 +44,7 @@ function GlobalModal({ id }: { id: string }) {
     ) : null,
 
     showOkButton ? (
-      <Button key="submit" type={okType} onClick={onOk || undefined} loading={isLoading}>
+      <Button key="submit" type={okType} onClick={onOk || undefined} loading={isLoading} disabled={disableOk}>
         {isLoading ? loadingLabel : okLabel}
       </Button>
     ) : null,
@@ -59,6 +61,7 @@ function GlobalModal({ id }: { id: string }) {
       width={width}
       closable={closable}
       maskClosable={closable}
+      centered={centered}
     >
       {content}
     </Modal>

@@ -163,6 +163,11 @@
   color: $textColourPrimary;
 }
 
+.ant-input.inverse {
+  background-color: $textColourPrimary;
+  color: $backgroundTertiary;
+}
+
 .ant-menu-horizontal {
   background: transparent;
   border-bottom: none;

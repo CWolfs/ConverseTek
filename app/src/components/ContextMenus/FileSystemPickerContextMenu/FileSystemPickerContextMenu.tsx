@@ -48,11 +48,11 @@ export function FileSystemPickerContextMenu({
       ModalSimpleInput,
       {
         type: 'warning',
-        title: 'Please give this favourite a title?',
-        body: 'Title',
-        inputLabel: 'Title',
+        title: 'Provide a name',
+        body: 'Name',
         width: '30rem',
         buttons,
+        centered: true,
       },
       'global2',
     );

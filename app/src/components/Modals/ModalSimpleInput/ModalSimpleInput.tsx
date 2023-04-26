@@ -51,6 +51,7 @@ export function ModalSimpleInput({ globalModalId, type, title, header, body, wid
       modalStore.setOkLabel(buttons.positiveLabel, globalModalId);
       modalStore.setOnOk(onOk, globalModalId);
       modalStore.setShowOkButton(true, globalModalId);
+      modalStore.setDisableOk(true, globalModalId);
     } else {
       modalStore.setShowOkButton(false, globalModalId);
     }
@@ -81,9 +82,18 @@ export function ModalSimpleInput({ globalModalId, type, title, header, body, wid
           <div style={{ marginRight: 8 }}>{body}</div>
           <div style={{ width: '100%' }}>
             <Input
+              className="inverse"
               value={inputValue}
               onChange={(event) => {
-                setInputValue(event.target.value.trim());
+                const value = event.target.value.trim();
+
+                if (value.length > 0) {
+                  modalStore.setDisableOk(false, globalModalId);
+                } else {
+                  modalStore.setDisableOk(true, globalModalId);
+                }
+
+                setInputValue(value);
               }}
             />
           </div>
