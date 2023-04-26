@@ -5,7 +5,7 @@ Conversation editor for HBS's [Battletech](http://battletechgame.com/).
 Battletech uses a binary data format for its conversations. It isn't possible to edit those files directly so this tool is being developed to allow for editing and creating new conversations.
 
 ![Example Conversation Edit](./docs/images/conversetek-example.png)
-![Example Speaker Override](./docs/images/conversetek-example-speaker-override.png)
+![ConverseTek](./docs/images/conversetek.png)
 
 ## Overview
 
@@ -15,15 +15,10 @@ Latest release: **v1.4.0** | [Download](https://github.com/CWolfs/ConverseTek/re
 
 - `ExtendedConversations` mod | Adds more dialog tags, actions, conditions and features | [Docs](https://github.com/CWolfs/ExtendedConversations) | [Download](https://github.com/CWolfs/ExtendedConversations/releases/)
 
-## Examples
-
-### Screenshots
-
-- [Editor View](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/1.0.0/conversetek-example.png)
-- [In-Game Edited Conversation](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/conversetek-example.png)
-
 ### Videos
 
+- [Zooming](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/1.4.0/conversetek-zoom-feature.png)
+- [Improved Folder Navgation](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/1.4.0/conversetek-improved-folder-navigation.png)
 - [Conversation with Yang](https://www.youtube.com/watch?v=JcjByWyr1lM)
 - [Copy & Links Functionality](https://www.youtube.com/watch?v=P9sbtz019ws)
 - [Drag Rearrange Functionality](https://www.youtube.com/watch?v=9Y4xSxJRO_s)
