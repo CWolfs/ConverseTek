@@ -46,21 +46,17 @@ function ConversationGeneral({ node }: Props) {
     ({ speakerOverrideId, sourceInSceneRef } = node);
   }
 
-  const sceneRefCastId: string | null = sourceInSceneRef && sourceInSceneRef.id ? sourceInSceneRef.id : null;
+  const castId: string | null = sourceInSceneRef && sourceInSceneRef.id ? sourceInSceneRef.id : null;
   const nodeSpeakerId = speakerOverrideId !== '' ? speakerOverrideId : null;
-  const defaultSpeaker = sceneRefCastId !== null || nodeSpeakerId === null ? 'castId' : 'speakerId';
+  const speakerType = castId !== null || nodeSpeakerId === null ? 'castId' : 'speakerId';
   const isRootOrResponse = type !== 'node';
 
   const [nodeId, setNodeId] = useState<string>(getId(idRef));
-  const [selectedSpeaker, setSelectedSpeaker] = useState<string>(defaultSpeaker);
-  const [castId, setCastId] = useState<string | null>(sceneRefCastId);
-  const [speakerId, setSpeakerId] = useState(nodeSpeakerId);
+  const [selectedSpeakerType, setSelectedSpeakerType] = useState<string>(speakerType);
 
   const populateState = () => {
     setNodeId(getId(idRef));
-    setSelectedSpeaker(defaultSpeaker);
-    setCastId(castId);
-    setSpeakerId(nodeSpeakerId);
+    setSelectedSpeakerType(speakerType);
   };
 
   // onNodeChange
@@ -82,7 +78,7 @@ function ConversationGeneral({ node }: Props) {
     if (value !== 'speakerId' && value !== 'castId') throw Error(`Invalid speaker change with value ${value as string}`);
 
     nodeStore.setPromptNodeSpeakerType(node, value);
-    setSelectedSpeaker(value);
+    setSelectedSpeakerType(value);
   };
 
   const handleCastIdChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -91,8 +87,6 @@ function ConversationGeneral({ node }: Props) {
 
     const newCastId = event.target.value.trim();
     nodeStore.setPromptNodeSourceInSceneId(node, newCastId);
-
-    setCastId(newCastId);
   };
 
   const handleSpeakerIdChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -101,8 +95,6 @@ function ConversationGeneral({ node }: Props) {
 
     const newSpeakerId = event.target.value.trim();
     nodeStore.setPromptNodeSpeakerId(node, newSpeakerId);
-
-    setSpeakerId(newSpeakerId);
   };
 
   const handleCommentChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -162,11 +154,16 @@ function ConversationGeneral({ node }: Props) {
           </Col>
           <Col {...colTwoLayout}>
             <div className="conversation-general__speaker-group">
-              <Select className="conversation-general__speaker-select" value={selectedSpeaker} style={{ width: 115 }} onChange={handleSpeakerChange}>
+              <Select
+                className="conversation-general__speaker-select"
+                value={selectedSpeakerType}
+                style={{ width: 115 }}
+                onChange={handleSpeakerChange}
+              >
                 <Option value="castId">Cast Id</Option>
                 <Option value="speakerId">Speaker Id</Option>
               </Select>
-              {selectedSpeaker === 'castId' && (
+              {selectedSpeakerType === 'castId' && (
                 <Input
                   value={castId || undefined}
                   onChange={handleCastIdChange}
@@ -174,7 +171,9 @@ function ConversationGeneral({ node }: Props) {
                   spellCheck="false"
                 />
               )}
-              {selectedSpeaker === 'speakerId' && <Input value={speakerId || undefined} onChange={handleSpeakerIdChange} spellCheck="false" />}
+              {selectedSpeakerType === 'speakerId' && (
+                <Input value={nodeSpeakerId || undefined} onChange={handleSpeakerIdChange} spellCheck="false" />
+              )}
             </div>
           </Col>
         </Row>

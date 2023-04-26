@@ -517,6 +517,7 @@ class NodeStore {
 
   setPromptNodeSpeakerType(node: PromptNodeType, value: 'castId' | 'speakerId') {
     node.speakerType = value;
+    if (value === 'speakerId') node.sourceInSceneRef = null;
   }
 
   setPromptNodeSourceInSceneId(node: PromptNodeType, id: string) {
@@ -525,6 +526,7 @@ class NodeStore {
     } else {
       node.sourceInSceneRef.id = id;
     }
+    console.log('just set setPromptNodeSourceInSceneId', node);
   }
 
   setPromptNodeSpeakerId(node: PromptNodeType, id: string) {
