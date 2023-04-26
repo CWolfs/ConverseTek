@@ -79,6 +79,10 @@ export function isAllowedToPasteLink(nodeId: string | undefined, clipboard: Clip
   if (nodeId === '0') return false;
 
   const node = nodeStore.getNode(nodeId);
+  const originalNode = nodeStore.getNode(clipboard?.originalNodeId);
+
+  // Don't allow linking to deleted nodes
+  if (originalNode == null || originalNode.deleting) return false;
 
   // GUARD
   if (node == null || clipboard == null) return false;
