@@ -64,7 +64,6 @@ function ConversationGeneral({ node }: Props) {
   };
 
   // onNodeChange
-  // Maybe only this useEffect is needed. Test it.
   useEffect(() => {
     populateState();
   }, [node]);

@@ -529,6 +529,7 @@ class NodeStore {
 
   setPromptNodeSpeakerId(node: PromptNodeType, id: string) {
     node.speakerOverrideId = id;
+    node.sourceInSceneRef = null;
   }
 
   setNodeActions(node: PromptNodeType | ElementNodeType, actions: OperationCallType[] | null) {
