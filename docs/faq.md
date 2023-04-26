@@ -28,8 +28,8 @@ For group conversations or conversations not initiated from clicking the dropshi
 
 An empty node is not actually empty, it just has no dialog text associated with it. Battletech uses these for a few reason:
 
-* As a conditional check point
-* As a 'autofollow' conversation branch. This allows for the same character, or a new non-player character, to continue talking
+- As a conditional check point
+- As a 'autofollow' conversation branch. This allows for the same character, or a new non-player character, to continue talking
 
 You can add conditions to a node by selecting the node you wish to add a condition to, select the 'Conditions' tab on the bottom right of ConverseTek - then select the blue '+' button. If you have mulitple conditions you may need to scroll to the bottom to see the add button.
 
@@ -49,12 +49,12 @@ Always show does what it says. This means that even if 'Only Once' is selected, 
 
 Make sure when dragging nodes that you move the node _directly_ into the highlighted zone. Node dragging will only work in certain situations. These situations are:
 
-* _Roots_ can be dragged up or down within the _Root_ level
+- _Roots_ can be dragged up or down within the _Root_ level
 
-* _Nodes_ can be dragged into a different empty _Root_
-* _Nodes_ can be dragged into a different empty _Response_
+- _Nodes_ can be dragged into a different empty _Root_
+- _Nodes_ can be dragged into a different empty _Response_
 
-* _Responses_ can be dragged up or down within their _Node_ level
+- _Responses_ can be dragged up or down within their _Node_ level
 
 ### "What is an action?"
 
@@ -67,7 +67,7 @@ your player's history so, for instance, if you selected your back story to inclu
 
 ### "How did I add a condition, or an action?"
 
-Select the root, node or response you wish to add to, then select the appropriate tab (`Conditions` or `Actions`) on the bottom right of ConverseTek. Select the blue '+' button to add a new item. 
+Select the root, node or response you wish to add to, then select the appropriate tab (`Conditions` or `Actions`) on the bottom right of ConverseTek. Select the blue '+' button to add a new item.
 
 ### "When I enter in a 'Cast Id' into the node 'General' details, but then decide to use 'Speaker Id' and save the conversation - the 'Cast Id' is lost. Why?"
 
@@ -85,9 +85,9 @@ Responses only ever have _one_ node that follows it. You cannot add a second nod
 
 This is usually because the conversation is too short and doesn't satisfy the rules in the Battletech conversation system. Ideally, your conversation should be structured as follows:
 
-* An empty root at the start of the conversation (future proofed for actions and conditions to gate the branch)
-* A non-empty node after that empty root
-* A non-empty response after that node
+- An empty root at the start of the conversation (future proofed for actions and conditions to gate the branch)
+- A non-empty node after that empty root
+- A non-empty response after that node
 
 ### "How do I link back to a previous part in a conversation, for example, when returning to a list of questions after one question has been answered?"
 
@@ -98,3 +98,11 @@ Remember, you can only link from a _Response_ (yellow) to a _Node_ (blue).
 ### "I've copied some dialog from another mod but the tool won't open it. Why?"
 
 They are probably using `ExtendedConversations` mod which adds many more dialog tags, conditions, actions and features. If a conversation is using one of those features then you will need to use the mod and install the ConverseTek definitions that come with it.
+
+### I've created a lot of response nodes under a prompt node in a conversation and now my conversation doesn't work in BT. Why?
+
+There is a hard limit of 10 responses per prompt node that exists in the game itself. If you have 11 or more responses to a single node, your conversation will break.
+
+### I can't get any conditionals to take effect / conditions don't work! Why?!
+
+Due to the nature of the BT dialogue system, all prompt nodes (blue nodes) that have a conditional on them require an empty response node (yellow) to follow it. Empty response nodes just get followed by the conversation system so you won't see the empty response in the actual conversation - think of it as the conversation logic process.
