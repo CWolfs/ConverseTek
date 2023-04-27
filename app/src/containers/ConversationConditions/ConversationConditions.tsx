@@ -97,10 +97,9 @@ function ConversationConditions({ node }: { node: ElementNodeType }) {
   };
   const displayConditions = conditions === null || !conditions.ops ? [] : conditions.ops;
   dataSize.current = displayConditions.length;
-  const height = window.document.getElementsByClassName('conversation-editor__details')[0].clientHeight - 22;
 
   return (
-    <div className="conversation-conditions" style={{ height }}>
+    <div className="conversation-conditions">
       <Collapse>{displayConditions.map((condition, index) => renderPanel(condition, index))}</Collapse>
       <div className="conversation-conditions__buttons">
         <Button className="button-secondary" size="small" onClick={onAddCondition}>
