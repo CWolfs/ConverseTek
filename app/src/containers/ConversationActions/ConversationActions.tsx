@@ -1,4 +1,4 @@
-import React, { useRef, MouseEvent, useEffect } from 'react';
+import React, { useRef, MouseEvent, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
 import { Button, Icon, Collapse, Popconfirm } from 'antd';
@@ -23,6 +23,7 @@ function ConversationActions({ node }: { node: PromptNodeType | ElementNodeType 
   const nodeStore = useStore<NodeStore>('node');
   const defStore = useStore<DefStore>('def');
   const dataSize = useRef(0);
+  const [activeActionPanelKeys, setActiveActionPanelKeys] = useState<string[]>([]);
   const update = useUpdate();
 
   const { actions } = node;
@@ -54,16 +55,12 @@ function ConversationActions({ node }: { node: PromptNodeType | ElementNodeType 
   };
 
   const onDeleteAction = (event: MouseEvent, index: number) => {
-    if (!actions || !actions.ops) return;
-
-    remove(actions.ops, (value, i) => i === index);
-    if (actions.ops.length <= 0) nodeStore.setNodeActions(node, null);
-
+    nodeStore.removeNodeAction(node, index);
     event.stopPropagation();
   };
 
   const renderPanel = (action: OperationCallType, index: number) => {
-    const key = `${node.idRef.id}.${index}.${action.functionName}`;
+    const key = `${node.idRef.id}.${index}`;
 
     const classes = classnames('conversation-actions__panel', {
       first: index === 0,
@@ -107,7 +104,9 @@ function ConversationActions({ node }: { node: PromptNodeType | ElementNodeType 
 
   return (
     <div className="conversation-actions" style={{ height }}>
-      <Collapse>{displayActions.map((action, index) => renderPanel(action, index))}</Collapse>
+      <Collapse defaultActiveKey={activeActionPanelKeys} onChange={(val) => console.log('value', val)}>
+        {displayActions.map((action, index) => renderPanel(action, index))}
+      </Collapse>
       <div className="conversation-actions__buttons">
         <Button className="button-secondary" size="small" onClick={onAddAction}>
           <Icon type="plus" />

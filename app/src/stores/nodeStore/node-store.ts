@@ -69,9 +69,11 @@ class NodeStore {
       setPromptNodeSourceInSceneId: action,
       setPromptNodeSpeakerId: action,
       setNodeActions: action,
+      removeNodeAction: action,
       addNodeAction: action,
       setElementNodeConditions: action,
       addNodeCondition: action,
+      removeNodeCondition: action,
       processDeletes: action,
       addNodeByParentId: action,
       addRootNode: action,
@@ -568,6 +570,14 @@ class NodeStore {
     }
   }
 
+  removeNodeAction(node: PromptNodeType | ElementNodeType, index: number): void {
+    const { actions } = node;
+    if (!actions || !actions.ops) return;
+
+    remove(actions.ops, (value, i) => i === index);
+    if (actions.ops.length <= 0) nodeStore.setNodeActions(node, null);
+  }
+
   setElementNodeConditions(elementNode: ElementNodeType, conditions: OperationCallType[] | null) {
     if (conditions === null) elementNode.conditions = null;
 
@@ -584,6 +594,14 @@ class NodeStore {
     } else {
       this.setElementNodeConditions(elementNode, [elementNodeCondition]);
     }
+  }
+
+  removeNodeCondition(node: ElementNodeType, index: number): void {
+    const { conditions } = node;
+    if (!conditions || !conditions.ops) return;
+
+    remove(conditions.ops, (value, i) => i === index);
+    if (conditions.ops.length <= 0) nodeStore.setElementNodeConditions(node, null);
   }
 
   getNode(nodeId: string | undefined): PromptNodeType | ElementNodeType | null {

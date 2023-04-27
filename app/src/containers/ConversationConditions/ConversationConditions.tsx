@@ -53,16 +53,12 @@ function ConversationConditions({ node }: { node: ElementNodeType }) {
   };
 
   const onDeleteCondition = (event: MouseEvent, index: number) => {
-    if (!conditions || !conditions.ops) return;
-
-    remove(conditions.ops, (value, i) => i === index);
-    if (conditions.ops.length <= 0) nodeStore.setElementNodeConditions(node, null);
-
+    nodeStore.removeNodeCondition(node, index);
     event.stopPropagation();
   };
 
   const renderPanel = (condition: OperationCallType, index: number) => {
-    const key = `${node.idRef.id}.${index}.${condition.functionName}`;
+    const key = `${node.idRef.id}.${index}`;
 
     const classes = classnames('conversation-conditions__panel', {
       first: index === 0,
