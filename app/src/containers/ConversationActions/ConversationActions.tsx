@@ -63,7 +63,7 @@ function ConversationActions({ node }: { node: PromptNodeType | ElementNodeType 
   };
 
   const renderPanel = (action: OperationCallType, index: number) => {
-    const key = index;
+    const key = `${node.idRef.id}.${index}.${action.functionName}`;
 
     const classes = classnames('conversation-actions__panel', {
       first: index === 0,
@@ -107,7 +107,7 @@ function ConversationActions({ node }: { node: PromptNodeType | ElementNodeType 
 
   return (
     <div className="conversation-actions" style={{ height }}>
-      <Collapse>{displayActions.map((condition, index) => renderPanel(condition, index))}</Collapse>
+      <Collapse>{displayActions.map((action, index) => renderPanel(action, index))}</Collapse>
       <div className="conversation-actions__buttons">
         <Button className="button-secondary" size="small" onClick={onAddAction}>
           <Icon type="plus" />

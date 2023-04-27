@@ -62,7 +62,7 @@ function ConversationConditions({ node }: { node: ElementNodeType }) {
   };
 
   const renderPanel = (condition: OperationCallType, index: number) => {
-    const key = index;
+    const key = `${node.idRef.id}.${index}.${condition.functionName}`;
 
     const classes = classnames('conversation-conditions__panel', {
       first: index === 0,
