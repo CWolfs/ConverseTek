@@ -103,9 +103,7 @@ function ConversationActions({ node }: { node: PromptNodeType | ElementNodeType 
 
   return (
     <div className="conversation-actions">
-      <Collapse defaultActiveKey={activeActionPanelKeys} onChange={(val) => console.log('value', val)}>
-        {displayActions.map((action, index) => renderPanel(action, index))}
-      </Collapse>
+      <Collapse defaultActiveKey={activeActionPanelKeys}>{displayActions.map((action, index) => renderPanel(action, index))}</Collapse>
       <div className="conversation-actions__buttons">
         <Button className="button-secondary" size="small" onClick={onAddAction}>
           <Icon type="plus" />
