@@ -17,9 +17,9 @@ Latest release: **v1.4.0** | [Download](https://github.com/CWolfs/ConverseTek/re
 
 ### Videos
 
-- [v1.4 - Zooming](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/1.4.0/conversetek-zoom-feature.png)
-- [v1.4 - Improved Folder Navgation](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/1.4.0/conversetek-improved-folder-navigation.png)
-- [v1.4 - Improved Layout](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/1.4.0/conversetek-drag-expand.png))
+- [v1.4 - Zooming](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/1.4.0/conversetek-zoom-feature.gif)
+- [v1.4 - Improved Folder Navgation](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/1.4.0/conversetek-improved-folder-navigation.gif)
+- [v1.4 - Improved Layout](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/1.4.0/conversetek-drag-expand.gif))
 - [Conversation with Yang](https://www.youtube.com/watch?v=JcjByWyr1lM)
 - [Copy & Links Functionality](https://www.youtube.com/watch?v=P9sbtz019ws)
 - [Drag Rearrange Functionality](https://www.youtube.com/watch?v=9Y4xSxJRO_s)
