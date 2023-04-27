@@ -17,7 +17,7 @@ function EditableInput({ value = null, options = null, onChange, optionLabelProp
   const isAutocomplete = !!options;
   let displayValueLabel: string | { text: string; value: string | number } | null = valueLabel;
   const conditionalProps: {
-    defaultValue?: string;
+    value?: string;
     optionLabelProp?: string;
   } = {};
 
@@ -36,7 +36,7 @@ function EditableInput({ value = null, options = null, onChange, optionLabelProp
   } as CSSProperties;
 
   if (isAutocomplete) {
-    if (value !== null && value !== undefined) conditionalProps.defaultValue = value;
+    if (value !== null && value !== undefined) conditionalProps.value = value;
     if (optionLabelProp) conditionalProps.optionLabelProp = optionLabelProp;
 
     if (!displayValueLabel) {
