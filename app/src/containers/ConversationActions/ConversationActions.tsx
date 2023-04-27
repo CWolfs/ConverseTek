@@ -100,10 +100,9 @@ function ConversationActions({ node }: { node: PromptNodeType | ElementNodeType 
 
   const displayActions = actions === null || !actions.ops ? [] : actions.ops;
   dataSize.current = displayActions.length;
-  const height = window.document.getElementsByClassName('conversation-editor__details')[0].clientHeight - 22;
 
   return (
-    <div className="conversation-actions" style={{ height }}>
+    <div className="conversation-actions">
       <Collapse defaultActiveKey={activeActionPanelKeys} onChange={(val) => console.log('value', val)}>
         {displayActions.map((action, index) => renderPanel(action, index))}
       </Collapse>

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react';
 import { message, Button, Row, Col, Form, Input, Icon, Tabs, Popconfirm } from 'antd';
+import { Split } from '@geoffcox/react-splitter';
 
 import { updateConversation } from 'services/api';
 import { regenerateNodeIds, regenerateConversationId } from 'utils/conversation-utils';
@@ -25,6 +26,31 @@ const { TabPane } = Tabs;
 
 type Props = {
   conversationAsset: ConversationAssetType;
+};
+
+const formItemLayout = {
+  labelCol: {
+    xs: { span: 24 },
+    sm: { span: 24 },
+    md: { span: 4 },
+    lg: { span: 3 },
+  },
+  wrapperCol: {
+    xs: { span: 24 },
+    sm: { span: 24 },
+    md: { span: 20 },
+    lg: { span: 21 },
+  },
+};
+
+const activeNodeSplitSizes = {
+  minPrimarySize: '5%',
+  minSecondarySize: '5%',
+};
+
+const inactiveNodeSplitSizes = {
+  minPrimarySize: '100%',
+  minSecondarySize: '0%',
 };
 
 function ConversationEditor({ conversationAsset }: Props) {
@@ -92,21 +118,6 @@ function ConversationEditor({ conversationAsset }: Props) {
   const { type } = activeNode || { type: null };
   const { isRoot, isResponse } = detectType(type);
 
-  const formItemLayout = {
-    labelCol: {
-      xs: { span: 24 },
-      sm: { span: 24 },
-      md: { span: 4 },
-      lg: { span: 3 },
-    },
-    wrapperCol: {
-      xs: { span: 24 },
-      sm: { span: 24 },
-      md: { span: 20 },
-      lg: { span: 21 },
-    },
-  };
-
   return (
     <div className="conversation-editor">
       <div>
@@ -154,32 +165,34 @@ function ConversationEditor({ conversationAsset }: Props) {
         </Row>
       </Form>
 
-      <DialogEditor conversationAsset={unsavedActiveConversationAsset} rebuild={rebuild} />
+      <Split {...(activeNode ? activeNodeSplitSizes : inactiveNodeSplitSizes)} horizontal>
+        <DialogEditor conversationAsset={unsavedActiveConversationAsset} rebuild={rebuild} />
 
-      {activeNode && (
-        <div className="conversation-editor__details">
-          <Row gutter={16}>
-            <Col md={12} className="conversation-editor__details-left">
-              <DialogTextArea node={activeNode} />
-            </Col>
-            <Col md={12} className="conversation-editor__details-right">
-              <Tabs defaultActiveKey="1">
-                <TabPane tab="General" key="1">
-                  <ConversationGeneral node={activeNode} />
-                </TabPane>
-                {(isRoot || isResponse) && (
-                  <TabPane tab="Conditions" key="2">
-                    <ConversationConditions node={activeNode as ElementNodeType} />
+        {activeNode && (
+          <div className="conversation-editor__details">
+            <Row gutter={16}>
+              <Col md={12} className="conversation-editor__details-left">
+                <DialogTextArea node={activeNode} />
+              </Col>
+              <Col md={12} className="conversation-editor__details-right">
+                <Tabs defaultActiveKey="1">
+                  <TabPane tab="General" key="1">
+                    <ConversationGeneral node={activeNode} />
                   </TabPane>
-                )}
-                <TabPane tab="Actions" key="3">
-                  <ConversationActions node={activeNode} />
-                </TabPane>
-              </Tabs>
-            </Col>
-          </Row>
-        </div>
-      )}
+                  {(isRoot || isResponse) && (
+                    <TabPane tab="Conditions" key="2">
+                      <ConversationConditions node={activeNode as ElementNodeType} />
+                    </TabPane>
+                  )}
+                  <TabPane tab="Actions" key="3">
+                    <ConversationActions node={activeNode} />
+                  </TabPane>
+                </Tabs>
+              </Col>
+            </Row>
+          </div>
+        )}
+      </Split>
     </div>
   );
 }
