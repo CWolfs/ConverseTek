@@ -39,6 +39,7 @@ function ConversationGeneral({ node }: Props) {
   const nodeStore = useStore<NodeStore>('node');
 
   const { idRef, type } = node;
+  const { id } = idRef;
 
   let speakerOverrideId = null;
   let sourceInSceneRef = null;
@@ -62,7 +63,7 @@ function ConversationGeneral({ node }: Props) {
   // onNodeChange
   useEffect(() => {
     populateState();
-  }, [node]);
+  }, [node, id]);
 
   const handleIdChange = (event: ChangeEvent<HTMLInputElement>) => {
     setNodeId(event.target.value.trim());

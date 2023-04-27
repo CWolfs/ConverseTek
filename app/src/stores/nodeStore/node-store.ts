@@ -18,6 +18,7 @@ import {
   setResponseNodes,
   setRootNodes,
   addNodes,
+  regenerateNodeIds,
 } from 'utils/conversation-utils';
 import { ClipboardType, ConversationAssetType, ElementNodeType, OperationCallType, PromptNodeType } from 'types';
 import { isElementNodeType, isPromptNodeType } from 'utils/node-utils';
@@ -48,6 +49,7 @@ class NodeStore {
       rebuild: observable,
       setRebuild: action,
       init: action,
+      regenerateNodeIds: action,
       updateActiveNode: action,
       setActiveNode: action,
       setActiveNodeByIndex: action,
@@ -110,6 +112,10 @@ class NodeStore {
       return this.nodeIdToTreeIndexMap.get(nodeId);
     }
     return null;
+  }
+
+  regenerateNodeIds(conversationAsset: ConversationAssetType) {
+    regenerateNodeIds(conversationAsset);
   }
 
   setRebuild(flag: boolean) {

@@ -2,9 +2,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import md5 from 'md5';
 import findIndex from 'lodash.findindex';
-import sortBy from 'lodash.sortby';
-import range from 'lodash.range';
-import difference from 'lodash.difference';
 import forEachRight from 'lodash.foreachright';
 
 import { ElementNodeType, PromptNodeType, ConversationAssetType, IdRef } from 'types';

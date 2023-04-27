@@ -6,7 +6,7 @@ import { message, Button, Row, Col, Form, Input, Icon, Tabs, Popconfirm } from '
 import { Split } from '@geoffcox/react-splitter';
 
 import { updateConversation } from 'services/api';
-import { regenerateNodeIds, regenerateConversationId } from 'utils/conversation-utils';
+import { regenerateConversationId } from 'utils/conversation-utils';
 import { detectType } from 'utils/node-utils';
 import { useStore } from 'hooks/useStore';
 import { DialogEditor } from 'components/DialogEditor';
@@ -81,7 +81,7 @@ function ConversationEditor({ conversationAsset }: Props) {
   const onRegenerateNodeIdsButtonClicked = () => {
     if (unsavedActiveConversationAsset == null) throw Error('unsavedActiveConversationAsset is null or undefined.');
 
-    regenerateNodeIds(unsavedActiveConversationAsset);
+    nodeStore.regenerateNodeIds(unsavedActiveConversationAsset);
     nodeStore.setRebuild(true);
   };
 
