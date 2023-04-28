@@ -5,25 +5,21 @@ Conversation editor for HBS's [Battletech](http://battletechgame.com/).
 Battletech uses a binary data format for its conversations. It isn't possible to edit those files directly so this tool is being developed to allow for editing and creating new conversations.
 
 ![Example Conversation Edit](./docs/images/conversetek-example.png)
-![Example Speaker Override](./docs/images/conversetek-example-speaker-override.png)
+![ConverseTek](./docs/images/conversetek.png)
 
 ## Overview
 
-Latest release: **v1.3.3** | [Download](https://github.com/CWolfs/ConverseTek/releases/tag/v1.3.3)
+Latest release: **v1.4.0** | [Download](https://github.com/CWolfs/ConverseTek/releases/tag/v1.4.0)
 
 ### Complimentary Mods
 
 - `ExtendedConversations` mod | Adds more dialog tags, actions, conditions and features | [Docs](https://github.com/CWolfs/ExtendedConversations) | [Download](https://github.com/CWolfs/ExtendedConversations/releases/)
 
-## Examples
-
-### Screenshots
-
-- [Editor View](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/1.0.0/conversetek-example.png)
-- [In-Game Edited Conversation](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/conversetek-example.png)
-
 ### Videos
 
+- [v1.4 - Zooming](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/1.4.0/conversetek-zoom-feature.gif)
+- [v1.4 - Improved Folder Navgation](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/1.4.0/conversetek-improved-folder-navigation.gif)
+- [v1.4 - Improved Layout](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/1.4.0/conversetek-drag-expand.gif)
 - [Conversation with Yang](https://www.youtube.com/watch?v=JcjByWyr1lM)
 - [Copy & Links Functionality](https://www.youtube.com/watch?v=P9sbtz019ws)
 - [Drag Rearrange Functionality](https://www.youtube.com/watch?v=9Y4xSxJRO_s)
@@ -32,7 +28,7 @@ Latest release: **v1.3.3** | [Download](https://github.com/CWolfs/ConverseTek/re
 
 ## Installation Instructions
 
-- Download and install [.NET 4.72 Runtime](https://www.microsoft.com/net/download/thank-you/net472)
+- Download and install [.NET framework](https://dotnet.microsoft.com/en-us/download/dotnet-framework) (no earlier than [.NET 4.72 Runtime](https://www.microsoft.com/net/download/thank-you/net472))
 - Download the [latest release](https://github.com/CWolfs/ConverseTek/releases/) and unzip it
 - Copy `ShadowrunDTO.dll` and `ShadowrunSerializer.dll` from your `BATTLETECH/BattleTech_Data/Managed` directory into the `ConverseTek` application folder
 - Run `ConverseTek.exe` from the `ConverseTek` application folder

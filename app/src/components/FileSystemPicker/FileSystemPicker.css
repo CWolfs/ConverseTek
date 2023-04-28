@@ -4,7 +4,10 @@
   display: flex;
 
   &__quick-links {
-    margin-right: $mediumLargeSpace;
+    margin-right: 20px;
+    text-align: center;
+    max-height: 55vh;
+    overflow: auto;
   }
 
   &__directory-list {
@@ -16,15 +19,22 @@
 
   &__directory-item {
     cursor: pointer;
-    padding-left: 8px;
-    padding-right: 8px;
+    padding: 0;
   }
 
-  &__directory-item:hover, &__directory-item:focus, &__directory-item--active {
+  &__directory-item-subcontainer {
+    padding: 12px 8px;
+    width: 100%;
+  }
+
+  &__directory-item:hover,
+  &__directory-item:focus,
+  &__directory-item--active {
     background-color: #2ab0f77d;
   }
 
-  &__directory-icon, &__file-icon {
+  &__directory-icon,
+  &__file-icon {
     margin-right: $smallMediumSpace;
   }
 

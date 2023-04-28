@@ -7,16 +7,18 @@
 
   &__row-contents {
     cursor: pointer;
-    
+
     &-logic {
       display: inline-block;
-      vertical-align: middle;
+      vertical-align: sub;
     }
   }
 
   &__root {
     &-row {
-      &:focus, &:hover, &--active {
+      &:focus,
+      &:hover,
+      &--active {
         border: 1px #007eff solid;
         box-shadow: 0px 0px 8px #0095ff;
       }
@@ -40,7 +42,9 @@
 
   &__node {
     &-row {
-      &:focus, &:hover, &--active {
+      &:focus,
+      &:hover,
+      &--active {
         border: 1px #007eff solid;
         box-shadow: 0px 0px 8px #0095ff;
       }
@@ -64,7 +68,9 @@
 
   &__response {
     &-row {
-      &:focus, &:hover, &--active {
+      &:focus,
+      &:hover,
+      &--active {
         border: 1px $borderSecondary solid;
         box-shadow: 0px 0px 6px gold;
       }
@@ -89,7 +95,9 @@
 
   &__link {
     &-row {
-      &:focus, &:hover, &--active {
+      &:focus,
+      &:hover,
+      &--active {
         border: 1px #007eff solid;
         box-shadow: 0px 0px 8px #0095ff;
       }
@@ -445,4 +453,8 @@
 .rst__rtl.rst__lineChildren::after {
   right: 50%;
   left: initial;
+}
+
+.contexify {
+  border: 1px solid $grey4;
 }

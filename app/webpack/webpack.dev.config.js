@@ -1,21 +1,25 @@
 /* eslint-disable */
 const webpack = require('webpack');
-const merge = require('lodash.merge');
 
-module.exports = function(config, APP_DIR, BUILD_DIR) {
-    console.log('Using local config');
+module.exports = function (config, APP_DIR, BUILD_DIR) {
+  console.log('Using dev config');
 
-    config = merge(config, {
-        mode: 'development',
-        devtool: 'inline-source-map',
-    });
+  config = {
+    ...config,
+    mode: 'development',
+    devtool: 'inline-source-map',
 
-    config.plugins.push(
-        new webpack.NamedModulesPlugin(),
-        new webpack.DefinePlugin({
-            __BUILD_DATE__: JSON.stringify(`LOCAL ${new Date(Date.now()).toUTCString()}`),
-        }),
-    );
+    optimization: {
+      moduleIds: 'named',
+    },
+  };
 
-    return config;
-}
+  config.plugins.push(
+    new webpack.DefinePlugin({
+      __BUILD_DATE__: JSON.stringify(`LOCAL ${new Date(Date.now()).toUTCString()}`),
+      __INITIAL_ROUTE_PATH__: JSON.stringify('index.html'),
+    }),
+  );
+
+  return config;
+};

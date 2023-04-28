@@ -11,7 +11,8 @@
     border-color: $green6;
   }
 
-  &:focus, &:hover {
+  &:focus,
+  &:hover {
     color: #fff;
     background-color: $green6;
     border-color: $green6;
@@ -22,7 +23,30 @@
   }
 }
 
-.ant-btn-secondary {
+.button-primary-pale {
+  color: #fff;
+  background-color: $green6;
+  border-color: $green6;
+
+  &:active {
+    color: #fff;
+    background-color: $green3;
+    border-color: $green3;
+  }
+
+  &:focus,
+  &:hover {
+    color: #fff;
+    background-color: $green3;
+    border-color: $green3;
+  }
+
+  &.ant-btn-clicked:after {
+    border: 0 solid $green6;
+  }
+}
+
+.button-secondary {
   color: #fff;
   background-color: $backgroundSecondary;
   border-color: $backgroundSecondary;
@@ -33,7 +57,8 @@
     border-color: $backgroundSecondary;
   }
 
-  &:focus, &:hover {
+  &:focus,
+  &:hover {
     color: #fff;
     background-color: $backgroundSecondary;
     border-color: $backgroundSecondary;
@@ -41,7 +66,30 @@
 
   &.ant-btn-clicked:after {
     border: 0 solid $backgroundSecondary;
-  } 
+  }
+}
+
+.button-secondary-pale {
+  color: #fff;
+  background-color: $backgroundSecondaryPale;
+  border-color: $backgroundSecondaryPale;
+
+  &:active {
+    color: #fff;
+    background-color: $backgroundSecondary;
+    border-color: $backgroundSecondary;
+  }
+
+  &:focus,
+  &:hover {
+    color: #fff;
+    background-color: $backgroundSecondary;
+    border-color: $backgroundSecondary;
+  }
+
+  &.ant-btn-clicked:after {
+    border: 0 solid $backgroundSecondaryPale;
+  }
 }
 
 .ant-btn-tertiary {
@@ -55,7 +103,8 @@
     border-color: $buttonBackgroundPrimary;
   }
 
-  &:focus, &:hover {
+  &:focus,
+  &:hover {
     color: #fff;
     background-color: $buttonBackgroundPrimary;
     border-color: $buttonBackgroundPrimary;
@@ -63,29 +112,30 @@
 
   &.ant-btn-clicked:after {
     border: 0 solid $buttonBackgroundPrimary;
-  } 
+  }
 }
 
-.ant-btn-caution {
+.ant-btn-danger {
   color: white;
   background-color: #f5222d;
   border-color: #f5222d;
 
   &:active {
-    color: #f5222d;
-    background-color: white;
-    border-color: white;
+    color: white;
+    background-color: #ab171f;
+    border-color: #ab171f;
   }
 
-  &:focus, &:hover {
-    color: #f5222d;
-    background-color: white;
-    border-color: white;
+  &:focus,
+  &:hover {
+    color: white;
+    background-color: #ab171f;
+    border-color: #ab171f;
   }
 
   &.ant-btn-clicked:after {
     border: 0 solid #f5222d;
-  } 
+  }
 }
 
 .ant-tree,
@@ -98,7 +148,7 @@
   color: white;
 }
 
-.ant-tree li .ant-tree-node-content-wrapper:hover, 
+.ant-tree li .ant-tree-node-content-wrapper:hover,
 .ant-tree li .ant-tree-node-content-wrapper.ant-tree-node-selected {
   background-color: #2ab0f77d;
   color: white;
@@ -109,8 +159,13 @@
 }
 
 .ant-input {
-  background-color: $backgroundTertiary;  
+  background-color: $backgroundTertiary;
   color: $textColourPrimary;
+}
+
+.ant-input.inverse {
+  background-color: $textColourPrimary;
+  color: $backgroundTertiary;
 }
 
 .ant-menu-horizontal {
@@ -120,7 +175,14 @@
   line-height: 12px;
 }
 
-.ant-menu-horizontal > .ant-menu-item:hover, .ant-menu-horizontal > .ant-menu-submenu:hover, .ant-menu-horizontal > .ant-menu-item-active, .ant-menu-horizontal > .ant-menu-submenu-active, .ant-menu-horizontal > .ant-menu-item-open, .ant-menu-horizontal > .ant-menu-submenu-open, .ant-menu-horizontal > .ant-menu-item-selected, .ant-menu-horizontal > .ant-menu-submenu-selected {
+.ant-menu-horizontal > .ant-menu-item:hover,
+.ant-menu-horizontal > .ant-menu-submenu:hover,
+.ant-menu-horizontal > .ant-menu-item-active,
+.ant-menu-horizontal > .ant-menu-submenu-active,
+.ant-menu-horizontal > .ant-menu-item-open,
+.ant-menu-horizontal > .ant-menu-submenu-open,
+.ant-menu-horizontal > .ant-menu-item-selected,
+.ant-menu-horizontal > .ant-menu-submenu-selected {
   border-bottom: none;
   color: white;
 }
@@ -129,7 +191,8 @@
   background: none;
 }
 
-.ant-menu-horizontal > .ant-menu-item, .ant-menu-horizontal > .ant-menu-submenu {
+.ant-menu-horizontal > .ant-menu-item,
+.ant-menu-horizontal > .ant-menu-submenu {
   border-bottom: none;
   padding: 12px 0;
 }
@@ -138,12 +201,23 @@
   border-radius: 2px;
 }
 
-.ant-menu-vertical > .ant-menu-item, .ant-menu-vertical-left > .ant-menu-item, .ant-menu-vertical-right > .ant-menu-item, .ant-menu-inline > .ant-menu-item, .ant-menu-vertical > .ant-menu-submenu > .ant-menu-submenu-title, .ant-menu-vertical-left > .ant-menu-submenu > .ant-menu-submenu-title, .ant-menu-vertical-right > .ant-menu-submenu > .ant-menu-submenu-title, .ant-menu-inline > .ant-menu-submenu > .ant-menu-submenu-title {
+.ant-menu-vertical > .ant-menu-item,
+.ant-menu-vertical-left > .ant-menu-item,
+.ant-menu-vertical-right > .ant-menu-item,
+.ant-menu-inline > .ant-menu-item,
+.ant-menu-vertical > .ant-menu-submenu > .ant-menu-submenu-title,
+.ant-menu-vertical-left > .ant-menu-submenu > .ant-menu-submenu-title,
+.ant-menu-vertical-right > .ant-menu-submenu > .ant-menu-submenu-title,
+.ant-menu-inline > .ant-menu-submenu > .ant-menu-submenu-title {
   line-height: 32px;
   height: 32px;
 }
 
-.ant-menu-item:hover, .ant-menu-item-active, .ant-menu:not(.ant-menu-inline) .ant-menu-submenu-open, .ant-menu-submenu-active, .ant-menu-submenu-title:hover {
+.ant-menu-item:hover,
+.ant-menu-item-active,
+.ant-menu:not(.ant-menu-inline) .ant-menu-submenu-open,
+.ant-menu-submenu-active,
+.ant-menu-submenu-title:hover {
   color: $linkColourTertiary;
   background-color: $backgroundQuaternary;
 }
@@ -154,8 +228,15 @@
   }
 }
 
+.ant-modal-body {
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
 .ant-select-selection {
-  background-color: $backgroundTertiary;  
+  background-color: $backgroundTertiary;
   color: $textColourPrimary;
 }
 
@@ -176,9 +257,18 @@
       color: white;
     }
 
+    &:hover:not(.ant-select-dropdown-menu-item-disabled) {
+      background-color: $highlightColourPrimary;
+    }
+
     &-selected {
       background-color: $backgroundTertiary;
       color: $textColourTertiary;
+    }
+
+    &-active:not(.ant-select-dropdown-menu-item-disabled) {
+      background-color: $highlightColourPrimary;
+      color: white;
     }
   }
 }
@@ -188,8 +278,8 @@
   color: black;
 }
 
-.ant-tooltip-placement-top .ant-tooltip-arrow {
-  border-top-color: gold;
+.ant-tooltip-arrow::before {
+  background-color: gold;
 }
 
 .ant-input::-webkit-input-placeholder {

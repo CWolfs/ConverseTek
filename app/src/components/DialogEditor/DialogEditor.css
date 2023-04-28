@@ -1,13 +1,18 @@
 @import '../../css/constants.css';
 
 .dialog-editor {
+  position: relative;
   background-color: $backgroundTertiary;
   border: 1px solid white;
   border-radius: 2px;
   display: flex;
   flex-grow: 1;
+  height: 100%;
 
   &__tree {
+    position: absolute;
+    top: 0;
+    left: 0;
     font-size: $fontSizeSmall;
     line-height: $lineHeightSmall;
     flex-grow: 1;
@@ -20,10 +25,6 @@
   .rst__lineHalfVerticalBottom::after,
   .rst__lineChildren::after {
     background-color: gold;
-  }
-
-  .rst__virtualScrollOverride * {
-    color: black;
   }
 
   .rst__nodeContent {
@@ -48,6 +49,7 @@
 
   .rst__rowLabel {
     padding-right: 5px !important;
+    margin-bottom: 2px;
   }
 
   .rst__rowWrapper {

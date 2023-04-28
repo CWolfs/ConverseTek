@@ -1,14 +1,23 @@
 /* eslint-disable */
-var webpack = require('webpack');
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
-module.exports = function(config, APP_DIR) {
-    console.log('Using jsx loader');
+module.exports = function (config, APP_DIR, isLocal) {
+  console.log('Using jsx loader');
 
-    config.module.rules.push({
-      test: /\.jsx?$/,
-      loaders: ['babel-loader?cacheDirectory'],
-      include: APP_DIR
-    });
+  config.module.rules.push({
+    test: /\.(js|jsx|tsx|ts)$/,
+    use: [
+      {
+        loader: 'babel-loader?cacheDirectory',
+        options: {
+          plugins: isLocal ? [require.resolve('react-refresh/babel')] : undefined,
+        },
+      },
+    ],
+    include: APP_DIR,
+  });
 
-    return config;
-}
+  if (isLocal) config.plugins.push(new ReactRefreshWebpackPlugin());
+
+  return config;
+};

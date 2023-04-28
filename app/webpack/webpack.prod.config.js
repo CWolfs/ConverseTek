@@ -1,20 +1,25 @@
 /* eslint-disable */
-var webpack = require('webpack');
-var UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const webpack = require('webpack');
 
-module.exports = function(config) {
-    console.log('Using prod config');
-    config.mode = 'production';
+module.exports = function (config) {
+  console.log('Using prod config');
 
-    config.plugins.push(
-        new webpack.DefinePlugin({
-            __BUILD_DATE__: '',
-            'process.env.NODE_ENV': JSON.stringify('production')
-        }),
-        new UglifyJSPlugin({
-            sourceMap: true
-        })
-    );
+  config = {
+    ...config,
+    mode: 'production',
 
-    return config;
-}
+    optimization: {
+      minimize: true,
+    },
+  };
+
+  config.plugins.push(
+    new webpack.DefinePlugin({
+      __BUILD_DATE__: '',
+      'process.env.NODE_ENV': JSON.stringify('production'),
+      __INITIAL_ROUTE_PATH__: JSON.stringify('index.html'),
+    }),
+  );
+
+  return config;
+};

@@ -1,6 +1,7 @@
 @import '../../css/constants.css';
 
 .conversation-actions {
+  height: calc(100% - 28px);
   overflow-y: auto;
   overflow-x: hidden;
 
@@ -34,8 +35,9 @@
     padding-bottom: 0;
   }
 
-  .first, .last {
-    .ant-list-item-meta-title  {
+  .first,
+  .last {
+    .ant-list-item-meta-title {
       margin-bottom: 0;
     }
   }
