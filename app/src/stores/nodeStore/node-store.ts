@@ -540,12 +540,12 @@ class NodeStore {
     elementNode.hideIfUnavailable = hideIfUnavailable;
   }
 
-  setPromptNodeSpeakerType(node: PromptNodeType, value: 'castId' | 'speakerId') {
+  setPromptNodeSpeakerType(node: PromptNodeType, value: 'castId' | 'speakerId'): void {
     node.speakerType = value;
     if (value === 'speakerId') node.sourceInSceneRef = null;
   }
 
-  setPromptNodeSourceInSceneId(node: PromptNodeType, id: string) {
+  setPromptNodeSourceInSceneId(node: PromptNodeType, id: string): void {
     if (!node.sourceInSceneRef) {
       node.sourceInSceneRef = { id };
     } else {
@@ -553,20 +553,23 @@ class NodeStore {
     }
   }
 
-  setPromptNodeSpeakerId(node: PromptNodeType, id: string) {
+  setPromptNodeSpeakerId(node: PromptNodeType, id: string): void {
     node.speakerOverrideId = id;
     node.sourceInSceneRef = null;
   }
 
-  setNodeActions(node: PromptNodeType | ElementNodeType, actions: OperationCallType[] | null) {
-    if (actions === null) node.actions = null;
+  setNodeActions(node: PromptNodeType | ElementNodeType, actions: OperationCallType[] | null): void {
+    if (actions === null) {
+      node.actions = null;
+      return;
+    }
 
     node.actions = {
       ops: actions,
     };
   }
 
-  addNodeAction(node: PromptNodeType | ElementNodeType, nodeAction: OperationCallType) {
+  addNodeAction(node: PromptNodeType | ElementNodeType, nodeAction: OperationCallType): void {
     const { actions } = node;
 
     if (actions) {
@@ -584,15 +587,18 @@ class NodeStore {
     if (actions.ops.length <= 0) nodeStore.setNodeActions(node, null);
   }
 
-  setElementNodeConditions(elementNode: ElementNodeType, conditions: OperationCallType[] | null) {
-    if (conditions === null) elementNode.conditions = null;
+  setElementNodeConditions(elementNode: ElementNodeType, conditions: OperationCallType[] | null): void {
+    if (conditions === null) {
+      elementNode.conditions = null;
+      return;
+    }
 
     elementNode.conditions = {
       ops: conditions,
     };
   }
 
-  addNodeCondition(elementNode: ElementNodeType, elementNodeCondition: OperationCallType) {
+  addNodeCondition(elementNode: ElementNodeType, elementNodeCondition: OperationCallType): void {
     const { conditions } = elementNode;
 
     if (conditions) {

@@ -23,7 +23,6 @@ function ConversationActions({ node }: { node: PromptNodeType | ElementNodeType 
   const nodeStore = useStore<NodeStore>('node');
   const defStore = useStore<DefStore>('def');
   const dataSize = useRef(0);
-  const [activeActionPanelKeys, setActiveActionPanelKeys] = useState<string[]>([]);
   const update = useUpdate();
 
   const { actions } = node;
@@ -103,7 +102,7 @@ function ConversationActions({ node }: { node: PromptNodeType | ElementNodeType 
 
   return (
     <div className="conversation-actions">
-      <Collapse defaultActiveKey={activeActionPanelKeys}>{displayActions.map((action, index) => renderPanel(action, index))}</Collapse>
+      <Collapse>{displayActions.map((action, index) => renderPanel(action, index))}</Collapse>
       <div className="conversation-actions__buttons">
         <Button className="button-secondary" size="small" onClick={onAddAction}>
           <Icon type="plus" />

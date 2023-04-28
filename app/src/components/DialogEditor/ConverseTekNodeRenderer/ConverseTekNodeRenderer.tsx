@@ -62,11 +62,11 @@ function hasActionsAndConditions(node: PromptNodeType | ElementNodeType | null):
   const { type } = node;
   if (type === 'node') {
     const { actions } = node;
-    hasActions = !!actions;
+    hasActions = actions != null && actions.ops != null && actions.ops.length > 0;
   } else if (type === 'root' || type === 'response') {
     const { actions, conditions } = node;
-    hasActions = !!actions;
-    hasConditions = !!conditions;
+    hasActions = actions != null && actions.ops != null && actions.ops.length > 0;
+    hasConditions = conditions != null && conditions.ops != null && conditions.ops.length > 0;
   }
 
   return { hasActions, hasConditions };
