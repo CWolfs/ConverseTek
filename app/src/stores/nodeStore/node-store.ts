@@ -819,13 +819,14 @@ class NodeStore {
     const newParentPromptNode = this.getNode(newParentNodeId) as PromptNodeType;
     const oldParentPromptNode = this.getNode(responseNode.parentId) as PromptNodeType;
 
+    const { parentId: oldParentId } = responseNode;
     responseNode.parentId = newParentNodeId;
 
     const updatedNewParentBranches = [...newParentResponseOrder.map((responseNodeId) => this.getNode(responseNodeId.id))] as ElementNodeType[];
     newParentPromptNode.branches = updatedNewParentBranches;
 
     // Don't remove if within the same parent Node
-    if (responseNode.parentId !== newParentNodeId) {
+    if (oldParentId !== newParentNodeId) {
       const updatedOldParentBranches = oldParentPromptNode.branches.filter(
         (responseNode: ElementNodeType) => getId(responseNode) !== responseToMoveId,
       );

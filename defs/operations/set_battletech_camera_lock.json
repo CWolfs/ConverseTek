@@ -9,6 +9,7 @@
       "label": "Key",
       "types": ["string"],
       "values": [
+        { "text": "AUTO", "value": "AUTO" },
         { "text": "Alexander", "value": "ALEXANDER" },
         { "text": "Darius", "value": "DARIUS" },
         { "text": "Farah", "value": "FARAH" },
