@@ -234,9 +234,26 @@ export const ConverseTekNodeRenderer = observer(
       ...logicStyle,
     };
 
+    const responseContinueStyle = {
+      ...logicStyle,
+      transform: 'rotate(270deg)',
+      fontSize: 22,
+      paddingRight: 4,
+    };
+
     if ((!nodeTitle || (typeof nodeTitle === 'string' && nodeTitle.length <= 0)) && hasActions) {
       logicStyle.paddingRight = '8px';
     }
+
+    const resolvedNodeTitle =
+      typeof nodeTitle === 'function'
+        ? nodeTitle({
+            node,
+            path,
+            treeIndex,
+          })
+        : nodeTitle;
+    const hasNodeTitle = typeof resolvedNodeTitle === 'string' && resolvedNodeTitle.length > 0;
 
     const rowContents = (
       <div
@@ -275,18 +292,11 @@ export const ConverseTekNodeRenderer = observer(
             <div className="node-renderer__row-contents-logic">
               {hasConditions && <Icon type="question-circle" theme="filled" style={logicStyle} />}
               {hasActions && <Icon type="right-circle" theme="filled" style={actionsIconStyle} />}
+              {!hasNodeTitle && <Icon type="enter" style={responseContinueStyle} />}
             </div>
 
             <div className={labelClasses}>
-              <span className={titleClasses}>
-                {typeof nodeTitle === 'function'
-                  ? nodeTitle({
-                      node,
-                      path,
-                      treeIndex,
-                    })
-                  : nodeTitle}
-              </span>
+              <span className={titleClasses}>{resolvedNodeTitle}</span>
 
               {nodeSubtitle && (
                 <span className="rst__rowSubtitle">
