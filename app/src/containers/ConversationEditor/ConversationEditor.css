@@ -15,11 +15,21 @@
     margin-right: $tinySpace;
   }
 
-  &__buttons {
-    float: right;
+  &__toolbar {
+    display: flex;
+    justify-content: space-between;
+    margin: 0 $smallSpace $tinySpace $smallSpace;
   }
 
   &__regenerate-ids-button {
+    margin-right: $smallSpace;
+  }
+
+  &__tool-buttons {
+    margin-bottom: $smallSpace;
+  }
+
+  &__expand-nodes {
     margin-right: $smallSpace;
   }
 
@@ -88,6 +98,6 @@
   }
 
   .ant-form-item {
-    margin-bottom: $smallMediumSpace;
+    margin-bottom: $tinySpace;
   }
 }

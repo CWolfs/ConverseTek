@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react';
@@ -56,6 +56,7 @@ const inactiveNodeSplitSizes = {
 function ConversationEditor({ conversationAsset }: Props) {
   const nodeStore = useStore<NodeStore>('node');
   const dataStore = useStore<DataStore>('data');
+  const [isAllExpanded, setIsAllExpanded] = useState<boolean>(true);
 
   const { unsavedActiveConversationAsset } = dataStore;
   const { activeNode, rebuild } = nodeStore;
@@ -120,25 +121,6 @@ function ConversationEditor({ conversationAsset }: Props) {
 
   return (
     <div className="conversation-editor">
-      <div>
-        <div className="conversation-editor__buttons">
-          <Popconfirm
-            title="Are you sure you want to regenerate all dialog node ids?"
-            placement="bottomRight"
-            onConfirm={onRegenerateNodeIdsButtonClicked}
-            okText="Yes"
-            cancelText="No"
-          >
-            <Button className="conversation-editor__regenerate-ids-button button-secondary" type="primary" size="small">
-              <Icon type="retweet" />
-            </Button>
-          </Popconfirm>
-          <Button className="conversation-editor__save-button" type="primary" size="small" onClick={onSaveButtonClicked}>
-            <Icon type="save" />
-          </Button>
-        </div>
-      </div>
-
       <Form>
         <Row gutter={16}>
           <Col span={11}>
@@ -165,8 +147,33 @@ function ConversationEditor({ conversationAsset }: Props) {
         </Row>
       </Form>
 
+      <div className="conversation-editor__toolbar">
+        <div className="conversation-editor__tool-buttons">
+          <Button className="conversation-editor__expand-nodes button-secondary" size="small" onClick={() => setIsAllExpanded(!isAllExpanded)}>
+            <Icon type={isAllExpanded ? 'menu-fold' : 'menu-unfold'} />
+          </Button>
+        </div>
+
+        <div className="conversation-editor__buttons">
+          <Popconfirm
+            title="Are you sure you want to regenerate all dialog node ids?"
+            placement="bottomRight"
+            onConfirm={onRegenerateNodeIdsButtonClicked}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button className="conversation-editor__regenerate-ids-button button-secondary" type="primary" size="small">
+              <Icon type="retweet" />
+            </Button>
+          </Popconfirm>
+          <Button className="conversation-editor__save-button" type="primary" size="small" onClick={onSaveButtonClicked}>
+            <Icon type="save" />
+          </Button>
+        </div>
+      </div>
+
       <Split {...(activeNode ? activeNodeSplitSizes : inactiveNodeSplitSizes)} horizontal>
-        <DialogEditor conversationAsset={unsavedActiveConversationAsset} rebuild={rebuild} />
+        <DialogEditor conversationAsset={unsavedActiveConversationAsset} rebuild={rebuild} expandAll={isAllExpanded} />
 
         {activeNode && (
           <div className="conversation-editor__details">
