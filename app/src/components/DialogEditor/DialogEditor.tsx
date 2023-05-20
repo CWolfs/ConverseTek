@@ -1,7 +1,6 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { useState, useEffect, useRef, MouseEvent } from 'react';
-import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
 import SortableTree from 'react-sortable-tree';
 import { useContextMenu } from 'react-contexify';
@@ -20,6 +19,8 @@ import { ScalableScrollbar } from 'components/ScalableScrollbar';
 
 import { ConverseTekNodeRenderer } from './ConverseTekNodeRenderer';
 import { DialogEditorContextMenu } from '../ContextMenus/DialogEditorContextMenu';
+
+import { toggleExpandedForAll } from 'utils/tree-data-utils';
 
 import './DialogEditor.css';
 
@@ -46,7 +47,7 @@ function buildTreeData(nodeStore: NodeStore, conversationAsset: ConversationAsse
 
 const zoomLevelIncrement = 0.05;
 
-function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: ConversationAssetType; rebuild: boolean }) {
+function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationAsset: ConversationAssetType; rebuild: boolean; expandAll: boolean }) {
   const nodeStore = useStore<NodeStore>('node');
 
   const dialogEditorRef = useRef<HTMLDivElement>(null);
@@ -208,6 +209,14 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
     setTimeout(resize, 100);
   }, [activeNodeId]);
 
+  // Expand or Collapse all
+  useEffect(() => {
+    if (treeData == null) return;
+
+    const updatedTreeData = toggleExpandedForAll({ treeData, expanded: expandAll });
+    setTreeData(updatedTreeData);
+  }, [expandAll]);
+
   useControlWheel(treeElement, onControlWheel);
 
   if (treeData === null) return null;
@@ -261,14 +270,5 @@ function DialogEditor({ conversationAsset, rebuild }: { conversationAsset: Conve
     </div>
   );
 }
-
-DialogEditor.defaultProps = {
-  rebuild: false,
-};
-
-DialogEditor.propTypes = {
-  conversationAsset: PropTypes.object.isRequired,
-  rebuild: PropTypes.bool,
-};
 
 export const ObservingDialogueEditor = observer(DialogEditor);
