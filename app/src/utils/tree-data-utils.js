@@ -344,10 +344,13 @@ export function map({ treeData, getNodeKey, callback, ignoreCollapsed = true }) 
 /**
  * Expand or close every node in the tree
  */
-export function toggleExpandedForAll({ treeData, expanded = true }) {
+export function toggleExpandedForAll({ treeData, callback = (node) => {}, expanded = true }) {
   return map({
     treeData,
-    callback: ({ node }) => ({ ...node, expanded }),
+    callback: ({ node }) => {
+      callback(node);
+      return { ...node, expanded };
+    },
     getNodeKey: ({ treeIndex }) => treeIndex,
     ignoreCollapsed: false,
   });

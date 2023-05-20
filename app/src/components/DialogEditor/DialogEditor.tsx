@@ -213,7 +213,13 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
   useEffect(() => {
     if (treeData == null) return;
 
-    const updatedTreeData = toggleExpandedForAll({ treeData, expanded: expandAll });
+    const updatedTreeData = toggleExpandedForAll({
+      treeData,
+      callback: (node: RSTNode) => {
+        nodeStore.setNodeExpansion(node.id, expandAll);
+      },
+      expanded: expandAll,
+    });
     setTreeData(updatedTreeData);
   }, [expandAll]);
 
