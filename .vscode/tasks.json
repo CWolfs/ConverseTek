@@ -39,7 +39,21 @@
     {
       "label": "UI Build",
       "type": "shell",
-      "command": "npm run build --prefix app"
+      "command": "npm run build --prefix app && xcopy /y /e /i dist K:\\Modding\\ConverseTek\\bin\\x64\\Debug\\net472\\dist",
+      "windows": {
+          "command": "cmd",
+          "args": [
+              "/C",
+              "npm run build --prefix app && xcopy /y /e /i dist K:\\Modding\\ConverseTek\\bin\\x64\\Debug\\net472\\dist"
+          ]
+      },
+      "presentation": {
+          "reveal": "always"
+      },
+      "group": {
+          "kind": "build",
+          "isDefault": true
+      }
     },
     {
       "label": "Fast Run",
