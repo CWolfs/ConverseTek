@@ -231,9 +231,11 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
   useEffect(() => {
     if (collapseOnNodeId == null || treeData == null) return;
 
-    console.log('[useEffect] Collapse on Node ID is: ', collapseOnNodeId);
     const node = nodeStore.getNode(collapseOnNodeId);
-    const updatedTreeData = collapseOtherBranches(treeData, node, (node: RSTNode) => console.log('[iterate] node is', node));
+    const updatedTreeData = collapseOtherBranches(treeData, node, (node: RSTNode) => {
+      nodeStore.setNodeExpansion(node.id, false);
+    });
+
     setTreeData(updatedTreeData);
     nodeStore.setCollapseOnNodeId(null);
   }, [collapseOnNodeId]);
