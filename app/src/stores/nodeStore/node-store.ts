@@ -643,6 +643,16 @@ class NodeStore {
     return null;
   }
 
+  getRoots(): ElementNodeType[] {
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+    if (!conversationAsset) {
+      throw Error('Unsaved conversation is null or undefined');
+    }
+
+    const { roots } = conversationAsset.conversation;
+    return roots;
+  }
+
   getPromptNodeByIndex(index: number): PromptNodeType | null {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     if (conversationAsset === null) return null;
