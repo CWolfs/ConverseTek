@@ -42,7 +42,7 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
   if (!focusedNode) return null;
 
   const { id: focusedNodeId, type } = focusedNode;
-  const { isNode, isResponse } = detectType(type);
+  const { isRoot, isNode, isResponse } = detectType(type);
 
   const allowAdd = isAllowedToCreateNode(focusedNodeId);
   const allowedToPasteCopy = isAllowedToPasteCopy(focusedNodeId, clipboard);
@@ -81,13 +81,29 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
     }
   };
 
+  const onIsolateBranch = ({ props }: ItemParams<EventProps>) => {
+    if (!props) return;
+
+    const { id: nodeId, type: nodeType, parentId } = props;
+  };
+
+  const onCollapseOtherBranches = ({ props }: ItemParams<EventProps>) => {
+    if (!props) return;
+
+    const { id: nodeId } = props;
+
+    nodeStore.setCollapseOnNodeId(nodeId);
+  };
+
   return (
     <Menu id={id} onVisibilityChange={onVisibilityChange}>
       {allowAdd && <Item onClick={onAddClicked}>{getAddLabel(type)}</Item>}
       {(isNode || isResponse) && <Item onClick={onCopyClicked}>Copy</Item>}
       {allowedToPasteCopy && <Item onClick={onPasteAsCopy}>Paste as Copy</Item>}
       {allowedToPasteLink && <Item onClick={onPasteAsLink}>Paste as Link</Item>}
-      {type && <Item onClick={onDeleteClicked}>Delete</Item>}
+      {type != 'root' && <Item onClick={onDeleteClicked}>Delete</Item>}
+      {(isNode || isResponse || isRoot) && <Item onClick={onIsolateBranch}>Isolate Branch</Item>}
+      {(isNode || isResponse || isRoot) && <Item onClick={onCollapseOtherBranches}>Collapse Other Branches</Item>}
     </Menu>
   );
 }

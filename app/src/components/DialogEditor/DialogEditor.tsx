@@ -23,6 +23,7 @@ import { DialogEditorContextMenu } from '../ContextMenus/DialogEditorContextMenu
 import { toggleExpandedForAll } from 'utils/tree-data-utils';
 
 import './DialogEditor.css';
+import { collapseOtherBranches } from 'utils/custom-tree-data-utils';
 
 export type OnNodeContextMenuProps = {
   event: MouseEvent<HTMLDivElement>;
@@ -31,15 +32,17 @@ export type OnNodeContextMenuProps = {
   parentId: string | null;
 };
 
-function buildTreeData(nodeStore: NodeStore, conversationAsset: ConversationAssetType) {
+function buildTreeData(nodeStore: NodeStore, conversationAsset: ConversationAssetType): RSTNode[] {
   const data = [
     {
       title: 'Root',
       id: '0',
+      type: 'root',
+      parentId: '-1',
       children: nodeStore.getChildrenFromRoots(conversationAsset.conversation.roots),
       expanded: true,
       canDrag: false,
-    },
+    } as RSTNode,
   ];
 
   return data;
@@ -53,7 +56,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
   const dialogEditorRef = useRef<HTMLDivElement>(null);
   const dialogEditorSize = useSize(dialogEditorRef);
 
-  const [treeData, setTreeData] = useState<object[] | null>(null);
+  const [treeData, setTreeData] = useState<RSTNode[] | null>(null);
   const [treeWidth, setTreeWidth] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [isContextMenuVisible, setIsContextMenuVisible] = useState(false);
@@ -63,6 +66,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
   });
 
   const activeNodeId = nodeStore.getActiveNodeId();
+  const collapseOnNodeId = nodeStore.getCollapseOnNodeId();
 
   const onMove = (nodeContainer: RSTNodeOnMoveContainer) => {
     const { node, nextParentNode } = nodeContainer;
@@ -219,9 +223,20 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
         nodeStore.setNodeExpansion(node.id, expandAll);
       },
       expanded: expandAll,
-    });
+    }) as RSTNode[];
+
     setTreeData(updatedTreeData);
   }, [expandAll]);
+
+  useEffect(() => {
+    if (collapseOnNodeId == null || treeData == null) return;
+
+    console.log('[useEffect] Collapse on Node ID is: ', collapseOnNodeId);
+    const node = nodeStore.getNode(collapseOnNodeId);
+    const updatedTreeData = collapseOtherBranches(treeData, node, (node: RSTNode) => console.log('[iterate] node is', node));
+    setTreeData(updatedTreeData);
+    nodeStore.setCollapseOnNodeId(null);
+  }, [collapseOnNodeId]);
 
   useControlWheel(treeElement, onControlWheel);
 
@@ -244,7 +259,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
         <ScalableScrollbar width={10 / zoomLevel}>
           <SortableTree
             treeData={treeData}
-            onChange={(data: object[]) => setTreeData(data)}
+            onChange={(data: RSTNode[]) => setTreeData(data)}
             getNodeKey={({ node, treeIndex }: { node: RSTNode; treeIndex: number }) => {
               if (node.treeIndex !== treeIndex) {
                 // eslint-disable-next-line no-param-reassign
