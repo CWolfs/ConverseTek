@@ -8,6 +8,7 @@ import { useSize } from 'ahooks';
 
 import 'react-sortable-tree/style.css';
 
+import { DataStore } from 'stores/dataStore/data-store';
 import { NodeStore } from 'stores/nodeStore/node-store';
 import { ConversationAssetType, ElementNodeType } from 'types';
 
@@ -28,16 +29,16 @@ import { collapseOtherBranches } from 'utils/custom-tree-data-utils';
 export type OnNodeContextMenuProps = {
   event: MouseEvent<HTMLDivElement>;
   contextMenuId: string;
-  type: 'node' | 'response' | 'root' | 'link';
+  type: 'core' | 'node' | 'response' | 'root' | 'link';
   parentId: string | null;
 };
 
 function buildTreeData(nodeStore: NodeStore, conversationAsset: ConversationAssetType): RSTNode[] {
   const data = [
     {
-      title: 'Root',
+      title: 'Core',
       id: '0',
-      type: 'root',
+      type: 'core',
       parentId: '-1',
       children: nodeStore.getChildrenFromRoots(conversationAsset.conversation.roots),
       expanded: true,
@@ -51,6 +52,7 @@ function buildTreeData(nodeStore: NodeStore, conversationAsset: ConversationAsse
 const zoomLevelIncrement = 0.05;
 
 function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationAsset: ConversationAssetType; rebuild: boolean; expandAll: boolean }) {
+  const dataStore = useStore<DataStore>('data');
   const nodeStore = useStore<NodeStore>('node');
 
   const dialogEditorRef = useRef<HTMLDivElement>(null);
@@ -277,10 +279,12 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
             canDrop={canDrop}
             onMoveNode={onMove}
             generateNodeProps={() => ({
+              dataStore,
               nodeStore,
               activeNodeId,
               onNodeContextMenu,
               isContextMenuVisible,
+              zoomLevel,
             })}
             nodeContentRenderer={(props: any) => <ConverseTekNodeRenderer {...props} />}
             reactVirtualizedListProps={{

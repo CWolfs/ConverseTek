@@ -19,8 +19,7 @@
       &:focus,
       &:hover,
       &--active {
-        border: 1px #007eff solid;
-        box-shadow: 0px 0px 8px #0095ff;
+        /* unused */
       }
     }
 
@@ -45,8 +44,7 @@
       &:focus,
       &:hover,
       &--active {
-        border: 1px #007eff solid;
-        box-shadow: 0px 0px 8px #0095ff;
+        /* unused */
       }
     }
 
@@ -71,8 +69,7 @@
       &:focus,
       &:hover,
       &--active {
-        border: 1px $borderSecondary solid;
-        box-shadow: 0px 0px 6px gold;
+        /* unused */
       }
 
       &-contents {
@@ -98,8 +95,7 @@
       &:focus,
       &:hover,
       &--active {
-        border: 1px #007eff solid;
-        box-shadow: 0px 0px 8px #0095ff;
+        /* unused */
       }
 
       &-contents {

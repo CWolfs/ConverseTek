@@ -11,5 +11,6 @@ export type { PromptNodeType } from './PromptNodeType';
 export type { QuickLinkType } from './QuickLinkType';
 export type { TagDefinitionType } from './TagDefinitionType';
 export type { DependencyStatusType } from './DependencyStatusType';
+export type { ColourConfigType } from './ColourConfig';
 
 export { InputTypeTypes } from './OperationDefinitionType';

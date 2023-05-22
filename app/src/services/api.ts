@@ -1,6 +1,6 @@
 import { runInAction } from 'mobx';
 
-import { ConversationAssetType, DefinitionsType, FileSystemItemType, QuickLinkType } from 'types';
+import { ConversationAssetType, DefinitionsType, FileSystemItemType, QuickLinkType, ColourConfigType } from 'types';
 import { consolidateSpeaker, rebuildNodeIndexes, removeAllOldFillerNodes } from 'utils/conversation-utils';
 
 import { get, post } from './rest';
@@ -139,6 +139,13 @@ export function removeQuickLink(title: string, path: string) {
       entries.push({ title: key, path: value } as QuickLinkType);
     }
     return entries;
+  });
+}
+
+export function getColourConfig() {
+  return get('/colour-config').then((colourConfig: ColourConfigType) => {
+    console.log('colour config is: ', colourConfig);
+    dataStore.setColourConfig(colourConfig);
   });
 }
 

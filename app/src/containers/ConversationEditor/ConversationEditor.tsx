@@ -172,7 +172,7 @@ function ConversationEditor({ conversationAsset }: Props) {
         </div>
       </div>
 
-      <Split {...(activeNode ? activeNodeSplitSizes : inactiveNodeSplitSizes)} horizontal>
+      <Split initialPrimarySize={'68%'} {...(activeNode ? activeNodeSplitSizes : inactiveNodeSplitSizes)} horizontal>
         <DialogEditor conversationAsset={unsavedActiveConversationAsset} rebuild={rebuild} expandAll={isAllExpanded} />
 
         {activeNode && (

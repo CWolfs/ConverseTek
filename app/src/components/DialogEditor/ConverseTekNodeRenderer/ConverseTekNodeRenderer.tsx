@@ -1,17 +1,19 @@
 /* eslint-disable function-paren-newline */
 /* eslint-disable indent */
-import React from 'react';
+import React, { useState } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Icon } from 'antd';
 import defer from 'lodash.defer';
+import tinycolor from 'tinycolor2';
 
 import { OnNodeContextMenuProps } from '../DialogEditor';
-import { PromptNodeType, ElementNodeType } from 'types';
+import { PromptNodeType, ElementNodeType, ColourConfigType } from 'types';
 
 import { isDescendant } from 'utils/tree-data-utils';
 import { detectType } from 'utils/node-utils';
 
+import { DataStore } from 'stores/dataStore/data-store';
 import { NodeStore } from 'stores/nodeStore/node-store';
 
 import { LinkIcon } from '../../Svg';
@@ -25,6 +27,7 @@ type NodeStateProps = {
 };
 
 type Props = {
+  dataStore: DataStore;
   nodeStore: NodeStore;
   activeNodeId: string | null;
   onNodeContextMenu: (props: OnNodeContextMenuProps) => void;
@@ -52,6 +55,7 @@ type Props = {
   isOver: boolean;
   parentNode: RSTNode | null;
   rowDirection: string;
+  zoomLevel: number;
 };
 
 function hasActionsAndConditions(node: PromptNodeType | ElementNodeType | null): { hasActions: boolean; hasConditions: boolean } {
@@ -73,9 +77,26 @@ function hasActionsAndConditions(node: PromptNodeType | ElementNodeType | null):
   return { hasActions, hasConditions };
 }
 
+function getHighlightColour(colourConfig: ColourConfigType, nodeType: string): string {
+  switch (nodeType) {
+    case 'core':
+      return colourConfig.coreNode.highlight;
+    case 'root':
+      return colourConfig.rootNode.highlight;
+    case 'node':
+      return colourConfig.promptNode.highlight;
+    case 'response':
+      return colourConfig.responseNode.highlight;
+    case 'link':
+      return colourConfig.linkNode.highlight;
+  }
+  return '';
+}
+
 /* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
 export const ConverseTekNodeRenderer = observer(
   ({
+    dataStore,
     nodeStore,
     activeNodeId = null,
     onNodeContextMenu,
@@ -103,6 +124,7 @@ export const ConverseTekNodeRenderer = observer(
     isOver, // Not needed, but preserved for other renderers
     parentNode = null, // Needed for dndManager
     rowDirection = 'ltr',
+    zoomLevel,
     ...otherProps
   }: Props) => {
     const nodeSubtitle = subtitle || node.subtitle;
@@ -111,6 +133,10 @@ export const ConverseTekNodeRenderer = observer(
     const storedNode = nodeStore.getNode(node.id);
     const { type: nodeType } = node;
     const canNodeBeDragged = !(node.canDrag === false);
+    const [isHoveringOver, setIsHoveringOver] = useState<boolean>(false);
+    const { colourConfig } = dataStore;
+
+    if (colourConfig == null) return null;
 
     const { hasActions, hasConditions } = hasActionsAndConditions(storedNode);
     const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node);
@@ -131,6 +157,17 @@ export const ConverseTekNodeRenderer = observer(
         nodeTitle = storedNode.responseText;
       }
     }
+
+    const alpha = zoomLevel <= 0.55 ? 1 : 1 - zoomLevel / 3;
+    const highlightConfigValue = getHighlightColour(colourConfig, nodeType);
+    const highlightColour = tinycolor(highlightConfigValue);
+    highlightColour.setAlpha(alpha);
+    console.log('hightlightColour', highlightColour.toRgbString());
+
+    const hoverActiveBoxShadowStyle = `0px 2px 10px ${highlightColour.toRgbString()},
+                                        0px -2px 10px ${highlightColour.toRgbString()},
+                                        2px 0px 10px ${highlightColour.toRgbString()},
+                                        -2px 0px 10px ${highlightColour.toRgbString()}`;
 
     const moveHandleClasses = classnames('rst__moveHandle', {
       'node-renderer__root-handle': isRoot,
@@ -371,9 +408,16 @@ export const ConverseTekNodeRenderer = observer(
             <div
               className={rowClasses}
               style={{
-                opacity: isDraggedDescendant ? 0.5 : 1,
+                opacity: isDraggedDescendant
+                  ? 0.5
+                  : activeNodeId == null || isActiveNode || isHoveringOver
+                  ? 1
+                  : colourConfig.dialogueNodeTree.nonActiveOpacity,
+                boxShadow: isActiveNode || isHoveringOver ? hoverActiveBoxShadowStyle : undefined,
                 ...style,
               }}
+              onMouseEnter={() => setIsHoveringOver(true)}
+              onMouseLeave={() => setIsHoveringOver(false)}
             >
               {handle}
 
