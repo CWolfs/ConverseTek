@@ -1,0 +1,22 @@
+{
+  "rootNode": {
+    "primary": "",
+    "secondary": "",
+    "highlight": "#0095ff"
+  },
+  "promptNode": {
+    "primary": "#",
+    "secondary": "",
+    "highlight": "#0095ff"
+  },
+  "responseNode": {
+    "primary": "",
+    "secondary": "",
+    "highlight": "gold"
+  },
+  "linkNode": {
+    "primary": "",
+    "secondary": "",
+    "highlight": "#0095ff"
+  }
+}

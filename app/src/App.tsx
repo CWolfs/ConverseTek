@@ -4,7 +4,7 @@ import { Provider, observer } from 'mobx-react';
 
 import stores from './stores';
 import { DependencyStatusType } from 'types';
-import { getDependencyStatus } from 'services/api';
+import { getDependencyStatus, getColourConfig } from 'services/api';
 import { useStore } from 'hooks/useStore';
 import { ModalStore } from 'stores/modalStore/modal-store';
 import { ModalConfirmation } from 'components/Modals/ModalConfirmation';
@@ -39,6 +39,8 @@ const App = () => {
         );
       }
     });
+
+    void getColourConfig();
   }, []);
 
   return (

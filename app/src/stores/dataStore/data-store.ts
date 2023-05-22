@@ -1,7 +1,7 @@
 /* eslint-disable class-methods-use-this */
 import { observable, action, makeObservable } from 'mobx';
 
-import type { ConversationAssetType } from 'types';
+import type { ColourConfigType, ConversationAssetType } from 'types';
 
 import { deleteConversation } from 'services/api';
 import { createConversation } from 'utils/conversation-utils';
@@ -13,11 +13,13 @@ class DataStore {
   public conversationAssets = observable.map<string, ConversationAssetType>(new Map(), { deep: false });
   public activeConversationAsset: ConversationAssetType | null;
   public unsavedActiveConversationAsset: ConversationAssetType | null;
+  public colourConfig: ColourConfigType | null;
 
   constructor() {
     makeObservable(this, {
       workingDirectory: observable,
       workingDirectoryName: observable,
+      colourConfig: observable,
       conversationAssets: observable,
       activeConversationAsset: observable,
       unsavedActiveConversationAsset: observable,
@@ -42,12 +44,17 @@ class DataStore {
     this.unsavedActiveConversationAsset = null;
     this.workingDirectory = null;
     this.workingDirectoryName = null;
+    this.colourConfig = null;
   }
 
   setWorkingDirectory(directoryPath: string, directoryName: string): void {
     if (directoryPath !== this.workingDirectory) this.clearActiveConversation();
     this.workingDirectory = directoryPath;
     this.workingDirectoryName = directoryName;
+  }
+
+  setColourConfig(colourConfig: ColourConfigType) {
+    this.colourConfig = colourConfig;
   }
 
   createNewConversation(): void {

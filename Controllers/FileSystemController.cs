@@ -24,6 +24,7 @@ namespace ConverseTek.Controllers {
       this.RegisterGetRequest("/quicklinks", this.GetQuickLinks);
       this.RegisterPostRequest("/add-quicklink", this.AddQuickLink);
       this.RegisterPostRequest("/remove-quicklink", this.RemoveQuickLink);
+      this.RegisterGetRequest("/colour-config", this.GetColourConfig);
       this.RegisterPostRequest("/working-directory", this.SetWorkingDirectory);
       this.RegisterGetRequest("/dependency-status", this.GetDependencyStatus);
     }
@@ -122,6 +123,18 @@ namespace ConverseTek.Controllers {
         Log.Error(e);
         return null;
       }
+    }
+
+    private ChromelyResponse GetColourConfig(ChromelyRequest request) {
+      ConfigService configService = ConfigService.getInstance();
+      Dictionary<string, Dictionary<string, string>> colourConfig = configService.GetColourConfig();
+      string colourConfigJson = JsonConvert.SerializeObject(colourConfig);
+
+      ChromelyResponse response = new ChromelyResponse();
+      response.Data = colourConfigJson;
+      Log.Info(colourConfigJson);
+
+      return response;
     }
 
     private ChromelyResponse SetWorkingDirectory(ChromelyRequest request) {

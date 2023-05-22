@@ -8,6 +8,7 @@ import { useSize } from 'ahooks';
 
 import 'react-sortable-tree/style.css';
 
+import { DataStore } from 'stores/dataStore/data-store';
 import { NodeStore } from 'stores/nodeStore/node-store';
 import { ConversationAssetType, ElementNodeType } from 'types';
 
@@ -51,6 +52,7 @@ function buildTreeData(nodeStore: NodeStore, conversationAsset: ConversationAsse
 const zoomLevelIncrement = 0.05;
 
 function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationAsset: ConversationAssetType; rebuild: boolean; expandAll: boolean }) {
+  const dataStore = useStore<DataStore>('data');
   const nodeStore = useStore<NodeStore>('node');
 
   const dialogEditorRef = useRef<HTMLDivElement>(null);
@@ -277,6 +279,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
             canDrop={canDrop}
             onMoveNode={onMove}
             generateNodeProps={() => ({
+              dataStore,
               nodeStore,
               activeNodeId,
               onNodeContextMenu,

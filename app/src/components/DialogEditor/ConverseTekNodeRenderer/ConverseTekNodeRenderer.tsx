@@ -5,13 +5,15 @@ import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Icon } from 'antd';
 import defer from 'lodash.defer';
+import tinycolor from 'tinycolor2';
 
 import { OnNodeContextMenuProps } from '../DialogEditor';
-import { PromptNodeType, ElementNodeType } from 'types';
+import { PromptNodeType, ElementNodeType, ColourConfigType } from 'types';
 
 import { isDescendant } from 'utils/tree-data-utils';
 import { detectType } from 'utils/node-utils';
 
+import { DataStore } from 'stores/dataStore/data-store';
 import { NodeStore } from 'stores/nodeStore/node-store';
 
 import { LinkIcon } from '../../Svg';
@@ -25,6 +27,7 @@ type NodeStateProps = {
 };
 
 type Props = {
+  dataStore: DataStore;
   nodeStore: NodeStore;
   activeNodeId: string | null;
   onNodeContextMenu: (props: OnNodeContextMenuProps) => void;
@@ -74,9 +77,24 @@ function hasActionsAndConditions(node: PromptNodeType | ElementNodeType | null):
   return { hasActions, hasConditions };
 }
 
+function getHighlightColour(colourConfig: ColourConfigType, nodeType: string): string {
+  switch (nodeType) {
+    case 'root':
+      return colourConfig.rootNode.highlight;
+    case 'node':
+      return colourConfig.promptNode.highlight;
+    case 'response':
+      return colourConfig.responseNode.highlight;
+    case 'link':
+      return colourConfig.linkNode.highlight;
+  }
+  return '';
+}
+
 /* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
 export const ConverseTekNodeRenderer = observer(
   ({
+    dataStore,
     nodeStore,
     activeNodeId = null,
     onNodeContextMenu,
@@ -114,6 +132,9 @@ export const ConverseTekNodeRenderer = observer(
     const { type: nodeType } = node;
     const canNodeBeDragged = !(node.canDrag === false);
     const [isHoveringOver, setIsHoveringOver] = useState<boolean>(false);
+    const { colourConfig } = dataStore;
+
+    if (colourConfig == null) return null;
 
     const { hasActions, hasConditions } = hasActionsAndConditions(storedNode);
     const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node);
@@ -135,14 +156,16 @@ export const ConverseTekNodeRenderer = observer(
       }
     }
 
-    console.log('zoomlevel', zoomLevel);
     const alpha = zoomLevel <= 0.55 ? 1 : 1 - zoomLevel / 3;
+    const highlightConfigValue = getHighlightColour(colourConfig, nodeType);
+    const highlightColour = tinycolor(highlightConfigValue);
+    highlightColour.setAlpha(alpha);
+    console.log('hightlightColour', highlightColour.toRgbString());
 
-    const hoverActiveBoxShadowStyle = `0px 2px 10px rgba(255, 168, 101, ${alpha}),
-                                        0px -2px 10px rgba(255, 168, 101, ${alpha}),
-                                        2px 0px 10px rgba(255, 168, 101, ${alpha}),
-                                        -2px 0px 10px rgba(255, 168, 101, ${alpha})`;
-    const hoverActiveBorderStyle = `1px #ffa865 solid`;
+    const hoverActiveBoxShadowStyle = `0px 2px 10px ${highlightColour.toRgbString()},
+                                        0px -2px 10px ${highlightColour.toRgbString()},
+                                        2px 0px 10px ${highlightColour.toRgbString()},
+                                        -2px 0px 10px ${highlightColour.toRgbString()}`;
 
     const moveHandleClasses = classnames('rst__moveHandle', {
       'node-renderer__root-handle': isRoot,
@@ -175,8 +198,6 @@ export const ConverseTekNodeRenderer = observer(
       !canNodeBeDragged && 'rst__rowContentsDragDisabled',
       rowDirectionClass,
     );
-
-    console.log('zoomLevel', zoomLevel);
 
     const rowClasses = classnames(
       'rst__row',
@@ -387,7 +408,6 @@ export const ConverseTekNodeRenderer = observer(
               style={{
                 opacity: isDraggedDescendant ? 0.5 : 1,
                 boxShadow: isActiveNode || isHoveringOver ? hoverActiveBoxShadowStyle : undefined,
-                // border: isActiveNode || isHoveringOver ? hoverActiveBorderStyle : 'unset',
                 ...style,
               }}
               onMouseEnter={() => setIsHoveringOver(true)}
