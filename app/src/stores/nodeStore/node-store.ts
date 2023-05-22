@@ -22,10 +22,11 @@ import {
 } from 'utils/conversation-utils';
 import { ClipboardType, ConversationAssetType, ElementNodeType, OperationCallType, PromptNodeType } from 'types';
 import { isElementNodeType, isPromptNodeType } from 'utils/node-utils';
+import { ModalConfirmation } from 'components/Modals/ModalConfirmation';
+import { findTreeNodeParentWithDataNodeId } from 'utils/custom-tree-data-utils';
 
 import { dataStore } from '../dataStore';
 import { modalStore } from '../modalStore';
-import { ModalConfirmation } from 'components/Modals/ModalConfirmation';
 
 /* eslint-disable no-return-assign, no-param-reassign, class-methods-use-this */
 class NodeStore {
@@ -152,25 +153,43 @@ class NodeStore {
    * || ACTIVE NODE METHODS ||
    * =========================
    */
-  updateActiveNode(node: PromptNodeType | ElementNodeType) {
+  updateActiveNode(node: PromptNodeType | ElementNodeType): void {
     this.setActiveNode(getId(node));
   }
 
-  setActiveNode(nodeId: string) {
+  setActiveNode(nodeId: string): void {
     this.activeNode = this.getNode(nodeId);
   }
 
-  setActiveNodeByIndex(nodeIndex: number) {
+  setActiveNodeByIndex(nodeIndex: number): void {
     this.activeNode = this.getPromptNodeByIndex(nodeIndex);
   }
 
-  getActiveNodeId() {
+  getActiveNodeId(): string | null {
     if (!this.activeNode) return null;
     return getId(this.activeNode);
   }
 
-  clearActiveNode() {
+  clearActiveNode(): void {
     this.activeNode = null;
+  }
+
+  isNodeVisible(nodeId: string): boolean {
+    const element = window.document.querySelector(`[data-node-id="${nodeId}"]`) as HTMLElement;
+    const rect = element.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    const topElement = document.elementFromPoint(centerX, centerY);
+
+    if (topElement == null) return false;
+    const parentWithDataId = findTreeNodeParentWithDataNodeId(topElement as HTMLElement);
+
+    if (parentWithDataId !== null) {
+      return parentWithDataId === element;
+    }
+
+    return false;
   }
 
   /*

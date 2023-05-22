@@ -4,6 +4,7 @@ import React from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Icon } from 'antd';
+import defer from 'lodash.defer';
 
 import { OnNodeContextMenuProps } from '../DialogEditor';
 import { PromptNodeType, ElementNodeType } from 'types';
@@ -278,6 +279,16 @@ export const ConverseTekNodeRenderer = observer(
           } else {
             if (!id) throw Error('id should be valid but it is not defined');
             nodeStore.setActiveNode(id);
+
+            defer(() => {
+              if (!nodeStore.isNodeVisible(id)) {
+                const nodeTreeIndex = nodeStore.getTreeIndex(id);
+                if (!nodeTreeIndex) throw Error(`node tree index is not found for nodeId ${id}`);
+                const direction = nodeTreeIndex < treeIndex ? 'up' : 'down';
+
+                setTimeout(() => nodeStore.scrollToNode(id, direction), 100);
+              }
+            });
           }
         }}
         onMouseEnter={() => !isContextMenuVisible && nodeStore.setFocusedTreeNode(node)}
