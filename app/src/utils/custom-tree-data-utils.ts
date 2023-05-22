@@ -99,3 +99,15 @@ export function collapseOtherBranches(
 
   return updatedTreeData;
 }
+
+export function findTreeNodeParentWithDataNodeId(element: HTMLElement): HTMLElement | null {
+  if (element == null) return null;
+
+  if (element.hasAttribute('data-node-id')) {
+    return element;
+  }
+
+  if (element.parentElement == null) return null;
+
+  return findTreeNodeParentWithDataNodeId(element.parentElement);
+}
