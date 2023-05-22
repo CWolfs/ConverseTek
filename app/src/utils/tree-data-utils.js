@@ -170,7 +170,7 @@ function walkDescendants({
  * @return {number|false} nextIndex - Index of the next sibling of `node`,
  *                                    or false if the walk should be terminated
  */
-function mapDescendants({
+export function mapDescendants({
   callback,
   getNodeKey,
   ignoreCollapsed,
@@ -314,15 +314,15 @@ export function walk({ treeData, getNodeKey, callback, ignoreCollapsed = true })
 }
 
 /**
- * Perform a depth-first transversal of the descendants and
- *  make a change to every node in the tree
+ * Perform a depth-first traversal of the descendants and
+ * make a change to every node in the tree
  *
- * @param {!Object[]} treeData - Tree data
- * @param {!function} getNodeKey - Function to get the key from the nodeData and tree index
- * @param {function} callback - Function to call on each node
- * @param {boolean=} ignoreCollapsed - Ignore children of nodes without `expanded` set to `true`
+ *  {Object[]} treeData - Tree data
+ *  {(nodeData: any, treeIndex: number) => string} getNodeKey - Function to get the key from the nodeData and tree index
+ *  {(node: any) => void} [callback] - Function to call on each node
+ *  {boolean} [ignoreCollapsed] - Ignore children of nodes without `expanded` set to `true`
  *
- * @return {Object[]} changedTreeData - The changed tree data
+ *  {Object[]} The changed tree data
  */
 export function map({ treeData, getNodeKey, callback, ignoreCollapsed = true }) {
   if (!treeData || treeData.length < 1) {
@@ -359,14 +359,14 @@ export function toggleExpandedForAll({ treeData, callback = (node) => {}, expand
 /**
  * Replaces node at path with object, or callback-defined object
  *
- * @param {!Object[]} treeData
- * @param {number[]|string[]} path - Array of keys leading up to node to be changed
- * @param {function|any} newNode - Node to replace the node at the path with,
+ *  {!Object[]} treeData
+ *  {number[]|string[]} path - Array of keys leading up to node to be changed
+ *  {function|any} newNode - Node to replace the node at the path with,
  *         or a function producing the new node
- * @param {!function} getNodeKey - Function to get the key from the nodeData and tree index
- * @param {boolean=} ignoreCollapsed - Ignore children of nodes without `expanded` set to `true`
+ *  {!function} getNodeKey - Function to get the key from the nodeData and tree index
+ *  {boolean=} ignoreCollapsed - Ignore children of nodes without `expanded` set to `true`
  *
- * @return {Object[]} changedTreeData - The changed tree data
+ *  {Object[]} changedTreeData - The changed tree data
  */
 export function changeNodeAtPath({ treeData, path, newNode, getNodeKey, ignoreCollapsed = true }) {
   const RESULT_MISS = 'RESULT_MISS';
@@ -926,17 +926,17 @@ export function getDepth(node, depth = 0) {
 /**
  * Find nodes matching a search query in the tree,
  *
- * @param {!function} getNodeKey - Function to get the key from the nodeData and tree index
- * @param {!Object[]} treeData - Tree data
- * @param {?string|number} searchQuery - Function returning a boolean to indicate whether the node is a match or not
- * @param {!function} searchMethod - Function returning a boolean to indicate whether the node is a match or not
- * @param {?number} searchFocusOffset - The offset of the match to focus on
+ *  {!function} getNodeKey - Function to get the key from the nodeData and tree index
+ *  {!Object[]} treeData - Tree data
+ *  {?string|number} searchQuery - Function returning a boolean to indicate whether the node is a match or not
+ *  {!function} searchMethod - Function returning a boolean to indicate whether the node is a match or not
+ *  {?number} searchFocusOffset - The offset of the match to focus on
  *                                      (e.g., 0 focuses on the first match, 1 on the second)
- * @param {boolean=} expandAllMatchPaths - If true, expands the paths to any matched node
- * @param {boolean=} expandFocusMatchPaths - If true, expands the path to the focused node
+ *  {boolean=} expandAllMatchPaths - If true, expands the paths to any matched node
+ *  {boolean=} expandFocusMatchPaths - If true, expands the path to the focused node
  *
- * @return {Object[]} matches - An array of objects containing the matching `node`s, their `path`s and `treeIndex`s
- * @return {Object[]} treeData - The original tree data with all relevant nodes expanded.
+ *  {Object[]} matches - An array of objects containing the matching `node`s, their `path`s and `treeIndex`s
+ *  {Object[]} treeData - The original tree data with all relevant nodes expanded.
  *                               If expandAllMatchPaths and expandFocusMatchPaths are both false,
  *                               it will be the same as the original tree data.
  */

@@ -32,6 +32,7 @@ class NodeStore {
   static deleteDeferred = false;
 
   activeNode: PromptNodeType | ElementNodeType | null = null;
+  collapseOnNodeId: string | null = null;
   focusedTreeNode: RSTNode | null = null;
   ownerId: string | null = null;
   takenPromptNodeIndexes: number[] = [];
@@ -91,6 +92,7 @@ class NodeStore {
       deleteNodeCascade: action,
       deleteBranchCascade: action,
       deleteLink: action,
+      setCollapseOnNodeId: action,
       reset: action,
     });
   }
@@ -641,6 +643,16 @@ class NodeStore {
     return null;
   }
 
+  getRoots(): ElementNodeType[] {
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+    if (!conversationAsset) {
+      throw Error('Unsaved conversation is null or undefined');
+    }
+
+    const { roots } = conversationAsset.conversation;
+    return roots;
+  }
+
   getPromptNodeByIndex(index: number): PromptNodeType | null {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     if (conversationAsset === null) return null;
@@ -968,6 +980,14 @@ class NodeStore {
     const isNodeExpanded = this.expandMap.get(nodeId);
     if (isNodeExpanded === undefined) return true;
     return isNodeExpanded;
+  }
+
+  setCollapseOnNodeId(nodeId: string | null): void {
+    this.collapseOnNodeId = nodeId;
+  }
+
+  getCollapseOnNodeId(): string | null {
+    return this.collapseOnNodeId;
   }
 
   getNodeResponseIdsFromNodeId(nodeId: string): string[] {
