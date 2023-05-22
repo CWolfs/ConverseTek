@@ -79,6 +79,7 @@ export function collapseOtherBranches(
       elementNodeTreeItem.expanded = false;
       onNode(elementNodeTreeItem);
 
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       updatedTreeData = changeNodeAtPath({
         treeData: updatedTreeData,
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
