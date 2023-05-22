@@ -1,4 +1,12 @@
 export type ColourConfigType = {
+  dialogueNodeTree: {
+    nonActiveOpacity: number;
+  };
+  coreNode: {
+    primary: string;
+    secondary: string;
+    highlight: string;
+  };
   rootNode: {
     primary: string;
     secondary: string;

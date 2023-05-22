@@ -79,6 +79,8 @@ function hasActionsAndConditions(node: PromptNodeType | ElementNodeType | null):
 
 function getHighlightColour(colourConfig: ColourConfigType, nodeType: string): string {
   switch (nodeType) {
+    case 'core':
+      return colourConfig.coreNode.highlight;
     case 'root':
       return colourConfig.rootNode.highlight;
     case 'node':
@@ -406,7 +408,11 @@ export const ConverseTekNodeRenderer = observer(
             <div
               className={rowClasses}
               style={{
-                opacity: isDraggedDescendant ? 0.5 : 1,
+                opacity: isDraggedDescendant
+                  ? 0.5
+                  : activeNodeId == null || isActiveNode || isHoveringOver
+                  ? 1
+                  : colourConfig.dialogueNodeTree.nonActiveOpacity,
                 boxShadow: isActiveNode || isHoveringOver ? hoverActiveBoxShadowStyle : undefined,
                 ...style,
               }}

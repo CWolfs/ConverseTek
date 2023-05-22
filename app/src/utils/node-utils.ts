@@ -29,7 +29,7 @@ export function detectType(type: string | null): NodeTypeDetectionResult {
 
 export function isAllowedToCreateNode(nodeId: string | undefined) {
   if (!nodeId) return false;
-  if (nodeId === '0') return true; // for the 'Root'
+  if (nodeId === '0') return true; // for the 'Core'
 
   const node = nodeStore.getNode(nodeId);
 
