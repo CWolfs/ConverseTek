@@ -119,3 +119,7 @@ h3[type='secondary'] {
 ::-webkit-scrollbar-corner {
   background: $backgroundTertiary;
 }
+
+.ReactVirtualized__Grid {
+  overflow-x: scroll !important;
+}

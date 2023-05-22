@@ -198,28 +198,39 @@ class NodeStore {
    * =============================
    */
   scrollToNode(nodeId: string, direction: 'up' | 'down', cachedTree?: HTMLElement) {
+    const horizontalScrollBarHeight = 10;
+
     // Quickly scroll in the given direction to force the virtual tree to load
     // At the same time check for the required node
-    const tree = cachedTree || window.document.querySelector('.ReactVirtualized__Grid');
-    const element = window.document.querySelector(`[data-node-id="${nodeId}"]`) as HTMLElement;
+    requestAnimationFrame(() => {
+      const tree = cachedTree || window.document.querySelector('.ReactVirtualized__Grid');
+      const element = window.document.querySelector(`[data-node-id="${nodeId}"]`) as HTMLElement;
 
-    if (tree == null) throw Error('Tree not found for autoscroll to node. This should not happen.');
+      if (tree == null) throw Error('Tree not found for autoscroll to node. This should not happen.');
 
-    // TODO: Stop the scrolling it the top or bottom has been reached
+      if (element) {
+        const scrollTop = ((element.offsetParent as HTMLElement)?.offsetParent as HTMLElement)?.offsetTop;
+        const scrollLeft = (element.offsetParent as HTMLElement)?.offsetLeft - 50;
+        tree.scrollTop = scrollTop;
+        tree.scrollLeft = scrollLeft;
+      } else if (!element) {
+        if (direction === 'up' && tree.scrollTop <= 0) {
+          tree.scrollTop = 0;
+          return;
+        } else if (direction === 'down' && tree.scrollTop >= tree.scrollHeight - tree.clientHeight - horizontalScrollBarHeight) {
+          tree.scrollTop = tree.scrollHeight - tree.clientHeight - horizontalScrollBarHeight;
+          return;
+        }
 
-    if (element) {
-      const scrollTop = ((element.offsetParent as HTMLElement)?.offsetParent as HTMLElement)?.offsetTop;
-      const scrollLeft = (element.offsetParent as HTMLElement)?.offsetLeft - 50;
-      tree.scrollTop = scrollTop;
-      tree.scrollLeft = scrollLeft;
-    } else if (!element) {
-      if (direction === 'up') {
-        tree.scrollTop -= 200;
-      } else if (direction === 'down') {
-        tree.scrollTop += 200;
+        if (direction === 'up') {
+          tree.scrollTop -= 200;
+        } else if (direction === 'down') {
+          tree.scrollTop += 200;
+        }
+
+        requestAnimationFrame(() => this.scrollToNode(nodeId, direction, tree as HTMLElement));
       }
-      defer(() => this.scrollToNode(nodeId, direction, tree as HTMLElement));
-    }
+    });
   }
 
   /*
