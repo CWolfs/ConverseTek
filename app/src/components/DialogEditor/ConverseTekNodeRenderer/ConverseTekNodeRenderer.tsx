@@ -323,7 +323,7 @@ export const ConverseTekNodeRenderer = observer(
                 if (!nodeTreeIndex) throw Error(`node tree index is not found for nodeId ${id}`);
                 const direction = nodeTreeIndex < treeIndex ? 'up' : 'down';
 
-                setTimeout(() => nodeStore.scrollToNode(id, direction), 250);
+                setTimeout(() => nodeStore.scrollToNode(id, direction, undefined, true), 250);
               }
             });
           }

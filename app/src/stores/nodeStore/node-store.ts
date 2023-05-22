@@ -197,7 +197,7 @@ class NodeStore {
    * || SCROLL TO  NODE METHODS ||
    * =============================
    */
-  scrollToNode(nodeId: string, direction: 'up' | 'down', cachedTree?: HTMLElement) {
+  scrollToNode(nodeId: string, direction: 'up' | 'down', cachedTree?: HTMLElement, skipHorizontalScroll = false) {
     const horizontalScrollBarHeight = 10;
 
     // Quickly scroll in the given direction to force the virtual tree to load
@@ -209,10 +209,15 @@ class NodeStore {
       if (tree == null) throw Error('Tree not found for autoscroll to node. This should not happen.');
 
       if (element) {
-        const scrollTop = ((element.offsetParent as HTMLElement)?.offsetParent as HTMLElement)?.offsetTop;
+        const offsetTop = ((element.offsetParent as HTMLElement)?.offsetParent as HTMLElement)?.offsetTop;
+        let scrollTop = offsetTop;
+        if (direction === 'down') {
+          scrollTop = offsetTop - tree.clientHeight + horizontalScrollBarHeight + element.getBoundingClientRect().height;
+        }
+
         const scrollLeft = (element.offsetParent as HTMLElement)?.offsetLeft - 50;
         tree.scrollTop = scrollTop;
-        tree.scrollLeft = scrollLeft;
+        if (!skipHorizontalScroll) tree.scrollLeft = scrollLeft;
       } else if (!element) {
         if (direction === 'up' && tree.scrollTop <= 0) {
           tree.scrollTop = 0;
@@ -228,7 +233,7 @@ class NodeStore {
           tree.scrollTop += 200;
         }
 
-        requestAnimationFrame(() => this.scrollToNode(nodeId, direction, tree as HTMLElement));
+        requestAnimationFrame(() => this.scrollToNode(nodeId, direction, tree as HTMLElement, skipHorizontalScroll));
       }
     });
   }
