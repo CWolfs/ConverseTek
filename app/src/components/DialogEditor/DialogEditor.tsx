@@ -281,6 +281,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
               activeNodeId,
               onNodeContextMenu,
               isContextMenuVisible,
+              zoomLevel,
             })}
             nodeContentRenderer={(props: any) => <ConverseTekNodeRenderer {...props} />}
             reactVirtualizedListProps={{

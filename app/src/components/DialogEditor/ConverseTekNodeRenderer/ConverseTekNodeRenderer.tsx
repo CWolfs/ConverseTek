@@ -1,6 +1,6 @@
 /* eslint-disable function-paren-newline */
 /* eslint-disable indent */
-import React from 'react';
+import React, { useState } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Icon } from 'antd';
@@ -52,6 +52,7 @@ type Props = {
   isOver: boolean;
   parentNode: RSTNode | null;
   rowDirection: string;
+  zoomLevel: number;
 };
 
 function hasActionsAndConditions(node: PromptNodeType | ElementNodeType | null): { hasActions: boolean; hasConditions: boolean } {
@@ -103,6 +104,7 @@ export const ConverseTekNodeRenderer = observer(
     isOver, // Not needed, but preserved for other renderers
     parentNode = null, // Needed for dndManager
     rowDirection = 'ltr',
+    zoomLevel,
     ...otherProps
   }: Props) => {
     const nodeSubtitle = subtitle || node.subtitle;
@@ -111,6 +113,7 @@ export const ConverseTekNodeRenderer = observer(
     const storedNode = nodeStore.getNode(node.id);
     const { type: nodeType } = node;
     const canNodeBeDragged = !(node.canDrag === false);
+    const [isHoveringOver, setIsHoveringOver] = useState<boolean>(false);
 
     const { hasActions, hasConditions } = hasActionsAndConditions(storedNode);
     const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node);
@@ -131,6 +134,15 @@ export const ConverseTekNodeRenderer = observer(
         nodeTitle = storedNode.responseText;
       }
     }
+
+    console.log('zoomlevel', zoomLevel);
+    const alpha = zoomLevel <= 0.55 ? 1 : 1 - zoomLevel / 3;
+
+    const hoverActiveBoxShadowStyle = `0px 2px 10px rgba(255, 168, 101, ${alpha}),
+                                        0px -2px 10px rgba(255, 168, 101, ${alpha}),
+                                        2px 0px 10px rgba(255, 168, 101, ${alpha}),
+                                        -2px 0px 10px rgba(255, 168, 101, ${alpha})`;
+    const hoverActiveBorderStyle = `1px #ffa865 solid`;
 
     const moveHandleClasses = classnames('rst__moveHandle', {
       'node-renderer__root-handle': isRoot,
@@ -163,6 +175,8 @@ export const ConverseTekNodeRenderer = observer(
       !canNodeBeDragged && 'rst__rowContentsDragDisabled',
       rowDirectionClass,
     );
+
+    console.log('zoomLevel', zoomLevel);
 
     const rowClasses = classnames(
       'rst__row',
@@ -372,8 +386,12 @@ export const ConverseTekNodeRenderer = observer(
               className={rowClasses}
               style={{
                 opacity: isDraggedDescendant ? 0.5 : 1,
+                boxShadow: isActiveNode || isHoveringOver ? hoverActiveBoxShadowStyle : undefined,
+                // border: isActiveNode || isHoveringOver ? hoverActiveBorderStyle : 'unset',
                 ...style,
               }}
+              onMouseEnter={() => setIsHoveringOver(true)}
+              onMouseLeave={() => setIsHoveringOver(false)}
             >
               {handle}
 
