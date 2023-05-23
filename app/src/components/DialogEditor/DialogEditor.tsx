@@ -14,17 +14,17 @@ import { ConversationAssetType, ElementNodeType } from 'types';
 
 import { useStore } from 'hooks/useStore';
 import { useControlWheel } from 'hooks/useControlWheel';
+import { useWindowSize } from 'hooks/useWindowSize';
 import { detectType, isPromptNodeType } from 'utils/node-utils';
+import { toggleExpandedForAll } from 'utils/tree-data-utils';
+import { collapseOtherBranches } from 'utils/custom-tree-data-utils';
 
 import { ScalableScrollbar } from 'components/ScalableScrollbar';
 
 import { ConverseTekNodeRenderer } from './ConverseTekNodeRenderer';
 import { DialogEditorContextMenu } from '../ContextMenus/DialogEditorContextMenu';
 
-import { toggleExpandedForAll } from 'utils/tree-data-utils';
-
 import './DialogEditor.css';
-import { collapseOtherBranches } from 'utils/custom-tree-data-utils';
 
 export type OnNodeContextMenuProps = {
   event: MouseEvent<HTMLDivElement>;
@@ -178,21 +178,12 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
     });
   };
 
+  const windowSize = useWindowSize();
+
   // onMount
   useEffect(() => {
     nodeStore.init(conversationAsset);
     setTreeData(buildTreeData(nodeStore, conversationAsset));
-
-    window.addEventListener('resize', resize);
-
-    if (treeElement.current) {
-      const calculatedTreeWidth = treeElement.current.clientWidth;
-      setTreeWidth(calculatedTreeWidth);
-    }
-
-    return () => {
-      window.removeEventListener('resize', resize);
-    };
   }, []);
 
   // OnConversationChange or rebuild
@@ -202,18 +193,15 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
     setIsContextMenuVisible(false);
   }, [conversationAsset, rebuild]);
 
-  // On every update
+  // On window size change
   useEffect(() => {
-    if (treeElement.current) {
-      const calculatedTreeWidth = treeElement.current.clientWidth;
-      if (treeWidth !== calculatedTreeWidth) resize();
-    }
-  });
-
-  // Resize when a new node is selected to fix issue with scrollbar not being in the correct location
-  useEffect(() => {
-    setTimeout(resize, 100);
-  }, [activeNodeId]);
+    setTimeout(() => {
+      if (treeElement.current) {
+        const calculatedTreeWidth = treeElement.current.clientWidth;
+        if (treeWidth !== calculatedTreeWidth) resize();
+      }
+    }, 50);
+  }, [windowSize.width, windowSize.height, zoomLevel]);
 
   // Expand or Collapse all
   useEffect(() => {
