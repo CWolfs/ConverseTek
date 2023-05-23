@@ -248,7 +248,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
           height: (dialogEditorSize ? dialogEditorSize.height / zoomLevel : 0) - 1,
         }}
       >
-        <ScalableScrollbar width={10 / zoomLevel}>
+        <ScalableScrollbar activeNodeId={activeNodeId} width={10 / zoomLevel}>
           <SortableTree
             treeData={treeData}
             onChange={(data: RSTNode[]) => setTreeData(data)}

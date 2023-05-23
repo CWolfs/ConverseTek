@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 
 type Props = {
   children: React.ReactNode;
+  activeNodeId: string | null;
   width: number;
   hideScrollOnScale?: boolean;
 };
@@ -21,7 +22,7 @@ function createScrollBarStyling(width: number, hideScroll: boolean): HTMLStyleEl
   return style;
 }
 
-export const ScalableScrollbar = ({ children, width, hideScrollOnScale = true }: Props) => {
+export const ScalableScrollbar = ({ children, activeNodeId, width, hideScrollOnScale = true }: Props) => {
   useEffect(() => {
     const styleElement = createScrollBarStyling(width, hideScrollOnScale);
     const elementId = styleElement.id;
@@ -42,7 +43,7 @@ export const ScalableScrollbar = ({ children, width, hideScrollOnScale = true }:
         styleElement.remove();
       }
     };
-  }, [width]);
+  }, [activeNodeId, width]);
 
   return (
     <div className="scalable-scrollbar" style={{ width: '100%', height: '100%' }}>
