@@ -209,7 +209,7 @@ class DefStore {
       const message = `You are missing the operation definition: '${functionName}'.`;
       const message2 =
         "The definition is required in a conversation being loaded. This is probably because the conversation uses Extended Conversations mod but you do not have it's definitions installed in ConverseTek.";
-      const message3 = "Get the missing operation definition and place them in your 'ConverseTek/defs/operations' folder.";
+      const message3 = "Get the missing operation definitions and place them in your 'ConverseTek/defs/operations' folder.";
 
       const modalTitle = `Missing Operation Definition`;
       modalStore.setModelContent(
