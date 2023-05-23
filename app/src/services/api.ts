@@ -144,7 +144,6 @@ export function removeQuickLink(title: string, path: string) {
 
 export function getColourConfig() {
   return get('/colour-config').then((colourConfig: ColourConfigType) => {
-    console.log('colour config is: ', colourConfig);
     dataStore.setColourConfig(colourConfig);
   });
 }

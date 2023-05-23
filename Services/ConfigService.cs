@@ -86,7 +86,6 @@ namespace ConverseTek.Services {
         }
 
         string json = File.ReadAllText(COLOURS_PATH);
-        Log.Debug("[ConfigService] Colours are " + json);
         Dictionary<string, Dictionary<string, string>> colourConfig = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(json);
         return colourConfig;
       } catch (Exception error) {

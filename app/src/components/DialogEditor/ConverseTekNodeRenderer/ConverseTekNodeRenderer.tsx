@@ -162,7 +162,6 @@ export const ConverseTekNodeRenderer = observer(
     const highlightConfigValue = getHighlightColour(colourConfig, nodeType);
     const highlightColour = tinycolor(highlightConfigValue);
     highlightColour.setAlpha(alpha);
-    console.log('hightlightColour', highlightColour.toRgbString());
 
     const hoverActiveBoxShadowStyle = `0px 2px 10px ${highlightColour.toRgbString()},
                                         0px -2px 10px ${highlightColour.toRgbString()},
@@ -308,7 +307,7 @@ export const ConverseTekNodeRenderer = observer(
 
             const linkTreeIndex = nodeStore.getTreeIndex(linkId);
 
-            if (!linkTreeIndex) throw Error(`link tree index is not found for linkId ${linkId}`);
+            if (linkTreeIndex == null) throw Error(`link tree index is not found for linkId ${linkId}`);
 
             const direction = linkTreeIndex < treeIndex ? 'up' : 'down';
             nodeStore.setActiveNode(linkId);
@@ -320,7 +319,7 @@ export const ConverseTekNodeRenderer = observer(
             defer(() => {
               if (!nodeStore.isNodeVisible(id)) {
                 const nodeTreeIndex = nodeStore.getTreeIndex(id);
-                if (!nodeTreeIndex) throw Error(`node tree index is not found for nodeId ${id}`);
+                if (nodeTreeIndex == null) throw Error(`node tree index is not found for nodeId ${id}`);
                 const direction = nodeTreeIndex < treeIndex ? 'up' : 'down';
 
                 setTimeout(() => nodeStore.scrollToNode(id, direction, undefined, true), 250);
