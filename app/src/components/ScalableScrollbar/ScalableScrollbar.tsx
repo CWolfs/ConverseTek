@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 type Props = {
   children: React.ReactNode;
@@ -22,28 +22,41 @@ function createScrollBarStyling(width: number, hideScroll: boolean): HTMLStyleEl
   return style;
 }
 
-export const ScalableScrollbar = ({ children, activeNodeId, width, hideScrollOnScale = true }: Props) => {
-  useEffect(() => {
-    const styleElement = createScrollBarStyling(width, hideScrollOnScale);
-    const elementId = styleElement.id;
+function runScrollScale(width: number, hideScrollOnScale: boolean) {
+  const styleElement = createScrollBarStyling(width, hideScrollOnScale);
+  const elementId = styleElement.id;
 
-    if (hideScrollOnScale) {
-      setTimeout(() => {
-        const styleElement = document.getElementById(elementId);
-        if (styleElement) {
-          styleElement.remove();
-          createScrollBarStyling(width, false);
-        }
-      }, 350);
-    }
-
-    return () => {
+  if (hideScrollOnScale) {
+    setTimeout(() => {
       const styleElement = document.getElementById(elementId);
       if (styleElement) {
         styleElement.remove();
+        createScrollBarStyling(width, false);
       }
-    };
-  }, [activeNodeId, width]);
+    }, 350);
+  }
+
+  return () => {
+    const styleElement = document.getElementById(elementId);
+    if (styleElement) {
+      styleElement.remove();
+    }
+  };
+}
+
+export const ScalableScrollbar = ({ children, activeNodeId, width, hideScrollOnScale = true }: Props) => {
+  const [previousActiveNodeId, setPreviousActiveNodeId] = useState<string | null>(activeNodeId);
+
+  useEffect(() => {
+    runScrollScale(width, hideScrollOnScale);
+  }, [width]);
+
+  useEffect(() => {
+    if (previousActiveNodeId == null) {
+      runScrollScale(width, hideScrollOnScale);
+    }
+    setPreviousActiveNodeId(activeNodeId);
+  }, [activeNodeId]);
 
   return (
     <div className="scalable-scrollbar" style={{ width: '100%', height: '100%' }}>
