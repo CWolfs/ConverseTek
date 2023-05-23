@@ -6,6 +6,8 @@ import { ElementNodeType, PromptNodeType } from 'types';
 import { useStore } from 'hooks/useStore';
 import { NodeStore } from 'stores/nodeStore/node-store';
 
+import './DialogTextArea.css';
+
 const { TextArea } = Input;
 
 function DialogTextArea({ node }: { node: PromptNodeType | ElementNodeType }) {

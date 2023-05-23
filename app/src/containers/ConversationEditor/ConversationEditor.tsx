@@ -179,6 +179,16 @@ function ConversationEditor({ conversationAsset }: Props) {
           <div className="conversation-editor__details">
             <Row gutter={16}>
               <Col md={12} className="conversation-editor__details-left">
+                <div className="conversation-editor__details-left-buttons">
+                  <Button
+                    className="conversation-editor__go-to-node-button button-secondary"
+                    type="primary"
+                    size="small"
+                    onClick={() => nodeStore.scrollToActiveNode()}
+                  >
+                    <Icon type="arrow-right" />
+                  </Button>
+                </div>
                 <DialogTextArea node={activeNode} />
               </Col>
               <Col md={12} className="conversation-editor__details-right">

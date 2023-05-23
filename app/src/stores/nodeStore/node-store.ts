@@ -110,11 +110,17 @@ class NodeStore {
     this.nodeIdToTreeIndexMap.set(nodeId, index);
   }
 
-  getTreeIndex(nodeId: string) {
+  getActiveNodeTreeIndex(): number | undefined {
+    const activeNodeId = this.getActiveNodeId();
+    if (activeNodeId == null) return 0;
+    return this.getTreeIndex(activeNodeId);
+  }
+
+  getTreeIndex(nodeId: string): number | undefined {
     if (this.nodeIdToTreeIndexMap.has(nodeId)) {
       return this.nodeIdToTreeIndexMap.get(nodeId);
     }
-    return null;
+    return undefined;
   }
 
   regenerateNodeIds(conversationAsset: ConversationAssetType) {
@@ -176,8 +182,10 @@ class NodeStore {
 
   isNodeVisible(nodeId: string): boolean {
     const element = window.document.querySelector(`[data-node-id="${nodeId}"]`) as HTMLElement;
+    if (element == null) return false;
+
     const rect = element.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
+    const centerX = rect.left + rect.width / 3;
     const centerY = rect.top + rect.height / 2;
 
     const topElement = document.elementFromPoint(centerX, centerY);
@@ -197,6 +205,27 @@ class NodeStore {
    * || SCROLL TO  NODE METHODS ||
    * =============================
    */
+  scrollToActiveNode() {
+    const activeNodeId = this.getActiveNodeId();
+    if (activeNodeId == null) return;
+    if (this.isNodeVisible(activeNodeId)) return;
+
+    const nodeTreeIndex = this.getActiveNodeTreeIndex();
+    if (nodeTreeIndex == null) throw Error(`node tree index is not found for active node`);
+
+    // Get a random visible node id to use for the base check
+    const element = window.document.querySelector(`[data-node-id]`) as HTMLElement;
+    const baseNodeId = element.getAttribute('data-node-id');
+    if (baseNodeId == null) return;
+
+    const baseTreeIndex = this.getTreeIndex(baseNodeId);
+    if (baseTreeIndex == null) return;
+
+    const direction = nodeTreeIndex < baseTreeIndex ? 'up' : 'down';
+
+    this.scrollToNode(activeNodeId, direction, undefined, true);
+  }
+
   scrollToNode(nodeId: string, direction: 'up' | 'down', cachedTree?: HTMLElement, skipHorizontalScroll = false) {
     const horizontalScrollBarHeight = 10;
 
