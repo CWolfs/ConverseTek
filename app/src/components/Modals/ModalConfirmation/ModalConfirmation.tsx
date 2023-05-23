@@ -1,5 +1,5 @@
 /* eslint-disable react/jsx-one-expression-per-line */
-import React, { useEffect, MouseEvent, CSSProperties } from 'react';
+import React, { useEffect, MouseEvent } from 'react';
 import { Icon } from 'antd';
 
 import { useStore } from 'hooks/useStore';
@@ -12,7 +12,7 @@ type Props = {
   type: 'info' | 'warning' | 'error';
   title: string;
   header: string;
-  body: string;
+  body: string | string[];
   width: string;
   buttons: {
     positiveType?: 'link' | 'primary' | 'default' | 'ghost' | 'dashed' | 'danger' | undefined;
@@ -72,12 +72,20 @@ export function ModalConfirmation({ globalModalId, type, title, header, body, wi
     setupModal();
   }, []);
 
+  const isBodyArray = Array.isArray(body);
+
   return (
     <div className="modal-confirmation">
       <div className="modal-confirmation__content">
         {header && <h3>{header}</h3>}
         <div className="modal-confirmation__content-body">
-          <div>{body}</div>
+          {isBodyArray &&
+            body.map((message: string, index: number) => (
+              <div key={message} style={index > 0 ? { marginTop: 16 } : {}}>
+                {message}
+              </div>
+            ))}
+          {!isBodyArray && <div>{body}</div>}
         </div>
       </div>
     </div>

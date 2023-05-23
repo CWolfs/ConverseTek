@@ -2,6 +2,7 @@ import { observable, action, makeObservable } from 'mobx';
 import keys from 'lodash.keys';
 import values from 'lodash.values';
 
+import { ModalConfirmation } from 'components/Modals/ModalConfirmation';
 import { createArg } from 'utils/def-utils';
 import { tryParseInt, tryParseFloat } from 'utils/number-utils';
 import {
@@ -16,6 +17,8 @@ import {
   PresetDefinitionType,
   TagDefinitionType,
 } from 'types';
+
+import { modalStore } from '../modalStore';
 
 /* eslint-disable class-methods-use-this, no-param-reassign */
 class DefStore {
@@ -201,7 +204,26 @@ class DefStore {
   getDefinitionByName(functionName: string): OperationDefinitionType | null {
     const definition = this.operations.find((operation) => operation.key === functionName);
     if (!definition) {
-      console.error(`No operation definition found with functionName '${functionName}'`);
+      console.error(`Missing Operation Definition: '${functionName}'`);
+
+      const message = `You are missing the operation definition: '${functionName}'.`;
+      const message2 =
+        "The definition is required in a conversation being loaded. This is probably because the conversation uses Extended Conversations mod but you do not have it's definitions installed in ConverseTek.";
+      const message3 = "Get the missing operation definition and place them in your 'ConverseTek/defs/operations' folder.";
+
+      const modalTitle = `Missing Operation Definition`;
+      modalStore.setModelContent(
+        ModalConfirmation,
+        {
+          type: 'warning',
+          title: modalTitle,
+          body: [message, message2, message3],
+          width: '50rem',
+          closable: false,
+        },
+        'global1',
+      );
+
       return null;
     }
     return definition;
