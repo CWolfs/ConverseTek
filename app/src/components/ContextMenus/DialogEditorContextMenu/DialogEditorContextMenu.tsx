@@ -86,6 +86,7 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
     };
 
     const buttons = {
+      positiveType: 'danger',
       positiveLabel: 'Confirm',
       onPositive: proceedWithDelete,
       negativeLabel: 'Cancel',
