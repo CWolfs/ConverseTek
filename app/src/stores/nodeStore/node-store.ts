@@ -34,6 +34,7 @@ class NodeStore {
 
   activeNode: PromptNodeType | ElementNodeType | null = null;
   collapseOnNodeId: string | null = null;
+  expandFromCoreToNodeId: string | null = null;
   focusedTreeNode: RSTNode | null = null;
   ownerId: string | null = null;
   takenPromptNodeIndexes: number[] = [];
@@ -48,6 +49,7 @@ class NodeStore {
       activeNode: observable,
       focusedTreeNode: observable,
       dirtyActiveNode: observable,
+      expandFromCoreToNodeId: observable,
       rebuild: observable,
       setRebuild: action,
       init: action,
@@ -56,7 +58,7 @@ class NodeStore {
       setActiveNode: action,
       setActiveNodeByIndex: action,
       clearActiveNode: action,
-      scrollToNode: action,
+      initScrollToNode: action,
       setFocusedTreeNode: action,
       clearFocusedNode: action,
       setClipboard: action,
@@ -94,6 +96,7 @@ class NodeStore {
       deleteBranchCascade: action,
       deleteLink: action,
       setCollapseOnNodeId: action,
+      setExpandFromCoreToNodeId: action,
       reset: action,
     });
   }
@@ -133,7 +136,10 @@ class NodeStore {
       defer(
         action(() => {
           this.rebuild = false;
-          if (this.activeNode) this.updateActiveNode(this.activeNode);
+          if (this.activeNode) {
+            this.updateActiveNode(this.activeNode);
+            defer(() => this.scrollToActiveNode());
+          }
         }),
       );
     }
@@ -223,10 +229,16 @@ class NodeStore {
 
     const direction = nodeTreeIndex < baseTreeIndex ? 'up' : 'down';
 
-    this.scrollToNode(activeNodeId, direction, undefined, true);
+    this.initScrollToNode(activeNodeId, direction, undefined, true);
   }
 
-  scrollToNode(nodeId: string, direction: 'up' | 'down', cachedTree?: HTMLElement, skipHorizontalScroll = false) {
+  initScrollToNode(nodeId: string, direction: 'up' | 'down', cachedTree?: HTMLElement, skipHorizontalScroll = false) {
+    console.log('initScrollToNode', nodeId);
+    this.setExpandFromCoreToNodeId(nodeId);
+    setTimeout(() => this.scrollToNode(nodeId, direction, cachedTree, skipHorizontalScroll), 100);
+  }
+
+  private scrollToNode(nodeId: string, direction: 'up' | 'down', cachedTree?: HTMLElement, skipHorizontalScroll = false) {
     const horizontalScrollBarHeight = 10;
 
     // Quickly scroll in the given direction to force the virtual tree to load
@@ -811,9 +823,9 @@ class NodeStore {
     }
   }
 
-  addRootNode(): void {
+  addRootNode(): string | null {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-    if (conversationAsset === null) return;
+    if (conversationAsset === null) return null;
 
     const rootNode = createRootNode();
     rootNode.parentId = '0';
@@ -821,6 +833,7 @@ class NodeStore {
 
     this.updateActiveNode(rootNode);
     this.setRebuild(true);
+    return getId(rootNode);
   }
 
   setRootNodesByIds(rootNodeIds: string[]) {
@@ -831,11 +844,11 @@ class NodeStore {
     setRootNodes(conversationAsset, rootNodes as ElementNodeType[]);
   }
 
-  addPromptNode(parentElementNode: ElementNodeType) {
+  addPromptNode(parentElementNode: ElementNodeType): string | null {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     const { nextNodeIndex: existingNextPromptNodeIndex } = parentElementNode;
 
-    if (conversationAsset === null) return;
+    if (conversationAsset === null) return null;
 
     if (existingNextPromptNodeIndex === -1) {
       const nextPromptNodeIndex = this.generateNextPromptNodeIndex();
@@ -854,14 +867,16 @@ class NodeStore {
 
       this.updateActiveNode(node);
       this.setRebuild(true);
-    } else {
-      console.warn("[Node Store] Will not create new node. Only one node per 'root' or 'response' allowed");
+      return getId(node);
     }
+
+    console.warn("[Node Store] Will not create new node. Only one node per 'root' or 'response' allowed");
+    return null;
   }
 
-  addResponseNode(parentPromptNode: PromptNodeType) {
+  addResponseNode(parentPromptNode: PromptNodeType): string | null {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-    if (conversationAsset === null) return;
+    if (conversationAsset === null) return null;
 
     const responseNode = createResponseNode();
     responseNode.parentId = getId(parentPromptNode);
@@ -869,6 +884,7 @@ class NodeStore {
 
     this.updateActiveNode(responseNode);
     this.setRebuild(true);
+    return getId(responseNode);
   }
 
   setResponseNodesByIds(parentId: string, responseIds: string[]) {
@@ -1052,6 +1068,14 @@ class NodeStore {
 
   getCollapseOnNodeId(): string | null {
     return this.collapseOnNodeId;
+  }
+
+  setExpandFromCoreToNodeId(nodeId: string | null): void {
+    this.expandFromCoreToNodeId = nodeId;
+  }
+
+  getExpandFromCoreToNodeId(): string | null {
+    return this.expandFromCoreToNodeId;
   }
 
   getNodeResponseIdsFromNodeId(nodeId: string): string[] {
