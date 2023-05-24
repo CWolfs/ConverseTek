@@ -240,7 +240,6 @@ class NodeStore {
   }
 
   initScrollToNode(nodeId: string, direction: 'up' | 'down', cachedTree?: HTMLElement, skipHorizontalScroll = false) {
-    console.log('initScrollToNode', nodeId);
     this.setExpandFromCoreToNodeId(nodeId);
     setTimeout(() => this.scrollToNode(nodeId, direction, cachedTree, skipHorizontalScroll), 100);
   }

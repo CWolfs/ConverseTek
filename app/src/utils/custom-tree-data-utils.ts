@@ -74,29 +74,34 @@ export function collapseOtherBranches(
   return updatedTreeData;
 }
 
-export function collapseBranches(treeData: RSTNode[], node: PromptNodeType | ElementNodeType | null, onNode: (node: RSTNode) => void): RSTNode[] {
+export function collapseOrExpandBranches(
+  treeData: RSTNode[],
+  node: PromptNodeType | ElementNodeType | null,
+  onNode: (node: RSTNode) => void,
+  expand: boolean,
+): RSTNode[] {
   if (node == null) return treeData;
   const nodeId = getId(node);
   let updatedTreeData = treeData;
 
-  // If response or root node, mark as closed then go to prompt node - if one exists and isn't a link
+  // If response or root node, mark as expand/collapse then go to prompt node - if one exists and isn't a link
   if (isElementNodeType(node)) {
     const { nextNodeIndex, auxiliaryLink } = node;
 
-    updatedTreeData = setExpandedInTree(updatedTreeData, nodeId, onNode, false);
+    updatedTreeData = setExpandedInTree(updatedTreeData, nodeId, onNode, expand);
 
     const childPromptNode = nodeStore.getPromptNodeByIndex(nextNodeIndex);
     if (childPromptNode != null && !auxiliaryLink) {
-      updatedTreeData = collapseBranches(updatedTreeData, childPromptNode, onNode);
+      updatedTreeData = collapseOrExpandBranches(updatedTreeData, childPromptNode, onNode, expand);
     }
   } else {
     // If a prompt node, go through each branch and iterate over them closing them
     const { branches } = node;
     branches.forEach((branch) => {
-      updatedTreeData = collapseBranches(updatedTreeData, branch, onNode);
+      updatedTreeData = collapseOrExpandBranches(updatedTreeData, branch, onNode, expand);
     });
 
-    updatedTreeData = setExpandedInTree(updatedTreeData, nodeId, onNode, false);
+    updatedTreeData = setExpandedInTree(updatedTreeData, nodeId, onNode, expand);
   }
 
   return updatedTreeData;
@@ -148,13 +153,6 @@ export function expandFromCoreToNode(treeData: RSTNode[], node: PromptNodeType |
   const parentNode = nodeStore.getNode(node.parentId);
   return expandFromCoreToNode(updatedTreeData, parentNode, onNode);
 }
-
-// export function expandEntireBranch(treeData: RSTNode[], node: PromptNodeType | ElementNodeType | null, onNode: (node: RSTNode) => void): RSTNode[] {
-//   if (node == null) return treeData;
-
-//   const nodeId = getId(node);
-//   let updatedTreeData = treeData;
-// }
 
 export function findTreeNodeParentWithDataNodeId(element: HTMLElement): HTMLElement | null {
   if (element == null) return null;
