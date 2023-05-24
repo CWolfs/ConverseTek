@@ -61,33 +61,7 @@ export function collapseOtherBranches(
       const elementId = getId(elementNode);
       if (elementId === nodeId) return;
 
-      const { matches }: { matches: any[] } = find({
-        treeData: updatedTreeData,
-        searchQuery: undefined,
-        searchFocusOffset: undefined,
-        getNodeKey: ({ node }: { node: RSTNode }) => node.id,
-        searchMethod: ({ node }: { node: RSTNode }) => node.id === elementId,
-        expandFocusMatchPaths: false,
-      });
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const match = matches[0];
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const { path } = match;
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-      const elementNodeTreeItem = match.node as RSTNode;
-      elementNodeTreeItem.expanded = false;
-      onNode(elementNodeTreeItem);
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      updatedTreeData = changeNodeAtPath({
-        treeData: updatedTreeData,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        path,
-        newNode: elementNodeTreeItem,
-        getNodeKey: ({ node }: { node: RSTNode }) => node.id,
-        ignoreCollapsed: false,
-      });
+      updatedTreeData = setExpandedInTree(updatedTreeData, elementId, onNode, false);
     });
 
     if (promptNode) {
@@ -100,14 +74,37 @@ export function collapseOtherBranches(
   return updatedTreeData;
 }
 
-export function expandFromCoreToNode(treeData: RSTNode[], node: PromptNodeType | ElementNodeType | null, onNode: (node: RSTNode) => void): RSTNode[] {
+export function collapseBranches(treeData: RSTNode[], node: PromptNodeType | ElementNodeType | null, onNode: (node: RSTNode) => void): RSTNode[] {
   if (node == null) return treeData;
-
   const nodeId = getId(node);
   let updatedTreeData = treeData;
 
+  // If response or root node, mark as closed then go to prompt node - if one exists and isn't a link
+  if (isElementNodeType(node)) {
+    const { nextNodeIndex, auxiliaryLink } = node;
+
+    updatedTreeData = setExpandedInTree(updatedTreeData, nodeId, onNode, false);
+
+    const childPromptNode = nodeStore.getPromptNodeByIndex(nextNodeIndex);
+    if (childPromptNode != null && !auxiliaryLink) {
+      updatedTreeData = collapseBranches(updatedTreeData, childPromptNode, onNode);
+    }
+  } else {
+    // If a prompt node, go through each branch and iterate over them closing them
+    const { branches } = node;
+    branches.forEach((branch) => {
+      updatedTreeData = collapseBranches(updatedTreeData, branch, onNode);
+    });
+
+    updatedTreeData = setExpandedInTree(updatedTreeData, nodeId, onNode, false);
+  }
+
+  return updatedTreeData;
+}
+
+function setExpandedInTree(treeData: RSTNode[], nodeId: string, onNode: (node: RSTNode) => void, expanded: boolean): RSTNode[] {
   const { matches }: { matches: any[] } = find({
-    treeData: updatedTreeData,
+    treeData,
     searchQuery: undefined,
     searchFocusOffset: undefined,
     getNodeKey: ({ node }: { node: RSTNode }) => node.id,
@@ -121,18 +118,27 @@ export function expandFromCoreToNode(treeData: RSTNode[], node: PromptNodeType |
   const { path } = match;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   const treeNode = match.node as RSTNode;
-  treeNode.expanded = true;
+  treeNode.expanded = expanded;
   onNode(treeNode);
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  updatedTreeData = changeNodeAtPath({
-    treeData: updatedTreeData,
+  return changeNodeAtPath({
+    treeData,
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     path,
     newNode: treeNode,
     getNodeKey: ({ node }: { node: RSTNode }) => node.id,
     ignoreCollapsed: false,
-  });
+  }) as RSTNode[];
+}
+
+export function expandFromCoreToNode(treeData: RSTNode[], node: PromptNodeType | ElementNodeType | null, onNode: (node: RSTNode) => void): RSTNode[] {
+  if (node == null) return treeData;
+
+  const nodeId = getId(node);
+  let updatedTreeData = treeData;
+
+  updatedTreeData = setExpandedInTree(updatedTreeData, nodeId, onNode, true);
 
   if (node.parentId == null) {
     updatedTreeData[0].expanded = true;

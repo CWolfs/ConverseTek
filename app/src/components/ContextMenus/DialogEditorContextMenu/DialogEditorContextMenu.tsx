@@ -118,7 +118,7 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
 
     const { id: nodeId } = props;
 
-    // nodeStore.setCollapseOnNodeId(nodeId);
+    nodeStore.setExpandOnNodeId(nodeId);
   };
 
   const onCollapseBranch = ({ props }: ItemParams<EventProps>) => {
@@ -126,7 +126,7 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
 
     const { id: nodeId } = props;
 
-    // nodeStore.setCollapseOnNodeId(nodeId);
+    nodeStore.setCollapseOnNodeId(nodeId);
   };
 
   const onCollapseOtherBranches = ({ props }: ItemParams<EventProps>) => {
@@ -134,7 +134,7 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
 
     const { id: nodeId } = props;
 
-    nodeStore.setCollapseOnNodeId(nodeId);
+    nodeStore.setCollapseOthersOnNodeId(nodeId);
   };
 
   return (
