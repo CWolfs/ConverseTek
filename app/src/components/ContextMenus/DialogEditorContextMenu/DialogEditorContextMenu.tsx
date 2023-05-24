@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Item, ItemParams } from 'react-contexify';
+import { Menu, Item, ItemParams, Separator } from 'react-contexify';
 import { observer } from 'mobx-react';
 
 import 'react-contexify/ReactContexify.css';
@@ -137,6 +137,7 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
       {allowedToPasteCopy && <Item onClick={onPasteAsCopy}>Paste as Copy</Item>}
       {allowedToPasteLink && <Item onClick={onPasteAsLink}>Paste as Link</Item>}
       {!isCore && <Item onClick={onDeleteClicked}>Delete</Item>}
+      {(isNode || isResponse || isRoot) && <Separator />}
       {/* {(isNode || isResponse || isRoot) && <Item onClick={onIsolateBranch}>Isolate Branch</Item>} */}
       {(isNode || isResponse || isRoot) && <Item onClick={onExpandBranch}>Expand Branch</Item>}
       {(isNode || isResponse || isRoot) && <Item onClick={onCollapseBranch}>Collapse Branch</Item>}
