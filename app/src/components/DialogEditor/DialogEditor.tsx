@@ -17,7 +17,7 @@ import { useControlWheel } from 'hooks/useControlWheel';
 import { useWindowSize } from 'hooks/useWindowSize';
 import { detectType, isPromptNodeType } from 'utils/node-utils';
 import { toggleExpandedForAll } from 'utils/tree-data-utils';
-import { collapseOtherBranches } from 'utils/custom-tree-data-utils';
+import { collapseOtherBranches, expandFromCoreToNode } from 'utils/custom-tree-data-utils';
 
 import { ScalableScrollbar } from 'components/ScalableScrollbar';
 
@@ -69,6 +69,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
 
   const activeNodeId = nodeStore.getActiveNodeId();
   const collapseOnNodeId = nodeStore.getCollapseOnNodeId();
+  const expandFromCoreToNodeId = nodeStore.getExpandFromCoreToNodeId();
 
   const onMove = (nodeContainer: RSTNodeOnMoveContainer) => {
     const { node, nextParentNode } = nodeContainer;
@@ -229,6 +230,18 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
     setTreeData(updatedTreeData);
     nodeStore.setCollapseOnNodeId(null);
   }, [collapseOnNodeId]);
+
+  useEffect(() => {
+    if (expandFromCoreToNodeId == null || treeData == null) return;
+
+    const node = nodeStore.getNode(expandFromCoreToNodeId);
+    const updatedTreeData = expandFromCoreToNode(treeData, node, (node: RSTNode) => {
+      nodeStore.setNodeExpansion(node.id, false);
+    });
+
+    setTreeData(updatedTreeData);
+    nodeStore.setExpandFromCoreToNodeId(null);
+  }, [expandFromCoreToNodeId]);
 
   useControlWheel(treeElement, onControlWheel);
 

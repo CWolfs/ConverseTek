@@ -100,6 +100,53 @@ export function collapseOtherBranches(
   return updatedTreeData;
 }
 
+export function expandFromCoreToNode(treeData: RSTNode[], node: PromptNodeType | ElementNodeType | null, onNode: (node: RSTNode) => void): RSTNode[] {
+  if (node == null) return treeData;
+
+  const nodeId = getId(node);
+  let updatedTreeData = treeData;
+
+  const { matches }: { matches: any[] } = find({
+    treeData: updatedTreeData,
+    searchQuery: undefined,
+    searchFocusOffset: undefined,
+    getNodeKey: ({ node }: { node: RSTNode }) => node.id,
+    searchMethod: ({ node }: { node: RSTNode }) => node.id === nodeId,
+    expandFocusMatchPaths: false,
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const match = matches[0];
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const { path } = match;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  const treeNode = match.node as RSTNode;
+  treeNode.expanded = true;
+  onNode(treeNode);
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  updatedTreeData = changeNodeAtPath({
+    treeData: updatedTreeData,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    path,
+    newNode: treeNode,
+    getNodeKey: ({ node }: { node: RSTNode }) => node.id,
+    ignoreCollapsed: false,
+  });
+
+  if (nodeId === '0') return updatedTreeData;
+
+  const parentNode = nodeStore.getNode(node.parentId);
+  return expandFromCoreToNode(updatedTreeData, parentNode, onNode);
+}
+
+// export function expandEntireBranch(treeData: RSTNode[], node: PromptNodeType | ElementNodeType | null, onNode: (node: RSTNode) => void): RSTNode[] {
+//   if (node == null) return treeData;
+
+//   const nodeId = getId(node);
+//   let updatedTreeData = treeData;
+// }
+
 export function findTreeNodeParentWithDataNodeId(element: HTMLElement): HTMLElement | null {
   if (element == null) return null;
 

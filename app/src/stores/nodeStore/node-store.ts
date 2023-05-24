@@ -34,6 +34,7 @@ class NodeStore {
 
   activeNode: PromptNodeType | ElementNodeType | null = null;
   collapseOnNodeId: string | null = null;
+  expandFromCoreToNodeId: string | null = null;
   focusedTreeNode: RSTNode | null = null;
   ownerId: string | null = null;
   takenPromptNodeIndexes: number[] = [];
@@ -94,6 +95,7 @@ class NodeStore {
       deleteBranchCascade: action,
       deleteLink: action,
       setCollapseOnNodeId: action,
+      setExpandFromCoreToNodeId: action,
       reset: action,
     });
   }
@@ -228,6 +230,8 @@ class NodeStore {
 
   scrollToNode(nodeId: string, direction: 'up' | 'down', cachedTree?: HTMLElement, skipHorizontalScroll = false) {
     const horizontalScrollBarHeight = 10;
+
+    this.setExpandFromCoreToNodeId(nodeId);
 
     // Quickly scroll in the given direction to force the virtual tree to load
     // At the same time check for the required node
@@ -1052,6 +1056,14 @@ class NodeStore {
 
   getCollapseOnNodeId(): string | null {
     return this.collapseOnNodeId;
+  }
+
+  setExpandFromCoreToNodeId(nodeId: string | null): void {
+    this.expandFromCoreToNodeId = nodeId;
+  }
+
+  getExpandFromCoreToNodeId(): string | null {
+    return this.expandFromCoreToNodeId;
   }
 
   getNodeResponseIdsFromNodeId(nodeId: string): string[] {
