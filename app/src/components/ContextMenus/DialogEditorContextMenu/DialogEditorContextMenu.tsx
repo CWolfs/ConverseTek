@@ -97,7 +97,7 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
       {
         type: 'warning',
         title,
-        body: 'This action will delete the node and all its children. Are you sure you want to do this?,',
+        body: "This action will delete the node and all it's children. Are you sure you want to do this?",
         width: '30rem',
         buttons,
         disableOk: false,
