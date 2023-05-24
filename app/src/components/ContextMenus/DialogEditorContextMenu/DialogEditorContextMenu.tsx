@@ -6,7 +6,9 @@ import 'react-contexify/ReactContexify.css';
 
 import { useStore } from 'hooks/useStore';
 import { NodeStore } from 'stores/nodeStore/node-store';
+import { ModalStore } from 'stores/modalStore/modal-store';
 import { detectType, isAllowedToCreateNode, isAllowedToPasteCopy, isAllowedToPasteLink } from 'utils/node-utils';
+import { ModalConfirmation } from 'components/Modals/ModalConfirmation';
 
 export type EventProps = {
   id: string;
@@ -35,6 +37,7 @@ function getAddLabel(type: string) {
 
 export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string; onVisibilityChange: (flag: boolean) => void }) {
   const nodeStore = useStore<NodeStore>('node');
+  const modalStore = useStore<ModalStore>('modal');
 
   const { focusedTreeNode: focusedNode, clipboard } = nodeStore;
 
@@ -74,17 +77,55 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
     const { id: nodeId, type: nodeType, parentId } = props;
     const { isLink } = detectType(nodeType);
 
-    if (isLink) {
-      nodeStore.deleteLink(parentId);
-    } else {
-      nodeStore.deleteNodeCascadeById(nodeId);
-    }
+    const proceedWithDelete = () => {
+      if (isLink) {
+        nodeStore.deleteLink(parentId);
+      } else {
+        nodeStore.deleteNodeCascadeById(nodeId);
+      }
+    };
+
+    const buttons = {
+      positiveLabel: 'Confirm',
+      onPositive: proceedWithDelete,
+      negativeLabel: 'Cancel',
+    };
+
+    const title = 'Are you sure you want to delete this node?';
+    modalStore.setModelContent(
+      ModalConfirmation,
+      {
+        type: 'warning',
+        title,
+        body: 'This action will delete the node and all its children. Are you sure you want to do this?,',
+        width: '30rem',
+        buttons,
+        disableOk: false,
+      },
+      'global1',
+    );
   };
 
-  const onIsolateBranch = ({ props }: ItemParams<EventProps>) => {
+  // const onIsolateBranch = ({ props }: ItemParams<EventProps>) => {
+  //   if (!props) return;
+
+  //   const { id: nodeId, type: nodeType, parentId } = props;
+  // };
+
+  const onExpandBranch = ({ props }: ItemParams<EventProps>) => {
     if (!props) return;
 
-    const { id: nodeId, type: nodeType, parentId } = props;
+    const { id: nodeId } = props;
+
+    // nodeStore.setCollapseOnNodeId(nodeId);
+  };
+
+  const onCollapseBranch = ({ props }: ItemParams<EventProps>) => {
+    if (!props) return;
+
+    const { id: nodeId } = props;
+
+    // nodeStore.setCollapseOnNodeId(nodeId);
   };
 
   const onCollapseOtherBranches = ({ props }: ItemParams<EventProps>) => {
@@ -102,7 +143,9 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
       {allowedToPasteCopy && <Item onClick={onPasteAsCopy}>Paste as Copy</Item>}
       {allowedToPasteLink && <Item onClick={onPasteAsLink}>Paste as Link</Item>}
       {type != 'root' && <Item onClick={onDeleteClicked}>Delete</Item>}
-      {(isNode || isResponse || isRoot) && <Item onClick={onIsolateBranch}>Isolate Branch</Item>}
+      {/* {(isNode || isResponse || isRoot) && <Item onClick={onIsolateBranch}>Isolate Branch</Item>} */}
+      {(isNode || isResponse || isRoot) && <Item onClick={onExpandBranch}>Expand Branch</Item>}
+      {(isNode || isResponse || isRoot) && <Item onClick={onCollapseBranch}>Collapse Branch</Item>}
       {(isNode || isResponse || isRoot) && <Item onClick={onCollapseOtherBranches}>Collapse Other Branches</Item>}
     </Menu>
   );
