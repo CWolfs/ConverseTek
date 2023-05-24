@@ -45,7 +45,7 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
   if (!focusedNode) return null;
 
   const { id: focusedNodeId, type } = focusedNode;
-  const { isRoot, isNode, isResponse } = detectType(type);
+  const { isCore, isRoot, isNode, isResponse } = detectType(type);
 
   const allowAdd = isAllowedToCreateNode(focusedNodeId);
   const allowedToPasteCopy = isAllowedToPasteCopy(focusedNodeId, clipboard);
@@ -107,18 +107,11 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
     );
   };
 
-  // const onIsolateBranch = ({ props }: ItemParams<EventProps>) => {
-  //   if (!props) return;
-
-  //   const { id: nodeId, type: nodeType, parentId } = props;
-  // };
-
   const onExpandBranch = ({ props }: ItemParams<EventProps>) => {
     if (!props) return;
 
     const { id: nodeId } = props;
-
-    // nodeStore.setCollapseOnNodeId(nodeId);
+    nodeStore.setExpandOnNodeId(nodeId);
   };
 
   const onCollapseBranch = ({ props }: ItemParams<EventProps>) => {
@@ -126,7 +119,7 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
 
     const { id: nodeId } = props;
 
-    // nodeStore.setCollapseOnNodeId(nodeId);
+    nodeStore.setCollapseOnNodeId(nodeId);
   };
 
   const onCollapseOtherBranches = ({ props }: ItemParams<EventProps>) => {
@@ -134,7 +127,7 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
 
     const { id: nodeId } = props;
 
-    nodeStore.setCollapseOnNodeId(nodeId);
+    nodeStore.setCollapseOthersOnNodeId(nodeId);
   };
 
   return (
@@ -143,7 +136,7 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
       {(isNode || isResponse) && <Item onClick={onCopyClicked}>Copy</Item>}
       {allowedToPasteCopy && <Item onClick={onPasteAsCopy}>Paste as Copy</Item>}
       {allowedToPasteLink && <Item onClick={onPasteAsLink}>Paste as Link</Item>}
-      {type != 'root' && <Item onClick={onDeleteClicked}>Delete</Item>}
+      {!isCore && <Item onClick={onDeleteClicked}>Delete</Item>}
       {/* {(isNode || isResponse || isRoot) && <Item onClick={onIsolateBranch}>Isolate Branch</Item>} */}
       {(isNode || isResponse || isRoot) && <Item onClick={onExpandBranch}>Expand Branch</Item>}
       {(isNode || isResponse || isRoot) && <Item onClick={onCollapseBranch}>Collapse Branch</Item>}

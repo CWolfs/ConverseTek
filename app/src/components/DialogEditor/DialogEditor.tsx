@@ -17,7 +17,7 @@ import { useControlWheel } from 'hooks/useControlWheel';
 import { useWindowSize } from 'hooks/useWindowSize';
 import { detectType, isPromptNodeType } from 'utils/node-utils';
 import { toggleExpandedForAll } from 'utils/tree-data-utils';
-import { collapseOtherBranches, expandFromCoreToNode } from 'utils/custom-tree-data-utils';
+import { collapseOrExpandBranches, collapseOtherBranches, expandFromCoreToNode } from 'utils/custom-tree-data-utils';
 
 import { ScalableScrollbar } from 'components/ScalableScrollbar';
 
@@ -68,7 +68,9 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
   });
 
   const activeNodeId = nodeStore.getActiveNodeId();
+  const expandOnNodeId = nodeStore.getExpandOnNodeId();
   const collapseOnNodeId = nodeStore.getCollapseOnNodeId();
+  const collapseOthersOnNodeId = nodeStore.getCollapseOthersOnNodeId();
   const expandFromCoreToNodeId = nodeStore.getExpandFromCoreToNodeId();
 
   const onMove = (nodeContainer: RSTNodeOnMoveContainer) => {
@@ -204,7 +206,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
     }, 50);
   }, [windowSize.width, windowSize.height, zoomLevel]);
 
-  // Expand or Collapse all
+  // Expand or collapse all nodes
   useEffect(() => {
     if (treeData == null) return;
 
@@ -219,18 +221,56 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
     setTreeData(updatedTreeData);
   }, [expandAll]);
 
+  // To collapse all other branches except the provided branch starting at the node id
   useEffect(() => {
-    if (collapseOnNodeId == null || treeData == null) return;
+    if (collapseOthersOnNodeId == null || treeData == null) return;
 
-    const node = nodeStore.getNode(collapseOnNodeId);
+    const node = nodeStore.getNode(collapseOthersOnNodeId);
     const updatedTreeData = collapseOtherBranches(treeData, node, (node: RSTNode) => {
       nodeStore.setNodeExpansion(node.id, false);
     });
 
     setTreeData(updatedTreeData);
+    nodeStore.setCollapseOthersOnNodeId(null);
+  }, [collapseOthersOnNodeId]);
+
+  // To collapse branch below provided node id
+  useEffect(() => {
+    if (collapseOnNodeId == null || treeData == null) return;
+
+    const node = nodeStore.getNode(collapseOnNodeId);
+    const updatedTreeData = collapseOrExpandBranches(
+      treeData,
+      node,
+      (node: RSTNode) => {
+        nodeStore.setNodeExpansion(node.id, false);
+      },
+      false,
+    );
+
+    setTreeData(updatedTreeData);
     nodeStore.setCollapseOnNodeId(null);
   }, [collapseOnNodeId]);
 
+  // To expand branch below provided node id
+  useEffect(() => {
+    if (expandOnNodeId == null || treeData == null) return;
+
+    const node = nodeStore.getNode(expandOnNodeId);
+    const updatedTreeData = collapseOrExpandBranches(
+      treeData,
+      node,
+      (node: RSTNode) => {
+        nodeStore.setNodeExpansion(node.id, true);
+      },
+      true,
+    );
+
+    setTreeData(updatedTreeData);
+    nodeStore.setExpandOnNodeId(null);
+  }, [expandOnNodeId]);
+
+  // To expand from the core to the node id provided - used for autoscroll to uncover a node (e.g. follow link / go to active node)
   useEffect(() => {
     if (expandFromCoreToNodeId == null || treeData == null) return;
 

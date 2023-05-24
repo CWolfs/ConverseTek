@@ -2,6 +2,7 @@ import { ElementNodeType, PromptNodeType, ClipboardType } from 'types';
 import { nodeStore } from '../stores';
 
 export type NodeTypeDetectionResult = {
+  isCore: boolean;
   isRoot: boolean;
   isNode: boolean;
   isResponse: boolean;
@@ -17,9 +18,10 @@ export function isElementNodeType(node: PromptNodeType | ElementNodeType): node 
 }
 
 export function detectType(type: string | null): NodeTypeDetectionResult {
-  if (type == null) return { isRoot: false, isNode: false, isResponse: false, isLink: false };
+  if (type == null) return { isCore: false, isRoot: false, isNode: false, isResponse: false, isLink: false };
 
   return {
+    isCore: type === 'core',
     isRoot: type === 'root',
     isNode: type === 'node',
     isResponse: type === 'response',

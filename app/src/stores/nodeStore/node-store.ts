@@ -33,7 +33,9 @@ class NodeStore {
   static deleteDeferred = false;
 
   activeNode: PromptNodeType | ElementNodeType | null = null;
+  expandOnNodeId: string | null = null;
   collapseOnNodeId: string | null = null;
+  collapseOthersOnNodeId: string | null = null;
   expandFromCoreToNodeId: string | null = null;
   focusedTreeNode: RSTNode | null = null;
   ownerId: string | null = null;
@@ -49,6 +51,9 @@ class NodeStore {
       activeNode: observable,
       focusedTreeNode: observable,
       dirtyActiveNode: observable,
+      expandOnNodeId: observable,
+      collapseOnNodeId: observable,
+      collapseOthersOnNodeId: observable,
       expandFromCoreToNodeId: observable,
       rebuild: observable,
       setRebuild: action,
@@ -96,6 +101,8 @@ class NodeStore {
       deleteBranchCascade: action,
       deleteLink: action,
       setCollapseOnNodeId: action,
+      setExpandOnNodeId: action,
+      setCollapseOthersOnNodeId: action,
       setExpandFromCoreToNodeId: action,
       reset: action,
     });
@@ -233,7 +240,6 @@ class NodeStore {
   }
 
   initScrollToNode(nodeId: string, direction: 'up' | 'down', cachedTree?: HTMLElement, skipHorizontalScroll = false) {
-    console.log('initScrollToNode', nodeId);
     this.setExpandFromCoreToNodeId(nodeId);
     setTimeout(() => this.scrollToNode(nodeId, direction, cachedTree, skipHorizontalScroll), 100);
   }
@@ -1066,8 +1072,24 @@ class NodeStore {
     this.collapseOnNodeId = nodeId;
   }
 
+  setExpandOnNodeId(nodeId: string | null): void {
+    this.expandOnNodeId = nodeId;
+  }
+
+  setCollapseOthersOnNodeId(nodeId: string | null): void {
+    this.collapseOthersOnNodeId = nodeId;
+  }
+
   getCollapseOnNodeId(): string | null {
     return this.collapseOnNodeId;
+  }
+
+  getExpandOnNodeId(): string | null {
+    return this.expandOnNodeId;
+  }
+
+  getCollapseOthersOnNodeId(): string | null {
+    return this.collapseOthersOnNodeId;
   }
 
   setExpandFromCoreToNodeId(nodeId: string | null): void {
