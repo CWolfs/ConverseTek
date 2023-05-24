@@ -136,7 +136,10 @@ class NodeStore {
       defer(
         action(() => {
           this.rebuild = false;
-          if (this.activeNode) this.updateActiveNode(this.activeNode);
+          if (this.activeNode) {
+            this.updateActiveNode(this.activeNode);
+            defer(() => this.scrollToActiveNode());
+          }
         }),
       );
     }
@@ -820,9 +823,9 @@ class NodeStore {
     }
   }
 
-  addRootNode(): void {
+  addRootNode(): string | null {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-    if (conversationAsset === null) return;
+    if (conversationAsset === null) return null;
 
     const rootNode = createRootNode();
     rootNode.parentId = '0';
@@ -830,6 +833,7 @@ class NodeStore {
 
     this.updateActiveNode(rootNode);
     this.setRebuild(true);
+    return getId(rootNode);
   }
 
   setRootNodesByIds(rootNodeIds: string[]) {
@@ -840,11 +844,11 @@ class NodeStore {
     setRootNodes(conversationAsset, rootNodes as ElementNodeType[]);
   }
 
-  addPromptNode(parentElementNode: ElementNodeType) {
+  addPromptNode(parentElementNode: ElementNodeType): string | null {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     const { nextNodeIndex: existingNextPromptNodeIndex } = parentElementNode;
 
-    if (conversationAsset === null) return;
+    if (conversationAsset === null) return null;
 
     if (existingNextPromptNodeIndex === -1) {
       const nextPromptNodeIndex = this.generateNextPromptNodeIndex();
@@ -863,14 +867,16 @@ class NodeStore {
 
       this.updateActiveNode(node);
       this.setRebuild(true);
-    } else {
-      console.warn("[Node Store] Will not create new node. Only one node per 'root' or 'response' allowed");
+      return getId(node);
     }
+
+    console.warn("[Node Store] Will not create new node. Only one node per 'root' or 'response' allowed");
+    return null;
   }
 
-  addResponseNode(parentPromptNode: PromptNodeType) {
+  addResponseNode(parentPromptNode: PromptNodeType): string | null {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-    if (conversationAsset === null) return;
+    if (conversationAsset === null) return null;
 
     const responseNode = createResponseNode();
     responseNode.parentId = getId(parentPromptNode);
@@ -878,6 +884,7 @@ class NodeStore {
 
     this.updateActiveNode(responseNode);
     this.setRebuild(true);
+    return getId(responseNode);
   }
 
   setResponseNodesByIds(parentId: string, responseIds: string[]) {
