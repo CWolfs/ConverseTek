@@ -134,7 +134,10 @@ export function expandFromCoreToNode(treeData: RSTNode[], node: PromptNodeType |
     ignoreCollapsed: false,
   });
 
-  if (nodeId === '0') return updatedTreeData;
+  if (node.parentId == null) {
+    updatedTreeData[0].expanded = true;
+    return updatedTreeData;
+  }
 
   const parentNode = nodeStore.getNode(node.parentId);
   return expandFromCoreToNode(updatedTreeData, parentNode, onNode);

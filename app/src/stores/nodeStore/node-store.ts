@@ -49,6 +49,7 @@ class NodeStore {
       activeNode: observable,
       focusedTreeNode: observable,
       dirtyActiveNode: observable,
+      expandFromCoreToNodeId: observable,
       rebuild: observable,
       setRebuild: action,
       init: action,
@@ -57,7 +58,7 @@ class NodeStore {
       setActiveNode: action,
       setActiveNodeByIndex: action,
       clearActiveNode: action,
-      scrollToNode: action,
+      initScrollToNode: action,
       setFocusedTreeNode: action,
       clearFocusedNode: action,
       setClipboard: action,
@@ -225,13 +226,17 @@ class NodeStore {
 
     const direction = nodeTreeIndex < baseTreeIndex ? 'up' : 'down';
 
-    this.scrollToNode(activeNodeId, direction, undefined, true);
+    this.initScrollToNode(activeNodeId, direction, undefined, true);
   }
 
-  scrollToNode(nodeId: string, direction: 'up' | 'down', cachedTree?: HTMLElement, skipHorizontalScroll = false) {
-    const horizontalScrollBarHeight = 10;
-
+  initScrollToNode(nodeId: string, direction: 'up' | 'down', cachedTree?: HTMLElement, skipHorizontalScroll = false) {
+    console.log('initScrollToNode', nodeId);
     this.setExpandFromCoreToNodeId(nodeId);
+    setTimeout(() => this.scrollToNode(nodeId, direction, cachedTree, skipHorizontalScroll), 100);
+  }
+
+  private scrollToNode(nodeId: string, direction: 'up' | 'down', cachedTree?: HTMLElement, skipHorizontalScroll = false) {
+    const horizontalScrollBarHeight = 10;
 
     // Quickly scroll in the given direction to force the virtual tree to load
     // At the same time check for the required node

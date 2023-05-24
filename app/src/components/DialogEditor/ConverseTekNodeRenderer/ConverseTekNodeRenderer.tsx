@@ -311,7 +311,7 @@ export const ConverseTekNodeRenderer = observer(
 
             const direction = linkTreeIndex < treeIndex ? 'up' : 'down';
             nodeStore.setActiveNode(linkId);
-            nodeStore.scrollToNode(linkId, direction);
+            nodeStore.initScrollToNode(linkId, direction);
           } else {
             if (!id) throw Error('id should be valid but it is not defined');
             nodeStore.setActiveNode(id);
@@ -322,7 +322,7 @@ export const ConverseTekNodeRenderer = observer(
                 if (nodeTreeIndex == null) throw Error(`node tree index is not found for nodeId ${id}`);
                 const direction = nodeTreeIndex < treeIndex ? 'up' : 'down';
 
-                setTimeout(() => nodeStore.scrollToNode(id, direction, undefined, true), 250);
+                setTimeout(() => nodeStore.initScrollToNode(id, direction, undefined, true), 250);
               }
             });
           }

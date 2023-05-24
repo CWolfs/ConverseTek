@@ -236,7 +236,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
 
     const node = nodeStore.getNode(expandFromCoreToNodeId);
     const updatedTreeData = expandFromCoreToNode(treeData, node, (node: RSTNode) => {
-      nodeStore.setNodeExpansion(node.id, false);
+      nodeStore.setNodeExpansion(node.id, true);
     });
 
     setTreeData(updatedTreeData);
