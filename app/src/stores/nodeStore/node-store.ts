@@ -1183,11 +1183,31 @@ class NodeStore {
 
   getChildrenFromElementNodeIncludingSelf(elementNode: ElementNodeType): RSTNode[] | null {
     const { auxiliaryLink } = elementNode;
-    if (auxiliaryLink) return [];
 
     const elementNodeId = getId(elementNode);
     const isElementNodeExpanded = this.isNodeExpanded(elementNodeId);
-    const elementNodeChildren: RSTNode[] | null = this.getChildrenFromElementNode(elementNode);
+
+    const isValidLink = auxiliaryLink && elementNode.nextNodeIndex !== -1;
+    let elementNodeChildren: RSTNode[] | null = [];
+
+    if (auxiliaryLink) {
+      if (isValidLink) {
+        const linkNode = this.getPromptNodeByIndex(elementNode.nextNodeIndex);
+
+        elementNodeChildren = [
+          {
+            title: `[Link to NODE ${elementNode.nextNodeIndex}]`,
+            type: 'link',
+            linkId: linkNode ? getId(linkNode) : null,
+            linkIndex: elementNode.nextNodeIndex,
+            canDrag: false,
+            parentId: elementNodeId,
+          },
+        ];
+      }
+    } else {
+      elementNodeChildren = this.getChildrenFromElementNode(elementNode);
+    }
 
     return [
       {
