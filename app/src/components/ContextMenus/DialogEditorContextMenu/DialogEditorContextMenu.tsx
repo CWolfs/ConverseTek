@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Item, ItemParams, Separator } from 'react-contexify';
+import { Menu, Item, ItemParams, Separator, useContextMenu } from 'react-contexify';
 import { observer } from 'mobx-react';
 
 import 'react-contexify/ReactContexify.css';
@@ -38,6 +38,9 @@ function getAddLabel(type: string) {
 export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string; onVisibilityChange: (flag: boolean) => void }) {
   const nodeStore = useStore<NodeStore>('node');
   const modalStore = useStore<ModalStore>('modal');
+  const { hideAll } = useContextMenu({
+    id,
+  });
 
   const { focusedTreeNode: focusedNode, clipboard } = nodeStore;
 
@@ -54,21 +57,25 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
   const onAddClicked = ({ props }: ItemParams<EventProps>) => {
     if (!props) return;
     nodeStore.addNodeByParentId(props.id);
+    hideAll();
   };
 
   const onCopyClicked = ({ props }: ItemParams<EventProps>) => {
     if (!props) return;
     nodeStore.setClipboard(props.id);
+    hideAll();
   };
 
   const onPasteAsCopy = ({ props }: ItemParams<EventProps>) => {
     if (!props) return;
     nodeStore.pasteAsCopyFromClipboard(props.id);
+    hideAll();
   };
 
   const onPasteAsLink = ({ props }: ItemParams<EventProps>) => {
     if (!props) return;
     nodeStore.pasteAsLinkFromClipboard(props.id);
+    hideAll();
   };
 
   const onDeleteClicked = ({ props }: ItemParams<EventProps>) => {
@@ -105,6 +112,8 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
       },
       'global1',
     );
+
+    hideAll();
   };
 
   const onExpandBranch = ({ props }: ItemParams<EventProps>) => {
@@ -112,6 +121,7 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
 
     const { id: nodeId } = props;
     nodeStore.setExpandOnNodeId(nodeId);
+    hideAll();
   };
 
   const onCollapseBranch = ({ props }: ItemParams<EventProps>) => {
@@ -120,6 +130,7 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
     const { id: nodeId } = props;
 
     nodeStore.setCollapseOnNodeId(nodeId);
+    hideAll();
   };
 
   const onCollapseOtherBranches = ({ props }: ItemParams<EventProps>) => {
@@ -128,6 +139,7 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
     const { id: nodeId } = props;
 
     nodeStore.setCollapseOthersOnNodeId(nodeId);
+    hideAll();
   };
 
   const onIsolateBranch = ({ props }: ItemParams<EventProps>) => {
@@ -136,13 +148,16 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
     const { id: nodeId } = props;
 
     nodeStore.setIsolateOnNodeId(nodeId);
+    hideAll();
   };
 
   const onExitIsolateBranch = ({ props }: ItemParams<EventProps>) => {
     if (!props) return;
 
     nodeStore.setIsolateOnNodeId('exit');
+    hideAll();
   };
+
   return (
     <Menu id={id} onVisibilityChange={onVisibilityChange}>
       {allowAdd && !isIsolatedCore && <Item onClick={onAddClicked}>{getAddLabel(type)}</Item>}
