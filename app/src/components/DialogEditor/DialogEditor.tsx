@@ -33,7 +33,7 @@ export type OnNodeContextMenuProps = {
   parentId: string | null;
 };
 
-function buildTreeData(nodeStore: NodeStore, conversationAsset: ConversationAssetType): RSTNode[] {
+function buildTreeDataFromConversation(nodeStore: NodeStore, conversationAsset: ConversationAssetType): RSTNode[] {
   const data = [
     {
       title: 'Core',
@@ -49,13 +49,15 @@ function buildTreeData(nodeStore: NodeStore, conversationAsset: ConversationAsse
   return data;
 }
 
-function buildTreeDataFromNode(nodeStore: NodeStore, node: PromptNodeType | ElementNodeType): RSTNode[] {
+function buildTreeDataFromNode(nodeStore: NodeStore, node: PromptNodeType | ElementNodeType | null): RSTNode[] {
   let children: RSTNode[] = [];
 
-  if (isPromptNodeType(node)) {
-    children = nodeStore.getChildrenFromPromptNodeIncludingSelf(node) || [];
-  } else if (isElementNodeType(node)) {
-    children = nodeStore.getChildrenFromElementNodeIncludingSelf(node) || [];
+  if (node != null) {
+    if (isPromptNodeType(node)) {
+      children = nodeStore.getChildrenFromPromptNodeIncludingSelf(node) || [];
+    } else if (isElementNodeType(node)) {
+      children = nodeStore.getChildrenFromElementNodeIncludingSelf(node) || [];
+    }
   }
 
   const data = [
@@ -212,15 +214,38 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
   // onMount
   useEffect(() => {
     nodeStore.init(conversationAsset);
-    setTreeData(buildTreeData(nodeStore, conversationAsset));
+    setTreeData(buildTreeDataFromConversation(nodeStore, conversationAsset));
   }, []);
 
   // OnConversationChange or rebuild
   useEffect(() => {
     nodeStore.init(conversationAsset);
-    setTreeData(buildTreeData(nodeStore, conversationAsset));
+    setTreeData(buildTreeDataFromConversation(nodeStore, conversationAsset));
     setIsContextMenuVisible(false);
-  }, [conversationAsset, rebuild]);
+  }, [conversationAsset]);
+
+  useEffect(() => {
+    if (treeData == null || rebuild == false) return;
+
+    // in isolation mode
+    if (wholeTreeData.current) {
+      const coreTreeItem = treeData[0];
+      if (coreTreeItem == null) return;
+
+      const coreTreeItemChildren = coreTreeItem.children;
+      if (coreTreeItemChildren == null || coreTreeItemChildren.length <= 0) return;
+
+      console.log('coreTreeItem', coreTreeItemChildren[0].id);
+      const node = nodeStore.getNode(coreTreeItemChildren[0].id);
+
+      console.log('node', node);
+      setTreeData(buildTreeDataFromNode(nodeStore, node));
+    } else {
+      setTreeData(buildTreeDataFromConversation(nodeStore, conversationAsset));
+    }
+
+    setIsContextMenuVisible(false);
+  }, [rebuild]);
 
   // On window size change
   useEffect(() => {
@@ -320,6 +345,9 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
       // Restore the whole tree
       setTreeData(wholeTreeData.current);
       wholeTreeData.current = null;
+
+      // Rebuild
+      nodeStore.setRebuild(true);
     } else {
       const node = nodeStore.getNode(isolateOnNodeId);
       if (node == null) return;
