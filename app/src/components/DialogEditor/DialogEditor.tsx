@@ -55,7 +55,7 @@ function buildTreeDataFromNode(nodeStore: NodeStore, node: PromptNodeType | Elem
   if (isPromptNodeType(node)) {
     children = nodeStore.getChildrenFromPromptNode(node) || [];
   } else if (isElementNodeType(node)) {
-    children = nodeStore.getChildrenFromElementNode(node) || [];
+    children = nodeStore.getChildrenFromElementNodeIncludingSelf(node) || [];
   }
 
   const data = [

@@ -1179,6 +1179,26 @@ class NodeStore {
     ];
   }
 
+  getChildrenFromElementNodeIncludingSelf(elementNode: ElementNodeType): RSTNode[] | null {
+    const { auxiliaryLink } = elementNode;
+    if (auxiliaryLink) return [];
+
+    const elementNodeId = getId(elementNode);
+    const isElementNodeExpanded = this.isNodeExpanded(elementNodeId);
+    const elementNodeChildren: RSTNode[] | null = this.getChildrenFromElementNode(elementNode);
+
+    return [
+      {
+        title: elementNode.responseText,
+        id: elementNodeId,
+        parentId: elementNode.parentId,
+        type: 'response',
+        expanded: isElementNodeExpanded,
+        children: elementNodeChildren,
+      },
+    ];
+  }
+
   getChildrenFromElementNode(elementNode: ElementNodeType): RSTNode[] | null {
     const { nextNodeIndex } = elementNode; // root or response/branch
 
