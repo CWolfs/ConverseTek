@@ -10,12 +10,12 @@ import 'react-sortable-tree/style.css';
 
 import { DataStore } from 'stores/dataStore/data-store';
 import { NodeStore } from 'stores/nodeStore/node-store';
-import { ConversationAssetType, ElementNodeType } from 'types';
+import { ConversationAssetType, ElementNodeType, PromptNodeType } from 'types';
 
 import { useStore } from 'hooks/useStore';
 import { useControlWheel } from 'hooks/useControlWheel';
 import { useWindowSize } from 'hooks/useWindowSize';
-import { detectType, isPromptNodeType } from 'utils/node-utils';
+import { detectType, isElementNodeType, isPromptNodeType } from 'utils/node-utils';
 import { toggleExpandedForAll } from 'utils/tree-data-utils';
 import { collapseOrExpandBranches, collapseOtherBranches, expandFromCoreToNode } from 'utils/custom-tree-data-utils';
 
@@ -49,6 +49,30 @@ function buildTreeData(nodeStore: NodeStore, conversationAsset: ConversationAsse
   return data;
 }
 
+function buildTreeDataFromNode(nodeStore: NodeStore, node: PromptNodeType | ElementNodeType): RSTNode[] {
+  let children: RSTNode[] = [];
+
+  if (isPromptNodeType(node)) {
+    children = nodeStore.getChildrenFromPromptNode(node) || [];
+  } else if (isElementNodeType(node)) {
+    children = nodeStore.getChildrenFromElementNode(node) || [];
+  }
+
+  const data = [
+    {
+      title: 'Isolated Node Core',
+      id: '0',
+      type: 'core',
+      parentId: '-1',
+      children: children, // nodeStore.getChildrenFromRoots(conversationAsset.conversation.roots),
+      expanded: true,
+      canDrag: false,
+    } as RSTNode,
+  ];
+
+  return data;
+}
+
 const zoomLevelIncrement = 0.05;
 
 function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationAsset: ConversationAssetType; rebuild: boolean; expandAll: boolean }) {
@@ -58,6 +82,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
   const dialogEditorRef = useRef<HTMLDivElement>(null);
   const dialogEditorSize = useSize(dialogEditorRef);
 
+  const wholeTreeData = useRef<RSTNode[] | null>(null);
   const [treeData, setTreeData] = useState<RSTNode[] | null>(null);
   const [treeWidth, setTreeWidth] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(1);
@@ -72,6 +97,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
   const collapseOnNodeId = nodeStore.getCollapseOnNodeId();
   const collapseOthersOnNodeId = nodeStore.getCollapseOthersOnNodeId();
   const expandFromCoreToNodeId = nodeStore.getExpandFromCoreToNodeId();
+  const isolateOnNodeId = nodeStore.getIsolateOnNodeId();
 
   const onMove = (nodeContainer: RSTNodeOnMoveContainer) => {
     const { node, nextParentNode } = nodeContainer;
@@ -282,6 +308,32 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
     setTreeData(updatedTreeData);
     nodeStore.setExpandFromCoreToNodeId(null);
   }, [expandFromCoreToNodeId]);
+
+  // To isolate a branch starting from the provided node id
+  useEffect(() => {
+    if (isolateOnNodeId == null || treeData == null) return;
+
+    const node = nodeStore.getNode(isolateOnNodeId);
+    if (node == null) return;
+
+    // Backup the whole tree
+    wholeTreeData.current = treeData;
+
+    // Set the tree data starting from the selected node
+    setTreeData(buildTreeDataFromNode(nodeStore, node));
+
+    // const updatedTreeData = collapseOrExpandBranches(
+    //   treeData,
+    //   node,
+    //   (node: RSTNode) => {
+    //     nodeStore.setNodeExpansion(node.id, true);
+    //   },
+    //   true,
+    // );
+
+    // setTreeData(updatedTreeData);
+    nodeStore.setIsolateOnNodeId(null);
+  }, [isolateOnNodeId]);
 
   useControlWheel(treeElement, onControlWheel);
 

@@ -37,6 +37,7 @@ class NodeStore {
   collapseOnNodeId: string | null = null;
   collapseOthersOnNodeId: string | null = null;
   expandFromCoreToNodeId: string | null = null;
+  isolateOnNodeId: string | null = null;
   focusedTreeNode: RSTNode | null = null;
   ownerId: string | null = null;
   takenPromptNodeIndexes: number[] = [];
@@ -55,6 +56,7 @@ class NodeStore {
       collapseOnNodeId: observable,
       collapseOthersOnNodeId: observable,
       expandFromCoreToNodeId: observable,
+      isolateOnNodeId: observable,
       rebuild: observable,
       setRebuild: action,
       init: action,
@@ -104,6 +106,7 @@ class NodeStore {
       setExpandOnNodeId: action,
       setCollapseOthersOnNodeId: action,
       setExpandFromCoreToNodeId: action,
+      setIsolateOnNodeId: action,
       reset: action,
     });
   }
@@ -1100,6 +1103,14 @@ class NodeStore {
     return this.expandFromCoreToNodeId;
   }
 
+  setIsolateOnNodeId(nodeId: string | null): void {
+    this.isolateOnNodeId = nodeId;
+  }
+
+  getIsolateOnNodeId(): string | null {
+    return this.isolateOnNodeId;
+  }
+
   getNodeResponseIdsFromNodeId(nodeId: string): string[] {
     const promptNode = this.getNode(nodeId) as PromptNodeType;
     return this.getNodeResponseIds(promptNode);
@@ -1114,6 +1125,60 @@ class NodeStore {
    * || DIALOG TREE DATA BUILDING METHODS ||
    * =======================================
    */
+  getChildrenFromPromptNode(promptNode: PromptNodeType): RSTNode[] | null {
+    const promptNodeId = getId(promptNode);
+
+    return [
+      {
+        title: promptNode.text,
+        id: getId(promptNode),
+        parentId: promptNode.parentId,
+        type: 'node',
+        expanded: true,
+
+        children: promptNode.branches.map((elementNode: ElementNodeType): RSTNode => {
+          const { auxiliaryLink } = elementNode;
+          const elementNodeId = getId(elementNode);
+          const isElementNodeExpanded = this.isNodeExpanded(elementNodeId);
+
+          elementNode.type = 'response';
+          elementNode.parentId = promptNodeId;
+
+          const isValidLink = auxiliaryLink && elementNode.nextNodeIndex !== -1;
+          let elementNodeChildren: RSTNode[] | null = [];
+
+          if (auxiliaryLink) {
+            if (isValidLink) {
+              const linkNode = this.getPromptNodeByIndex(elementNode.nextNodeIndex);
+
+              elementNodeChildren = [
+                {
+                  title: `[Link to NODE ${elementNode.nextNodeIndex}]`,
+                  type: 'link',
+                  linkId: linkNode ? getId(linkNode) : null,
+                  linkIndex: elementNode.nextNodeIndex,
+                  canDrag: false,
+                  parentId: elementNodeId,
+                },
+              ];
+            }
+          } else {
+            elementNodeChildren = this.getChildrenFromElementNode(elementNode);
+          }
+
+          return {
+            title: elementNode.responseText,
+            id: elementNodeId,
+            parentId: promptNodeId,
+            type: 'response',
+            expanded: isElementNodeExpanded,
+            children: elementNodeChildren,
+          };
+        }),
+      },
+    ];
+  }
+
   getChildrenFromElementNode(elementNode: ElementNodeType): RSTNode[] | null {
     const { nextNodeIndex } = elementNode; // root or response/branch
 
