@@ -315,30 +315,28 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
 
     if (isolateOnNodeId === 'exit') {
       // Merge the isolated branch to the whole tree
+      // TODO: Add code
 
       // Restore the whole tree
       setTreeData(wholeTreeData.current);
+      wholeTreeData.current = null;
     } else {
       const node = nodeStore.getNode(isolateOnNodeId);
       if (node == null) return;
 
       // Backup the whole tree
-      wholeTreeData.current = treeData;
+      if (!wholeTreeData.current) {
+        wholeTreeData.current = treeData;
+      } else {
+        // If the whole tree data already exists then the user is already in an isolated view
+        // Merge their current isolated view with the whole tree data - then go into isolated view for the new node target
+        // TODO: add code
+      }
 
       // Set the tree data starting from the selected node
       setTreeData(buildTreeDataFromNode(nodeStore, node));
-
-      // const updatedTreeData = collapseOrExpandBranches(
-      //   treeData,
-      //   node,
-      //   (node: RSTNode) => {
-      //     nodeStore.setNodeExpansion(node.id, true);
-      //   },
-      //   true,
-      // );
-
-      // setTreeData(updatedTreeData);
     }
+
     nodeStore.setIsolateOnNodeId(null);
   }, [isolateOnNodeId]);
 
