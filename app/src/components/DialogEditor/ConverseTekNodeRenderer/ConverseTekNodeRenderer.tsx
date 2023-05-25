@@ -93,6 +93,14 @@ function getHighlightColour(colourConfig: ColourConfigType, nodeType: string): s
   return '';
 }
 
+function getTruncatedLinkText(nodeStore: NodeStore, linkIndex: number, maxLength: number) {
+  const linkedPromptNode = nodeStore.getPromptNodeByIndex(linkIndex);
+  if (linkedPromptNode == null) return '';
+
+  const text = linkedPromptNode.text;
+  return text.length < maxLength ? text : `${text.substring(0, maxLength)}...`;
+}
+
 /* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
 export const ConverseTekNodeRenderer = observer(
   ({
@@ -185,6 +193,7 @@ export const ConverseTekNodeRenderer = observer(
       'node-renderer__root-title': isRoot,
       'node-renderer__node-title': isNode,
       'node-renderer__response-title': isResponse,
+      'node-renderer__link-title': isLink,
     });
 
     const rowContentsClasses = classnames(
@@ -330,8 +339,16 @@ export const ConverseTekNodeRenderer = observer(
         onMouseEnter={() => !isContextMenuVisible && nodeStore.setFocusedTreeNode(node)}
       >
         {isLink && (
-          <div className="node-renderer__link-row-icon">
-            <LinkIcon />
+          <div className="node-renderer__link">
+            <div className="node-renderer__link-row-icon">
+              <LinkIcon />
+            </div>
+
+            {node.linkIndex && (
+              <div className={labelClasses}>
+                <span className={titleClasses}>{getTruncatedLinkText(nodeStore, node.linkIndex, 40)}</span>
+              </div>
+            )}
           </div>
         )}
         {!isLink && (
