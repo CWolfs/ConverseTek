@@ -5,6 +5,7 @@ import { observer } from 'mobx-react';
 import SortableTree from 'react-sortable-tree';
 import { useContextMenu } from 'react-contexify';
 import { useSize } from 'ahooks';
+import classnames from 'classnames';
 
 import 'react-sortable-tree/style.css';
 
@@ -62,7 +63,7 @@ function buildTreeDataFromNode(nodeStore: NodeStore, node: PromptNodeType | Elem
 
   const data = [
     {
-      title: 'Isolated Node Core',
+      title: 'Isolated Core',
       id: '0',
       type: 'isolatedcore',
       parentId: '-1',
@@ -213,12 +214,14 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
 
   // onMount
   useEffect(() => {
+    wholeTreeData.current = null;
     nodeStore.init(conversationAsset);
     setTreeData(buildTreeDataFromConversation(nodeStore, conversationAsset));
   }, []);
 
   // OnConversationChange or rebuild
   useEffect(() => {
+    wholeTreeData.current = null;
     nodeStore.init(conversationAsset);
     setTreeData(buildTreeDataFromConversation(nodeStore, conversationAsset));
     setIsContextMenuVisible(false);
@@ -372,8 +375,14 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
 
   if (treeData === null) return null;
 
+  console.log('isolateOnNodeId', isolateOnNodeId);
+  const dialogeEditorClasses = classnames('dialog-editor', {
+    'dialog-editor--isolated': wholeTreeData.current,
+  });
+  console.log('dialogeEditorClasses', dialogeEditorClasses);
+
   return (
-    <div ref={dialogEditorRef} className="dialog-editor">
+    <div ref={dialogEditorRef} className={dialogeEditorClasses}>
       <DialogEditorContextMenu id="dialog-context-menu" onVisibilityChange={onNodeContextMenuVisibilityChange} />
       <div
         className="dialog-editor__tree"

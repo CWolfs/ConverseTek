@@ -81,6 +81,8 @@ function getHighlightColour(colourConfig: ColourConfigType, nodeType: string): s
   switch (nodeType) {
     case 'core':
       return colourConfig.coreNode.highlight;
+    case 'isolatedcore':
+      return colourConfig.coreNode.highlight;
     case 'root':
       return colourConfig.rootNode.highlight;
     case 'node':
@@ -150,7 +152,7 @@ export const ConverseTekNodeRenderer = observer(
     const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node);
     const isLandingPadActive = !didDrop && isDragging;
 
-    const { isRoot, isNode, isResponse, isLink } = detectType(nodeType);
+    const { isCore, isBaseCore, isIsolatedCore, isRoot, isNode, isResponse, isLink } = detectType(nodeType);
 
     const contextMenuId = node.id || Math.random().toString();
     const { parentId } = node;
@@ -187,6 +189,7 @@ export const ConverseTekNodeRenderer = observer(
       'node-renderer__node-label': isNode,
       'node-renderer__response-label': isResponse,
       'node-renderer__link-label': isLink,
+      'node-renderer__core-label': isCore,
     });
 
     const titleClasses = classnames('rst__rowTitle', node.subtitle && 'rst__rowTitleWithSubtitle', {
@@ -266,6 +269,12 @@ export const ConverseTekNodeRenderer = observer(
     if (rowDirection === 'rtl') {
       buttonStyle = { right: -0.5 * scaffoldBlockPxWidth };
     }
+
+    const coreStyle: { color: string; fontSize: string; paddingRight?: string } = {
+      color: isBaseCore ? '#2f71d4' : '#f75d00',
+      fontSize: '18px',
+      paddingRight: '8px',
+    };
 
     const logicStyle: { color: string; fontSize: string; paddingRight?: string } = {
       color: isResponse ? 'white' : '#2f71d4',
@@ -354,6 +363,8 @@ export const ConverseTekNodeRenderer = observer(
         {!isLink && (
           <section>
             <div className="node-renderer__row-contents-logic">
+              {isBaseCore && <Icon type="profile" style={coreStyle} />}
+              {isIsolatedCore && <Icon type="branches" style={coreStyle} />}
               {hasConditions && <Icon type="question-circle" theme="filled" style={logicStyle} />}
               {hasActions && <Icon type="right-circle" theme="filled" style={actionsIconStyle} />}
               {!hasNodeTitle && <Icon type="enter" style={responseContinueStyle} />}
