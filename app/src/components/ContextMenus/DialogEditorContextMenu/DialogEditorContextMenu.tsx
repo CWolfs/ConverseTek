@@ -146,7 +146,7 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
       {allowedToPasteLink && <Item onClick={onPasteAsLink}>Paste as Link</Item>}
       {!isCore && <Item onClick={onDeleteClicked}>Delete</Item>}
       {(isNode || isResponse || isRoot) && <Separator />}
-      {(isNode || isResponse || isRoot) && <Item onClick={onIsolateBranch}>Isolate Branch</Item>}
+      {(isNode || isResponse) && <Item onClick={onIsolateBranch}>Isolate Branch</Item>}
       {(isNode || isResponse || isRoot) && <Item onClick={onExpandBranch}>Expand Branch</Item>}
       {(isNode || isResponse || isRoot) && <Item onClick={onCollapseBranch}>Collapse Branch</Item>}
       {(isNode || isResponse || isRoot) && <Item onClick={onCollapseOtherBranches}>Collapse Other Branches</Item>}
