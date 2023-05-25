@@ -45,7 +45,7 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
   if (!focusedNode) return null;
 
   const { id: focusedNodeId, type } = focusedNode;
-  const { isCore, isRoot, isNode, isResponse } = detectType(type);
+  const { isCore, isIsolatedCore, isRoot, isNode, isResponse } = detectType(type);
 
   const allowAdd = isAllowedToCreateNode(focusedNodeId);
   const allowedToPasteCopy = isAllowedToPasteCopy(focusedNodeId, clipboard);
@@ -138,9 +138,14 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
     nodeStore.setIsolateOnNodeId(nodeId);
   };
 
+  const onExitIsolateBranch = ({ props }: ItemParams<EventProps>) => {
+    if (!props) return;
+
+    nodeStore.setIsolateOnNodeId('exit');
+  };
   return (
     <Menu id={id} onVisibilityChange={onVisibilityChange}>
-      {allowAdd && <Item onClick={onAddClicked}>{getAddLabel(type)}</Item>}
+      {allowAdd && !isIsolatedCore && <Item onClick={onAddClicked}>{getAddLabel(type)}</Item>}
       {(isNode || isResponse) && <Item onClick={onCopyClicked}>Copy</Item>}
       {allowedToPasteCopy && <Item onClick={onPasteAsCopy}>Paste as Copy</Item>}
       {allowedToPasteLink && <Item onClick={onPasteAsLink}>Paste as Link</Item>}
@@ -150,6 +155,7 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
       {(isNode || isResponse || isRoot) && <Item onClick={onExpandBranch}>Expand Branch</Item>}
       {(isNode || isResponse || isRoot) && <Item onClick={onCollapseBranch}>Collapse Branch</Item>}
       {(isNode || isResponse || isRoot) && <Item onClick={onCollapseOtherBranches}>Collapse Other Branches</Item>}
+      {isIsolatedCore && <Item onClick={onExitIsolateBranch}>Back to Full Conversation</Item>}
     </Menu>
   );
 }

@@ -107,6 +107,8 @@ class NodeStore {
       setCollapseOthersOnNodeId: action,
       setExpandFromCoreToNodeId: action,
       setIsolateOnNodeId: action,
+      getChildrenFromPromptNodeIncludingSelf: action,
+      getChildrenFromElementNodeIncludingSelf: action,
       reset: action,
     });
   }
@@ -1125,7 +1127,7 @@ class NodeStore {
    * || DIALOG TREE DATA BUILDING METHODS ||
    * =======================================
    */
-  getChildrenFromPromptNode(promptNode: PromptNodeType): RSTNode[] | null {
+  getChildrenFromPromptNodeIncludingSelf(promptNode: PromptNodeType): RSTNode[] | null {
     const promptNodeId = getId(promptNode);
 
     return [

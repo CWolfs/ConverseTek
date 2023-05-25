@@ -29,7 +29,7 @@ import './DialogEditor.css';
 export type OnNodeContextMenuProps = {
   event: MouseEvent<HTMLDivElement>;
   contextMenuId: string;
-  type: 'core' | 'node' | 'response' | 'root' | 'link';
+  type: 'core' | 'isolatedcore' | 'node' | 'response' | 'root' | 'link';
   parentId: string | null;
 };
 
@@ -53,7 +53,7 @@ function buildTreeDataFromNode(nodeStore: NodeStore, node: PromptNodeType | Elem
   let children: RSTNode[] = [];
 
   if (isPromptNodeType(node)) {
-    children = nodeStore.getChildrenFromPromptNode(node) || [];
+    children = nodeStore.getChildrenFromPromptNodeIncludingSelf(node) || [];
   } else if (isElementNodeType(node)) {
     children = nodeStore.getChildrenFromElementNodeIncludingSelf(node) || [];
   }
@@ -62,9 +62,9 @@ function buildTreeDataFromNode(nodeStore: NodeStore, node: PromptNodeType | Elem
     {
       title: 'Isolated Node Core',
       id: '0',
-      type: 'core',
+      type: 'isolatedcore',
       parentId: '-1',
-      children: children, // nodeStore.getChildrenFromRoots(conversationAsset.conversation.roots),
+      children,
       expanded: true,
       canDrag: false,
     } as RSTNode,
@@ -313,25 +313,32 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
   useEffect(() => {
     if (isolateOnNodeId == null || treeData == null) return;
 
-    const node = nodeStore.getNode(isolateOnNodeId);
-    if (node == null) return;
+    if (isolateOnNodeId === 'exit') {
+      // Merge the isolated branch to the whole tree
 
-    // Backup the whole tree
-    wholeTreeData.current = treeData;
+      // Restore the whole tree
+      setTreeData(wholeTreeData.current);
+    } else {
+      const node = nodeStore.getNode(isolateOnNodeId);
+      if (node == null) return;
 
-    // Set the tree data starting from the selected node
-    setTreeData(buildTreeDataFromNode(nodeStore, node));
+      // Backup the whole tree
+      wholeTreeData.current = treeData;
 
-    // const updatedTreeData = collapseOrExpandBranches(
-    //   treeData,
-    //   node,
-    //   (node: RSTNode) => {
-    //     nodeStore.setNodeExpansion(node.id, true);
-    //   },
-    //   true,
-    // );
+      // Set the tree data starting from the selected node
+      setTreeData(buildTreeDataFromNode(nodeStore, node));
 
-    // setTreeData(updatedTreeData);
+      // const updatedTreeData = collapseOrExpandBranches(
+      //   treeData,
+      //   node,
+      //   (node: RSTNode) => {
+      //     nodeStore.setNodeExpansion(node.id, true);
+      //   },
+      //   true,
+      // );
+
+      // setTreeData(updatedTreeData);
+    }
     nodeStore.setIsolateOnNodeId(null);
   }, [isolateOnNodeId]);
 
