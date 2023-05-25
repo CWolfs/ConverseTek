@@ -17,6 +17,7 @@
   &__core {
     &-label {
       font-weight: 500;
+      color: #424242;
     }
 
     &-title {
