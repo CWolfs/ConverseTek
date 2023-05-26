@@ -1,6 +1,6 @@
 /* eslint-disable function-paren-newline */
 /* eslint-disable indent */
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Icon } from 'antd';
@@ -137,6 +137,8 @@ export const ConverseTekNodeRenderer = observer(
     zoomLevel,
     ...otherProps
   }: Props) => {
+    const nodeRef = useRef<HTMLDivElement>(null);
+
     const nodeSubtitle = subtitle || node.subtitle;
     const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : null;
     const isActiveNode = activeNodeId === node.id;
@@ -401,8 +403,22 @@ export const ConverseTekNodeRenderer = observer(
       </div>
     );
 
+    const [spacerLeftPosition, setSpacerLeftPosition] = useState<number>(0);
+    const maxTreeHorPos = nodeStore.getMaxTreeHorizontalNodePosition();
+    useEffect(() => {
+      console.log('maxTreeHorPos', maxTreeHorPos);
+      if (nodeRef.current) {
+        const parentElement = nodeRef.current.parentElement;
+        if (parentElement) {
+          setSpacerLeftPosition(nodeStore.getMaxTreeHorizontalNodePosition() - parseFloat(nodeRef.current.parentElement.style.left));
+        }
+      }
+    }, [maxTreeHorPos, nodeRef.current]);
+
+    console.log('about to set spacerLeftPosition', spacerLeftPosition);
+
     return (
-      <div style={{ height: '100%' }} data-node-id={node.id} {...otherProps}>
+      <div ref={nodeRef} style={{ height: '100%' }} data-node-id={node.id} {...otherProps}>
         {toggleChildrenVisibility && node.children && (node.children.length > 0 || typeof node.children === 'function') && (
           <div>
             <button
@@ -429,7 +445,7 @@ export const ConverseTekNodeRenderer = observer(
           </div>
         )}
 
-        <div className={classnames('rst__rowWrapper', rowDirectionClass)}>
+        <div className={classnames('rst__rowWrapper', rowDirectionClass)} style={{ display: 'inline-block' }}>
           {/* Set the row preview to be used during drag and drop */}
           {connectDragPreview(
             <div
@@ -451,6 +467,10 @@ export const ConverseTekNodeRenderer = observer(
               {rowContents}
             </div>,
           )}
+        </div>
+
+        <div className="faker" style={{ position: 'absolute', display: 'inline-block', visibility: 'hidden', left: spacerLeftPosition }}>
+          spacer
         </div>
       </div>
     );

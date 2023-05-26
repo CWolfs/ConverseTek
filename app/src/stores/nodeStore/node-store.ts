@@ -44,6 +44,7 @@ class NodeStore {
   expandMap = new Map<string, boolean>();
   clipboard: ClipboardType | null = null;
   nodeIdToTreeIndexMap = new Map<string, number>();
+  maxTreeHorizontalNodePosition = 0;
   dirtyActiveNode = false;
   rebuild = false;
 
@@ -58,6 +59,7 @@ class NodeStore {
       expandFromCoreToNodeId: observable,
       isolateOnNodeId: observable,
       rebuild: observable,
+      maxTreeHorizontalNodePosition: observable,
       setRebuild: action,
       init: action,
       regenerateNodeIds: action,
@@ -109,6 +111,8 @@ class NodeStore {
       setIsolateOnNodeId: action,
       getChildrenFromPromptNodeIncludingSelf: action,
       getChildrenFromElementNodeIncludingSelf: action,
+      setMaxTreeHorizontalNodePosition: action,
+      resetMaxTreeHorizontalNodePosition: action,
       reset: action,
     });
   }
@@ -216,6 +220,20 @@ class NodeStore {
     }
 
     return false;
+  }
+
+  setMaxTreeHorizontalNodePosition(value: number) {
+    if (value > this.maxTreeHorizontalNodePosition) {
+      this.maxTreeHorizontalNodePosition = value;
+    }
+  }
+
+  getMaxTreeHorizontalNodePosition() {
+    return this.maxTreeHorizontalNodePosition;
+  }
+
+  resetMaxTreeHorizontalNodePosition() {
+    this.maxTreeHorizontalNodePosition = 0;
   }
 
   /*
