@@ -86,6 +86,8 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
   const dialogEditorSize = useSize(dialogEditorRef);
 
   const wholeTreeData = useRef<RSTNode[] | null>(null);
+  const activeIsolateOnNodeId = useRef<string | null>(null);
+
   const [treeData, setTreeData] = useState<RSTNode[] | null>(null);
   const [treeWidth, setTreeWidth] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(1);
@@ -136,7 +138,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
     // GUARD - Don't allow drop at the very top of the tree
     if (nextParent === null) return false;
 
-    const { type: nodeType, parentId: nodeParentId } = node;
+    const { type: nodeType } = node;
     const { isRoot, isNode, isResponse } = detectType(nodeType);
 
     const { type: nextParentType, id: parentId } = nextParent;
@@ -215,6 +217,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
   // onMount
   useEffect(() => {
     wholeTreeData.current = null;
+    activeIsolateOnNodeId.current = null;
     nodeStore.init(conversationAsset);
     setTreeData(buildTreeDataFromConversation(nodeStore, conversationAsset));
   }, []);
@@ -223,7 +226,15 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
   useEffect(() => {
     wholeTreeData.current = null;
     nodeStore.init(conversationAsset);
-    setTreeData(buildTreeDataFromConversation(nodeStore, conversationAsset));
+
+    if (activeIsolateOnNodeId.current) {
+      wholeTreeData.current = buildTreeDataFromConversation(nodeStore, conversationAsset);
+      const node = nodeStore.getNode(activeIsolateOnNodeId.current);
+      setTreeData(buildTreeDataFromNode(nodeStore, node));
+    } else {
+      setTreeData(buildTreeDataFromConversation(nodeStore, conversationAsset));
+    }
+
     setIsContextMenuVisible(false);
   }, [conversationAsset]);
 
@@ -231,17 +242,8 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
     if (treeData == null || rebuild == false) return;
 
     // in isolation mode
-    if (wholeTreeData.current) {
-      const coreTreeItem = treeData[0];
-      if (coreTreeItem == null) return;
-
-      const coreTreeItemChildren = coreTreeItem.children;
-      if (coreTreeItemChildren == null || coreTreeItemChildren.length <= 0) return;
-
-      console.log('coreTreeItem', coreTreeItemChildren[0].id);
-      const node = nodeStore.getNode(coreTreeItemChildren[0].id);
-
-      console.log('node', node);
+    if (wholeTreeData.current && activeIsolateOnNodeId.current) {
+      const node = nodeStore.getNode(activeIsolateOnNodeId.current);
       setTreeData(buildTreeDataFromNode(nodeStore, node));
     } else {
       setTreeData(buildTreeDataFromConversation(nodeStore, conversationAsset));
@@ -342,12 +344,10 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
     if (isolateOnNodeId == null || treeData == null) return;
 
     if (isolateOnNodeId === 'exit') {
-      // Merge the isolated branch to the whole tree
-      // TODO: Add code
-
       // Restore the whole tree
       setTreeData(wholeTreeData.current);
       wholeTreeData.current = null;
+      activeIsolateOnNodeId.current = null;
 
       // Rebuild
       nodeStore.setRebuild(true);
@@ -358,10 +358,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
       // Backup the whole tree
       if (!wholeTreeData.current) {
         wholeTreeData.current = treeData;
-      } else {
-        // If the whole tree data already exists then the user is already in an isolated view
-        // Merge their current isolated view with the whole tree data - then go into isolated view for the new node target
-        // TODO: add code
+        activeIsolateOnNodeId.current = isolateOnNodeId;
       }
 
       // Set the tree data starting from the selected node
