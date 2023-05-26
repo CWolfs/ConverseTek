@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Item, ItemParams, Separator } from 'react-contexify';
+import { Menu, Item, ItemParams, Separator, useContextMenu } from 'react-contexify';
 import { observer } from 'mobx-react';
 
 import 'react-contexify/ReactContexify.css';
@@ -38,6 +38,9 @@ function getAddLabel(type: string) {
 export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string; onVisibilityChange: (flag: boolean) => void }) {
   const nodeStore = useStore<NodeStore>('node');
   const modalStore = useStore<ModalStore>('modal');
+  const { hideAll } = useContextMenu({
+    id,
+  });
 
   const { focusedTreeNode: focusedNode, clipboard } = nodeStore;
 
@@ -45,7 +48,7 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
   if (!focusedNode) return null;
 
   const { id: focusedNodeId, type } = focusedNode;
-  const { isCore, isRoot, isNode, isResponse } = detectType(type);
+  const { isCore, isIsolatedCore, isRoot, isNode, isResponse } = detectType(type);
 
   const allowAdd = isAllowedToCreateNode(focusedNodeId);
   const allowedToPasteCopy = isAllowedToPasteCopy(focusedNodeId, clipboard);
@@ -54,21 +57,25 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
   const onAddClicked = ({ props }: ItemParams<EventProps>) => {
     if (!props) return;
     nodeStore.addNodeByParentId(props.id);
+    hideAll();
   };
 
   const onCopyClicked = ({ props }: ItemParams<EventProps>) => {
     if (!props) return;
     nodeStore.setClipboard(props.id);
+    hideAll();
   };
 
   const onPasteAsCopy = ({ props }: ItemParams<EventProps>) => {
     if (!props) return;
     nodeStore.pasteAsCopyFromClipboard(props.id);
+    hideAll();
   };
 
   const onPasteAsLink = ({ props }: ItemParams<EventProps>) => {
     if (!props) return;
     nodeStore.pasteAsLinkFromClipboard(props.id);
+    hideAll();
   };
 
   const onDeleteClicked = ({ props }: ItemParams<EventProps>) => {
@@ -105,6 +112,8 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
       },
       'global1',
     );
+
+    hideAll();
   };
 
   const onExpandBranch = ({ props }: ItemParams<EventProps>) => {
@@ -112,6 +121,7 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
 
     const { id: nodeId } = props;
     nodeStore.setExpandOnNodeId(nodeId);
+    hideAll();
   };
 
   const onCollapseBranch = ({ props }: ItemParams<EventProps>) => {
@@ -120,6 +130,7 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
     const { id: nodeId } = props;
 
     nodeStore.setCollapseOnNodeId(nodeId);
+    hideAll();
   };
 
   const onCollapseOtherBranches = ({ props }: ItemParams<EventProps>) => {
@@ -128,20 +139,38 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
     const { id: nodeId } = props;
 
     nodeStore.setCollapseOthersOnNodeId(nodeId);
+    hideAll();
+  };
+
+  const onIsolateBranch = ({ props }: ItemParams<EventProps>) => {
+    if (!props) return;
+
+    const { id: nodeId } = props;
+
+    nodeStore.setIsolateOnNodeId(nodeId);
+    hideAll();
+  };
+
+  const onExitIsolateBranch = ({ props }: ItemParams<EventProps>) => {
+    if (!props) return;
+
+    nodeStore.setIsolateOnNodeId('exit');
+    hideAll();
   };
 
   return (
     <Menu id={id} onVisibilityChange={onVisibilityChange}>
-      {allowAdd && <Item onClick={onAddClicked}>{getAddLabel(type)}</Item>}
+      {allowAdd && !isIsolatedCore && <Item onClick={onAddClicked}>{getAddLabel(type)}</Item>}
       {(isNode || isResponse) && <Item onClick={onCopyClicked}>Copy</Item>}
       {allowedToPasteCopy && <Item onClick={onPasteAsCopy}>Paste as Copy</Item>}
       {allowedToPasteLink && <Item onClick={onPasteAsLink}>Paste as Link</Item>}
       {!isCore && <Item onClick={onDeleteClicked}>Delete</Item>}
       {(isNode || isResponse || isRoot) && <Separator />}
-      {/* {(isNode || isResponse || isRoot) && <Item onClick={onIsolateBranch}>Isolate Branch</Item>} */}
+      {(isNode || isResponse) && <Item onClick={onIsolateBranch}>Isolate Branch</Item>}
       {(isNode || isResponse || isRoot) && <Item onClick={onExpandBranch}>Expand Branch</Item>}
       {(isNode || isResponse || isRoot) && <Item onClick={onCollapseBranch}>Collapse Branch</Item>}
       {(isNode || isResponse || isRoot) && <Item onClick={onCollapseOtherBranches}>Collapse Other Branches</Item>}
+      {isIsolatedCore && <Item onClick={onExitIsolateBranch}>Back to Full Conversation</Item>}
     </Menu>
   );
 }

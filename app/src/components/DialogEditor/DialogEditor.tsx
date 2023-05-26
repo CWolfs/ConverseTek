@@ -5,17 +5,18 @@ import { observer } from 'mobx-react';
 import SortableTree from 'react-sortable-tree';
 import { useContextMenu } from 'react-contexify';
 import { useSize } from 'ahooks';
+import classnames from 'classnames';
 
 import 'react-sortable-tree/style.css';
 
 import { DataStore } from 'stores/dataStore/data-store';
 import { NodeStore } from 'stores/nodeStore/node-store';
-import { ConversationAssetType, ElementNodeType } from 'types';
+import { ConversationAssetType, ElementNodeType, PromptNodeType } from 'types';
 
 import { useStore } from 'hooks/useStore';
 import { useControlWheel } from 'hooks/useControlWheel';
 import { useWindowSize } from 'hooks/useWindowSize';
-import { detectType, isPromptNodeType } from 'utils/node-utils';
+import { detectType, isElementNodeType, isPromptNodeType } from 'utils/node-utils';
 import { toggleExpandedForAll } from 'utils/tree-data-utils';
 import { collapseOrExpandBranches, collapseOtherBranches, expandFromCoreToNode } from 'utils/custom-tree-data-utils';
 
@@ -29,11 +30,11 @@ import './DialogEditor.css';
 export type OnNodeContextMenuProps = {
   event: MouseEvent<HTMLDivElement>;
   contextMenuId: string;
-  type: 'core' | 'node' | 'response' | 'root' | 'link';
+  type: 'core' | 'isolatedcore' | 'node' | 'response' | 'root' | 'link';
   parentId: string | null;
 };
 
-function buildTreeData(nodeStore: NodeStore, conversationAsset: ConversationAssetType): RSTNode[] {
+function buildTreeDataFromConversation(nodeStore: NodeStore, conversationAsset: ConversationAssetType): RSTNode[] {
   const data = [
     {
       title: 'Core',
@@ -41,6 +42,32 @@ function buildTreeData(nodeStore: NodeStore, conversationAsset: ConversationAsse
       type: 'core',
       parentId: '-1',
       children: nodeStore.getChildrenFromRoots(conversationAsset.conversation.roots),
+      expanded: true,
+      canDrag: false,
+    } as RSTNode,
+  ];
+
+  return data;
+}
+
+function buildTreeDataFromNode(nodeStore: NodeStore, node: PromptNodeType | ElementNodeType | null): RSTNode[] {
+  let children: RSTNode[] = [];
+
+  if (node != null) {
+    if (isPromptNodeType(node)) {
+      children = nodeStore.getChildrenFromPromptNodeIncludingSelf(node) || [];
+    } else if (isElementNodeType(node)) {
+      children = nodeStore.getChildrenFromElementNodeIncludingSelf(node) || [];
+    }
+  }
+
+  const data = [
+    {
+      title: 'Isolated Core',
+      id: '0',
+      type: 'isolatedcore',
+      parentId: '-1',
+      children,
       expanded: true,
       canDrag: false,
     } as RSTNode,
@@ -58,6 +85,9 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
   const dialogEditorRef = useRef<HTMLDivElement>(null);
   const dialogEditorSize = useSize(dialogEditorRef);
 
+  const wholeTreeData = useRef<RSTNode[] | null>(null);
+  const activeIsolateOnNodeId = useRef<string | null>(null);
+
   const [treeData, setTreeData] = useState<RSTNode[] | null>(null);
   const [treeWidth, setTreeWidth] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(1);
@@ -72,6 +102,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
   const collapseOnNodeId = nodeStore.getCollapseOnNodeId();
   const collapseOthersOnNodeId = nodeStore.getCollapseOthersOnNodeId();
   const expandFromCoreToNodeId = nodeStore.getExpandFromCoreToNodeId();
+  const isolateOnNodeId = nodeStore.getIsolateOnNodeId();
 
   const onMove = (nodeContainer: RSTNodeOnMoveContainer) => {
     const { node, nextParentNode } = nodeContainer;
@@ -107,7 +138,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
     // GUARD - Don't allow drop at the very top of the tree
     if (nextParent === null) return false;
 
-    const { type: nodeType, parentId: nodeParentId } = node;
+    const { type: nodeType } = node;
     const { isRoot, isNode, isResponse } = detectType(nodeType);
 
     const { type: nextParentType, id: parentId } = nextParent;
@@ -185,16 +216,41 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
 
   // onMount
   useEffect(() => {
+    wholeTreeData.current = null;
+    activeIsolateOnNodeId.current = null;
     nodeStore.init(conversationAsset);
-    setTreeData(buildTreeData(nodeStore, conversationAsset));
+    setTreeData(buildTreeDataFromConversation(nodeStore, conversationAsset));
   }, []);
 
   // OnConversationChange or rebuild
   useEffect(() => {
+    wholeTreeData.current = null;
     nodeStore.init(conversationAsset);
-    setTreeData(buildTreeData(nodeStore, conversationAsset));
+
+    if (activeIsolateOnNodeId.current) {
+      wholeTreeData.current = buildTreeDataFromConversation(nodeStore, conversationAsset);
+      const node = nodeStore.getNode(activeIsolateOnNodeId.current);
+      setTreeData(buildTreeDataFromNode(nodeStore, node));
+    } else {
+      setTreeData(buildTreeDataFromConversation(nodeStore, conversationAsset));
+    }
+
     setIsContextMenuVisible(false);
-  }, [conversationAsset, rebuild]);
+  }, [conversationAsset]);
+
+  useEffect(() => {
+    if (treeData == null || rebuild == false) return;
+
+    // in isolation mode
+    if (wholeTreeData.current && activeIsolateOnNodeId.current) {
+      const node = nodeStore.getNode(activeIsolateOnNodeId.current);
+      setTreeData(buildTreeDataFromNode(nodeStore, node));
+    } else {
+      setTreeData(buildTreeDataFromConversation(nodeStore, conversationAsset));
+    }
+
+    setIsContextMenuVisible(false);
+  }, [rebuild]);
 
   // On window size change
   useEffect(() => {
@@ -283,12 +339,47 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
     nodeStore.setExpandFromCoreToNodeId(null);
   }, [expandFromCoreToNodeId]);
 
+  // To isolate a branch starting from the provided node id
+  useEffect(() => {
+    if (isolateOnNodeId == null || treeData == null) return;
+
+    if (isolateOnNodeId === 'exit') {
+      // Restore the whole tree
+      setTreeData(wholeTreeData.current);
+      wholeTreeData.current = null;
+      activeIsolateOnNodeId.current = null;
+
+      // Rebuild
+      nodeStore.setRebuild(true);
+    } else {
+      const node = nodeStore.getNode(isolateOnNodeId);
+      if (node == null) return;
+
+      // Backup the whole tree
+      if (!wholeTreeData.current) {
+        wholeTreeData.current = treeData;
+        activeIsolateOnNodeId.current = isolateOnNodeId;
+      }
+
+      // Set the tree data starting from the selected node
+      setTreeData(buildTreeDataFromNode(nodeStore, node));
+    }
+
+    nodeStore.setIsolateOnNodeId(null);
+  }, [isolateOnNodeId]);
+
   useControlWheel(treeElement, onControlWheel);
 
   if (treeData === null) return null;
 
+  console.log('isolateOnNodeId', isolateOnNodeId);
+  const dialogeEditorClasses = classnames('dialog-editor', {
+    'dialog-editor--isolated': wholeTreeData.current,
+  });
+  console.log('dialogeEditorClasses', dialogeEditorClasses);
+
   return (
-    <div ref={dialogEditorRef} className="dialog-editor">
+    <div ref={dialogEditorRef} className={dialogeEditorClasses}>
       <DialogEditorContextMenu id="dialog-context-menu" onVisibilityChange={onNodeContextMenuVisibilityChange} />
       <div
         className="dialog-editor__tree"

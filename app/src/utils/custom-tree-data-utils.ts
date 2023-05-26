@@ -117,6 +117,8 @@ function setExpandedInTree(treeData: RSTNode[], nodeId: string, onNode: (node: R
     expandFocusMatchPaths: false,
   });
 
+  if (matches == null || matches.length <= 0) return treeData;
+
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const match = matches[0];
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
