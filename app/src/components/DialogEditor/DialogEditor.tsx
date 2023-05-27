@@ -5,6 +5,7 @@ import { observer } from 'mobx-react';
 import SortableTree from 'react-sortable-tree';
 import { useContextMenu } from 'react-contexify';
 import { useSize } from 'ahooks';
+import throttle from 'lodash/throttle';
 import classnames from 'classnames';
 
 import 'react-sortable-tree/style.css';
@@ -214,10 +215,72 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
 
   const windowSize = useWindowSize();
 
+  const findMaxRightEdge = (node: HTMLElement | null): number => {
+    let maxRight = 0;
+    if (node) {
+      node.childNodes.forEach((child) => {
+        if (child instanceof HTMLElement) {
+          if (child.classList.contains('rst__rowWrapper')) {
+            const rect = child.getBoundingClientRect();
+            const left = child.parentElement?.parentElement?.style.left;
+            let leftValue = 0;
+
+            if (left) {
+              leftValue = parseFloat(left);
+            }
+
+            const rightEdge = rect.width + leftValue;
+            if (rightEdge > maxRight) {
+              maxRight = rightEdge;
+            }
+          }
+
+          // handle the child's children
+          const childMaxRight = findMaxRightEdge(child);
+          if (childMaxRight > maxRight) {
+            maxRight = childMaxRight;
+          }
+        }
+      });
+    }
+    return maxRight;
+  };
+
+  useEffect(() => {
+    if (treeElement.current) {
+      const maxWidth = findMaxRightEdge(treeElement.current);
+      nodeStore.setMaxTreeHorizontalNodePosition(maxWidth);
+    }
+  });
+
+  const handleScroll = throttle(() => {
+    if (treeElement.current) {
+      const maxWidth = findMaxRightEdge(treeElement.current);
+      nodeStore.setMaxTreeHorizontalNodePosition(maxWidth);
+    }
+  }, 100);
+
+  useEffect(() => {
+    if (treeElement.current) {
+      const scrollList = document.querySelector('.ReactVirtualized__List');
+
+      if (scrollList) {
+        scrollList.addEventListener('scroll', handleScroll);
+
+        return () => scrollList?.removeEventListener('scroll', handleScroll);
+      }
+    }
+  }, [treeElement.current]);
+
+  useEffect(() => {
+    nodeStore.resetMaxTreeHorizontalNodePosition();
+  }, [treeData]);
+
   // onMount
   useEffect(() => {
     wholeTreeData.current = null;
     activeIsolateOnNodeId.current = null;
+    nodeStore.resetMaxTreeHorizontalNodePosition();
     nodeStore.init(conversationAsset);
     setTreeData(buildTreeDataFromConversation(nodeStore, conversationAsset));
   }, []);
@@ -225,6 +288,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
   // OnConversationChange or rebuild
   useEffect(() => {
     wholeTreeData.current = null;
+    nodeStore.resetMaxTreeHorizontalNodePosition();
     nodeStore.init(conversationAsset);
 
     if (activeIsolateOnNodeId.current) {
@@ -372,11 +436,9 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
 
   if (treeData === null) return null;
 
-  console.log('isolateOnNodeId', isolateOnNodeId);
   const dialogeEditorClasses = classnames('dialog-editor', {
     'dialog-editor--isolated': wholeTreeData.current,
   });
-  console.log('dialogeEditorClasses', dialogeEditorClasses);
 
   return (
     <div ref={dialogEditorRef} className={dialogeEditorClasses}>
