@@ -269,6 +269,10 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
     }
   }, [treeElement.current]);
 
+  useEffect(() => {
+    nodeStore.resetMaxTreeHorizontalNodePosition();
+  }, [treeData]);
+
   // onMount
   useEffect(() => {
     wholeTreeData.current = null;
