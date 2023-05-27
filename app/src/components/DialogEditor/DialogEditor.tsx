@@ -300,6 +300,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
     }
 
     setIsContextMenuVisible(false);
+    nodeStore.scrollToTop();
   }, [conversationAsset]);
 
   useEffect(() => {

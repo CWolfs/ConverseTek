@@ -267,6 +267,11 @@ class NodeStore {
     setTimeout(() => this.scrollToNode(nodeId, direction, cachedTree, skipHorizontalScroll), 100);
   }
 
+  public scrollToTop(): void {
+    const tree = window.document.querySelector('.ReactVirtualized__Grid');
+    if (tree) tree.scrollTop = 0;
+  }
+
   private scrollToNode(nodeId: string, direction: 'up' | 'down', cachedTree?: HTMLElement, skipHorizontalScroll = false) {
     const horizontalScrollBarHeight = 10;
 

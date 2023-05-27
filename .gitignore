@@ -49,3 +49,5 @@ defs/operations/add_contract\.json
 defs/operations/set_battletech_camera_hard_lock.json
 
 defs/operations/add_flashpoint.json
+
+defs/operations/sideload_conversation.json
