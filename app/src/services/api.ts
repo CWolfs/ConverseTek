@@ -160,7 +160,7 @@ export function saveWorkingDirectory(path: string, name: string) {
 */
 export function getDefinitions(): Promise<any> {
   return get('/definitions').then((definitions: JsonValue): DefinitionsType => {
-    const typedDefinitions = lowercasePropertyNames(definitions) as DefinitionsType;
+    const typedDefinitions = lowercasePropertyNames(definitions, true) as DefinitionsType;
     defStore.setDefinitions(typedDefinitions);
     return typedDefinitions;
   });
