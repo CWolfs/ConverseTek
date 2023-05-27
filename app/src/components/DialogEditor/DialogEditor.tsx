@@ -222,7 +222,14 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
         if (child instanceof HTMLElement) {
           if (child.classList.contains('rst__rowWrapper')) {
             const rect = child.getBoundingClientRect();
-            const rightEdge = rect.left + rect.width;
+            const left = child.parentElement?.parentElement?.style.left;
+            let leftValue = 0;
+
+            if (left) {
+              leftValue = parseFloat(left);
+            }
+
+            const rightEdge = rect.width + leftValue;
             if (rightEdge > maxRight) {
               maxRight = rightEdge;
             }
@@ -247,7 +254,6 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
   });
 
   const handleScroll = throttle(() => {
-    console.log('scrolling...');
     if (treeElement.current) {
       const maxWidth = findMaxRightEdge(treeElement.current);
       nodeStore.setMaxTreeHorizontalNodePosition(maxWidth);
@@ -255,11 +261,8 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
   }, 100);
 
   useEffect(() => {
-    console.log('treeElement.current', treeElement.current);
     if (treeElement.current) {
-      console.log('treeElement.current true');
       const scrollList = document.querySelector('.ReactVirtualized__List');
-      console.log('scrollList', scrollList);
 
       if (scrollList) {
         scrollList.addEventListener('scroll', handleScroll);

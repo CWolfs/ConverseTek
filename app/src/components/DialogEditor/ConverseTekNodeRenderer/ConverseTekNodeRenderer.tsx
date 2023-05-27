@@ -406,7 +406,6 @@ export const ConverseTekNodeRenderer = observer(
     const [spacerLeftPosition, setSpacerLeftPosition] = useState<number>(0);
     const maxTreeHorPos = nodeStore.getMaxTreeHorizontalNodePosition();
     useEffect(() => {
-      console.log('maxTreeHorPos', maxTreeHorPos);
       if (nodeRef.current) {
         const parentElement = nodeRef.current.parentElement;
         if (parentElement) {
@@ -414,8 +413,6 @@ export const ConverseTekNodeRenderer = observer(
         }
       }
     }, [maxTreeHorPos, nodeRef.current]);
-
-    console.log('about to set spacerLeftPosition', spacerLeftPosition);
 
     return (
       <div ref={nodeRef} style={{ height: '100%' }} data-node-id={node.id} {...otherProps}>
