@@ -73,12 +73,12 @@ function ViewableLogic({ logic }: Props) {
 
             if (inputVal) {
               displayValue = inputVal.text;
-              if (inputVal.viewlabel) {
-                const inputValueViewLabel = inputVal.viewlabel;
+              if (inputVal.viewLabel) {
+                const inputValueViewLabel = inputVal.viewLabel;
                 if (inputValueViewLabel.includes('{value}')) {
                   displayValue = inputValueViewLabel.replace('{value}', displayValue);
                 } else {
-                  displayValue = inputVal.viewlabel;
+                  displayValue = inputVal.viewLabel;
                 }
               }
             }
