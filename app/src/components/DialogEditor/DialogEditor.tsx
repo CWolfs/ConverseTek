@@ -18,6 +18,7 @@ import { useStore } from 'hooks/useStore';
 import { useControlWheel } from 'hooks/useControlWheel';
 import { useWindowSize } from 'hooks/useWindowSize';
 import { detectType, isElementNodeType, isPromptNodeType } from 'utils/node-utils';
+import { getId } from 'utils/conversation-utils';
 import { toggleExpandedForAll } from 'utils/tree-data-utils';
 import { collapseOrExpandBranches, collapseOtherBranches, expandFromCoreToNode } from 'utils/custom-tree-data-utils';
 
@@ -87,6 +88,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
   const dialogEditorSize = useSize(dialogEditorRef);
 
   const wholeTreeData = useRef<RSTNode[] | null>(null);
+  const previousConversationId = useRef<string | null>(null);
   const activeIsolateOnNodeId = useRef<string | null>(null);
 
   const [treeData, setTreeData] = useState<RSTNode[] | null>(null);
@@ -99,6 +101,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
   });
 
   const activeNodeId = nodeStore.getActiveNodeId();
+  const previousNodeId = nodeStore.getPreviousActiveNodeId();
   const expandOnNodeId = nodeStore.getExpandOnNodeId();
   const collapseOnNodeId = nodeStore.getCollapseOnNodeId();
   const collapseOthersOnNodeId = nodeStore.getCollapseOthersOnNodeId();
@@ -246,6 +249,10 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
     return maxRight;
   };
 
+  const reset = () => {
+    activeIsolateOnNodeId.current = null;
+  };
+
   useEffect(() => {
     if (treeElement.current) {
       const maxWidth = findMaxRightEdge(treeElement.current);
@@ -287,6 +294,10 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
 
   // OnConversationChange or rebuild
   useEffect(() => {
+    if (getId(conversationAsset.conversation) !== previousConversationId.current) {
+      reset();
+    }
+
     wholeTreeData.current = null;
     nodeStore.resetMaxTreeHorizontalNodePosition();
     nodeStore.init(conversationAsset);
@@ -300,6 +311,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
     }
 
     setIsContextMenuVisible(false);
+    previousConversationId.current = getId(conversationAsset.conversation);
   }, [conversationAsset]);
 
   useEffect(() => {
@@ -476,6 +488,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
               dataStore,
               nodeStore,
               activeNodeId,
+              previousNodeId,
               onNodeContextMenu,
               isContextMenuVisible,
               zoomLevel,

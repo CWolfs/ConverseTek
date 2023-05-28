@@ -51,6 +51,10 @@
   background-color: $backgroundSecondary;
   border-color: $backgroundSecondary;
 
+  &.ant-btn[disabled] {
+    background-color: #f5f5f5;
+  }
+
   &:active {
     color: #fff;
     background-color: $backgroundSecondary;

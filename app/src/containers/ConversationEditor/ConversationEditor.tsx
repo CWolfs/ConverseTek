@@ -152,6 +152,17 @@ function ConversationEditor({ conversationAsset }: Props) {
           <Button className="conversation-editor__expand-nodes button-secondary" size="small" onClick={() => setIsAllExpanded(!isAllExpanded)}>
             <Icon type={isAllExpanded ? 'menu-fold' : 'menu-unfold'} />
           </Button>
+          <Button
+            className="conversation-editor__go-to-node-button button-secondary"
+            type="primary"
+            size="small"
+            disabled={!nodeStore.getActiveNodeId() && !nodeStore.getPreviousActiveNodeId()}
+            onClick={() => {
+              nodeStore.scrollToActiveNode(true);
+            }}
+          >
+            <Icon type="arrow-right" />
+          </Button>
         </div>
 
         <div className="conversation-editor__buttons">
