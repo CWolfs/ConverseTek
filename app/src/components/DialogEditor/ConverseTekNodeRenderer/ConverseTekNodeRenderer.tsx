@@ -30,6 +30,7 @@ type Props = {
   dataStore: DataStore;
   nodeStore: NodeStore;
   activeNodeId: string | null;
+  previousNodeId: string | null;
   onNodeContextMenu: (props: OnNodeContextMenuProps) => void;
   isContextMenuVisible: boolean;
   scaffoldBlockPxWidth: number;
@@ -109,6 +110,7 @@ export const ConverseTekNodeRenderer = observer(
     dataStore,
     nodeStore,
     activeNodeId = null,
+    previousNodeId = null,
     onNodeContextMenu,
     isContextMenuVisible,
     scaffoldBlockPxWidth,
@@ -142,6 +144,7 @@ export const ConverseTekNodeRenderer = observer(
     const nodeSubtitle = subtitle || node.subtitle;
     const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : null;
     const isActiveNode = activeNodeId === node.id;
+    const wasPreviousActiveNode = previousNodeId === node.id;
     const storedNode = nodeStore.getNode(node.id);
     const { type: nodeType } = node;
     const canNodeBeDragged = !(node.canDrag === false);
@@ -223,7 +226,7 @@ export const ConverseTekNodeRenderer = observer(
         'node-renderer__response-row': isResponse,
         'node-renderer__link-row': isLink,
       },
-      isActiveNode && {
+      (isActiveNode || wasPreviousActiveNode) && {
         'node-renderer__root-row--active': isRoot,
         'node-renderer__node-row--active': isNode,
         'node-renderer__response-row--active': isResponse,
@@ -453,7 +456,7 @@ export const ConverseTekNodeRenderer = observer(
                   : activeNodeId == null || isActiveNode || isHoveringOver
                   ? 1
                   : colourConfig.dialogueNodeTree.nonActiveOpacity,
-                boxShadow: isActiveNode || isHoveringOver ? hoverActiveBoxShadowStyle : undefined,
+                boxShadow: isActiveNode || wasPreviousActiveNode || isHoveringOver ? hoverActiveBoxShadowStyle : undefined,
                 ...style,
               }}
               onMouseEnter={() => setIsHoveringOver(true)}

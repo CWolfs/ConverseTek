@@ -1,5 +1,5 @@
 /* eslint-disable function-paren-newline */
-import { observable, action, toJS, makeObservable } from 'mobx';
+import { observable, action, toJS, makeObservable, runInAction } from 'mobx';
 import defer from 'lodash.defer';
 import remove from 'lodash.remove';
 import sortBy from 'lodash.sortby';
@@ -33,6 +33,7 @@ class NodeStore {
   static deleteDeferred = false;
 
   activeNode: PromptNodeType | ElementNodeType | null = null;
+  previousActiveNodeId: string | null = null;
   expandOnNodeId: string | null = null;
   collapseOnNodeId: string | null = null;
   collapseOthersOnNodeId: string | null = null;
@@ -51,6 +52,7 @@ class NodeStore {
   constructor() {
     makeObservable(this, {
       activeNode: observable,
+      previousActiveNodeId: observable,
       focusedTreeNode: observable,
       dirtyActiveNode: observable,
       expandOnNodeId: observable,
@@ -115,7 +117,18 @@ class NodeStore {
       resetMaxTreeHorizontalNodePosition: action,
       reset: action,
     });
+
+    document.addEventListener('keydown', this.handleKeyDown);
   }
+
+  handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'Escape') {
+      runInAction(() => {
+        this.clearActiveNode();
+        this.previousActiveNodeId = null;
+      });
+    }
+  };
 
   generateNextPromptNodeIndex() {
     this.takenPromptNodeIndexes = sortBy(this.takenPromptNodeIndexes, (index) => index);
@@ -168,6 +181,7 @@ class NodeStore {
     if (this.ownerId !== nextOwnerId) {
       this.ownerId = nextOwnerId;
       this.activeNode = null;
+      this.previousActiveNodeId = null;
       this.expandMap.clear();
       this.scrollToTop();
     } else {
@@ -187,10 +201,12 @@ class NodeStore {
   }
 
   setActiveNode(nodeId: string): void {
+    this.previousActiveNodeId = this.getActiveNodeId();
     this.activeNode = this.getNode(nodeId);
   }
 
   setActiveNodeByIndex(nodeIndex: number): void {
+    this.previousActiveNodeId = this.getActiveNodeId();
     this.activeNode = this.getPromptNodeByIndex(nodeIndex);
   }
 
@@ -199,7 +215,12 @@ class NodeStore {
     return getId(this.activeNode);
   }
 
+  getPreviousActiveNodeId(): string | null {
+    return this.previousActiveNodeId;
+  }
+
   clearActiveNode(): void {
+    this.previousActiveNodeId = this.getActiveNodeId();
     this.activeNode = null;
   }
 
@@ -242,10 +263,20 @@ class NodeStore {
    * || SCROLL TO  NODE METHODS ||
    * =============================
    */
-  scrollToActiveNode() {
-    const activeNodeId = this.getActiveNodeId();
-    if (activeNodeId == null) return;
-    if (this.isNodeVisible(activeNodeId)) return;
+  scrollToActiveNode(fallbackToPrevious = false) {
+    console.log('scroll to active node with fallback. fallbackToPrevious: ', fallbackToPrevious);
+    let focusNodeId = this.getActiveNodeId();
+    console.log('focusNodeId: ', focusNodeId);
+
+    if (focusNodeId == null && !fallbackToPrevious) return;
+
+    if (focusNodeId == null && fallbackToPrevious && this.previousActiveNodeId) {
+      focusNodeId = this.previousActiveNodeId;
+    }
+
+    if (focusNodeId == null) return;
+
+    if (this.isNodeVisible(focusNodeId)) return;
 
     const nodeTreeIndex = this.getActiveNodeTreeIndex();
     if (nodeTreeIndex == null) throw Error(`node tree index is not found for active node`);
@@ -260,7 +291,7 @@ class NodeStore {
 
     const direction = nodeTreeIndex < baseTreeIndex ? 'up' : 'down';
 
-    this.initScrollToNode(activeNodeId, direction, undefined, true);
+    this.initScrollToNode(focusNodeId, direction, undefined, true);
   }
 
   initScrollToNode(nodeId: string, direction: 'up' | 'down', cachedTree?: HTMLElement, skipHorizontalScroll = false) {

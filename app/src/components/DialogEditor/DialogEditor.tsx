@@ -99,6 +99,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
   });
 
   const activeNodeId = nodeStore.getActiveNodeId();
+  const previousNodeId = nodeStore.getPreviousActiveNodeId();
   const expandOnNodeId = nodeStore.getExpandOnNodeId();
   const collapseOnNodeId = nodeStore.getCollapseOnNodeId();
   const collapseOthersOnNodeId = nodeStore.getCollapseOthersOnNodeId();
@@ -476,6 +477,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
               dataStore,
               nodeStore,
               activeNodeId,
+              previousNodeId,
               onNodeContextMenu,
               isContextMenuVisible,
               zoomLevel,
