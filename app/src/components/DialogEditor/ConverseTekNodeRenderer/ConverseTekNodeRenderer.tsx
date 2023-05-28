@@ -143,6 +143,7 @@ export const ConverseTekNodeRenderer = observer(
 
     const nodeSubtitle = subtitle || node.subtitle;
     const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : null;
+    const isAnyNodeActive = !!activeNodeId;
     const isActiveNode = activeNodeId === node.id;
     const wasPreviousActiveNode = previousNodeId === node.id;
     const storedNode = nodeStore.getNode(node.id);
@@ -226,7 +227,7 @@ export const ConverseTekNodeRenderer = observer(
         'node-renderer__response-row': isResponse,
         'node-renderer__link-row': isLink,
       },
-      (isActiveNode || wasPreviousActiveNode) && {
+      (isActiveNode || (!isAnyNodeActive && wasPreviousActiveNode)) && {
         'node-renderer__root-row--active': isRoot,
         'node-renderer__node-row--active': isNode,
         'node-renderer__response-row--active': isResponse,
@@ -456,7 +457,7 @@ export const ConverseTekNodeRenderer = observer(
                   : activeNodeId == null || isActiveNode || isHoveringOver
                   ? 1
                   : colourConfig.dialogueNodeTree.nonActiveOpacity,
-                boxShadow: isActiveNode || wasPreviousActiveNode || isHoveringOver ? hoverActiveBoxShadowStyle : undefined,
+                boxShadow: isActiveNode || (!isAnyNodeActive && wasPreviousActiveNode) || isHoveringOver ? hoverActiveBoxShadowStyle : undefined,
                 ...style,
               }}
               onMouseEnter={() => setIsHoveringOver(true)}
