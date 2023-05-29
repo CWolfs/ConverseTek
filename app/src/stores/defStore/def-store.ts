@@ -258,7 +258,7 @@ class DefStore {
     return { type: null, value: null };
   }
 
-  createNewArg(type: InputTypeType, defaultValue: DefaultInputValueType = null) {
+  createNewArg(type: InputTypeType, defaultValue: DefaultInputValueType = null): OperationArgType {
     return {
       boolValue: false,
       callValue: null,
@@ -345,29 +345,36 @@ class DefStore {
       logic.args = args.splice(0, inputs.length);
     } else if (args.length < inputs.length) {
       inputs.forEach((input, index) => {
+        const { defaultValue } = input;
+
         if (args.length <= index) {
-          const newArg = createArg();
+          let newArg: OperationArgType | null = null;
           const { types } = input;
 
           if (types.includes('operation')) {
             // favour: operation, string, float, int
-            newArg.type = 'operation';
+            newArg = this.createNewArg('operation', defaultValue);
             const opLogic = { functionName: 'Get Preset Value (int)', args: [] };
             newArg.callValue = this.setOperation(opLogic, opLogic.functionName);
           } else if (types.includes('string')) {
-            newArg.type = 'string';
+            newArg = this.createNewArg('string', defaultValue);
           } else if (types.includes('float')) {
-            newArg.type = 'float';
+            newArg = this.createNewArg('float', defaultValue);
           } else if (types.includes('int')) {
-            newArg.type = 'int';
+            newArg = this.createNewArg('int', defaultValue);
           }
 
-          logic.args.push(newArg);
+          if (newArg) {
+            logic.args.push(newArg);
+          } else {
+            throw Error('Arg is null. This should not happen.');
+          }
         }
       });
     }
 
     // Reset all args
+    // RG 2023/05: Needs to be reset as the arg is reused when changing to another action
     logic.args.forEach((arg, index) => {
       this.resetArg(inputs[index], arg);
     });
@@ -376,7 +383,7 @@ class DefStore {
   }
 
   resetArg(input: InputType, arg: OperationArgType) {
-    const { types } = input;
+    const { types, defaultValue } = input;
 
     arg.callValue = null;
     arg.stringValue = '';
@@ -389,10 +396,13 @@ class DefStore {
       arg.callValue = this.setOperation(opLogic, opLogic.functionName);
     } else if (types.includes('string')) {
       arg.type = 'string';
+      if (defaultValue != null) arg.stringValue = defaultValue;
     } else if (types.includes('float')) {
       arg.type = 'float';
+      if (defaultValue != null) arg.floatValue = Number(defaultValue);
     } else if (types.includes('int')) {
       arg.type = 'int';
+      if (defaultValue != null) arg.intValue = Number(defaultValue);
     }
   }
 
