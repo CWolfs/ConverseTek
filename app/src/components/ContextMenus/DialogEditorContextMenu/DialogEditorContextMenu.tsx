@@ -20,16 +20,16 @@ function getAddLabel(type: string) {
   let addItemLabel = 'Add';
   switch (type) {
     case 'root':
-      addItemLabel = 'Add Node';
+      addItemLabel = 'Add Prompt Node';
       break;
     case 'node':
-      addItemLabel = 'Add Response';
+      addItemLabel = 'Add Response Node';
       break;
     case 'response':
-      addItemLabel = 'Add Node';
+      addItemLabel = 'Add Prompt Node';
       break;
     default:
-      addItemLabel = 'Add Node';
+      addItemLabel = 'Add Root Node';
       break;
   }
   return addItemLabel;
