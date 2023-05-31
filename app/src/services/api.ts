@@ -57,6 +57,7 @@ export function updateConversation(id: string, conversationAsset: ConversationAs
     (conversations: object[]): ConversationAssetType[] => {
       const typedConversations = conversations.map((conversation) => mapToType<ConversationAssetType>(conversation, fullConversationAssetMapping));
       dataStore.setConversations(typedConversations);
+      dataStore.setConversationDirty(false);
       return typedConversations;
     },
   );

@@ -162,6 +162,8 @@ class NodeStore {
   setRebuild(flag: boolean) {
     this.rebuild = flag;
     if (this.rebuild) {
+      dataStore.setConversationDirty(true);
+
       defer(
         action(() => {
           this.rebuild = false;
@@ -661,6 +663,8 @@ class NodeStore {
   setNodeId(node: PromptNodeType | ElementNodeType, id: string) {
     node.idRef.id = id;
     nodeStore.setRebuild(true);
+
+    dataStore.setConversationDirty(true);
   }
 
   setNodeText(node: PromptNodeType | ElementNodeType, text: string) {
@@ -670,23 +674,33 @@ class NodeStore {
     } else {
       node.responseText = text;
     }
+
+    dataStore.setConversationDirty(true);
   }
 
   setNodeComment(node: PromptNodeType | ElementNodeType, comment: string) {
     node.comment = comment;
+
+    dataStore.setConversationDirty(true);
   }
 
   setElementNodeOnlyOnce(elementNode: ElementNodeType, onlyOnce: boolean) {
     elementNode.onlyOnce = onlyOnce;
+
+    dataStore.setConversationDirty(true);
   }
 
   setElementNodeHideIfUnavailable(elementNode: ElementNodeType, hideIfUnavailable: boolean) {
     elementNode.hideIfUnavailable = hideIfUnavailable;
+
+    dataStore.setConversationDirty(true);
   }
 
   setPromptNodeSpeakerType(node: PromptNodeType, value: 'castId' | 'speakerId'): void {
     node.speakerType = value;
     if (value === 'speakerId') node.sourceInSceneRef = null;
+
+    dataStore.setConversationDirty(true);
   }
 
   setPromptNodeSourceInSceneId(node: PromptNodeType, id: string): void {
@@ -695,11 +709,14 @@ class NodeStore {
     } else {
       node.sourceInSceneRef.id = id;
     }
+
+    dataStore.setConversationDirty(true);
   }
 
   setPromptNodeSpeakerId(node: PromptNodeType, id: string): void {
     node.speakerOverrideId = id;
     node.sourceInSceneRef = null;
+    dataStore.setConversationDirty(true);
   }
 
   setNodeActions(node: PromptNodeType | ElementNodeType, actions: OperationCallType[] | null): void {
@@ -711,6 +728,8 @@ class NodeStore {
     node.actions = {
       ops: actions,
     };
+
+    dataStore.setConversationDirty(true);
   }
 
   addNodeAction(node: PromptNodeType | ElementNodeType, nodeAction: OperationCallType): void {
@@ -721,6 +740,8 @@ class NodeStore {
     } else {
       this.setNodeActions(node, [nodeAction]);
     }
+
+    dataStore.setConversationDirty(true);
   }
 
   removeNodeAction(node: PromptNodeType | ElementNodeType, index: number): void {
@@ -729,6 +750,8 @@ class NodeStore {
 
     remove(actions.ops, (value, i) => i === index);
     if (actions.ops.length <= 0) nodeStore.setNodeActions(node, null);
+
+    dataStore.setConversationDirty(true);
   }
 
   setElementNodeConditions(elementNode: ElementNodeType, conditions: OperationCallType[] | null): void {
@@ -740,6 +763,8 @@ class NodeStore {
     elementNode.conditions = {
       ops: conditions,
     };
+
+    dataStore.setConversationDirty(true);
   }
 
   addNodeCondition(elementNode: ElementNodeType, elementNodeCondition: OperationCallType): void {
@@ -750,6 +775,8 @@ class NodeStore {
     } else {
       this.setElementNodeConditions(elementNode, [elementNodeCondition]);
     }
+
+    dataStore.setConversationDirty(true);
   }
 
   removeNodeCondition(node: ElementNodeType, index: number): void {
@@ -758,6 +785,8 @@ class NodeStore {
 
     remove(conditions.ops, (value, i) => i === index);
     if (conditions.ops.length <= 0) nodeStore.setElementNodeConditions(node, null);
+
+    dataStore.setConversationDirty(true);
   }
 
   getNode(nodeId: string | undefined): PromptNodeType | ElementNodeType | null {
@@ -850,6 +879,8 @@ class NodeStore {
       NodeStore.deleteDeferred = true;
       defer(this.processDeletes);
     }
+
+    dataStore.setConversationDirty(true);
   }
 
   processDeletes = (): void => {
@@ -869,6 +900,8 @@ class NodeStore {
       NodeStore.deleteDeferred = false;
       this.setRebuild(true);
     });
+
+    dataStore.setConversationDirty(true);
   };
 
   addNodeByParentId(parentId: string): void {
@@ -990,6 +1023,8 @@ class NodeStore {
       );
       oldParentPromptNode.branches = updatedOldParentBranches;
     }
+
+    dataStore.setConversationDirty(true);
   }
 
   movePromptNode(nodeToMoveId: string, nextParentResponseId: string, previousParentResponseId: string): void {
@@ -1005,6 +1040,8 @@ class NodeStore {
     const previousParentElementNode = nodeStore.getNode(previousParentResponseId) as ElementNodeType;
     if (previousParentElementNode == null) throw Error(`Previous parent root/response '${previousParentResponseId}' not found`);
     previousParentElementNode.nextNodeIndex = -1;
+
+    dataStore.setConversationDirty(true);
   }
 
   deleteNodeCascadeById(id: string): void {

@@ -13,6 +13,7 @@ class DataStore {
   public conversationAssets = observable.map<string, ConversationAssetType>(new Map(), { deep: false });
   public activeConversationAsset: ConversationAssetType | null;
   public unsavedActiveConversationAsset: ConversationAssetType | null;
+  public isConversationDirty: boolean;
   public colourConfig: ColourConfigType | null;
 
   constructor() {
@@ -37,11 +38,13 @@ class DataStore {
       setUnsavedConversationId: action,
       setConversationId: action,
       setUnsavedConversationUIName: action,
+      setConversationDirty: action,
       reset: action,
     });
 
     this.activeConversationAsset = null;
     this.unsavedActiveConversationAsset = null;
+    this.isConversationDirty = false;
     this.workingDirectory = null;
     this.workingDirectoryName = null;
     this.colourConfig = null;
@@ -76,6 +79,10 @@ class DataStore {
 
   setConversation(conversationAsset: ConversationAssetType): void {
     this.conversationAssets.set(conversationAsset.conversation.idRef.id, conversationAsset);
+  }
+
+  setConversationDirty(flag: boolean): void {
+    this.isConversationDirty = flag;
   }
 
   getConversationAsset(id: string): ConversationAssetType | null {
@@ -118,6 +125,7 @@ class DataStore {
 
   setUnsavedActiveConversation(conversationAsset: ConversationAssetType): void {
     this.unsavedActiveConversationAsset = observable(conversationAsset);
+    this.setConversationDirty(false);
   }
 
   setConversationId(conversationAsset: ConversationAssetType, id: string): void {
@@ -145,6 +153,7 @@ class DataStore {
     this.activeConversationAsset = null;
     this.unsavedActiveConversationAsset = null;
     this.workingDirectory = null;
+    this.setConversationDirty(false);
   };
 }
 
