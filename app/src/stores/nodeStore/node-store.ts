@@ -185,7 +185,6 @@ class NodeStore {
       this.activeNode = null;
       this.previousActiveNodeId = null;
       this.expandMap.clear();
-      this.scrollToTop();
     } else {
       this.ownerId = nextOwnerId;
     }

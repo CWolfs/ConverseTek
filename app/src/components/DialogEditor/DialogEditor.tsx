@@ -7,6 +7,7 @@ import { useContextMenu } from 'react-contexify';
 import { useSize } from 'ahooks';
 import throttle from 'lodash/throttle';
 import classnames from 'classnames';
+import defer from 'lodash.defer';
 
 import 'react-sortable-tree/style.css';
 
@@ -251,6 +252,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
 
   const reset = () => {
     activeIsolateOnNodeId.current = null;
+    defer(() => nodeStore.scrollToTop());
   };
 
   useEffect(() => {
@@ -296,22 +298,22 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
   useEffect(() => {
     if (getId(conversationAsset.conversation) !== previousConversationId.current) {
       reset();
+
+      wholeTreeData.current = null;
+      nodeStore.resetMaxTreeHorizontalNodePosition();
+      nodeStore.init(conversationAsset);
+
+      if (activeIsolateOnNodeId.current) {
+        wholeTreeData.current = buildTreeDataFromConversation(nodeStore, conversationAsset);
+        const node = nodeStore.getNode(activeIsolateOnNodeId.current);
+        setTreeData(buildTreeDataFromNode(nodeStore, node));
+      } else {
+        setTreeData(buildTreeDataFromConversation(nodeStore, conversationAsset));
+      }
+
+      setIsContextMenuVisible(false);
+      previousConversationId.current = getId(conversationAsset.conversation);
     }
-
-    wholeTreeData.current = null;
-    nodeStore.resetMaxTreeHorizontalNodePosition();
-    nodeStore.init(conversationAsset);
-
-    if (activeIsolateOnNodeId.current) {
-      wholeTreeData.current = buildTreeDataFromConversation(nodeStore, conversationAsset);
-      const node = nodeStore.getNode(activeIsolateOnNodeId.current);
-      setTreeData(buildTreeDataFromNode(nodeStore, node));
-    } else {
-      setTreeData(buildTreeDataFromConversation(nodeStore, conversationAsset));
-    }
-
-    setIsContextMenuVisible(false);
-    previousConversationId.current = getId(conversationAsset.conversation);
   }, [conversationAsset]);
 
   useEffect(() => {
