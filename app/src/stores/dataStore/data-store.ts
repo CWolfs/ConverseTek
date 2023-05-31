@@ -24,6 +24,7 @@ class DataStore {
       conversationAssets: observable,
       activeConversationAsset: observable,
       unsavedActiveConversationAsset: observable,
+      isConversationDirty: observable,
       setWorkingDirectory: action,
       createNewConversation: action,
       setConversations: action,
