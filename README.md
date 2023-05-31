@@ -42,6 +42,10 @@ Some questions are answered in the [FAQ section](https://github.com/CWolfs/Conve
 
 All feedback is welcome in the [issues section](https://github.com/CWolfs/ConverseTek/issues).
 
+## Thanks
+
+MalD - Feature suggestions & testing
+
 ## Features
 
 - Load and Save sim game conversations
