@@ -1,10 +1,11 @@
 /* eslint-disable class-methods-use-this */
-import { observable, action, makeObservable } from 'mobx';
+import { observable, action, makeObservable, runInAction } from 'mobx';
+import { message } from 'antd';
 
 import type { ColourConfigType, ConversationAssetType } from 'types';
 
-import { deleteConversation } from 'services/api';
-import { createConversation } from 'utils/conversation-utils';
+import { deleteConversation, updateConversation } from 'services/api';
+import { createConversation, getId } from 'utils/conversation-utils';
 import { defStore } from '../defStore';
 
 class DataStore {
@@ -49,7 +50,24 @@ class DataStore {
     this.workingDirectory = null;
     this.workingDirectoryName = null;
     this.colourConfig = null;
+
+    document.addEventListener('keydown', this.handleKeyDown);
   }
+
+  handleKeyDown = (event: KeyboardEvent) => {
+    if (event.ctrlKey && (event.key === 's' || event.key === 'S')) {
+      event.preventDefault();
+
+      runInAction(() => {
+        const conversationAsset = this.unsavedActiveConversationAsset;
+        if (conversationAsset == null) return;
+
+        void updateConversation(getId(conversationAsset.conversation), conversationAsset).then(() => {
+          void message.success('Save successful');
+        });
+      });
+    }
+  };
 
   setWorkingDirectory(directoryPath: string, directoryName: string): void {
     if (directoryPath !== this.workingDirectory) this.clearActiveConversation();
