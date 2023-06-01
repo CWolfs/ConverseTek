@@ -157,13 +157,12 @@ class NodeStore {
 
   regenerateNodeIds(conversationAsset: ConversationAssetType) {
     regenerateNodeIds(conversationAsset);
+    dataStore.setConversationDirty(true);
   }
 
   setRebuild(flag: boolean) {
     this.rebuild = flag;
     if (this.rebuild) {
-      dataStore.setConversationDirty(true);
-
       defer(
         action(() => {
           this.rebuild = false;
@@ -513,6 +512,7 @@ class NodeStore {
           this.deletePromptNodeCascadeByIndex(nextNodeIndex, false);
         }
 
+        dataStore.setConversationDirty(true);
         this.clearClipboard();
         this.setRebuild(true);
       };
@@ -582,6 +582,7 @@ class NodeStore {
             this.deletePromptNodeCascadeByIndex(nextNodeIndex, false);
           }
 
+          dataStore.setConversationDirty(true);
           this.clearClipboard();
           this.setRebuild(true);
         };
@@ -657,6 +658,8 @@ class NodeStore {
       const parentPromptNode = this.getNode(node.parentId) as PromptNodeType;
       updateResponseNode(conversationAsset, parentPromptNode, node);
     }
+
+    dataStore.setConversationDirty(true);
   }
 
   setNodeId(node: PromptNodeType | ElementNodeType, id: string) {
@@ -919,6 +922,8 @@ class NodeStore {
         this.addPromptNode(parent);
       }
     }
+
+    dataStore.setConversationDirty(true);
   }
 
   addRootNode(): string | null {
@@ -929,6 +934,7 @@ class NodeStore {
     rootNode.parentId = '0';
     updateRootNode(conversationAsset, rootNode);
 
+    dataStore.setConversationDirty(true);
     this.updateActiveNode(rootNode);
     this.setRebuild(true);
     return getId(rootNode);
@@ -940,6 +946,7 @@ class NodeStore {
 
     const rootNodes = rootNodeIds.map((rootNodeId: string) => this.getNode(rootNodeId));
     setRootNodes(conversationAsset, rootNodes as ElementNodeType[]);
+    dataStore.setConversationDirty(true);
   }
 
   addPromptNode(parentElementNode: ElementNodeType): string | null {
@@ -963,6 +970,7 @@ class NodeStore {
 
       updatePromptNode(conversationAsset, node);
 
+      dataStore.setConversationDirty(true);
       this.updateActiveNode(node);
       this.setRebuild(true);
       return getId(node);
@@ -980,6 +988,7 @@ class NodeStore {
     responseNode.parentId = getId(parentPromptNode);
     updateResponseNode(conversationAsset, parentPromptNode, responseNode);
 
+    dataStore.setConversationDirty(true);
     this.updateActiveNode(responseNode);
     this.setRebuild(true);
     return getId(responseNode);
@@ -992,6 +1001,7 @@ class NodeStore {
     const responseNodes = responseIds.map((responseId) => this.getNode(responseId)) as ElementNodeType[];
     const parentPromptNode = this.getNode(parentId) as PromptNodeType;
     setResponseNodes(conversationAsset, parentPromptNode, responseNodes);
+    dataStore.setConversationDirty(true);
   }
 
   moveResponseNode(
@@ -1046,6 +1056,7 @@ class NodeStore {
   deleteNodeCascadeById(id: string): void {
     const node = this.getNode(id);
     if (node) {
+      dataStore.setConversationDirty(true);
       this.deleteNodeCascade(node);
       this.setRebuild(true);
     }
@@ -1054,6 +1065,7 @@ class NodeStore {
   deletePromptNodeCascadeByIndex(index: number, rebuild = true): void {
     const node = this.getPromptNodeByIndex(index);
     if (node) {
+      dataStore.setConversationDirty(true);
       this.deleteNodeCascade(node);
       this.setRebuild(rebuild);
     }
@@ -1122,12 +1134,15 @@ class NodeStore {
 
     if (this.activeNode && getId(this.activeNode) === getId(elementNode)) this.clearActiveNode();
     this.removeNode(elementNode);
+    dataStore.setConversationDirty(true);
   }
 
   deleteLink(parentId: string): void {
     const elementNode = this.getNode(parentId) as ElementNodeType;
     elementNode.nextNodeIndex = -1;
     elementNode.auxiliaryLink = false;
+
+    dataStore.setConversationDirty(true);
     this.setRebuild(true);
   }
 
