@@ -359,7 +359,7 @@ export const ConverseTekNodeRenderer = observer(
               <LinkIcon />
             </div>
 
-            {node.linkIndex && (
+            {node.linkIndex != null && (
               <div className={labelClasses}>
                 <span className={titleClasses}>{getTruncatedLinkText(nodeStore, node.linkIndex, 40)}</span>
               </div>
