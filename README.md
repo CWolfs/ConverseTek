@@ -42,7 +42,7 @@ Some questions are answered in the [FAQ section](https://github.com/CWolfs/Conve
 
 All feedback is welcome in the [issues section](https://github.com/CWolfs/ConverseTek/issues).
 
-## Thanks
+## Contributors
 
 MalD - Feature suggestions & testing
 
