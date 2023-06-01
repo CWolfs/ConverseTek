@@ -99,13 +99,17 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
       negativeLabel: 'Cancel',
     };
 
-    const title = 'Are you sure you want to delete this node?';
+    const title = `Are you sure you want to delete this ${isLink ? 'link' : 'node'}?`;
+    const message = isLink
+      ? 'This action will delete the link and only this specific link.'
+      : "This action will delete the node and all it's children. Are you sure you want to do this?";
+
     modalStore.setModelContent(
       ModalConfirmation,
       {
         type: 'warning',
         title,
-        body: "This action will delete the node and all it's children. Are you sure you want to do this?",
+        body: message,
         width: '30rem',
         buttons,
         disableOk: false,
