@@ -3,7 +3,7 @@ import keys from 'lodash.keys';
 import values from 'lodash.values';
 
 import { ModalConfirmation } from 'components/Modals/ModalConfirmation';
-import { createArg } from 'utils/def-utils';
+
 import { tryParseInt, tryParseFloat } from 'utils/number-utils';
 import {
   ConversationAssetType,
@@ -19,6 +19,7 @@ import {
 } from 'types';
 
 import { modalStore } from '../modalStore';
+import { dataStore } from '../dataStore';
 
 /* eslint-disable class-methods-use-this, no-param-reassign */
 class DefStore {
@@ -259,6 +260,8 @@ class DefStore {
   }
 
   createNewArg(type: InputTypeType, defaultValue: DefaultInputValueType = null): OperationArgType {
+    dataStore.setConversationDirty(true);
+
     return {
       boolValue: false,
       callValue: null,
@@ -301,6 +304,8 @@ class DefStore {
 
       arg.type = type;
       logic.args = [...args];
+
+      dataStore.setConversationDirty(true);
     }
   }
 
@@ -328,6 +333,8 @@ class DefStore {
     }
 
     logic.args = [...args];
+
+    dataStore.setConversationDirty(true);
   }
 
   setOperation(logic: OperationCallType, value: string) {
@@ -378,6 +385,8 @@ class DefStore {
     logic.args.forEach((arg, index) => {
       this.resetArg(inputs[index], arg);
     });
+
+    dataStore.setConversationDirty(true);
 
     return logic;
   }
