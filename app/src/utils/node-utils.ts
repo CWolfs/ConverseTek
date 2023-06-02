@@ -2,6 +2,9 @@ import { ElementNodeType, PromptNodeType, ClipboardType } from 'types';
 import { nodeStore } from '../stores';
 
 export type NodeTypeDetectionResult = {
+  isCore: boolean;
+  isBaseCore: boolean;
+  isIsolatedCore: boolean;
   isRoot: boolean;
   isNode: boolean;
   isResponse: boolean;
@@ -17,9 +20,13 @@ export function isElementNodeType(node: PromptNodeType | ElementNodeType): node 
 }
 
 export function detectType(type: string | null): NodeTypeDetectionResult {
-  if (type == null) return { isRoot: false, isNode: false, isResponse: false, isLink: false };
+  if (type == null)
+    return { isCore: false, isBaseCore: false, isIsolatedCore: false, isRoot: false, isNode: false, isResponse: false, isLink: false };
 
   return {
+    isCore: type.includes('core'),
+    isBaseCore: type === 'core',
+    isIsolatedCore: type === 'isolatedcore',
     isRoot: type === 'root',
     isNode: type === 'node',
     isResponse: type === 'response',
@@ -29,7 +36,7 @@ export function detectType(type: string | null): NodeTypeDetectionResult {
 
 export function isAllowedToCreateNode(nodeId: string | undefined) {
   if (!nodeId) return false;
-  if (nodeId === '0') return true; // for the 'Root'
+  if (nodeId === '0') return true; // for the 'Core'
 
   const node = nodeStore.getNode(nodeId);
 

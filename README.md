@@ -9,7 +9,7 @@ Battletech uses a binary data format for its conversations. It isn't possible to
 
 ## Overview
 
-Latest release: **v1.4.1** | [Download](https://github.com/CWolfs/ConverseTek/releases/tag/v1.4.1)
+Latest release: **v1.5.0** | [Download](https://github.com/CWolfs/ConverseTek/releases/tag/v1.5.0)
 
 ### Complimentary Mods
 
@@ -17,6 +17,7 @@ Latest release: **v1.4.1** | [Download](https://github.com/CWolfs/ConverseTek/re
 
 ### Videos
 
+- [v1.5 - Isolate Branch](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/1.5.0/conversetek-isolate-branch.gif)
 - [v1.4 - Zooming](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/1.4.0/conversetek-zoom-feature.gif)
 - [v1.4 - Improved Folder Navgation](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/1.4.0/conversetek-improved-folder-navigation.gif)
 - [v1.4 - Improved Layout](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/1.4.0/conversetek-drag-expand.gif)
@@ -40,6 +41,10 @@ Some questions are answered in the [FAQ section](https://github.com/CWolfs/Conve
 ## Feedback
 
 All feedback is welcome in the [issues section](https://github.com/CWolfs/ConverseTek/issues).
+
+## Contributors
+
+MalD - Feature suggestions & testing
 
 ## Features
 

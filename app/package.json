@@ -1,6 +1,6 @@
 {
   "name": "conversetek",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "Conversation editor for Battletech",
   "author": "Richard Griffiths [CWolf] (cwolfs@gmail.com)",
   "license": "GPL-3.0",
@@ -92,6 +92,7 @@
   "dependencies": {
     "@babel/polyfill": "^7.0.0",
     "@geoffcox/react-splitter": "^2.1.2",
+    "@types/tinycolor2": "^1.4.3",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
     "@ungap/structured-clone": "^1.0.2",
@@ -125,6 +126,7 @@
     "react-dom": "^16.14.0",
     "react-router-dom": "^6.10.0",
     "react-sortable-tree": "^2.8.0",
+    "tinycolor2": "^1.6.0",
     "uuid": "^9.0.0"
   }
 }

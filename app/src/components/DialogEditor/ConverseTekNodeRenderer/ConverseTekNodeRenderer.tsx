@@ -1,16 +1,19 @@
 /* eslint-disable function-paren-newline */
 /* eslint-disable indent */
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Icon } from 'antd';
+import defer from 'lodash.defer';
+import tinycolor from 'tinycolor2';
 
 import { OnNodeContextMenuProps } from '../DialogEditor';
-import { PromptNodeType, ElementNodeType } from 'types';
+import { PromptNodeType, ElementNodeType, ColourConfigType } from 'types';
 
 import { isDescendant } from 'utils/tree-data-utils';
 import { detectType } from 'utils/node-utils';
 
+import { DataStore } from 'stores/dataStore/data-store';
 import { NodeStore } from 'stores/nodeStore/node-store';
 
 import { LinkIcon } from '../../Svg';
@@ -24,8 +27,10 @@ type NodeStateProps = {
 };
 
 type Props = {
+  dataStore: DataStore;
   nodeStore: NodeStore;
   activeNodeId: string | null;
+  previousNodeId: string | null;
   onNodeContextMenu: (props: OnNodeContextMenuProps) => void;
   isContextMenuVisible: boolean;
   scaffoldBlockPxWidth: number;
@@ -51,6 +56,7 @@ type Props = {
   isOver: boolean;
   parentNode: RSTNode | null;
   rowDirection: string;
+  zoomLevel: number;
 };
 
 function hasActionsAndConditions(node: PromptNodeType | ElementNodeType | null): { hasActions: boolean; hasConditions: boolean } {
@@ -72,11 +78,39 @@ function hasActionsAndConditions(node: PromptNodeType | ElementNodeType | null):
   return { hasActions, hasConditions };
 }
 
+function getHighlightColour(colourConfig: ColourConfigType, nodeType: string): string {
+  switch (nodeType) {
+    case 'core':
+      return colourConfig.coreNode.highlight;
+    case 'isolatedcore':
+      return colourConfig.coreNode.highlight;
+    case 'root':
+      return colourConfig.rootNode.highlight;
+    case 'node':
+      return colourConfig.promptNode.highlight;
+    case 'response':
+      return colourConfig.responseNode.highlight;
+    case 'link':
+      return colourConfig.linkNode.highlight;
+  }
+  return '';
+}
+
+function getTruncatedLinkText(nodeStore: NodeStore, linkIndex: number, maxLength: number) {
+  const linkedPromptNode = nodeStore.getPromptNodeByIndex(linkIndex);
+  if (linkedPromptNode == null) return '';
+
+  const text = linkedPromptNode.text;
+  return text.length < maxLength ? text : `${text.substring(0, maxLength)}...`;
+}
+
 /* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
 export const ConverseTekNodeRenderer = observer(
   ({
+    dataStore,
     nodeStore,
     activeNodeId = null,
+    previousNodeId = null,
     onNodeContextMenu,
     isContextMenuVisible,
     scaffoldBlockPxWidth,
@@ -102,20 +136,29 @@ export const ConverseTekNodeRenderer = observer(
     isOver, // Not needed, but preserved for other renderers
     parentNode = null, // Needed for dndManager
     rowDirection = 'ltr',
+    zoomLevel,
     ...otherProps
   }: Props) => {
+    const nodeRef = useRef<HTMLDivElement>(null);
+
     const nodeSubtitle = subtitle || node.subtitle;
     const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : null;
+    const isAnyNodeActive = !!activeNodeId;
     const isActiveNode = activeNodeId === node.id;
+    const wasPreviousActiveNode = previousNodeId === node.id;
     const storedNode = nodeStore.getNode(node.id);
     const { type: nodeType } = node;
     const canNodeBeDragged = !(node.canDrag === false);
+    const [isHoveringOver, setIsHoveringOver] = useState<boolean>(false);
+    const { colourConfig } = dataStore;
+
+    if (colourConfig == null) return null;
 
     const { hasActions, hasConditions } = hasActionsAndConditions(storedNode);
     const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node);
     const isLandingPadActive = !didDrop && isDragging;
 
-    const { isRoot, isNode, isResponse, isLink } = detectType(nodeType);
+    const { isCore, isBaseCore, isIsolatedCore, isRoot, isNode, isResponse, isLink } = detectType(nodeType);
 
     const contextMenuId = node.id || Math.random().toString();
     const { parentId } = node;
@@ -131,6 +174,16 @@ export const ConverseTekNodeRenderer = observer(
       }
     }
 
+    const alpha = zoomLevel <= 0.55 ? 1 : 1 - zoomLevel / 3;
+    const highlightConfigValue = getHighlightColour(colourConfig, nodeType);
+    const highlightColour = tinycolor(highlightConfigValue);
+    highlightColour.setAlpha(alpha);
+
+    const hoverActiveBoxShadowStyle = `0px 2px 10px ${highlightColour.toRgbString()},
+                                        0px -2px 10px ${highlightColour.toRgbString()},
+                                        2px 0px 10px ${highlightColour.toRgbString()},
+                                        -2px 0px 10px ${highlightColour.toRgbString()}`;
+
     const moveHandleClasses = classnames('rst__moveHandle', {
       'node-renderer__root-handle': isRoot,
       'node-renderer__node-handle': isNode,
@@ -142,12 +195,14 @@ export const ConverseTekNodeRenderer = observer(
       'node-renderer__node-label': isNode,
       'node-renderer__response-label': isResponse,
       'node-renderer__link-label': isLink,
+      'node-renderer__core-label': isCore,
     });
 
     const titleClasses = classnames('rst__rowTitle', node.subtitle && 'rst__rowTitleWithSubtitle', {
       'node-renderer__root-title': isRoot,
       'node-renderer__node-title': isNode,
       'node-renderer__response-title': isResponse,
+      'node-renderer__link-title': isLink,
     });
 
     const rowContentsClasses = classnames(
@@ -172,7 +227,7 @@ export const ConverseTekNodeRenderer = observer(
         'node-renderer__response-row': isResponse,
         'node-renderer__link-row': isLink,
       },
-      isActiveNode && {
+      (isActiveNode || (!isAnyNodeActive && wasPreviousActiveNode)) && {
         'node-renderer__root-row--active': isRoot,
         'node-renderer__node-row--active': isNode,
         'node-renderer__response-row--active': isResponse,
@@ -221,6 +276,12 @@ export const ConverseTekNodeRenderer = observer(
       buttonStyle = { right: -0.5 * scaffoldBlockPxWidth };
     }
 
+    const coreStyle: { color: string; fontSize: string; paddingRight?: string } = {
+      color: isBaseCore ? '#2f71d4' : '#f75d00',
+      fontSize: '18px',
+      paddingRight: '8px',
+    };
+
     const logicStyle: { color: string; fontSize: string; paddingRight?: string } = {
       color: isResponse ? 'white' : '#2f71d4',
       fontSize: '18px',
@@ -234,9 +295,26 @@ export const ConverseTekNodeRenderer = observer(
       ...logicStyle,
     };
 
+    const responseContinueStyle = {
+      ...logicStyle,
+      transform: 'rotate(270deg)',
+      fontSize: 22,
+      paddingRight: 4,
+    };
+
     if ((!nodeTitle || (typeof nodeTitle === 'string' && nodeTitle.length <= 0)) && hasActions) {
       logicStyle.paddingRight = '8px';
     }
+
+    const resolvedNodeTitle =
+      typeof nodeTitle === 'function'
+        ? nodeTitle({
+            node,
+            path,
+            treeIndex,
+          })
+        : nodeTitle;
+    const hasNodeTitle = typeof resolvedNodeTitle === 'string' && resolvedNodeTitle.length > 0;
 
     const rowContents = (
       <div
@@ -253,40 +331,53 @@ export const ConverseTekNodeRenderer = observer(
 
             const linkTreeIndex = nodeStore.getTreeIndex(linkId);
 
-            if (!linkTreeIndex) throw Error(`link tree index is not found for linkId ${linkId}`);
+            if (linkTreeIndex == null) throw Error(`link tree index is not found for linkId ${linkId}`);
 
             const direction = linkTreeIndex < treeIndex ? 'up' : 'down';
             nodeStore.setActiveNode(linkId);
-            nodeStore.scrollToNode(linkId, direction);
+            nodeStore.initScrollToNode(linkId, direction);
           } else {
             if (!id) throw Error('id should be valid but it is not defined');
             nodeStore.setActiveNode(id);
+
+            defer(() => {
+              if (!nodeStore.isNodeVisible(id)) {
+                const nodeTreeIndex = nodeStore.getTreeIndex(id);
+                if (nodeTreeIndex == null) throw Error(`node tree index is not found for nodeId ${id}`);
+                const direction = nodeTreeIndex < treeIndex ? 'up' : 'down';
+
+                setTimeout(() => nodeStore.initScrollToNode(id, direction, undefined, true), 250);
+              }
+            });
           }
         }}
         onMouseEnter={() => !isContextMenuVisible && nodeStore.setFocusedTreeNode(node)}
       >
         {isLink && (
-          <div className="node-renderer__link-row-icon">
-            <LinkIcon />
+          <div className="node-renderer__link">
+            <div className="node-renderer__link-row-icon">
+              <LinkIcon />
+            </div>
+
+            {node.linkIndex != null && (
+              <div className={labelClasses}>
+                <span className={titleClasses}>{getTruncatedLinkText(nodeStore, node.linkIndex, 40)}</span>
+              </div>
+            )}
           </div>
         )}
         {!isLink && (
           <section>
             <div className="node-renderer__row-contents-logic">
+              {isBaseCore && <Icon type="profile" style={coreStyle} />}
+              {isIsolatedCore && <Icon type="branches" style={coreStyle} />}
               {hasConditions && <Icon type="question-circle" theme="filled" style={logicStyle} />}
               {hasActions && <Icon type="right-circle" theme="filled" style={actionsIconStyle} />}
+              {!hasNodeTitle && <Icon type="enter" style={responseContinueStyle} />}
             </div>
 
             <div className={labelClasses}>
-              <span className={titleClasses}>
-                {typeof nodeTitle === 'function'
-                  ? nodeTitle({
-                      node,
-                      path,
-                      treeIndex,
-                    })
-                  : nodeTitle}
-              </span>
+              <span className={titleClasses}>{resolvedNodeTitle}</span>
 
               {nodeSubtitle && (
                 <span className="rst__rowSubtitle">
@@ -316,8 +407,19 @@ export const ConverseTekNodeRenderer = observer(
       </div>
     );
 
+    const [spacerLeftPosition, setSpacerLeftPosition] = useState<number>(0);
+    const maxTreeHorPos = nodeStore.getMaxTreeHorizontalNodePosition();
+    useEffect(() => {
+      if (nodeRef.current) {
+        const parentElement = nodeRef.current.parentElement;
+        if (parentElement) {
+          setSpacerLeftPosition(nodeStore.getMaxTreeHorizontalNodePosition() - parseFloat(nodeRef.current.parentElement.style.left));
+        }
+      }
+    }, [maxTreeHorPos, nodeRef.current]);
+
     return (
-      <div style={{ height: '100%' }} data-node-id={node.id} {...otherProps}>
+      <div ref={nodeRef} style={{ height: '100%' }} data-node-id={node.id} {...otherProps}>
         {toggleChildrenVisibility && node.children && (node.children.length > 0 || typeof node.children === 'function') && (
           <div>
             <button
@@ -344,21 +446,32 @@ export const ConverseTekNodeRenderer = observer(
           </div>
         )}
 
-        <div className={classnames('rst__rowWrapper', rowDirectionClass)}>
+        <div className={classnames('rst__rowWrapper', rowDirectionClass)} style={{ display: 'inline-block' }}>
           {/* Set the row preview to be used during drag and drop */}
           {connectDragPreview(
             <div
               className={rowClasses}
               style={{
-                opacity: isDraggedDescendant ? 0.5 : 1,
+                opacity: isDraggedDescendant
+                  ? 0.5
+                  : activeNodeId == null || isActiveNode || isHoveringOver
+                  ? 1
+                  : colourConfig.dialogueNodeTree.nonActiveOpacity,
+                boxShadow: isActiveNode || (!isAnyNodeActive && wasPreviousActiveNode) || isHoveringOver ? hoverActiveBoxShadowStyle : undefined,
                 ...style,
               }}
+              onMouseEnter={() => setIsHoveringOver(true)}
+              onMouseLeave={() => setIsHoveringOver(false)}
             >
               {handle}
 
               {rowContents}
             </div>,
           )}
+        </div>
+
+        <div className="faker" style={{ position: 'absolute', display: 'inline-block', visibility: 'hidden', left: spacerLeftPosition }}>
+          spacer
         </div>
       </div>
     );

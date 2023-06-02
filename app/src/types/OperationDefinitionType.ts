@@ -6,7 +6,7 @@ export const InputTypeTypes = ['string', 'int', 'operation', 'float', 'bool'];
 export type DefaultInputValueType = 'string' | 'number' | null;
 
 export type InputValueType = {
-  viewlabel?: string;
+  viewLabel?: string;
   text: string;
   value: string | number;
 };

@@ -1,1 +1,1 @@
-export * from './FileTree';
+export { ObservingFileTree as FileTree } from './FileTree';

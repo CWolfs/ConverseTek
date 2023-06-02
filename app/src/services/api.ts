@@ -1,6 +1,6 @@
 import { runInAction } from 'mobx';
 
-import { ConversationAssetType, DefinitionsType, FileSystemItemType, QuickLinkType } from 'types';
+import { ConversationAssetType, DefinitionsType, FileSystemItemType, QuickLinkType, ColourConfigType } from 'types';
 import { consolidateSpeaker, rebuildNodeIndexes, removeAllOldFillerNodes } from 'utils/conversation-utils';
 
 import { get, post } from './rest';
@@ -57,6 +57,7 @@ export function updateConversation(id: string, conversationAsset: ConversationAs
     (conversations: object[]): ConversationAssetType[] => {
       const typedConversations = conversations.map((conversation) => mapToType<ConversationAssetType>(conversation, fullConversationAssetMapping));
       dataStore.setConversations(typedConversations);
+      dataStore.setConversationDirty(false);
       return typedConversations;
     },
   );
@@ -142,6 +143,12 @@ export function removeQuickLink(title: string, path: string) {
   });
 }
 
+export function getColourConfig() {
+  return get('/colour-config').then((colourConfig: ColourConfigType) => {
+    dataStore.setColourConfig(colourConfig);
+  });
+}
+
 export function saveWorkingDirectory(path: string, name: string) {
   dataStore.setWorkingDirectory(path, name);
   return post('/working-directory', { path });
@@ -154,7 +161,7 @@ export function saveWorkingDirectory(path: string, name: string) {
 */
 export function getDefinitions(): Promise<any> {
   return get('/definitions').then((definitions: JsonValue): DefinitionsType => {
-    const typedDefinitions = lowercasePropertyNames(definitions) as DefinitionsType;
+    const typedDefinitions = lowercasePropertyNames(definitions, true) as DefinitionsType;
     defStore.setDefinitions(typedDefinitions);
     return typedDefinitions;
   });

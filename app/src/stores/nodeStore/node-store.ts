@@ -1,5 +1,5 @@
 /* eslint-disable function-paren-newline */
-import { observable, action, toJS, makeObservable } from 'mobx';
+import { observable, action, toJS, makeObservable, runInAction } from 'mobx';
 import defer from 'lodash.defer';
 import remove from 'lodash.remove';
 import sortBy from 'lodash.sortby';
@@ -22,31 +22,46 @@ import {
 } from 'utils/conversation-utils';
 import { ClipboardType, ConversationAssetType, ElementNodeType, OperationCallType, PromptNodeType } from 'types';
 import { isElementNodeType, isPromptNodeType } from 'utils/node-utils';
+import { ModalConfirmation } from 'components/Modals/ModalConfirmation';
+import { findTreeNodeParentWithDataNodeId } from 'utils/custom-tree-data-utils';
 
 import { dataStore } from '../dataStore';
 import { modalStore } from '../modalStore';
-import { ModalConfirmation } from 'components/Modals/ModalConfirmation';
 
 /* eslint-disable no-return-assign, no-param-reassign, class-methods-use-this */
 class NodeStore {
   static deleteDeferred = false;
 
   activeNode: PromptNodeType | ElementNodeType | null = null;
+  previousActiveNodeId: string | null = null;
+  expandOnNodeId: string | null = null;
+  collapseOnNodeId: string | null = null;
+  collapseOthersOnNodeId: string | null = null;
+  expandFromCoreToNodeId: string | null = null;
+  isolateOnNodeId: string | null = null;
   focusedTreeNode: RSTNode | null = null;
   ownerId: string | null = null;
   takenPromptNodeIndexes: number[] = [];
   expandMap = new Map<string, boolean>();
   clipboard: ClipboardType | null = null;
   nodeIdToTreeIndexMap = new Map<string, number>();
+  maxTreeHorizontalNodePosition = 0;
   dirtyActiveNode = false;
   rebuild = false;
 
   constructor() {
     makeObservable(this, {
       activeNode: observable,
+      previousActiveNodeId: observable,
       focusedTreeNode: observable,
       dirtyActiveNode: observable,
+      expandOnNodeId: observable,
+      collapseOnNodeId: observable,
+      collapseOthersOnNodeId: observable,
+      expandFromCoreToNodeId: observable,
+      isolateOnNodeId: observable,
       rebuild: observable,
+      maxTreeHorizontalNodePosition: observable,
       setRebuild: action,
       init: action,
       regenerateNodeIds: action,
@@ -54,7 +69,7 @@ class NodeStore {
       setActiveNode: action,
       setActiveNodeByIndex: action,
       clearActiveNode: action,
-      scrollToNode: action,
+      initScrollToNode: action,
       setFocusedTreeNode: action,
       clearFocusedNode: action,
       setClipboard: action,
@@ -91,9 +106,29 @@ class NodeStore {
       deleteNodeCascade: action,
       deleteBranchCascade: action,
       deleteLink: action,
+      setCollapseOnNodeId: action,
+      setExpandOnNodeId: action,
+      setCollapseOthersOnNodeId: action,
+      setExpandFromCoreToNodeId: action,
+      setIsolateOnNodeId: action,
+      getChildrenFromPromptNodeIncludingSelf: action,
+      getChildrenFromElementNodeIncludingSelf: action,
+      setMaxTreeHorizontalNodePosition: action,
+      resetMaxTreeHorizontalNodePosition: action,
       reset: action,
     });
+
+    document.addEventListener('keydown', this.handleKeyDown);
   }
+
+  handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'Escape') {
+      runInAction(() => {
+        this.clearActiveNode();
+        this.previousActiveNodeId = null;
+      });
+    }
+  };
 
   generateNextPromptNodeIndex() {
     this.takenPromptNodeIndexes = sortBy(this.takenPromptNodeIndexes, (index) => index);
@@ -107,15 +142,22 @@ class NodeStore {
     this.nodeIdToTreeIndexMap.set(nodeId, index);
   }
 
-  getTreeIndex(nodeId: string) {
+  getActiveNodeTreeIndex(): number | undefined {
+    const activeNodeId = this.getActiveNodeId();
+    if (activeNodeId == null) return 0;
+    return this.getTreeIndex(activeNodeId);
+  }
+
+  getTreeIndex(nodeId: string): number | undefined {
     if (this.nodeIdToTreeIndexMap.has(nodeId)) {
       return this.nodeIdToTreeIndexMap.get(nodeId);
     }
-    return null;
+    return undefined;
   }
 
   regenerateNodeIds(conversationAsset: ConversationAssetType) {
     regenerateNodeIds(conversationAsset);
+    dataStore.setConversationDirty(true);
   }
 
   setRebuild(flag: boolean) {
@@ -124,7 +166,10 @@ class NodeStore {
       defer(
         action(() => {
           this.rebuild = false;
-          if (this.activeNode) this.updateActiveNode(this.activeNode);
+          if (this.activeNode) {
+            this.updateActiveNode(this.activeNode);
+            defer(() => this.scrollToActiveNode());
+          }
         }),
       );
     }
@@ -137,6 +182,7 @@ class NodeStore {
     if (this.ownerId !== nextOwnerId) {
       this.ownerId = nextOwnerId;
       this.activeNode = null;
+      this.previousActiveNodeId = null;
       this.expandMap.clear();
     } else {
       this.ownerId = nextOwnerId;
@@ -150,25 +196,66 @@ class NodeStore {
    * || ACTIVE NODE METHODS ||
    * =========================
    */
-  updateActiveNode(node: PromptNodeType | ElementNodeType) {
+  updateActiveNode(node: PromptNodeType | ElementNodeType): void {
     this.setActiveNode(getId(node));
   }
 
-  setActiveNode(nodeId: string) {
+  setActiveNode(nodeId: string): void {
+    this.previousActiveNodeId = this.getActiveNodeId();
     this.activeNode = this.getNode(nodeId);
   }
 
-  setActiveNodeByIndex(nodeIndex: number) {
+  setActiveNodeByIndex(nodeIndex: number): void {
+    this.previousActiveNodeId = this.getActiveNodeId();
     this.activeNode = this.getPromptNodeByIndex(nodeIndex);
   }
 
-  getActiveNodeId() {
+  getActiveNodeId(): string | null {
     if (!this.activeNode) return null;
     return getId(this.activeNode);
   }
 
-  clearActiveNode() {
+  getPreviousActiveNodeId(): string | null {
+    return this.previousActiveNodeId;
+  }
+
+  clearActiveNode(): void {
+    this.previousActiveNodeId = this.getActiveNodeId();
     this.activeNode = null;
+  }
+
+  isNodeVisible(nodeId: string): boolean {
+    const element = window.document.querySelector(`[data-node-id="${nodeId}"]`) as HTMLElement;
+    if (element == null) return false;
+
+    const rect = element.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 3;
+    const centerY = rect.top + rect.height / 2;
+
+    const topElement = document.elementFromPoint(centerX, centerY);
+
+    if (topElement == null) return false;
+    const parentWithDataId = findTreeNodeParentWithDataNodeId(topElement as HTMLElement);
+
+    if (parentWithDataId !== null) {
+      return parentWithDataId === element;
+    }
+
+    return false;
+  }
+
+  setMaxTreeHorizontalNodePosition(value: number) {
+    if (value > this.maxTreeHorizontalNodePosition) {
+      this.maxTreeHorizontalNodePosition = value;
+    }
+  }
+
+  getMaxTreeHorizontalNodePosition() {
+    return this.maxTreeHorizontalNodePosition;
+  }
+
+  resetMaxTreeHorizontalNodePosition() {
+    this.maxTreeHorizontalNodePosition = 0;
   }
 
   /*
@@ -176,29 +263,86 @@ class NodeStore {
    * || SCROLL TO  NODE METHODS ||
    * =============================
    */
-  scrollToNode(nodeId: string, direction: 'up' | 'down', cachedTree?: HTMLElement) {
+  scrollToActiveNode(fallbackToPrevious = false) {
+    console.log('scroll to active node with fallback. fallbackToPrevious: ', fallbackToPrevious);
+    let focusNodeId = this.getActiveNodeId();
+    console.log('focusNodeId: ', focusNodeId);
+
+    if (focusNodeId == null && !fallbackToPrevious) return;
+
+    if (focusNodeId == null && fallbackToPrevious && this.previousActiveNodeId) {
+      focusNodeId = this.previousActiveNodeId;
+    }
+
+    if (focusNodeId == null) return;
+
+    if (this.isNodeVisible(focusNodeId)) return;
+
+    const nodeTreeIndex = this.getActiveNodeTreeIndex();
+    if (nodeTreeIndex == null) throw Error(`node tree index is not found for active node`);
+
+    // Get a random visible node id to use for the base check
+    const element = window.document.querySelector(`[data-node-id]`) as HTMLElement;
+    const baseNodeId = element.getAttribute('data-node-id');
+    if (baseNodeId == null) return;
+
+    const baseTreeIndex = this.getTreeIndex(baseNodeId);
+    if (baseTreeIndex == null) return;
+
+    const direction = nodeTreeIndex < baseTreeIndex ? 'up' : 'down';
+
+    this.initScrollToNode(focusNodeId, direction, undefined, true);
+  }
+
+  initScrollToNode(nodeId: string, direction: 'up' | 'down', cachedTree?: HTMLElement, skipHorizontalScroll = false) {
+    this.setExpandFromCoreToNodeId(nodeId);
+    setTimeout(() => this.scrollToNode(nodeId, direction, cachedTree, skipHorizontalScroll), 100);
+  }
+
+  public scrollToTop(): void {
+    const tree = window.document.querySelector('.ReactVirtualized__Grid');
+    if (tree) tree.scrollTop = 0;
+  }
+
+  private scrollToNode(nodeId: string, direction: 'up' | 'down', cachedTree?: HTMLElement, skipHorizontalScroll = false) {
+    const horizontalScrollBarHeight = 10;
+
     // Quickly scroll in the given direction to force the virtual tree to load
     // At the same time check for the required node
-    const tree = cachedTree || window.document.querySelector('.ReactVirtualized__Grid');
-    const element = window.document.querySelector(`[data-node-id="${nodeId}"]`) as HTMLElement;
+    requestAnimationFrame(() => {
+      const tree = cachedTree || window.document.querySelector('.ReactVirtualized__Grid');
+      const element = window.document.querySelector(`[data-node-id="${nodeId}"]`) as HTMLElement;
 
-    if (tree == null) throw Error('Tree not found for autoscroll to node. This should not happen.');
+      if (tree == null) throw Error('Tree not found for autoscroll to node. This should not happen.');
 
-    // TODO: Stop the scrolling it the top or bottom has been reached
+      if (element) {
+        const offsetTop = ((element.offsetParent as HTMLElement)?.offsetParent as HTMLElement)?.offsetTop;
+        let scrollTop = offsetTop;
+        if (direction === 'down') {
+          scrollTop = offsetTop - tree.clientHeight + horizontalScrollBarHeight + element.getBoundingClientRect().height;
+        }
 
-    if (element) {
-      const scrollTop = ((element.offsetParent as HTMLElement)?.offsetParent as HTMLElement)?.offsetTop;
-      const scrollLeft = (element.offsetParent as HTMLElement)?.offsetLeft - 50;
-      tree.scrollTop = scrollTop;
-      tree.scrollLeft = scrollLeft;
-    } else if (!element) {
-      if (direction === 'up') {
-        tree.scrollTop -= 200;
-      } else if (direction === 'down') {
-        tree.scrollTop += 200;
+        const scrollLeft = (element.offsetParent as HTMLElement)?.offsetLeft - 50;
+        tree.scrollTop = scrollTop;
+        if (!skipHorizontalScroll) tree.scrollLeft = scrollLeft;
+      } else if (!element) {
+        if (direction === 'up' && tree.scrollTop <= 0) {
+          tree.scrollTop = 0;
+          return;
+        } else if (direction === 'down' && tree.scrollTop >= tree.scrollHeight - tree.clientHeight - horizontalScrollBarHeight) {
+          tree.scrollTop = tree.scrollHeight - tree.clientHeight - horizontalScrollBarHeight;
+          return;
+        }
+
+        if (direction === 'up') {
+          tree.scrollTop -= 200;
+        } else if (direction === 'down') {
+          tree.scrollTop += 200;
+        }
+
+        requestAnimationFrame(() => this.scrollToNode(nodeId, direction, tree as HTMLElement, skipHorizontalScroll));
       }
-      defer(() => this.scrollToNode(nodeId, direction, tree as HTMLElement));
-    }
+    });
   }
 
   /*
@@ -368,6 +512,7 @@ class NodeStore {
           this.deletePromptNodeCascadeByIndex(nextNodeIndex, false);
         }
 
+        dataStore.setConversationDirty(true);
         this.clearClipboard();
         this.setRebuild(true);
       };
@@ -437,6 +582,7 @@ class NodeStore {
             this.deletePromptNodeCascadeByIndex(nextNodeIndex, false);
           }
 
+          dataStore.setConversationDirty(true);
           this.clearClipboard();
           this.setRebuild(true);
         };
@@ -512,11 +658,15 @@ class NodeStore {
       const parentPromptNode = this.getNode(node.parentId) as PromptNodeType;
       updateResponseNode(conversationAsset, parentPromptNode, node);
     }
+
+    dataStore.setConversationDirty(true);
   }
 
   setNodeId(node: PromptNodeType | ElementNodeType, id: string) {
     node.idRef.id = id;
     nodeStore.setRebuild(true);
+
+    dataStore.setConversationDirty(true);
   }
 
   setNodeText(node: PromptNodeType | ElementNodeType, text: string) {
@@ -526,23 +676,33 @@ class NodeStore {
     } else {
       node.responseText = text;
     }
+
+    dataStore.setConversationDirty(true);
   }
 
   setNodeComment(node: PromptNodeType | ElementNodeType, comment: string) {
     node.comment = comment;
+
+    dataStore.setConversationDirty(true);
   }
 
   setElementNodeOnlyOnce(elementNode: ElementNodeType, onlyOnce: boolean) {
     elementNode.onlyOnce = onlyOnce;
+
+    dataStore.setConversationDirty(true);
   }
 
   setElementNodeHideIfUnavailable(elementNode: ElementNodeType, hideIfUnavailable: boolean) {
     elementNode.hideIfUnavailable = hideIfUnavailable;
+
+    dataStore.setConversationDirty(true);
   }
 
   setPromptNodeSpeakerType(node: PromptNodeType, value: 'castId' | 'speakerId'): void {
     node.speakerType = value;
     if (value === 'speakerId') node.sourceInSceneRef = null;
+
+    dataStore.setConversationDirty(true);
   }
 
   setPromptNodeSourceInSceneId(node: PromptNodeType, id: string): void {
@@ -551,11 +711,14 @@ class NodeStore {
     } else {
       node.sourceInSceneRef.id = id;
     }
+
+    dataStore.setConversationDirty(true);
   }
 
   setPromptNodeSpeakerId(node: PromptNodeType, id: string): void {
     node.speakerOverrideId = id;
     node.sourceInSceneRef = null;
+    dataStore.setConversationDirty(true);
   }
 
   setNodeActions(node: PromptNodeType | ElementNodeType, actions: OperationCallType[] | null): void {
@@ -567,6 +730,8 @@ class NodeStore {
     node.actions = {
       ops: actions,
     };
+
+    dataStore.setConversationDirty(true);
   }
 
   addNodeAction(node: PromptNodeType | ElementNodeType, nodeAction: OperationCallType): void {
@@ -577,6 +742,8 @@ class NodeStore {
     } else {
       this.setNodeActions(node, [nodeAction]);
     }
+
+    dataStore.setConversationDirty(true);
   }
 
   removeNodeAction(node: PromptNodeType | ElementNodeType, index: number): void {
@@ -585,6 +752,8 @@ class NodeStore {
 
     remove(actions.ops, (value, i) => i === index);
     if (actions.ops.length <= 0) nodeStore.setNodeActions(node, null);
+
+    dataStore.setConversationDirty(true);
   }
 
   setElementNodeConditions(elementNode: ElementNodeType, conditions: OperationCallType[] | null): void {
@@ -596,6 +765,8 @@ class NodeStore {
     elementNode.conditions = {
       ops: conditions,
     };
+
+    dataStore.setConversationDirty(true);
   }
 
   addNodeCondition(elementNode: ElementNodeType, elementNodeCondition: OperationCallType): void {
@@ -606,6 +777,8 @@ class NodeStore {
     } else {
       this.setElementNodeConditions(elementNode, [elementNodeCondition]);
     }
+
+    dataStore.setConversationDirty(true);
   }
 
   removeNodeCondition(node: ElementNodeType, index: number): void {
@@ -614,6 +787,8 @@ class NodeStore {
 
     remove(conditions.ops, (value, i) => i === index);
     if (conditions.ops.length <= 0) nodeStore.setElementNodeConditions(node, null);
+
+    dataStore.setConversationDirty(true);
   }
 
   getNode(nodeId: string | undefined): PromptNodeType | ElementNodeType | null {
@@ -639,6 +814,16 @@ class NodeStore {
     if (node) return node;
 
     return null;
+  }
+
+  getRoots(): ElementNodeType[] {
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+    if (!conversationAsset) {
+      throw Error('Unsaved conversation is null or undefined');
+    }
+
+    const { roots } = conversationAsset.conversation;
+    return roots;
   }
 
   getPromptNodeByIndex(index: number): PromptNodeType | null {
@@ -696,6 +881,8 @@ class NodeStore {
       NodeStore.deleteDeferred = true;
       defer(this.processDeletes);
     }
+
+    dataStore.setConversationDirty(true);
   }
 
   processDeletes = (): void => {
@@ -715,6 +902,8 @@ class NodeStore {
       NodeStore.deleteDeferred = false;
       this.setRebuild(true);
     });
+
+    dataStore.setConversationDirty(true);
   };
 
   addNodeByParentId(parentId: string): void {
@@ -733,18 +922,22 @@ class NodeStore {
         this.addPromptNode(parent);
       }
     }
+
+    dataStore.setConversationDirty(true);
   }
 
-  addRootNode(): void {
+  addRootNode(): string | null {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-    if (conversationAsset === null) return;
+    if (conversationAsset === null) return null;
 
     const rootNode = createRootNode();
     rootNode.parentId = '0';
     updateRootNode(conversationAsset, rootNode);
 
+    dataStore.setConversationDirty(true);
     this.updateActiveNode(rootNode);
     this.setRebuild(true);
+    return getId(rootNode);
   }
 
   setRootNodesByIds(rootNodeIds: string[]) {
@@ -753,13 +946,14 @@ class NodeStore {
 
     const rootNodes = rootNodeIds.map((rootNodeId: string) => this.getNode(rootNodeId));
     setRootNodes(conversationAsset, rootNodes as ElementNodeType[]);
+    dataStore.setConversationDirty(true);
   }
 
-  addPromptNode(parentElementNode: ElementNodeType) {
+  addPromptNode(parentElementNode: ElementNodeType): string | null {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     const { nextNodeIndex: existingNextPromptNodeIndex } = parentElementNode;
 
-    if (conversationAsset === null) return;
+    if (conversationAsset === null) return null;
 
     if (existingNextPromptNodeIndex === -1) {
       const nextPromptNodeIndex = this.generateNextPromptNodeIndex();
@@ -776,23 +970,28 @@ class NodeStore {
 
       updatePromptNode(conversationAsset, node);
 
+      dataStore.setConversationDirty(true);
       this.updateActiveNode(node);
       this.setRebuild(true);
-    } else {
-      console.warn("[Node Store] Will not create new node. Only one node per 'root' or 'response' allowed");
+      return getId(node);
     }
+
+    console.warn("[Node Store] Will not create new node. Only one node per 'root' or 'response' allowed");
+    return null;
   }
 
-  addResponseNode(parentPromptNode: PromptNodeType) {
+  addResponseNode(parentPromptNode: PromptNodeType): string | null {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-    if (conversationAsset === null) return;
+    if (conversationAsset === null) return null;
 
     const responseNode = createResponseNode();
     responseNode.parentId = getId(parentPromptNode);
     updateResponseNode(conversationAsset, parentPromptNode, responseNode);
 
+    dataStore.setConversationDirty(true);
     this.updateActiveNode(responseNode);
     this.setRebuild(true);
+    return getId(responseNode);
   }
 
   setResponseNodesByIds(parentId: string, responseIds: string[]) {
@@ -802,6 +1001,7 @@ class NodeStore {
     const responseNodes = responseIds.map((responseId) => this.getNode(responseId)) as ElementNodeType[];
     const parentPromptNode = this.getNode(parentId) as PromptNodeType;
     setResponseNodes(conversationAsset, parentPromptNode, responseNodes);
+    dataStore.setConversationDirty(true);
   }
 
   moveResponseNode(
@@ -832,6 +1032,8 @@ class NodeStore {
       );
       oldParentPromptNode.branches = updatedOldParentBranches;
     }
+
+    dataStore.setConversationDirty(true);
   }
 
   movePromptNode(nodeToMoveId: string, nextParentResponseId: string, previousParentResponseId: string): void {
@@ -847,11 +1049,14 @@ class NodeStore {
     const previousParentElementNode = nodeStore.getNode(previousParentResponseId) as ElementNodeType;
     if (previousParentElementNode == null) throw Error(`Previous parent root/response '${previousParentResponseId}' not found`);
     previousParentElementNode.nextNodeIndex = -1;
+
+    dataStore.setConversationDirty(true);
   }
 
   deleteNodeCascadeById(id: string): void {
     const node = this.getNode(id);
     if (node) {
+      dataStore.setConversationDirty(true);
       this.deleteNodeCascade(node);
       this.setRebuild(true);
     }
@@ -860,6 +1065,7 @@ class NodeStore {
   deletePromptNodeCascadeByIndex(index: number, rebuild = true): void {
     const node = this.getPromptNodeByIndex(index);
     if (node) {
+      dataStore.setConversationDirty(true);
       this.deleteNodeCascade(node);
       this.setRebuild(rebuild);
     }
@@ -928,12 +1134,15 @@ class NodeStore {
 
     if (this.activeNode && getId(this.activeNode) === getId(elementNode)) this.clearActiveNode();
     this.removeNode(elementNode);
+    dataStore.setConversationDirty(true);
   }
 
   deleteLink(parentId: string): void {
     const elementNode = this.getNode(parentId) as ElementNodeType;
     elementNode.nextNodeIndex = -1;
     elementNode.auxiliaryLink = false;
+
+    dataStore.setConversationDirty(true);
     this.setRebuild(true);
   }
 
@@ -970,6 +1179,46 @@ class NodeStore {
     return isNodeExpanded;
   }
 
+  setCollapseOnNodeId(nodeId: string | null): void {
+    this.collapseOnNodeId = nodeId;
+  }
+
+  setExpandOnNodeId(nodeId: string | null): void {
+    this.expandOnNodeId = nodeId;
+  }
+
+  setCollapseOthersOnNodeId(nodeId: string | null): void {
+    this.collapseOthersOnNodeId = nodeId;
+  }
+
+  getCollapseOnNodeId(): string | null {
+    return this.collapseOnNodeId;
+  }
+
+  getExpandOnNodeId(): string | null {
+    return this.expandOnNodeId;
+  }
+
+  getCollapseOthersOnNodeId(): string | null {
+    return this.collapseOthersOnNodeId;
+  }
+
+  setExpandFromCoreToNodeId(nodeId: string | null): void {
+    this.expandFromCoreToNodeId = nodeId;
+  }
+
+  getExpandFromCoreToNodeId(): string | null {
+    return this.expandFromCoreToNodeId;
+  }
+
+  setIsolateOnNodeId(nodeId: string | null): void {
+    this.isolateOnNodeId = nodeId;
+  }
+
+  getIsolateOnNodeId(): string | null {
+    return this.isolateOnNodeId;
+  }
+
   getNodeResponseIdsFromNodeId(nodeId: string): string[] {
     const promptNode = this.getNode(nodeId) as PromptNodeType;
     return this.getNodeResponseIds(promptNode);
@@ -984,6 +1233,100 @@ class NodeStore {
    * || DIALOG TREE DATA BUILDING METHODS ||
    * =======================================
    */
+  getChildrenFromPromptNodeIncludingSelf(promptNode: PromptNodeType): RSTNode[] | null {
+    const promptNodeId = getId(promptNode);
+
+    return [
+      {
+        title: promptNode.text,
+        id: getId(promptNode),
+        parentId: promptNode.parentId,
+        type: 'node',
+        expanded: true,
+
+        children: promptNode.branches.map((elementNode: ElementNodeType): RSTNode => {
+          const { auxiliaryLink } = elementNode;
+          const elementNodeId = getId(elementNode);
+          const isElementNodeExpanded = this.isNodeExpanded(elementNodeId);
+
+          elementNode.type = 'response';
+          elementNode.parentId = promptNodeId;
+
+          const isValidLink = auxiliaryLink && elementNode.nextNodeIndex !== -1;
+          let elementNodeChildren: RSTNode[] | null = [];
+
+          if (auxiliaryLink) {
+            if (isValidLink) {
+              const linkNode = this.getPromptNodeByIndex(elementNode.nextNodeIndex);
+
+              elementNodeChildren = [
+                {
+                  title: `[Link to NODE ${elementNode.nextNodeIndex}]`,
+                  type: 'link',
+                  linkId: linkNode ? getId(linkNode) : null,
+                  linkIndex: elementNode.nextNodeIndex,
+                  canDrag: false,
+                  parentId: elementNodeId,
+                },
+              ];
+            }
+          } else {
+            elementNodeChildren = this.getChildrenFromElementNode(elementNode);
+          }
+
+          return {
+            title: elementNode.responseText,
+            id: elementNodeId,
+            parentId: promptNodeId,
+            type: 'response',
+            expanded: isElementNodeExpanded,
+            children: elementNodeChildren,
+          };
+        }),
+      },
+    ];
+  }
+
+  getChildrenFromElementNodeIncludingSelf(elementNode: ElementNodeType): RSTNode[] | null {
+    const { auxiliaryLink } = elementNode;
+
+    const elementNodeId = getId(elementNode);
+    const isElementNodeExpanded = this.isNodeExpanded(elementNodeId);
+
+    const isValidLink = auxiliaryLink && elementNode.nextNodeIndex !== -1;
+    let elementNodeChildren: RSTNode[] | null = [];
+
+    if (auxiliaryLink) {
+      if (isValidLink) {
+        const linkNode = this.getPromptNodeByIndex(elementNode.nextNodeIndex);
+
+        elementNodeChildren = [
+          {
+            title: `[Link to NODE ${elementNode.nextNodeIndex}]`,
+            type: 'link',
+            linkId: linkNode ? getId(linkNode) : null,
+            linkIndex: elementNode.nextNodeIndex,
+            canDrag: false,
+            parentId: elementNodeId,
+          },
+        ];
+      }
+    } else {
+      elementNodeChildren = this.getChildrenFromElementNode(elementNode);
+    }
+
+    return [
+      {
+        title: elementNode.responseText,
+        id: elementNodeId,
+        parentId: elementNode.parentId,
+        type: 'response',
+        expanded: isElementNodeExpanded,
+        children: elementNodeChildren,
+      },
+    ];
+  }
+
   getChildrenFromElementNode(elementNode: ElementNodeType): RSTNode[] | null {
     const { nextNodeIndex } = elementNode; // root or response/branch
 

@@ -4,6 +4,10 @@ import { Tree } from 'antd';
 import CustomScroll from 'react-custom-scroll';
 import classnames from 'classnames';
 import { useContextMenu } from 'react-contexify';
+import { useStore } from 'hooks/useStore';
+import { DataStore } from 'stores/dataStore/data-store';
+import { getId } from 'utils/conversation-utils';
+import { observer } from 'mobx-react';
 
 import type { AntTreeNodeMouseEvent, AntTreeNodeSelectedEvent } from 'antd/lib/tree';
 
@@ -21,12 +25,33 @@ type Props = {
 
 const { TreeNode } = Tree;
 
-function renderTreeNodes(data: { key: string; label: string }[] | null): JSX.Element[] | undefined {
-  if (data) return data.map((item) => <TreeNode className="file-tree__tree__conversation" key={item.key} title={item.label} />);
+function renderTreeNodes(dataStore: DataStore, data: { key: string; label: string }[] | null): JSX.Element[] | undefined {
+  const { isConversationDirty, unsavedActiveConversationAsset: conversationAsset } = dataStore;
+
+  if (data)
+    return data.map((item) => {
+      const { key } = item;
+      let label: string | JSX.Element = item.label;
+
+      if (conversationAsset != null && key === getId(conversationAsset.conversation)) {
+        if (isConversationDirty) {
+          label = (
+            <span>
+              {`${item.label} `}
+              <span style={{ color: 'gold' }}>*</span>
+            </span>
+          );
+        }
+      }
+
+      return <TreeNode className="file-tree__tree__conversation" key={item.key} title={label} />;
+    });
   return undefined;
 }
 
-export const FileTree = ({ title, data = null, onSelected = () => {}, selectedKeys = [], selectedDirectoryName }: Props) => {
+const FileTree = ({ title, data = null, onSelected = () => {}, selectedKeys = [], selectedDirectoryName }: Props) => {
+  const dataStore = useStore<DataStore>('data');
+
   const { show } = useContextMenu({
     id: 'conversation-context-menu',
   });
@@ -49,7 +74,7 @@ export const FileTree = ({ title, data = null, onSelected = () => {}, selectedKe
         <CustomScroll heightRelativeToParent="calc(100% - 1px)">
           <Tree showIcon showLine defaultExpandedKeys={['0']} onSelect={onSelected} selectedKeys={selectedKeys} onRightClick={onRightClickTree}>
             <TreeNode className={headerClasses} title={data && data.length ? selectedDirectoryName : 'No Conversations'} key="0">
-              {renderTreeNodes(data)}
+              {renderTreeNodes(dataStore, data)}
             </TreeNode>
           </Tree>
         </CustomScroll>
@@ -57,3 +82,5 @@ export const FileTree = ({ title, data = null, onSelected = () => {}, selectedKe
     </div>
   );
 };
+
+export const ObservingFileTree = observer(FileTree);
