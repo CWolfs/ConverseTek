@@ -53,14 +53,15 @@ function ViewableLogic({ logic }: Props) {
 
           const { value: valueFromArg } = argValue;
           let displayValue = valueFromArg;
-          if (viewLabel) {
+
+          if (viewLabel != null) {
             if (viewLabel.includes('{value}')) {
               if (!displayValue) {
                 return displayValue;
               }
               displayValue = viewLabel.replace('{value}', displayValue.toString());
             } else {
-              displayValue = viewLabel;
+              displayValue = viewLabel.trim();
             }
           }
 
@@ -73,12 +74,14 @@ function ViewableLogic({ logic }: Props) {
 
             if (inputVal) {
               displayValue = inputVal.text;
-              if (inputVal.viewLabel) {
+
+              if (inputVal.viewLabel != null) {
                 const inputValueViewLabel = inputVal.viewLabel;
+
                 if (inputValueViewLabel.includes('{value}')) {
                   displayValue = inputValueViewLabel.replace('{value}', displayValue);
                 } else {
-                  displayValue = inputVal.viewLabel;
+                  displayValue = inputVal.viewLabel.trim();
                 }
               }
             }
