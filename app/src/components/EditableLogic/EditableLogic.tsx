@@ -224,8 +224,12 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
                     value={typeof argVal === 'number' ? argVal.toString() : argVal}
                     onChange={(value) => {
                       if (typeof value === 'string') {
-                        const parsedValue = tryParseInt(value, 0);
-                        defStore.setArgValue(logic, arg, parsedValue);
+                        if (value === '' && valueProps != null) {
+                          defStore.setArgValue(logic, arg, value); // Let's autocomplete occur for ints/floats with text/value
+                        } else {
+                          const parsedValue = tryParseInt(value, 0);
+                          defStore.setArgValue(logic, arg, parsedValue);
+                        }
                       } else {
                         defStore.setArgValue(logic, arg, value as number);
                       }
