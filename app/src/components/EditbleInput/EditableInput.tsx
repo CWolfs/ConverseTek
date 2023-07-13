@@ -9,11 +9,12 @@ type Props = {
   value: string | null;
   options: ({ text: string; value: string | number } | string)[] | null;
   onChange: (value: SelectValue) => void;
+  onBlur?: (value: SelectValue) => void;
   optionLabelProp?: string | null;
   valueLabel?: string | { text: string; value: string } | null;
 };
 
-function EditableInput({ value = null, options = null, onChange, optionLabelProp = null, valueLabel = null }: Props) {
+function EditableInput({ value = null, options = null, onChange, onBlur, optionLabelProp = null, valueLabel = null }: Props) {
   const isAutocomplete = !!options;
   let displayValueLabel: string | { text: string; value: string | number } | null = valueLabel;
   const conditionalProps: {
@@ -72,6 +73,7 @@ function EditableInput({ value = null, options = null, onChange, optionLabelProp
             return false;
           }}
           onChange={onChange}
+          onBlur={onBlur}
         />
         {optionLabelProp && (
           <span style={valueLabelStyle}>
@@ -88,6 +90,9 @@ function EditableInput({ value = null, options = null, onChange, optionLabelProp
       value={value || undefined}
       onChange={(event) => {
         onChange(event.target.value);
+      }}
+      onBlur={(event) => {
+        onBlur?.(event.target.value);
       }}
     />
   );

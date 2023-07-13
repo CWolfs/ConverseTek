@@ -203,10 +203,23 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
                     options={defStore.getPresetValuesForOptions(presetValue as string)}
                     onChange={(value) => {
                       if (typeof value === 'string') {
-                        const parsedValue = tryParseInt(value, 0);
-                        defStore.setArgValue(logic, arg, parsedValue);
+                        if (value === '-') {
+                          defStore.setArgValue(logic, arg, value);
+                        } else {
+                          const parsedValue = tryParseInt(value, 0);
+                          if (isNaN(parsedValue)) {
+                            defStore.setArgValue(logic, arg, 0);
+                          } else {
+                            defStore.setArgValue(logic, arg, parsedValue);
+                          }
+                        }
                       } else {
                         defStore.setArgValue(logic, arg, value as number);
+                      }
+                    }}
+                    onBlur={(value) => {
+                      if (value === '-') {
+                        defStore.setArgValue(logic, arg, 0);
                       }
                     }}
                     optionLabelProp="value"
@@ -227,11 +240,24 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
                         if (value === '' && valueProps.optionLabelProp != null && valueProps.options != null) {
                           defStore.setArgValue(logic, arg, value); // Let's autocomplete occur for ints/floats with text/value
                         } else {
-                          const parsedValue = tryParseInt(value, 0);
-                          defStore.setArgValue(logic, arg, parsedValue);
+                          if (value === '-') {
+                            defStore.setArgValue(logic, arg, value);
+                          } else {
+                            const parsedValue = tryParseInt(value, 0);
+                            if (isNaN(parsedValue)) {
+                              defStore.setArgValue(logic, arg, 0);
+                            } else {
+                              defStore.setArgValue(logic, arg, parsedValue);
+                            }
+                          }
                         }
                       } else {
                         defStore.setArgValue(logic, arg, value as number);
+                      }
+                    }}
+                    onBlur={(value) => {
+                      if (value === '-') {
+                        defStore.setArgValue(logic, arg, 0);
                       }
                     }}
                     {...valueProps}
