@@ -264,9 +264,7 @@ class NodeStore {
    * =============================
    */
   scrollToActiveNode(fallbackToPrevious = false) {
-    console.log('scroll to active node with fallback. fallbackToPrevious: ', fallbackToPrevious);
     let focusNodeId = this.getActiveNodeId();
-    console.log('focusNodeId: ', focusNodeId);
 
     if (focusNodeId == null && !fallbackToPrevious) return;
 
