@@ -53,3 +53,5 @@ defs/operations/add_flashpoint.json
 defs/operations/sideload_conversation.json
 
 defs/operations/add_mech.json
+
+defs/operations/evaluate_timeline.json
