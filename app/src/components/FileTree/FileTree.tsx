@@ -1,5 +1,5 @@
 /* eslint-disable function-paren-newline */
-import React from 'react';
+import React, { CSSProperties } from 'react';
 import { Tree } from 'antd';
 import CustomScroll from 'react-custom-scroll';
 import classnames from 'classnames';
@@ -31,18 +31,20 @@ function renderTreeNodes(dataStore: DataStore, data: { key: string; label: strin
   if (data)
     return data.map((item) => {
       const { key } = item;
-      let label: string | JSX.Element = item.label;
+      let style: CSSProperties = { visibility: 'hidden' };
 
       if (conversationAsset != null && key === getId(conversationAsset.conversation)) {
         if (isConversationDirty) {
-          label = (
-            <span>
-              {`${item.label} `}
-              <span style={{ color: 'gold' }}>*</span>
-            </span>
-          );
+          style = { visibility: 'visible', color: 'gold' };
         }
       }
+
+      const label = (
+        <span>
+          {`${item.label} `}
+          <span style={style}>*</span>
+        </span>
+      );
 
       return <TreeNode className="file-tree__tree__conversation" key={item.key} title={label} />;
     });
