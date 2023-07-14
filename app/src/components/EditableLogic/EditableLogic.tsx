@@ -211,7 +211,7 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
                             parsedValue = tryParseFloat(value, 0);
                             const fullstopCount = value.split('.').length - 1;
 
-                            if (!isNaN(parsedValue) && value.endsWith('.') && fullstopCount <= 1) {
+                            if (!isNaN(parsedValue) && (value.endsWith('.') || value.endsWith('0')) && fullstopCount <= 1) {
                               parsedValue = value;
                             }
                           } else if (argType === 'int') {
@@ -259,7 +259,7 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
                               parsedValue = tryParseFloat(value, 0);
                               const fullstopCount = value.split('.').length - 1;
 
-                              if (!isNaN(parsedValue) && value.endsWith('.') && fullstopCount <= 1) {
+                              if (!isNaN(parsedValue) && (value.endsWith('.') || value.endsWith('0')) && fullstopCount <= 1) {
                                 parsedValue = value;
                               }
                             } else if (argType === 'int') {
