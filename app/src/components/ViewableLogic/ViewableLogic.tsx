@@ -89,7 +89,7 @@ function ViewableLogic({ logic }: Props) {
 
           return <span key={index}>{displayValue} </span>;
         })}
-      {args.length <= 0 && <span>...</span>}
+      {args.length <= 0 && logicDef.inputs.length > 0 && <span>...</span>}
       {view.includes('result') && renderResult(args)}
     </span>
   );
