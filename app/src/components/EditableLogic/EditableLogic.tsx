@@ -11,7 +11,7 @@ import { SelectValue } from 'antd/lib/select';
 import { useStore } from 'hooks/useStore';
 import { DefStore } from 'stores/defStore/def-store';
 import { OperationCallType, OperationArgType, InputType, InputTypeType, InputTypeTypes, InputValueType, OperationDefinitionType } from 'types';
-import { tryParseInt } from 'utils/number-utils';
+import { tryParseFloat, tryParseInt } from 'utils/number-utils';
 
 import { EditableSelect } from '../EditableSelect';
 import { EditableInput } from '../EditbleInput';
@@ -206,8 +206,19 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
                         if (value === '-') {
                           defStore.setArgValue(logic, arg, value);
                         } else {
-                          const parsedValue = tryParseInt(value, 0);
-                          if (isNaN(parsedValue)) {
+                          let parsedValue: number | string = 0;
+                          if (argType === 'float') {
+                            parsedValue = tryParseFloat(value, 0);
+                            const fullstopCount = value.split('.').length - 1;
+
+                            if (!isNaN(parsedValue) && value.endsWith('.') && fullstopCount <= 1) {
+                              parsedValue = value;
+                            }
+                          } else if (argType === 'int') {
+                            parsedValue = tryParseInt(value, 0);
+                          }
+
+                          if (typeof parsedValue == 'number' && isNaN(parsedValue)) {
                             defStore.setArgValue(logic, arg, 0);
                           } else {
                             defStore.setArgValue(logic, arg, parsedValue);
@@ -243,8 +254,19 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
                           if (value === '-') {
                             defStore.setArgValue(logic, arg, value);
                           } else {
-                            const parsedValue = tryParseInt(value, 0);
-                            if (isNaN(parsedValue)) {
+                            let parsedValue: number | string = 0;
+                            if (argType === 'float') {
+                              parsedValue = tryParseFloat(value, 0);
+                              const fullstopCount = value.split('.').length - 1;
+
+                              if (!isNaN(parsedValue) && value.endsWith('.') && fullstopCount <= 1) {
+                                parsedValue = value;
+                              }
+                            } else if (argType === 'int') {
+                              parsedValue = tryParseInt(value, 0);
+                            }
+
+                            if (typeof parsedValue == 'number' && isNaN(parsedValue)) {
                               defStore.setArgValue(logic, arg, 0);
                             } else {
                               defStore.setArgValue(logic, arg, parsedValue);
