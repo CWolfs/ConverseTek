@@ -329,7 +329,7 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
   return (
     <div className="editable-logic">
       <div className={operationClasses}>{content}</div>
-      <div className={argClasses}>{argContent}</div>
+      {logicDef.inputs.length > 0 && <div className={argClasses}>{argContent}</div>}
     </div>
   );
 }

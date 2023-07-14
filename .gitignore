@@ -55,3 +55,7 @@ defs/operations/sideload_conversation.json
 defs/operations/add_mech.json
 
 defs/operations/evaluate_timeline.json
+
+defs/operations/trigger_event.json
+
+defs/operations/trigger_random_event.json
