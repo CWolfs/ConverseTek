@@ -59,3 +59,5 @@ defs/operations/evaluate_timeline.json
 defs/operations/trigger_event.json
 
 defs/operations/trigger_random_event.json
+
+defs/operations/reset_battletech_viewscreen.json
