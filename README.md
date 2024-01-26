@@ -17,6 +17,7 @@ Latest release: **v1.6.0** | [Download](https://github.com/CWolfs/ConverseTek/re
 
 ### Videos
 
+- [v1.5 - Walkthrough](https://www.youtube.com/watch?v=GFBJt1Cjpwk)
 - [v1.5 - Isolate Branch](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/1.5.0/conversetek-isolate-branch.gif)
 - [v1.4 - Zooming](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/1.4.0/conversetek-zoom-feature.gif)
 - [v1.4 - Improved Folder Navgation](https://raw.githubusercontent.com/CWolfs/ConverseTek/develop/docs/images/1.4.0/conversetek-improved-folder-navigation.gif)
