@@ -1,8 +1,10 @@
 # ConverseTek: An Open Source Conversation Editor for BattleTech
 
+**Date**: 26th Jan 2024
+
 ConverseTek is a tree-based dialogue editor I developed for modding the game BattleTech. It enables modders to create intricate conversations with branching nodes that encompass dialogue text, actions, and conditions. Actions trigger game logic, while conditions determine the availability of dialogue branches.
 
-## Technical Innovation
+### Technical Innovation
 
 - **Reverse Engineering:** Leveraged BattleTech's game assembly files to convert binary format game dialogue into editable JSON. This approach was a significant time-saver compared to full binary reverse engineering.
 - **Chromely Framework:** Chose Chromely for its lightweight nature compared to Electron, and for its compatibility with a C# /.NET backend, crucial for reusing BattleTech's prebuilt game assembly.
