@@ -5,7 +5,7 @@ import { consolidateSpeaker, rebuildNodeIndexes, removeAllOldFillerNodes } from 
 
 import { get, post } from './rest';
 
-import { dataStore, defStore } from '../stores';
+import { dataStore, defStore, nodeStore } from '../stores';
 import { JsonValue, fullConversationAssetMapping, lowercasePropertyNames, mapToType, reversedFullConversationAssetMapping } from './mappings/mapping';
 
 /*
@@ -49,6 +49,11 @@ export function updateConversation(id: string, conversationAsset: ConversationAs
     consolidateSpeaker(conversationAsset);
     removeAllOldFillerNodes(conversationAsset); // This only exists to fix old conversations pre-v1.4
     rebuildNodeIndexes(conversationAsset);
+
+    const nodeID = nodeStore.getActiveNodeId();
+    if (nodeID) {
+      setTimeout(() => nodeStore.setActiveNode(nodeID));
+    }
   });
 
   const apiMappedConversation = mapToType<object>(conversationAsset, reversedFullConversationAssetMapping);
@@ -68,6 +73,11 @@ export function exportConversation(id: string, conversationAsset: ConversationAs
     consolidateSpeaker(conversationAsset);
     removeAllOldFillerNodes(conversationAsset); // This only exists to fix old conversations pre-v1.4
     rebuildNodeIndexes(conversationAsset);
+
+    const nodeID = nodeStore.getActiveNodeId();
+    if (nodeID) {
+      setTimeout(() => nodeStore.setActiveNode(nodeID));
+    }
   });
 
   const apiMappedConversation = mapToType<object>(conversationAsset, reversedFullConversationAssetMapping);
@@ -81,6 +91,11 @@ export function exportAllConversations(id: string, conversationAsset: Conversati
       consolidateSpeaker(conversationAsset);
       removeAllOldFillerNodes(conversationAsset); // This only exists to fix old conversations pre-v1.4
       rebuildNodeIndexes(conversationAsset);
+
+      const nodeID = nodeStore.getActiveNodeId();
+      if (nodeID) {
+        setTimeout(() => nodeStore.setActiveNode(nodeID));
+      }
     });
   }
 
