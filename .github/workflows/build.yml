@@ -1,0 +1,63 @@
+name: Build ConverseTek
+
+on:
+  push:
+    branches: [develop, master]
+  pull_request:
+    branches: [develop, master]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          path: .
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.19.2"
+
+      - name: Install Node dependencies
+        run: cd app && npm install
+
+      - name: Download ShadowrunDTO.dll from private repo
+        run: |
+          curl -L `
+              -H "Authorization: token ${{ secrets.PRIVATE_REPO_TOKEN }}" `
+              -H "Accept: application/vnd.github.v3.raw" `
+              "https://api.github.com/repos/CWolfs/ConverseTekSecrets/contents/libs/ShadowrunDTO.dll?ref=master" `
+              -o libs/ShadowrunDTO.dll
+
+      - name: Download ShadowrunSerializer.dll from private repo
+        run: |
+          curl -L `
+            -H "Authorization: token ${{ secrets.PRIVATE_REPO_TOKEN }}" `
+            -H "Accept: application/vnd.github.v3.raw" `
+            "https://api.github.com/repos/CWolfs/ConverseTekSecrets/contents/libs/ShadowrunSerializer.dll?ref=master" `
+            -o libs/ShadowrunSerializer.dll
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Restore NuGet packages
+        run: nuget restore ConverseTek.csproj
+
+      - name: Build ConverseTek
+        run: msbuild ConverseTek.csproj /t:BuildRelease /p:Configuration=Release
+
+      - name: Remove private DLLs before packaging
+        shell: bash
+        run: |
+          rm -f bin/x64/Release/net472/ShadowrunDTO.dll
+          rm -f bin/x64/Release/net472/ShadowrunSerializer.dll
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ConverseTek-Release
+          path: |
+            bin/x64/Release/net472/
