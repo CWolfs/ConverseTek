@@ -32,7 +32,7 @@ jobs:
         run: msbuild ConverseTek.csproj /t:BuildRelease /p:Configuration=Release
 
       - name: Upload Build Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: converseTek-release
           path: |
