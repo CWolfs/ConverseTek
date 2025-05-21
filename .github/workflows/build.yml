@@ -22,7 +22,7 @@ jobs:
           node-version: "20.19.2"
 
       - name: Install Node dependencies
-        run: npm install --prefix app
+        run: npm install --prefix ConverseTek/app
 
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
