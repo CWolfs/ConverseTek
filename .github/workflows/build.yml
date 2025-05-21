@@ -26,18 +26,18 @@ jobs:
 
       - name: Download ShadowrunDTO.dll from private repo
         run: |
-          curl -L \
-            -H "Authorization: token ${{ secrets.PRIVATE_REPO_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3.raw" \
-            https://api.github.com/repos/cwolfs/ConverseTekSecrets/contents/libs/ShadowrunDTO.dll?ref=master \
-            -o libs/ShadowrunDTO.dll
+          curl -L `
+              -H "Authorization: token ${{ secrets.PRIVATE_REPO_TOKEN }}" `
+              -H "Accept: application/vnd.github.v3.raw" `
+              "https://api.github.com/repos/CWolfs/ConverseTekSecrets/contents/libs/ShadowrunDTO.dll?ref=master" `
+              -o libs/ShadowrunDTO.dll
 
       - name: Download ShadowrunSerializer.dll from private repo
         run: |
-          curl -L \
-            -H "Authorization: token ${{ secrets.PRIVATE_REPO_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3.raw" \
-            https://api.github.com/repos/cwolfs/ConverseTekSecrets/contents/libs/ShadowrunSerializer.dll?ref=master \
+          curl -L `
+            -H "Authorization: token ${{ secrets.PRIVATE_REPO_TOKEN }}" `
+            -H "Accept: application/vnd.github.v3.raw" `
+            "https://api.github.com/repos/CWolfs/ConverseTekSecrets/contents/libs/ShadowrunSerializer.dll?ref=master" `
             -o libs/ShadowrunSerializer.dll
 
       - name: Setup MSBuild
