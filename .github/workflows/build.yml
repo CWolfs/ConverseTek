@@ -1,0 +1,39 @@
+name: Build ConverseTek
+
+on:
+  push:
+    branches: [feature/test-build]
+  pull_request:
+    branches: [feature/test-build]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20.19.2"
+
+      - name: Install Node dependencies
+        run: npm install --prefix app
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Restore NuGet packages
+        run: nuget restore ConverseTek.csproj
+
+      - name: Build ConverseTek
+        run: msbuild ConverseTek.csproj /t:BuildRelease /p:Configuration=Release
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: converseTek-release
+          path: |
+            bin/x64/Release/net472/
