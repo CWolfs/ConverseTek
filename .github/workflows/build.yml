@@ -49,9 +49,14 @@ jobs:
       - name: Build ConverseTek
         run: msbuild ConverseTek.csproj /t:BuildRelease /p:Configuration=Release
 
+      - name: Remove private DLLs before packaging
+        run: |
+          Remove-Item -Force bin/x64/Release/net472/ShadowrunDTO.dll
+          Remove-Item -Force bin/x64/Release/net472/ShadowrunSerializer.dll
+
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: converseTek-release
+          name: ConverseTek-Release
           path: |
             bin/x64/Release/net472/
