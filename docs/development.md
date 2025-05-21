@@ -69,4 +69,4 @@ The tasks are defined in `.vscode/tasks.json`.
 ### 6 - Run Project
 
 - Run the task `Fast Run`, which runs the tool from the `bin` folder
-- Alternatively, run `bin/x64/Debug/net472/ConverseTek.exe` from inside the project directory
+- Alternatively, run `bin/x64/Debug/net472/ConverseTek.exe`
