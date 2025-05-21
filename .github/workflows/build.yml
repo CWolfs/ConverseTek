@@ -2,9 +2,9 @@ name: Build ConverseTek
 
 on:
   push:
-    branches: [feature/test-build]
+    branches: [feature/build-test]
   pull_request:
-    branches: [feature/test-build]
+    branches: [feature/build-test]
 
 jobs:
   build:
