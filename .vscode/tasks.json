@@ -9,7 +9,7 @@
         "build",
         "--configuration",
         "Release",
-        "K:/Modding/ConverseTek/ConverseTek.csproj",
+        "${workspaceFolder}/ConverseTek.csproj",
         "/t:BuildRelease"
       ],
       "problemMatcher": "$msCompile"
@@ -20,7 +20,7 @@
       "type": "process",
       "args": [
         "build",
-        "K:/Modding/ConverseTek/ConverseTek.csproj",
+        "${workspaceFolder}/ConverseTek.csproj",
         "/t:BuildDebug"
       ],
       "problemMatcher": "$msCompile"
@@ -31,7 +31,7 @@
       "type": "process",
       "args": [
         "build",
-        "K:/Modding/ConverseTek/ConverseTek.csproj",
+        "${workspaceFolder}/ConverseTek.csproj",
         "/t:BuildServer"
       ],
       "problemMatcher": "$msCompile"
@@ -54,12 +54,12 @@
     {
       "label": "UI Build",
       "type": "shell",
-      "command": "npm run build --prefix app && xcopy /y /e /i dist K:\\Modding\\ConverseTek\\bin\\x64\\Debug\\net472\\dist",
+      "command": "npm run build --prefix app && xcopy /y /e /i dist ${workspaceFolder}\\bin\\x64\\Debug\\net472\\dist",
       "windows": {
           "command": "cmd",
           "args": [
               "/C",
-              "npm run build --prefix app && xcopy /y /e /i dist K:\\Modding\\ConverseTek\\bin\\x64\\Debug\\net472\\dist"
+              "npm run build --prefix app && xcopy /y /e /i dist ${workspaceFolder}\\bin\\x64\\Debug\\net472\\dist"
           ]
       },
       "presentation": {
@@ -72,7 +72,7 @@
     },
     {
       "label": "Fast Run",
-      "command": "K:/Modding/ConverseTek/bin/x64/Debug/net472/ConverseTek.exe",
+      "command": "${workspaceFolder}/bin/x64/Debug/net472/ConverseTek.exe",
       "type": "shell"
     },
     {
