@@ -1,4 +1,4 @@
-# Development & Setup Guide to ConverseTek
+# Development & Setup Guide
 
 Thank you for your interest in contributing! This project uses **Chromely with CefSharp**, and is based on **.NET Framework 4.7.2**. Because of this, some setup steps differ from modern .NET (.NET 6/8) projects.
 
