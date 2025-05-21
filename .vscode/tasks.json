@@ -37,6 +37,21 @@
       "problemMatcher": "$msCompile"
     },
     {
+      "label": "UI Install",
+      "type": "shell",
+      "command": "npm install",
+      "options": {
+        "cwd": "${workspaceFolder}/app"
+      },
+      "presentation": {
+        "reveal": "always"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
+    },
+    {
       "label": "UI Build",
       "type": "shell",
       "command": "npm run build --prefix app && xcopy /y /e /i dist K:\\Modding\\ConverseTek\\bin\\x64\\Debug\\net472\\dist",
