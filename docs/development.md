@@ -36,7 +36,7 @@ A result of:
 
 Used to build the frontend (in the /app directory):
 
-- v14.21.3 (✅ Compatible)
+- v20.19.2 (✅ Compatible)
 
 ### 3 - VSCode Task Plugin
 
@@ -48,25 +48,34 @@ Once installed you will see the tasks at buttons in the bottom status bar of VSC
 
 This helps automate:
 
-    - Frontend builds
-    - Copying files into dist/, libs/, etc.
-    - Deploy-to-output steps
+- Frontend builds
+- Copying files into dist/, libs/, etc.
+- Deploy-to-output steps
 
 The tasks are defined in `.vscode/tasks.json`.
 
 💡 These tasks are **VS Code-specific** and won't work in Visual Studio.
 
-### 4 - Install Frontend Dependencies
+### 4 - Install Game-Related Dependencies
+
+ConverseTek makes use of two BattleTech C# assemblies (.dll files). These are required to be copied from the game into the ConverseTek 'libs' folder before building the project.
+
+- ShadowrunDTO.dll
+- ShadowrunSerializer.dll
+
+These are found in the BattleTech game folder under `BATTLETECH/BattleTech_Data/Managed`.
+
+### 5 - Install Frontend Dependencies
 
 - Run the task `UI Install`
 - Alternatively, navigate into the `app` folder and run `npm install`
 
-### 5 - Build Project
+### 6 - Build Project
 
 - Run the task `Build All`
 - Alternatively, run `dotnet build /t:BuildDebug` from inside the project directory
 
-### 6 - Run Project
+### 7 - Run Project
 
 - Run the task `Fast Run`, which runs the tool from the `bin` folder
 - Alternatively, run `bin/x64/Debug/net472/ConverseTek.exe`
