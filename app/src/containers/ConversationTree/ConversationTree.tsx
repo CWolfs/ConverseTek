@@ -28,7 +28,7 @@ function ConversationTree() {
   const modalStore = useStore<ModalStore>('modal');
 
   const { conversationAssets, activeConversationAsset, workingDirectoryName } = dataStore;
-  const data = remapConversationData(conversationAssets);
+  const data = remapConversationData(new Map<string, ConversationAssetType>(conversationAssets.entries()));
   const selectedKeys = activeConversationAsset ? [activeConversationAsset.conversation.idRef.id] : undefined;
 
   const onNodeSelected = (newSelectedKeys: string[]): void => {
