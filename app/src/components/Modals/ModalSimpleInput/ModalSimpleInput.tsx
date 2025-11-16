@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-one-expression-per-line */
 import React, { useEffect, MouseEvent, useState } from 'react';
-import { Icon, Input } from 'antd';
+import { Input } from 'antd';
 
 import { useStore } from 'hooks/useStore';
 import { ModalStore, OnCancelType, OnOkType } from 'stores/modalStore/modal-store';

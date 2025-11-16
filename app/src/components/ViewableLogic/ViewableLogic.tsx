@@ -56,7 +56,7 @@ function ViewableLogic({ logic }: Props) {
 
           if (viewLabel != null) {
             if (viewLabel.includes('{value}')) {
-              if (!displayValue) {
+              if (displayValue == null) {
                 return displayValue;
               }
               displayValue = viewLabel.replace('{value}', displayValue.toString());
@@ -89,7 +89,7 @@ function ViewableLogic({ logic }: Props) {
 
           return <span key={index}>{displayValue} </span>;
         })}
-      {args.length <= 0 && <span>...</span>}
+      {args.length <= 0 && logicDef.inputs.length > 0 && <span>...</span>}
       {view.includes('result') && renderResult(args)}
     </span>
   );

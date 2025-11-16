@@ -2,7 +2,6 @@ import React, { useRef, MouseEvent, useEffect } from 'react';
 import { observer } from 'mobx-react';
 import { Button, Icon, Collapse, Popconfirm } from 'antd';
 import classnames from 'classnames';
-import remove from 'lodash.remove';
 import { useUpdate } from 'ahooks';
 
 import 'react-custom-scroll/dist/customScroll.css';

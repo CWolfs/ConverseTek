@@ -55,3 +55,17 @@ defs/operations/sideload_conversation.json
 defs/operations/add_mech.json
 
 defs/operations/evaluate_timeline.json
+
+defs/operations/trigger_event.json
+
+defs/operations/trigger_random_event.json
+
+defs/operations/reset_battletech_viewscreen.json
+
+defs/operations/take_contract.json
+
+defs/operations/time_skip_to_date.json
+
+defs/operations/evaluate_days_since_date.json
+
+defs/operations/get_current_date.json
