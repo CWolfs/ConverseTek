@@ -56,7 +56,7 @@ function ViewableLogic({ logic }: Props) {
 
           if (viewLabel != null) {
             if (viewLabel.includes('{value}')) {
-              if (displayValue == null) {
+              if (displayValue == null || displayValue === '') {
                 return displayValue;
               }
               displayValue = viewLabel.replace('{value}', displayValue.toString());
