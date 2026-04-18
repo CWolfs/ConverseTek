@@ -8,7 +8,7 @@ import { useStore } from 'hooks/useStore';
 import { NodeStore } from 'stores/nodeStore/node-store';
 import { ModalStore } from 'stores/modalStore/modal-store';
 import { detectType, isAllowedToCreateNode, isAllowedToPasteCopy, isAllowedToPasteLink } from 'utils/node-utils';
-import { ModalConfirmation } from 'components/Modals/ModalConfirmation';
+import { handleDeleteIntent } from './handle-delete';
 
 export type EventProps = {
   id: string;
@@ -80,43 +80,7 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
 
   const onDeleteClicked = ({ props }: ItemParams<EventProps>) => {
     if (!props) return;
-
-    const { id: nodeId, type: nodeType, parentId } = props;
-    const { isLink } = detectType(nodeType);
-
-    const proceedWithDelete = () => {
-      if (isLink) {
-        nodeStore.deleteLink(parentId);
-      } else {
-        nodeStore.deleteNodeCascadeById(nodeId);
-      }
-    };
-
-    const buttons = {
-      positiveType: 'danger',
-      positiveLabel: 'Confirm',
-      onPositive: proceedWithDelete,
-      negativeLabel: 'Cancel',
-    };
-
-    const title = `Are you sure you want to delete this ${isLink ? 'link' : 'node'}?`;
-    const message = isLink
-      ? 'This action will delete the link and only this specific link.'
-      : "This action will delete the node and all it's children. Are you sure you want to do this?";
-
-    modalStore.setModelContent(
-      ModalConfirmation,
-      {
-        type: 'warning',
-        title,
-        body: message,
-        width: '30rem',
-        buttons,
-        disableOk: false,
-      },
-      'global1',
-    );
-
+    handleDeleteIntent({ props, nodeStore, modalStore });
     hideAll();
   };
 

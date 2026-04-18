@@ -10,7 +10,8 @@
     "build": "npm run verify && cross-env NODE_ENV=development CT_ENV=development webpack",
     "prod": "cross-env NODE_ENV=production CT_ENV=production webpack",
     "verify": "npm run ts-check",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "ts-watch": "tsc --watch",
     "ts-check": "tsc",
     "generate:hooks": "npx simple-git-hooks"
@@ -85,6 +86,7 @@
     "style-loader": "^2.0.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4",
+    "vitest": "^4.1.4",
     "webpack": "^5.78.0",
     "webpack-cli": "^5.0.1",
     "webpack-dev-server": "^4.13.2"

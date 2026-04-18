@@ -22,6 +22,7 @@ import {
 } from 'utils/conversation-utils';
 import { ClipboardType, ConversationAssetType, ElementNodeType, OperationCallType, PromptNodeType } from 'types';
 import { isElementNodeType, isPromptNodeType } from 'utils/node-utils';
+import { findInboundLinksToPromptNodeIndex } from 'utils/node-link-utils';
 import { ModalConfirmation } from 'components/Modals/ModalConfirmation';
 import { findTreeNodeParentWithDataNodeId } from 'utils/custom-tree-data-utils';
 
@@ -1067,6 +1068,14 @@ class NodeStore {
       this.deleteNodeCascade(node);
       this.setRebuild(rebuild);
     }
+  }
+
+  getInboundLinksToPromptNodeIndex(indexToFind: number): ElementNodeType[] {
+    const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+    if (conversationAsset === null) return [];
+
+    const { roots, nodes } = conversationAsset.conversation;
+    return findInboundLinksToPromptNodeIndex(roots, nodes, indexToFind);
   }
 
   /*
