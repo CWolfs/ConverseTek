@@ -1,0 +1,83 @@
+# Data Flow
+
+End-to-end traces of the most common user actions. Each step lists the relevant file path so you can follow along.
+
+## 1. Opening a folder
+
+1. **UI** — `containers/Header/Header.tsx`: user picks a folder via `FileSystemPicker`. The picker eventually calls `dataStore.setWorkingDirectory(path, name)`.
+2. **API** — `app/src/services/api.ts:saveWorkingDirectory()` → `POST /working-directory` with `{ path }`.
+3. **Backend** — `Controllers/FileSystemController.cs:SetWorkingDirectory()` → `FileSystemService.getInstance().WorkingDirectory = path`.
+4. **Frontend** triggers a follow-up `getConversations()` → `GET /conversations`.
+5. **Backend** — `ConversationController.GetConversations()` → `ConversationService.LoadConversations()`:
+   - Scans `WorkingDirectory` for `*.bytes` files.
+   - For each: `protobuf-net` `RuntimeTypeModel.Deserialize(stream, ..., typeof(Conversation))` → wraps in `ConversationAsset { FileName, FilePath, Conversation }`.
+   - Files matching `.cvsl.bytes` are routed to `LoadSpeakersList()` instead.
+   - Returns `List<ConversationAsset>`.
+6. **Serialise & return** — `JsonConvert.SerializeObject(conversations)` → `ChromelyResponse.Data`.
+7. **Frontend** — `getConversations()` maps the response with `fullConversationAssetMapping` (snake_case → camelCase) into `ConversationAssetType[]`, then `dataStore.setConversations(typedConversations)` populates the `conversationAssets` ObservableMap.
+8. **UI** — observers (`ConversationTree`, `Conversations`) re-render with the loaded list.
+
+In parallel, definitions are fetched once via `getDefinitions()` → `GET /definitions` → `DefinitionService.LoadDefinitions()` → `defStore.setDefinitions(...)`.
+
+## 2. Editing a dialogue node
+
+1. **Selection** — User clicks a node in the tree → `nodeStore.setActiveNode(nodeId)`.
+2. **Editor opens** — `ConversationEditor` reads `nodeStore.activeNode`, renders inputs (text, speaker, etc.).
+3. **Edits** — Input handlers call `nodeStore.setNodeText(...)`, `nodeStore.setPromptNodeSpeakerId(...)`, etc., mutating the node in-place on `dataStore.unsavedActiveConversationAsset`.
+4. **Operation edits** — `EditableLogic` argument changes call `defStore.setArgValue(...)`, `defStore.setOperation(...)`, etc.
+5. **Dirty tracking** — Mutations call `dataStore.setConversationDirty(true)`. The header's *Save* item only renders when there's an active conversation.
+6. **Save trigger** — Either the File → Save menu item or the Ctrl+S handler in `data-store.ts` fires `updateConversation(id, asset)` from `api.ts`.
+7. **Frontend preprocessing** — Before sending: `consolidateSpeaker(asset)`, `removeAllOldFillerNodes(asset)`, `rebuildNodeIndexes(asset)`, then `mapToType(asset, reversedFullConversationAssetMapping)` for the wire format.
+8. **API** — `POST /conversations/put` with `{ method: 'PUT', conversationAsset }`.
+9. **Backend** — `ConversationController.UpdateConversations()` deserialises into `ConversationAsset`, calls `ConversationService.SaveConversation(asset, FileFormat.BINARY)`, which writes via `protobuf-net` to `*.bytes`.
+10. **Response** — Backend re-loads and returns the full conversation list. Frontend calls `dataStore.setConversations(typed)` and `setConversationDirty(false)`.
+
+## 3. Exporting a single conversation as JSON
+
+1. **UI** — File → Export Conversation as JSON in `Header.tsx`.
+2. **API** — `exportConversation(id, asset)` runs the same preprocessing as a save, maps with `reversedFullConversationAssetMapping`, then `POST /conversations/export`.
+3. **Backend** — `ConversationController.ExportConversations()` → `ConversationService.SaveConversation(asset, FileFormat.JSON)` writes `*.json` next to the `*.bytes` in the working directory.
+
+## 4. Exporting all conversations as JSON
+
+1. **UI** — File → Export All Conversations as JSON. Visible whenever `workingDirectory` is set; **does not require an open conversation** (see issue #194 / PR #195).
+2. **API** — `exportAllConversations(id, asset | null)` → `POST /conversations/export-all`. The asset, if provided, is sent as a courtesy save; if `null`, the JS bridge serialises it as JSON `null` and the backend treats it as "no extra asset".
+3. **Backend** — `ConversationController.ExportAllConversations()` (lines 101–129):
+   - Loads all conversations from disk via `ConversationService.LoadConversations()`.
+   - Loops them, calling `SaveConversation(c, FileFormat.JSON)` on each — this is the actual "export all" work, runs unconditionally.
+   - Then, in a try/catch, also saves the posted asset if its serialised form is non-empty. `JValue.Null.ToString()` returns `""`, so a frontend `null` correctly skips this branch.
+   - Returns the updated conversation list.
+
+## 5. Importing a JSON conversation
+
+1. **UI** — File → Import Conversation from JSON. `FileSystemPicker` (file mode).
+2. **API** — `importConversation(path)` calls `dataStore.clearActiveConversation()` then `POST /conversations/import` with `{ path }`.
+3. **Backend** — `ConversationController.ImportConversation()` reads the JSON file, deserialises to `Conversation`, then writes it back as `*.bytes` into the working directory via `ConversationService.SaveConversation(..., FileFormat.BINARY)`.
+4. **Effect** — The new `*.bytes` shows up on the next reload.
+
+## 6. Deleting a conversation
+
+1. **UI** — Tree context menu in `ConversationTree`.
+2. **API** — `deleteConversation(path)` → `POST /conversations/delete`.
+3. **Backend** — `ConversationService.DeleteConversation(path)` removes the file. Backend returns the updated list.
+
+## 7. Loading definitions
+
+1. **At startup** — `Conversations` container calls `getDefinitions()` (via `api.ts`) once.
+2. **API** — `GET /definitions`.
+3. **Backend** — `DefinitionController.GetDefinitions()` → `DefinitionService.LoadDefinitions()` reads every JSON file under `defs/operations/`, `defs/presets/`, `defs/tags/`.
+4. **Frontend** — `lowercasePropertyNames(response, true)` (PascalCase → camelCase) → `defStore.setDefinitions(typed)`.
+5. **Consumption** — `EditableLogic` and `ViewableLogic` look up an operation by `functionName` via `defStore.getDefinition(...)` and render inputs from its `inputs[]` schema. No code change is needed to add a new action — drop a JSON file into `defs/operations/` and rebuild.
+
+## Summary diagram
+
+```
+Open Folder      | UI -> POST /working-directory -> FileSystemService
+                 |    -> GET  /conversations     -> ConversationService.Load -> dataStore
+Edit & Save      | UI -> nodeStore/dataStore mutations
+                 |    -> POST /conversations/put -> ConversationService.Save (BINARY)
+Export single    | UI -> POST /conversations/export       -> Save (JSON)
+Export all       | UI -> POST /conversations/export-all   -> Loop Save (JSON)
+Import           | UI -> POST /conversations/import       -> Read JSON, Save (BINARY)
+Definitions      | once -> GET /definitions -> DefinitionService.Load -> defStore
+```
