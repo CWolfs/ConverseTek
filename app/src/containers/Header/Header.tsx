@@ -76,9 +76,9 @@ export function Header() {
             <MenuItem
               onClick={() => {
                 const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-                if (!conversationAsset) return;
+                const id = conversationAsset ? conversationAsset.conversation.idRef.id : '-1';
 
-                void exportAllConversations(conversationAsset ? conversationAsset.conversation.idRef.id : '-1', conversationAsset).then(() => {
+                void exportAllConversations(id, conversationAsset).then(() => {
                   void message.success('Export successful');
                 });
               }}

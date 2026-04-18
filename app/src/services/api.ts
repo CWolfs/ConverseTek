@@ -85,7 +85,7 @@ export function exportConversation(id: string, conversationAsset: ConversationAs
   return post('/conversations/export', { id }, { method: 'PUT', conversationAsset: apiMappedConversation });
 }
 
-export function exportAllConversations(id: string, conversationAsset: ConversationAssetType): Promise<any> {
+export function exportAllConversations(id: string, conversationAsset: ConversationAssetType | null): Promise<any> {
   if (conversationAsset) {
     runInAction(() => {
       consolidateSpeaker(conversationAsset);
