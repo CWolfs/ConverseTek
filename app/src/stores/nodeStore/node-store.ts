@@ -49,6 +49,7 @@ class NodeStore {
   maxTreeHorizontalNodePosition = 0;
   dirtyActiveNode = false;
   rebuild = false;
+  speakerRevision = 0;
 
   constructor() {
     makeObservable(this, {
@@ -62,6 +63,7 @@ class NodeStore {
       expandFromCoreToNodeId: observable,
       isolateOnNodeId: observable,
       rebuild: observable,
+      speakerRevision: observable,
       maxTreeHorizontalNodePosition: observable,
       setRebuild: action,
       init: action,
@@ -86,6 +88,7 @@ class NodeStore {
       setPromptNodeSpeakerType: action,
       setPromptNodeSourceInSceneId: action,
       setPromptNodeSpeakerId: action,
+      bumpSpeakerRevision: action,
       setNodeActions: action,
       removeNodeAction: action,
       addNodeAction: action,
@@ -702,6 +705,7 @@ class NodeStore {
     if (value === 'speakerId') node.sourceInSceneRef = null;
 
     dataStore.setConversationDirty(true);
+    this.bumpSpeakerRevision();
   }
 
   setPromptNodeSourceInSceneId(node: PromptNodeType, id: string): void {
@@ -712,12 +716,22 @@ class NodeStore {
     }
 
     dataStore.setConversationDirty(true);
+    this.bumpSpeakerRevision();
   }
 
   setPromptNodeSpeakerId(node: PromptNodeType, id: string): void {
     node.speakerOverrideId = id;
     node.sourceInSceneRef = null;
     dataStore.setConversationDirty(true);
+    this.bumpSpeakerRevision();
+  }
+
+  bumpSpeakerRevision(): void {
+    this.speakerRevision += 1;
+  }
+
+  getSpeakerRevision(): number {
+    return this.speakerRevision;
   }
 
   setNodeActions(node: PromptNodeType | ElementNodeType, actions: OperationCallType[] | null): void {

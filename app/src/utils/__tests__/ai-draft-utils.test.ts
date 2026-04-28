@@ -36,6 +36,7 @@ function makeDraft(overrides: Partial<AiConversationDraftType> = {}): AiConversa
     roots: [
       {
         text: 'Open the briefing.',
+        comment: 'Gate into the opening briefing.',
         targetKey: 'intro',
         endsConversation: false,
         auxiliaryLink: false,
@@ -46,12 +47,14 @@ function makeDraft(overrides: Partial<AiConversationDraftType> = {}): AiConversa
     nodes: [
       {
         key: 'intro',
+        comment: 'Opening contract hook.',
         speaker: { type: 'castId', id: 'DariusDefault' },
         text: 'Commander, this contract has been dead for years, but someone just paid to exhume it.',
         actions: [{ functionName: 'SetFlag', args: [{ type: 'string', value: 'dead_claim_intro' }], note: '' }],
         choices: [
           {
             text: 'Keep talking.',
+            comment: 'Continue to the practical follow-up.',
             targetKey: 'followup',
             endsConversation: false,
             auxiliaryLink: false,
@@ -62,12 +65,14 @@ function makeDraft(overrides: Partial<AiConversationDraftType> = {}): AiConversa
       },
       {
         key: 'followup',
+        comment: 'Darius gives the risk and reward.',
         speaker: { type: 'castId', id: 'DariusDefault' },
         text: 'I do not like the smell of it, but the money is real.',
         actions: [],
         choices: [
           {
             text: 'End briefing.',
+            comment: 'Close the draft conversation.',
             targetKey: '',
             endsConversation: true,
             auxiliaryLink: false,
@@ -102,14 +107,41 @@ describe('AI draft utilities', () => {
     expect(result.errors).toContain("Prompt node key 'intro' is duplicated.");
   });
 
+  it('accepts a response rewrite draft without prompt nodes', async () => {
+    const { validateAiDraft } = await import('utils/ai-draft-utils');
+    const draft = makeDraft({
+      mode: 'nodeSuggestion',
+      nodes: [],
+      roots: [
+        {
+          text: 'Put them through. Darius, keep the Survey Centre hot; I want every scrap of intel before we jump.',
+          comment: 'Sharper closing response for the selected branch.',
+          targetKey: '',
+          endsConversation: true,
+          auxiliaryLink: false,
+          conditions: [],
+          actions: [],
+        },
+      ],
+    });
+
+    const result = validateAiDraft(draft, operations, 'nodeSuggestion', { type: 'response' } as ElementNodeType);
+
+    expect(result.errors).toEqual([]);
+  });
+
   it('turns a full draft into a fresh conversation asset with resolved graph targets', async () => {
     const { buildConversationAssetFromDraft } = await import('utils/ai-draft-utils');
 
     const conversationAsset = buildConversationAssetFromDraft(makeDraft(), 'K:/Mods/DeadClaim/conversations');
 
     expect(conversationAsset.conversation.uiName).toBe('Dead Claim Briefing');
+    expect(conversationAsset.conversation.roots[0].responseText).toBe('');
+    expect(conversationAsset.conversation.roots[0].comment).toBe('Gate into the opening briefing.');
     expect(conversationAsset.conversation.roots[0].nextNodeIndex).toBe(0);
+    expect(conversationAsset.conversation.nodes[0].comment).toBe('Opening contract hook.');
     expect(conversationAsset.conversation.nodes[0].branches[0].nextNodeIndex).toBe(1);
+    expect(conversationAsset.conversation.nodes[0].branches[0].comment).toBe('Continue to the practical follow-up.');
     expect(conversationAsset.conversation.nodes[1].branches[0].nextNodeIndex).toBe(-1);
     expect(conversationAsset.conversation.nodes[0].actions?.ops?.[0].functionName).toBe('SetFlag');
   });

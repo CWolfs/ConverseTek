@@ -66,7 +66,8 @@ const FileTree = ({ title, data = null, onSelected = () => {}, selectedKeys = []
     const { eventKey } = node.props;
     if (eventKey === '0') return;
 
-    show({ event, props: { id: eventKey, title: node.props.title, selected: node.props.selected } });
+    const item = data?.find((conversation) => conversation.key === eventKey);
+    show({ event, props: { id: eventKey, title: item?.label || String(eventKey), selected: node.props.selected } });
   };
 
   return (

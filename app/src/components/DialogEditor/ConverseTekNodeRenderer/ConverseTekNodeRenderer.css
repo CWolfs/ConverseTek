@@ -101,6 +101,27 @@
     }
   }
 
+  &__speaker-badge {
+    display: inline-flex;
+    align-items: center;
+    max-width: 86px;
+    height: 16px;
+    margin-right: 7px;
+    overflow: hidden;
+    padding: 0 6px;
+    border-radius: 2px;
+    background: #e6f0ff;
+    box-shadow: inset 0 0 0 1px rgba(47, 113, 212, 0.22);
+    color: #1f5f9f;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 16px;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    vertical-align: 1px;
+    white-space: nowrap;
+  }
+
   &__link {
     display: flex;
     width: 100%;

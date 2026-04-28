@@ -34,9 +34,10 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["key", "speaker", "text", "choices", "actions"],
+        "required": ["key", "comment", "speaker", "text", "choices", "actions"],
         "properties": {
           "key": { "type": "string" },
+          "comment": { "type": "string" },
           "speaker": { "$ref": "#/definitions/speaker" },
           "text": { "type": "string" },
           "choices": {
@@ -71,9 +72,10 @@
     "choice": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["text", "targetKey", "endsConversation", "auxiliaryLink", "conditions", "actions"],
+      "required": ["text", "comment", "targetKey", "endsConversation", "auxiliaryLink", "conditions", "actions"],
       "properties": {
         "text": { "type": "string" },
+        "comment": { "type": "string" },
         "targetKey": { "type": "string" },
         "endsConversation": { "type": "boolean" },
         "auxiliaryLink": { "type": "boolean" },

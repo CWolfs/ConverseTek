@@ -402,7 +402,7 @@
 .ai-draft-artifact-viewer {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   max-height: calc(100vh - 240px);
 }
 
@@ -419,14 +419,33 @@
 .ai-draft-artifact-viewer__toolbar {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
+  align-items: flex-start;
+  gap: 8px 16px;
+  padding-top: 2px;
   color: #595959;
   font-size: 12px;
 }
 
+.ai-draft-artifact-viewer__toolbar .ant-btn-group {
+  flex: 0 0 auto;
+}
+
 .ai-draft-artifact-viewer__toolbar .ant-btn {
-  min-height: 26px;
+  min-height: 30px;
+  padding-right: 12px;
+  padding-left: 12px;
+}
+
+.ai-draft-artifact-viewer__note {
+  flex: 1 0 100%;
+  min-width: 0;
+  padding: 8px 10px;
+  border-radius: 3px;
+  background: #f6f8fb;
+  box-shadow: inset 0 0 0 1px rgba(31, 47, 67, 0.08);
+  color: #5f6b7a;
+  line-height: 1.4;
+  text-wrap: pretty;
 }
 
 .ai-draft-artifact-viewer__alert {

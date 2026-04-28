@@ -42,6 +42,7 @@ export type AiDraftSpeakerType = {
 
 export type AiDraftChoiceType = {
   text: string;
+  comment?: string;
   targetKey: string;
   endsConversation: boolean;
   auxiliaryLink: boolean;
@@ -51,6 +52,7 @@ export type AiDraftChoiceType = {
 
 export type AiDraftNodeType = {
   key: string;
+  comment?: string;
   speaker: AiDraftSpeakerType;
   text: string;
   choices: AiDraftChoiceType[];

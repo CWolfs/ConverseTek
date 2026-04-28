@@ -36,6 +36,7 @@ export type ConversationTreeNodeStore = {
   getMaxTreeHorizontalNodePosition: () => number;
   setNodeExpansion: (nodeId: string | undefined, flag: boolean) => void;
   isNodeExpanded: (nodeId: string | undefined) => boolean;
+  getSpeakerRevision?: () => number;
 };
 
 export type ConverseTekNodeRendererProps = {
@@ -116,6 +117,29 @@ function getTruncatedLinkText(nodeStore: ConversationTreeNodeStore, linkIndex: n
   return text.length < maxLength ? text : `${text.substring(0, maxLength)}...`;
 }
 
+function getPromptSpeakerBadge(node: PromptNodeType | ElementNodeType | null): { label: string; title: string } | null {
+  if (node == null || node.type !== 'node') return null;
+
+  let speaker = '';
+  if (node.speakerType === 'castId') {
+    speaker = node.sourceInSceneRef?.id || '';
+  } else if (node.speakerType === 'speakerId') {
+    speaker = node.speakerOverrideId || '';
+  }
+
+  if (!speaker) {
+    return {
+      label: 'Inherits',
+      title: 'No node speaker; BattleTech reuses the current conversation speaker',
+    };
+  }
+
+  return {
+    label: speaker.replace(/Default$/i, '') || speaker,
+    title: `${node.speakerType || 'speaker'} ${speaker}`,
+  };
+}
+
 /* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
 export const ConverseTekNodeRenderer = observer(
   ({
@@ -159,12 +183,14 @@ export const ConverseTekNodeRenderer = observer(
     const isActiveNode = activeNodeId === node.id;
     const wasPreviousActiveNode = previousNodeId === node.id;
     const storedNode = nodeStore.getNode(node.id);
+    const speakerRevision = nodeStore.getSpeakerRevision ? nodeStore.getSpeakerRevision() : 0;
     const { type: nodeType } = node;
     const canNodeBeDragged = !(node.canDrag === false);
     const [isHoveringOver, setIsHoveringOver] = useState<boolean>(false);
     const { colourConfig } = dataStore;
     const rendererOnlyProps = [canDrag, treeId, isOver, parentNode];
     void rendererOnlyProps;
+    void speakerRevision;
 
     if (colourConfig == null) return null;
 
@@ -329,6 +355,7 @@ export const ConverseTekNodeRenderer = observer(
           })
         : nodeTitle;
     const hasNodeTitle = typeof resolvedNodeTitle === 'string' && resolvedNodeTitle.length > 0;
+    const speakerBadge = getPromptSpeakerBadge(storedNode);
 
     const rowContents = (
       <div
@@ -391,6 +418,11 @@ export const ConverseTekNodeRenderer = observer(
             </div>
 
             <div className={labelClasses}>
+              {speakerBadge && (
+                <span className="node-renderer__speaker-badge" title={speakerBadge.title}>
+                  {speakerBadge.label}
+                </span>
+              )}
               <span className={titleClasses}>{resolvedNodeTitle}</span>
 
               {nodeSubtitle && (

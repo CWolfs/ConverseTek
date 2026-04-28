@@ -41,6 +41,7 @@ export function validateAiDraft(
   draft: AiConversationDraftType | null,
   operations: OperationDefinitionType[],
   mode: AiDraftModeType,
+  activeNode: PromptNodeType | ElementNodeType | null = null,
 ): AiDraftValidationResultType {
   const errors: string[] = [];
   const warnings: string[] = [];
@@ -55,6 +56,19 @@ export function validateAiDraft(
 
   if (!draft.title || draft.title.trim() === '') {
     errors.push('Draft title is blank.');
+  }
+
+  if (mode === 'nodeSuggestion') {
+    if (activeNode == null) {
+      errors.push('Node suggestion drafts need a selected node.');
+    }
+
+    if (getSuggestedNodeText(draft, activeNode).trim() === '') {
+      errors.push('Node suggestion drafts need suggested text.');
+    }
+
+    draft.warnings?.forEach((warning) => warnings.push(`AI warning: ${warning}`));
+    return { errors, warnings };
   }
 
   if (!Array.isArray(draft.nodes) || draft.nodes.length === 0) {
@@ -89,7 +103,9 @@ export function validateAiDraft(
     node.choices?.forEach((choice, index) => validateChoice(`node '${node.key}' choice ${index + 1}`, choice, nodeKeys, operations, errors, warnings));
   });
 
-  draft.roots?.forEach((root, index) => validateChoice(`root ${index + 1}`, root, nodeKeys, operations, errors, warnings));
+  draft.roots?.forEach((root, index) =>
+    validateChoice(`root ${index + 1}`, root, nodeKeys, operations, errors, warnings, mode === 'fullConversation' && index === 0),
+  );
   draft.warnings?.forEach((warning) => warnings.push(`AI warning: ${warning}`));
 
   return { errors, warnings };
@@ -115,8 +131,9 @@ function validateChoice(
   operations: OperationDefinitionType[],
   errors: string[],
   warnings: string[],
+  allowBlankText = false,
 ): void {
-  if (!choice.text || choice.text.trim() === '') {
+  if (!allowBlankText && (!choice.text || choice.text.trim() === '')) {
     warnings.push(`${label} has blank response text.`);
   }
 
@@ -192,7 +209,9 @@ export function buildConversationAssetFromDraft(draft: AiConversationDraftType, 
   const context = createDraftBuildContext(draft);
   const nodes = buildPromptNodeShells(draft);
   conversationAsset.conversation.nodes = nodes;
-  conversationAsset.conversation.roots = draft.roots.map((root) => buildElementNode(root, 'root', '0', nodes, context));
+  conversationAsset.conversation.roots = draft.roots.map((root, index) =>
+    buildElementNode(root, 'root', '0', nodes, context, index === 0),
+  );
   populatePromptNodeBranches(draft, nodes, context);
 
   return conversationAsset;
@@ -260,10 +279,10 @@ export function buildBranchExpansionPatch(draft: AiConversationDraftType, active
 
 export function getSuggestedNodeText(draft: AiConversationDraftType, activeNode: PromptNodeType | ElementNodeType | null): string {
   if (activeNode?.type === 'node') {
-    return draft.nodes[0]?.text || '';
+    return draft.nodes?.[0]?.text || '';
   }
 
-  return draft.roots[0]?.text || draft.nodes[0]?.choices[0]?.text || '';
+  return draft.roots?.[0]?.text || draft.nodes?.[0]?.choices?.[0]?.text || '';
 }
 
 function createDraftBuildContext(draft: AiConversationDraftType): DraftBuildContext {
@@ -277,7 +296,7 @@ function buildPromptNodeShells(draft: AiConversationDraftType): PromptNodeType[]
   return draft.nodes.map((draftNode, index) => {
     const node = createPromptNode(index);
     node.text = draftNode.text;
-    node.comment = draftNode.key;
+    node.comment = normaliseDraftComment(draftNode.comment);
     node.actions = buildOperationsContainer(draftNode.actions);
 
     if (draftNode.speaker.type === 'castId') {
@@ -316,6 +335,7 @@ function buildElementNode(
   parentId: string,
   nodes: PromptNodeType[],
   context: DraftBuildContext,
+  forceBlankText = false,
 ): ElementNodeType {
   const elementNode = type === 'root' ? createRootNode() : createResponseNode();
   const targetIndex = choice.endsConversation ? -1 : resolveTargetIndex(choice.targetKey, nodes, context.indexByKey);
@@ -324,7 +344,8 @@ function buildElementNode(
 
   elementNode.type = type;
   elementNode.parentId = parentId;
-  elementNode.responseText = choice.text;
+  elementNode.responseText = forceBlankText ? '' : choice.text;
+  elementNode.comment = normaliseDraftComment(choice.comment);
   elementNode.nextNodeIndex = targetIndex;
   elementNode.auxiliaryLink = useAuxiliaryLink;
   elementNode.conditions = buildOperationsContainer(choice.conditions);
@@ -350,6 +371,11 @@ function resolveTargetIndex(
 
   const targetNode = nodes.find((node) => getId(node) === targetKey || node.comment === targetKey);
   return targetNode?.index ?? -1;
+}
+
+function normaliseDraftComment(comment: string | null | undefined): string {
+  if (!comment) return '';
+  return comment.trim();
 }
 
 function buildOperationsContainer(intents: AiDraftOperationIntentType[] | null | undefined): { ops: OperationCallType[] | null } | null {

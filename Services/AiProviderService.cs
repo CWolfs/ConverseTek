@@ -400,9 +400,12 @@ namespace ConverseTek.Services {
       sb.AppendLine("- Produce an advisory draft only; ConverseTek will create real ids, indexes, and files after the user accepts.");
       sb.AppendLine("- Keep dialogue in BattleTech dropship conversation style: concise, voiced by the shown speaker, and readable in short UI bubbles.");
       sb.AppendLine("- Use speaker.type castId for known cast ids such as DariusDefault, SumireDefault, YangDefault, FarahDefault, KrakenIsabella, or BladesKai.");
-      sb.AppendLine("- Use speaker.type none for stage directions or non-speaker narration.");
+      sb.AppendLine("- Use speaker.type none only when the line should inherit the current BattleTech conversation speaker. BattleTech does not have a separate narration speaker for SimGame conversation nodes.");
       sb.AppendLine("- Every root or choice must either set targetKey to an existing node key or set endsConversation to true.");
-      sb.AppendLine("- Do not leave root or choice text blank. Use explicit short choices such as Continue, Understood, Ask Yang, or End conversation.");
+      sb.AppendLine("- For fullConversation, make the first root text an empty string and point it at the opening prompt node. Do not use Continue for that first root.");
+      sb.AppendLine("- For every other root or choice, use explicit short choices such as Understood, Ask Yang, or End conversation.");
+      sb.AppendLine("- For nodeSuggestion, return a text rewrite only. If the selected node is a prompt node, put the rewrite in nodes[0].text. If the selected node is a root or response, put the rewrite in roots[0].text. Leave the unused array empty.");
+      sb.AppendLine("- Write comment fields as short authoring notes that explain the beat, branch purpose, or condition context. Do not use draft keys such as darius_check as comments.");
       sb.AppendLine("- For operation intents, only use operation names present in the supplied definitions JSON. If unsure, leave operations empty and describe the concern in warnings.");
       sb.AppendLine("- Use mode from the request exactly.");
       sb.AppendLine();

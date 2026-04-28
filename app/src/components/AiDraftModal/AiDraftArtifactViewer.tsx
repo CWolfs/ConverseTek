@@ -45,7 +45,7 @@ export function AiDraftArtifactViewer({ globalModalId, title, path, content, tru
           </Button>
         </Button.Group>
         {viewMode === 'formatted' && formattedContent.notes.length > 0 && (
-          <span>{formattedContent.notes.join(' ')}</span>
+          <span className="ai-draft-artifact-viewer__note">{formattedContent.notes.join(' ')}</span>
         )}
       </div>
       {truncated && (

@@ -272,7 +272,7 @@ function formatElementSubtitle(elementNode: ElementNodeType): string {
 function formatSpeaker(promptNode: PromptNodeType): string {
   if (promptNode.speakerType === 'castId' && promptNode.sourceInSceneRef?.id) return promptNode.sourceInSceneRef.id;
   if (promptNode.speakerType === 'speakerId' && promptNode.speakerOverrideId) return promptNode.speakerOverrideId;
-  return 'Narration';
+  return 'Inherits';
 }
 
 function buildPreviewNodeButtons(node: PreviewTreeNode, previewNodeStore: PreviewNodeStore): JSX.Element[] {

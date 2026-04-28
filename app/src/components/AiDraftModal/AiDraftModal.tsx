@@ -270,8 +270,8 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
       return;
     }
 
-    setValidation(validateAiDraft(draft, defStore.operations, mode));
-  }, [draft, mode, defStore.operations]);
+    setValidation(validateAiDraft(draft, defStore.operations, mode, selectedNode));
+  }, [draft, mode, selectedNode, defStore.operations]);
 
   const updateSettings = (patch: Partial<AiSettingsType>) => {
     console.log(`${AI_DEBUG_PREFIX} updateSettings`, {
