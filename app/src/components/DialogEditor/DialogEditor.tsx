@@ -25,7 +25,7 @@ import { collapseOrExpandBranches, collapseOtherBranches, expandFromCoreToNode }
 
 import { ScalableScrollbar } from 'components/ScalableScrollbar';
 
-import { ConverseTekNodeRenderer } from './ConverseTekNodeRenderer';
+import { ConverseTekNodeRenderer, ConverseTekNodeRendererProps } from './ConverseTekNodeRenderer';
 import { DialogEditorContextMenu } from '../ContextMenus/DialogEditorContextMenu';
 
 import './DialogEditor.css';
@@ -495,7 +495,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
               isContextMenuVisible,
               zoomLevel,
             })}
-            nodeContentRenderer={(props: any) => <ConverseTekNodeRenderer {...props} />}
+            nodeContentRenderer={(props: ConverseTekNodeRendererProps) => <ConverseTekNodeRenderer {...props} />}
             reactVirtualizedListProps={{
               width: treeWidth,
             }}

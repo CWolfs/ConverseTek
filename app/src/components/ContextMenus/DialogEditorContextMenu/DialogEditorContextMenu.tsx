@@ -5,9 +5,11 @@ import { observer } from 'mobx-react';
 import 'react-contexify/ReactContexify.css';
 
 import { useStore } from 'hooks/useStore';
+import { useAiFeatureEnabled } from 'hooks/useAiFeatureEnabled';
 import { NodeStore } from 'stores/nodeStore/node-store';
 import { ModalStore } from 'stores/modalStore/modal-store';
 import { detectType, isAllowedToCreateNode, isAllowedToPasteCopy, isAllowedToPasteLink } from 'utils/node-utils';
+import { AiDraftModal } from 'components/AiDraftModal';
 import { handleDeleteIntent } from './handle-delete';
 
 export type EventProps = {
@@ -38,6 +40,7 @@ function getAddLabel(type: string) {
 export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string; onVisibilityChange: (flag: boolean) => void }) {
   const nodeStore = useStore<NodeStore>('node');
   const modalStore = useStore<ModalStore>('modal');
+  const aiFeatureEnabled = useAiFeatureEnabled(true);
   const { hideAll } = useContextMenu({
     id,
   });
@@ -53,6 +56,8 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
   const allowAdd = isAllowedToCreateNode(focusedNodeId);
   const allowedToPasteCopy = isAllowedToPasteCopy(focusedNodeId, clipboard);
   const allowedToPasteLink = isAllowedToPasteLink(focusedNodeId, clipboard);
+  const showAiActions = aiFeatureEnabled && (isNode || isResponse || isRoot);
+  const showBranchActions = isNode || isResponse || isRoot;
 
   const onAddClicked = ({ props }: ItemParams<EventProps>) => {
     if (!props) return;
@@ -81,6 +86,18 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
   const onDeleteClicked = ({ props }: ItemParams<EventProps>) => {
     if (!props) return;
     handleDeleteIntent({ props, nodeStore, modalStore });
+    hideAll();
+  };
+
+  const onAiSuggestNode = ({ props }: ItemParams<EventProps>) => {
+    if (!props) return;
+    modalStore.setModelContent(AiDraftModal, { mode: 'nodeSuggestion', selectedNodeId: props.id }, 'global1');
+    hideAll();
+  };
+
+  const onAiExpandBranch = ({ props }: ItemParams<EventProps>) => {
+    if (!props) return;
+    modalStore.setModelContent(AiDraftModal, { mode: 'branchExpansion', selectedNodeId: props.id }, 'global1');
     hideAll();
   };
 
@@ -133,7 +150,10 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
       {allowedToPasteCopy && <Item onClick={onPasteAsCopy}>Paste as Copy</Item>}
       {allowedToPasteLink && <Item onClick={onPasteAsLink}>Paste as Link</Item>}
       {!isCore && <Item onClick={onDeleteClicked}>Delete</Item>}
-      {(isNode || isResponse || isRoot) && <Separator />}
+      {showAiActions && <Separator />}
+      {showAiActions && <Item onClick={onAiSuggestNode}>AI Suggest Rewrite</Item>}
+      {aiFeatureEnabled && (isResponse || isRoot) && <Item onClick={onAiExpandBranch}>AI Expand Branch</Item>}
+      {showBranchActions && <Separator />}
       {(isNode || isResponse) && <Item onClick={onIsolateBranch}>Isolate Branch</Item>}
       {(isNode || isResponse || isRoot) && <Item onClick={onExpandBranch}>Expand Branch</Item>}
       {(isNode || isResponse || isRoot) && <Item onClick={onCollapseBranch}>Collapse Branch</Item>}

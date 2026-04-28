@@ -42,7 +42,8 @@ Containers consume stores by key: `useStore<DataStore>('data')`, `useStore<NodeS
 
 ## Major UI surfaces (containers)
 
-- `Header` — File menu (Open Folder, Save, Import/Export, Export All), top nav. Reads `dataStore.workingDirectory`, `dataStore.activeConversationAsset`.
+- `Header` — File menu (Open Folder, Save, Import/Export, Export All), AI menu, top nav. Reads `dataStore.workingDirectory`, `dataStore.activeConversationAsset`.
+- `AiDraftModal` — AI-assisted conversation drafting and suggestion review. It stores draft preview state locally, validates it, and only applies changes when the user accepts.
 - `Conversations` — Top-level layout; loads conversations + definitions on mount; switches between `ConversationEditor` and `SplashScreen`.
 - `ConversationTree` — Left sidebar list of conversations.
 - `ConversationEditor` — Main workspace; hosts `ConversationGeneral`, `ConversationActions`, `ConversationConditions` and the dialogue tree.
@@ -60,8 +61,18 @@ Containers consume stores by key: `useStore<DataStore>('data')`, `useStore<NodeS
 
 `app/src/services/api.ts`
 - High-level operations layered over `rest.ts`. Knows the routes (`/conversations`, `/conversations/put`, `/conversations/export`, `/conversations/export-all`, `/conversations/import`, `/conversations/delete`, `/definitions`, `/filesystem`, `/directories`, `/quicklinks`, `/colour-config`, `/working-directory`, `/dependency-status`).
+- Also wraps AI routes (`/ai/settings`, `/ai/models`, `/ai/draft`, `/ai/validate-conversation`) for provider settings, model polling, draft generation, and backend round-trip validation.
 - Handles preprocessing (`consolidateSpeaker`, `removeAllOldFillerNodes`, `rebuildNodeIndexes`) before sending writes.
 - Updates stores after responses (`dataStore.setConversations`, `defStore.setDefinitions`, etc.).
+
+## AI drafting flow
+
+- Whole-conversation drafts are opened from the Header `AI` menu. Node rewrites and branch expansion are opened from the dialogue tree context menu.
+- AI entry points are gated by `config/ai.json` `Enabled`/`enabled`, defaulting to on. When disabled, the Header AI menu and dialogue-tree AI context actions are hidden.
+- The model selector loads the saved provider catalogue first, polls the provider CLI when no cache exists, and only repolls on `Refresh`. It keeps an empty value as "provider default/latest" so drafts are not pinned unless the user chooses a specific model.
+- AI responses are parsed as `AiConversationDraftType`, rendered as a read-only tree preview where possible, and validated before acceptance. Prompt and response diagnostics can be opened from the draft metadata panel.
+- `app/src/utils/ai-draft-utils.ts` converts drafts with pure functions. Full drafts produce a fresh `ConversationAssetType`; branch expansion produces a patch with a cloned parent root/response and new prompt nodes; node suggestions produce replacement text.
+- Accepting a draft is the only point where MobX state changes. The accept handler applies one deliberate action, marks the conversation dirty, and triggers a tree rebuild.
 
 ## Snake_case ↔ camelCase mapping
 

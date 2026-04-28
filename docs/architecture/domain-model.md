@@ -138,6 +138,19 @@ Scope-specific tag lists. Example (`commander.json`): `{ "scope": "commander", "
 - `Controllers/DefinitionController.cs` serves it on `GET /definitions`.
 - `app/src/services/api.ts:getDefinitions()` calls it, runs `lowercasePropertyNames` (PascalCase → camelCase), and stores the result in `defStore` via `setDefinitions`.
 
+## AI conversation drafts
+
+AI drafts are an intermediate authoring format, not a BattleTech runtime format. They are shaped by `app/src/types/AiDraftType.ts` and the provider schema in `config/ai-draft-output.schema.json`.
+
+Important fields:
+- `mode` -> `fullConversation`, `nodeSuggestion`, or `branchExpansion`.
+- `roots[]` -> initial player choices for full drafts.
+- `nodes[]` -> prompt nodes with stable draft `key` values.
+- `choices[]` -> player responses that point to a target draft key or deliberately end the conversation.
+- `actions[]` / `conditions[]` -> operation intents using existing definition `key` names and typed argument values.
+
+Draft keys are temporary. ConverseTek generates real BattleTech ids and prompt indexes during acceptance. This keeps AI output advisory and prevents preview rendering from mutating the active observable conversation graph.
+
 ## Other notable types (frontend)
 
 | Type | File | Purpose |

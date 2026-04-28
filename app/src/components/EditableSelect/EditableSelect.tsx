@@ -5,15 +5,14 @@ import { SelectValue } from 'antd/lib/select';
 
 const { Option } = Select;
 
+type SelectOptionElement = ReactElement<unknown, string | JSXElementConstructor<unknown>>;
+
 type Props = {
   value: string | null;
   options: string[] | { key: string }[];
   placeholder: string;
   style?: object;
-  onChange: (
-    value: SelectValue,
-    option: ReactElement<any, string | JSXElementConstructor<any>> | ReactElement<any, string | JSXElementConstructor<any>>[],
-  ) => void;
+  onChange: (value: SelectValue, option: SelectOptionElement | SelectOptionElement[]) => void;
 };
 
 function EditableSelect({ value, options, placeholder, style = {}, onChange }: Props) {

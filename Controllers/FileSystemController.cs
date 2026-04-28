@@ -45,6 +45,16 @@ namespace ConverseTek.Controllers {
         IDictionary<string, object> requestParams = request.Parameters;
         string path = (string)requestParams["path"];
         bool includeFiles = (bool)requestParams["includeFiles"];
+        List<string> fileExtensions = new List<string>();
+
+        if (requestParams.ContainsKey("fileExtensions") && requestParams["fileExtensions"] != null) {
+          JArray extensionTokens = requestParams["fileExtensions"] as JArray;
+          if (extensionTokens != null) {
+            foreach (JToken extensionToken in extensionTokens) {
+              fileExtensions.Add(extensionToken.ToString());
+            }
+          }
+        }
 
         if (path == "Desktop") {
           path = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
@@ -59,7 +69,7 @@ namespace ConverseTek.Controllers {
         List<FsFile> files = new List<FsFile>();
 
         if (includeFiles) {
-          files = fileSystemService.GetFiles(path);
+          files = fileSystemService.GetFiles(path, fileExtensions);
         }
 
         FsView fsView = new FsView();

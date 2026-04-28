@@ -1,0 +1,414 @@
+.ai-draft-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: calc(100vh - 190px);
+  overflow-y: auto;
+  padding-right: 4px;
+  padding-bottom: 4px;
+}
+
+.ai-draft-modal textarea,
+.ai-draft-modal input {
+  font-family: inherit;
+}
+
+.ai-draft-modal .ant-form-item-label label {
+  color: #262626;
+  font-weight: 600;
+}
+
+.ai-draft-modal .ant-input,
+.ai-draft-modal .ant-select-selection {
+  border-color: #5f6b7a;
+}
+
+.ai-draft-modal .ant-input::-webkit-input-placeholder {
+  color: #c8d1dc;
+  opacity: 1;
+}
+
+.ai-draft-modal .ant-input::placeholder {
+  color: #c8d1dc;
+  opacity: 1;
+}
+
+.ai-draft-modal__field-label {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+}
+
+.ai-draft-modal__help-icon {
+  margin-left: 6px;
+  padding: 4px;
+  color: #59728a;
+  cursor: help;
+  line-height: 1;
+}
+
+.ai-draft-modal__help-icon:hover,
+.ai-draft-modal__help-icon:focus {
+  color: #1f5f8b;
+}
+
+.ai-draft-modal__model-row {
+  display: flex;
+  align-items: center;
+}
+
+.ai-draft-modal__model-row .ant-select {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ai-draft-modal__model-row .ant-btn {
+  flex: 0 0 auto;
+  margin-left: 8px;
+  min-height: 32px;
+}
+
+.ai-draft-modal__inline-alert {
+  margin-top: 8px;
+}
+
+.ai-draft-modal__field-note {
+  margin-top: 6px;
+  color: #595959;
+  font-size: 12px;
+}
+
+.ai-draft-modal__field-actions {
+  display: flex;
+  margin-top: 8px;
+}
+
+.ai-draft-modal__field-actions .ant-btn {
+  min-height: 32px;
+}
+
+.ai-draft-modal__alert {
+  margin-bottom: 12px;
+  white-space: pre-line;
+}
+
+.ai-draft-modal__meta {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #d9d9d9;
+  background: #fafafa;
+}
+
+.ai-draft-modal__meta > div {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  align-items: start;
+  gap: 8px;
+}
+
+.ai-draft-modal__meta span {
+  color: #595959;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 24px;
+  text-transform: uppercase;
+}
+
+.ai-draft-modal__meta code {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  padding: 4px 6px;
+  border: 1px solid #e8e8e8;
+  background: #fff;
+  color: #262626;
+  font-size: 12px;
+}
+
+.ai-draft-modal__artifact-actions {
+  padding-top: 4px;
+}
+
+.ai-draft-modal__artifact-actions > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ai-draft-modal__artifact-actions .ant-btn {
+  min-height: 28px;
+}
+
+.ai-draft-modal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 8px 0 12px;
+}
+
+.ai-draft-modal__actions .ant-btn {
+  margin-right: 8px;
+  margin-bottom: 8px;
+  min-height: 32px;
+}
+
+.ai-draft-modal__actions .ant-btn:last-child {
+  margin-right: 0;
+}
+
+.ai-draft-modal__loading {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  color: #595959;
+}
+
+.ai-draft-modal__loading span {
+  margin-left: 10px;
+}
+
+.ai-draft-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.ai-draft-preview__summary {
+  padding: 12px 0;
+  border-top: 1px solid #e8e8e8;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.ai-draft-preview__summary h3 {
+  color: #262626;
+  margin: 0 0 6px;
+}
+
+.ai-draft-preview__summary p,
+.ai-draft-preview__suggestion p {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.ai-draft-preview__cast {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ai-draft-preview__suggestion {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #d9d9d9;
+  background: #fff;
+}
+
+.ai-draft-preview__suggestion h4 {
+  margin: 0;
+  color: #262626;
+}
+
+.ai-draft-preview-tree {
+  display: flex;
+  flex-direction: column;
+  min-height: 520px;
+  border: 1px solid #d9d9d9;
+  background: #2f2f2f;
+}
+
+.ai-draft-preview-tree__toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 12px;
+  border-bottom: 1px solid #e8e8e8;
+  background: #fafafa;
+  color: #595959;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.ai-draft-preview-tree__toolbar .anticon {
+  margin-right: 6px;
+}
+
+.ai-draft-preview-tree__canvas {
+  position: relative;
+  height: 484px;
+  min-width: 0;
+  overflow: hidden;
+  background: #2f2f2f;
+}
+
+/* Keep these tree overrides scoped to the AI preview. The real DialogEditor tree uses the same renderer classes. */
+.ai-draft-preview-tree__canvas .rst__rowWrapper {
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+
+.ai-draft-preview-tree__canvas .rst__row {
+  align-items: stretch;
+}
+
+.ai-draft-preview-tree__canvas .rst__rowContents {
+  align-items: flex-start;
+  flex: 0 1 auto;
+  width: auto;
+  min-width: 280px;
+  max-width: 540px;
+  height: auto;
+  min-height: 42px;
+  padding: 6px 10px;
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.28);
+}
+
+.ai-draft-preview-tree__canvas .node-renderer__row-contents section {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  min-width: 0;
+}
+
+.ai-draft-preview-tree__canvas .node-renderer__row-contents-logic {
+  flex: 0 0 auto;
+  padding-top: 1px;
+}
+
+.ai-draft-preview-tree__canvas .rst__rowLabel {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-right: 0;
+}
+
+.ai-draft-preview-tree__canvas .rst__rowTitle,
+.ai-draft-preview-tree__canvas .rst__rowSubtitle {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.ai-draft-preview-tree__canvas .rst__rowTitle {
+  line-height: 1.25;
+}
+
+.ai-draft-preview-tree__canvas .rst__rowTitleWithSubtitle {
+  display: block;
+  height: auto;
+  margin-bottom: 2px;
+  font-size: 12px;
+}
+
+.ai-draft-preview-tree__canvas .rst__rowSubtitle {
+  display: block;
+  color: #595959;
+  font-size: 10px;
+  line-height: 1.25;
+}
+
+.ai-draft-preview-tree__canvas .node-renderer__response-row-contents .rst__rowSubtitle {
+  color: #e8e8e8;
+}
+
+.ai-draft-preview-tree__canvas .rst__rowToolbar {
+  flex: 0 0 auto;
+  margin-left: 10px;
+}
+
+.ai-draft-preview-tree__speaker-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  max-width: 130px;
+  overflow: hidden;
+  padding: 0 7px;
+  border-radius: 3px;
+  background: #003a8c;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.ai-draft-preview-tree__canvas .node-renderer__response-row-contents .ai-draft-preview-tree__speaker-badge {
+  background: #262626;
+}
+
+.ai-draft-preview-tree__canvas .rst__moveHandle {
+  flex: 0 0 44px;
+}
+
+.ai-draft-preview-tree__canvas .node-renderer__row {
+  box-shadow: none !important;
+}
+
+.ai-draft-preview-tree__canvas .rst__rowContents {
+  cursor: default;
+}
+
+.ai-draft-preview-tree__canvas .rst__moveHandle {
+  cursor: default;
+}
+
+.ai-draft-preview-tree__canvas .ReactVirtualized__Grid {
+  background: #2f2f2f;
+  outline: none;
+}
+
+.ai-draft-artifact-viewer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: calc(100vh - 240px);
+}
+
+.ai-draft-artifact-viewer__path {
+  overflow-wrap: anywhere;
+  padding: 6px 8px;
+  border: 1px solid #e8e8e8;
+  background: #fafafa;
+  color: #595959;
+  font-family: Consolas, 'Courier New', monospace;
+  font-size: 12px;
+}
+
+.ai-draft-artifact-viewer__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  color: #595959;
+  font-size: 12px;
+}
+
+.ai-draft-artifact-viewer__toolbar .ant-btn {
+  min-height: 26px;
+}
+
+.ai-draft-artifact-viewer__alert {
+  margin-bottom: 0;
+}
+
+.ai-draft-artifact-viewer pre {
+  min-height: 360px;
+  max-height: calc(100vh - 330px);
+  margin: 0;
+  overflow: auto;
+  padding: 12px;
+  border: 1px solid #d9d9d9;
+  background: #1f1f1f;
+  color: #e8e8e8;
+  font-family: Consolas, 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  user-select: text;
+}

@@ -1,4 +1,22 @@
 export type { ClipboardType } from './ClipboardType';
+export type {
+  AiAcceptedDraftType,
+  AiDraftArtifactResultType,
+  AiBranchExpansionPatchType,
+  AiConversationDraftType,
+  AiDraftChoiceType,
+  AiDraftModeType,
+  AiDraftOperationIntentType,
+  AiDraftRequestType,
+  AiDraftRunResultType,
+  AiDraftValidationResultType,
+  AiModelCatalogResultType,
+  AiModelOptionType,
+  AiProviderName,
+  AiSettingsType,
+  AiWorkspaceSettingsType,
+  ConversationValidationResultType,
+} from './AiDraftType';
 export type { IdRef, ConversationAssetType } from './ConversationAssetType';
 export type { DefinitionsType } from './DefinitionsType';
 export type { ElementNodeType } from './ElementNodeType';

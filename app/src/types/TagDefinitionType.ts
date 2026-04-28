@@ -1,3 +1,5 @@
 export type TagDefinitionType = {
-  scope: null;
+  scope: string | null;
+  type?: string;
+  tags: string[];
 };

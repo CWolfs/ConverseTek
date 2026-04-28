@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Guidance for Claude Code when working in this repository.
+Guidance for Claude Code when working in this repository. `AGENTS.md` is the canonical local guidance for coding agents; keep this file compatible with it.
 
 ## What this project is
 
@@ -34,6 +34,14 @@ For architecture detail, read the docs under [`docs/architecture/`](./docs/archi
 - API calls go through `app/src/services/api.ts`, which wraps the Chromely bridge in `app/src/services/rest.ts`. Don't call the bridge directly from components.
 - Backend controllers live in `Controllers/`, services in `Services/`. Services follow a singleton `getInstance()` pattern.
 - Prefer editing existing files over creating new ones. Don't add comments that explain *what* the code does — only *why* when non-obvious.
+
+## AI drafting
+
+- AI-assisted drafting is advisory until accepted. Keep draft preview data outside `dataStore.unsavedActiveConversationAsset`.
+- Global AI settings live in `config/ai.json`; workspace AI context is keyed by conversation folder inside that file. Do not write loose AI settings into a mod `conversations/` folder.
+- Backend AI providers go through `Services/AiProviderService.cs`; Codex CLI is the first provider, but provider names should stay generic for future CLIs.
+- Frontend draft conversion lives in `app/src/utils/ai-draft-utils.ts` and should return fresh conversation assets or explicit patch objects.
+- Full drafts use "Turn Into Real Conversation"; node/branch suggestions use "Accept" / "Reject".
 
 ## Important quirks
 

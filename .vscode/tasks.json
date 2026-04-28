@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Release",
+      "label": "CT: Release",
       "command": "dotnet",
       "type": "process",
       "args": [
@@ -15,7 +15,7 @@
       "problemMatcher": "$msCompile"
     },
     {
-      "label": "Build All",
+      "label": "CT: Build All",
       "command": "dotnet",
       "type": "process",
       "args": [
@@ -26,7 +26,7 @@
       "problemMatcher": "$msCompile"
     },
     {
-      "label": "Build Server",
+      "label": "CT: Build Server",
       "command": "dotnet",
       "type": "process",
       "args": [
@@ -37,7 +37,7 @@
       "problemMatcher": "$msCompile"
     },
     {
-      "label": "UI Install",
+      "label": "CT: UI Install",
       "type": "shell",
       "command": "npm install",
       "options": {
@@ -52,9 +52,12 @@
       }
     },
     {
-      "label": "UI Build",
+      "label": "CT: UI Build",
       "type": "shell",
       "command": "npm run build --prefix app && xcopy /y /e /i dist ${workspaceFolder}\\bin\\x64\\Debug\\net472\\dist",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
       "windows": {
           "command": "cmd",
           "args": [
@@ -71,12 +74,12 @@
       }
     },
     {
-      "label": "Fast Run",
+      "label": "CT: Fast Run",
       "command": "${workspaceFolder}/bin/x64/Debug/net472/ConverseTek.exe",
       "type": "shell"
     },
     {
-      "label": "UI-Only Run",
+      "label": "CT: UI-Only Run",
       "command": "npm start",
       "options": {
         "cwd": "${workspaceFolder}/app/"

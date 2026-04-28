@@ -1,11 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export type JsonValue = string | number | boolean | JsonObject | JsonArray | null;
 export type JsonObject = { [key: string]: JsonValue };
 export type JsonArray = JsonValue[];
+type MappableObject = Record<string, unknown>;
 
 type PropertyMapping = {
   [apiProperty: string]: string;
@@ -52,32 +48,47 @@ export const reversedFullConversationAssetMapping = reverseMapping(fullConversat
 
 // PROCESSING
 
-export function lowercasePropertyNames(obj: JsonValue, firstCharacterLower = false): JsonValue {
+function toJsonValue(value: unknown): JsonValue {
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' || value === null) {
+    return value;
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((item) => toJsonValue(item));
+  }
+
+  if (isObject(value)) {
+    const jsonObject: JsonObject = {};
+    for (const [key, nestedValue] of Object.entries(value)) {
+      jsonObject[key] = toJsonValue(nestedValue);
+    }
+    return jsonObject;
+  }
+
+  return null;
+}
+
+export function lowercasePropertyNames(obj: unknown, firstCharacterLower = false): JsonValue {
   if (Array.isArray(obj)) {
     return obj.map((item) => lowercasePropertyNames(item, firstCharacterLower));
   } else if (typeof obj === 'object' && obj !== null) {
     const newObj: JsonObject = {};
 
-    for (const key in obj) {
-      if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        newObj[firstCharacterLower ? `${key[0].toLowerCase()}${key.substring(1)}` : key.toLowerCase()] = lowercasePropertyNames(
-          obj[key],
-          firstCharacterLower,
-        );
-      }
+    for (const [key, value] of Object.entries(obj)) {
+      newObj[firstCharacterLower ? `${key[0].toLowerCase()}${key.substring(1)}` : key.toLowerCase()] = lowercasePropertyNames(value, firstCharacterLower);
     }
 
     return newObj;
   } else {
-    return obj;
+    return toJsonValue(obj);
   }
 }
 
-function isObject(value: any): boolean {
+function isObject(value: unknown): value is MappableObject {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
-function mapArray<T>(arr: any[], mapping: PropertyMapping): any[] {
+function mapArray(arr: unknown[], mapping: PropertyMapping): unknown[] {
   return arr.map((item) => {
     if (isObject(item)) {
       return mapToType(item, mapping);
@@ -89,17 +100,18 @@ function mapArray<T>(arr: any[], mapping: PropertyMapping): any[] {
 }
 
 export function mapToType<T>(obj: object, mapping: PropertyMapping): T {
-  const result: Partial<T> = {};
+  const source = obj as MappableObject;
+  const result: MappableObject = {};
   for (const key in obj) {
     const newKey: string = mapping[key] || key;
-    const value = (obj as any)[key];
+    const value = source[key];
 
     if (isObject(value)) {
-      (result as any)[newKey] = mapToType(value, mapping);
+      result[newKey] = mapToType(value, mapping);
     } else if (Array.isArray(value)) {
-      (result as any)[newKey] = mapArray(value, mapping);
+      result[newKey] = mapArray(value, mapping);
     } else {
-      (result as any)[newKey] = value;
+      result[newKey] = value;
     }
   }
   return result as T;

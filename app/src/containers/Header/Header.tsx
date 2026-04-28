@@ -3,12 +3,14 @@ import { message, Menu } from 'antd';
 import { observer } from 'mobx-react';
 
 import { useStore } from 'hooks/useStore';
+import { useAiFeatureEnabled } from 'hooks/useAiFeatureEnabled';
 import { DataStore } from 'stores/dataStore/data-store';
 import { ModalStore } from 'stores/modalStore/modal-store';
 
 import { FileSystemPicker } from 'components/FileSystemPicker';
 import { SaveConversationAs } from 'components/SaveConversationAs';
 import { About } from 'components/About';
+import { AiDraftModal } from 'components/AiDraftModal';
 import { updateConversation, exportConversation, exportAllConversations } from 'services/api';
 
 import './Header.css';
@@ -19,6 +21,7 @@ const { SubMenu } = Menu;
 export function Header() {
   const dataStore = useStore<DataStore>('data');
   const modalStore = useStore<ModalStore>('modal');
+  const aiFeatureEnabled = useAiFeatureEnabled(true);
 
   const { workingDirectory } = dataStore;
   const hasActiveConversation = dataStore.activeConversationAsset !== null;
@@ -87,6 +90,13 @@ export function Header() {
             </MenuItem>
           )}
         </SubMenu>
+        {workingDirectory && aiFeatureEnabled && (
+          <SubMenu title="AI">
+            <MenuItem onClick={() => modalStore.setModelContent(AiDraftModal, { mode: 'fullConversation' }, 'global1')}>
+              Draft Conversation...
+            </MenuItem>
+          </SubMenu>
+        )}
         <SubMenu title="Help">
           <MenuItem onClick={() => modalStore.setModelContent(About, {}, 'global1')}>About</MenuItem>
         </SubMenu>

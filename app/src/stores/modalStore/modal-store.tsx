@@ -1,7 +1,6 @@
 /* eslint-disable function-paren-newline */
 import React, { MouseEvent, ElementType } from 'react';
 import { observable, action, makeObservable } from 'mobx';
-import defer from 'lodash.defer';
 import { ButtonType } from 'antd/lib/button';
 
 export type OnOkType = ((event: MouseEvent<HTMLElement>, value?: string) => void) | null;
@@ -41,6 +40,7 @@ type ModalOptions = {
 class ModalStore {
   modals = new Map<string, ElementType | JSX.Element>();
   options = new Map<string, ModalOptions>();
+  private modalVersion = 0;
 
   constructor() {
     makeObservable(this, {
@@ -71,7 +71,8 @@ class ModalStore {
   }
 
   setModelContent(ModalContent: ElementType, props = {}, globalModalId: string, show = true): void {
-    this.modals.set(globalModalId, <ModalContent globalModalId={globalModalId} {...props} />);
+    this.modalVersion += 1;
+    this.modals.set(globalModalId, <ModalContent key={`${globalModalId}-${this.modalVersion}`} globalModalId={globalModalId} {...props} />);
 
     const options: ModalOptions = {
       props,

@@ -5,6 +5,15 @@ import { nodeStore } from '../stores';
 import { changeNodeAtPath, find } from './tree-data-utils';
 import { getId } from './conversation-utils';
 
+type TreeSearchMatch = {
+  node: RSTNode;
+  path: RSTPath;
+};
+
+type TreeSearchResult = {
+  matches: TreeSearchMatch[];
+};
+
 /**
  * Collapses all other branches that aren't on the same branch as the selected node
  *
@@ -108,30 +117,25 @@ export function collapseOrExpandBranches(
 }
 
 function setExpandedInTree(treeData: RSTNode[], nodeId: string, onNode: (node: RSTNode) => void, expanded: boolean): RSTNode[] {
-  const { matches }: { matches: any[] } = find({
+  const { matches } = find({
     treeData,
     searchQuery: undefined,
     searchFocusOffset: undefined,
     getNodeKey: ({ node }: { node: RSTNode }) => node.id,
     searchMethod: ({ node }: { node: RSTNode }) => node.id === nodeId,
     expandFocusMatchPaths: false,
-  });
+  }) as TreeSearchResult;
 
   if (matches == null || matches.length <= 0) return treeData;
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const match = matches[0];
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const { path } = match;
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  const treeNode = match.node as RSTNode;
+  const treeNode = match.node;
   treeNode.expanded = expanded;
   onNode(treeNode);
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   return changeNodeAtPath({
     treeData,
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     path,
     newNode: treeNode,
     getNodeKey: ({ node }: { node: RSTNode }) => node.id,
