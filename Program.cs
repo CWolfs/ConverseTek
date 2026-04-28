@@ -62,8 +62,8 @@ namespace ConverseTek {
 
                 string startUrl = "local://dist/index.html";
 
-                int defaultScreenWidth = 1480;
-                int defaultScreenHeight = 900;
+                int defaultScreenWidth = 1720;
+                int defaultScreenHeight = 1000;
 
                 int screenWidth = Screen.PrimaryScreen.Bounds.Width - 100;
                 int screenHeight = Screen.PrimaryScreen.Bounds.Height - 100;

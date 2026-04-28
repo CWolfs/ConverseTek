@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
        "target": "esnext",
-       "moduleResolution": "node",
+       "moduleResolution": "bundler",
        "module": "esnext",
        "rootDir": ".",
        "resolveJsonModule": true,
@@ -14,16 +14,16 @@
        "isolatedModules": true,
        "noEmit": true,
        "jsx": "react", // change to "react-jsx" when upgrading to React 18
-       "baseUrl": "./",
        "paths": {
-         "components/*": ["src/components/*"],
-         "containers/*": ["src/containers/*"],
-         "services/*": ["src/services/*"],
-         "hooks/*": ["src/hooks/*"],
-         "stores/*": ["src/stores/*"],
-         "utils/*": ["src/utils/*"],
-         "types/*": ["src/types/*"],
-         "types": ["src/types"],
+         "components/*": ["./src/components/*"],
+         "containers/*": ["./src/containers/*"],
+         "services/*": ["./src/services/*"],
+         "hooks/*": ["./src/hooks/*"],
+         "stores/*": ["./src/stores/*"],
+         "utils/*": ["./src/utils/*"],
+         "types/*": ["./src/types/*"],
+         "types": ["./src/types"],
+         "package.json": ["./package.json"],
      }
     }
   }

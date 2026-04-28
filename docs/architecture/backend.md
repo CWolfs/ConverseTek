@@ -8,7 +8,7 @@ Repo root contains the `.csproj`, `Program.cs`, and the source folders described
 
 - `Program.Main()` (lines ~59–136) bootstraps a Chromely CefSharp WinForms host (.NET 4.7.2, win10-x64).
 - **Start URL**: `local://dist/index.html` — serves the React bundle copied to `bin/x64/Debug/net472/dist/` (or release equivalent).
-- **Window**: 1480×900 default, responsive to screen size.
+- **Window**: 1720x1000 default, responsive to screen size.
 - **Logging**: `logs/conversetek-interface.log` and `logs/conversetek-core.log`.
 - **Scheme handlers**:
   - `UseDefaultResourceSchemeHandler("local", ...)` — serves bundle assets.
