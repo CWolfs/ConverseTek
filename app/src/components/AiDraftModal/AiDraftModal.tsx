@@ -3,6 +3,7 @@ import { toJS } from 'mobx';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react';
 import { Alert, Button, Col, Form, Icon, Input, message, Row, Select, Spin, Tabs, Tag, Tooltip } from 'antd';
+import classnames from 'classnames';
 
 import { useStore } from 'hooks/useStore';
 import { DataStore } from 'stores/dataStore/data-store';
@@ -87,7 +88,7 @@ function getModeTitle(mode: AiDraftModeType): string {
 }
 
 function getAcceptLabel(mode: AiDraftModeType): string {
-  if (mode === 'fullConversation') return 'Create From Preview';
+  if (mode === 'fullConversation') return 'Open In Main Editor';
   return 'Accept';
 }
 
@@ -216,7 +217,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
 
   useEffect(() => {
     modalStore.setTitle(getModeTitle(mode), globalModalId);
-    modalStore.setWidth('78vw', globalModalId);
+    modalStore.setWidth(mode === 'fullConversation' ? '74vw' : '86vw', globalModalId);
     modalStore.setShowOkButton(false, globalModalId);
     modalStore.setShowCancelButton(true, globalModalId);
     modalStore.setCancelLabel('Close', globalModalId);
@@ -536,7 +537,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
   };
 
   return (
-    <div className="ai-draft-modal">
+    <div className={classnames('ai-draft-modal', draft && 'ai-draft-modal--has-draft')}>
       <Tabs activeKey={activeTab} onChange={changeTab}>
         <TabPane tab="Draft" key="draft">
           {!canGenerate && (
@@ -561,7 +562,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                   <TextArea
                     value={brief}
                     onChange={(event: ChangeEvent<HTMLTextAreaElement>) => setBrief(event.target.value)}
-                    rows={7}
+                    rows={draft ? 4 : 7}
                     placeholder="Describe the scene, tone, required beats, choices, tags, and anything the AI must avoid."
                   />
                 </Form.Item>
@@ -857,7 +858,7 @@ function DraftPreview({
   selectedNode: PromptNodeType | ElementNodeType | null;
 }) {
   const previewConversationAsset = useMemo(
-    () => buildPreviewConversationAssetFromDraft(draft, mode, workingDirectory, selectedNode),
+    () => (mode === 'fullConversation' ? null : buildPreviewConversationAssetFromDraft(draft, mode, workingDirectory, selectedNode)),
     [draft, mode, workingDirectory, selectedNode],
   );
   const suggestedText = useMemo(() => getSuggestedNodeText(draft, selectedNode), [draft, selectedNode]);

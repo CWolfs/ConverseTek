@@ -2,10 +2,14 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  max-height: calc(100vh - 190px);
+  max-height: calc(100vh - 170px);
   overflow-y: auto;
   padding-right: 4px;
   padding-bottom: 4px;
+}
+
+.ai-draft-modal--has-draft {
+  max-height: calc(100vh - 150px);
 }
 
 .ai-draft-modal textarea,
@@ -214,9 +218,11 @@
 .ai-draft-preview-tree {
   display: flex;
   flex-direction: column;
-  min-height: 520px;
-  border: 1px solid #d9d9d9;
-  background: #2f2f2f;
+  min-height: 480px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #f3f6fa;
+  box-shadow: 0 0 0 1px rgba(31, 47, 67, 0.12), 0 10px 24px rgba(31, 47, 67, 0.12);
 }
 
 .ai-draft-preview-tree__toolbar {
@@ -225,12 +231,12 @@
   align-items: center;
   min-height: 36px;
   padding: 0 12px;
-  border-bottom: 1px solid #e8e8e8;
-  background: #fafafa;
-  color: #595959;
+  background: #fff;
+  color: #4b6178;
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
+  box-shadow: 0 1px 0 rgba(31, 47, 67, 0.12);
 }
 
 .ai-draft-preview-tree__toolbar .anticon {
@@ -239,32 +245,45 @@
 
 .ai-draft-preview-tree__canvas {
   position: relative;
-  height: 484px;
+  height: calc(100vh - 430px);
+  min-height: 400px;
+  max-height: 620px;
   min-width: 0;
   overflow: hidden;
-  background: #2f2f2f;
+  background: #f3f6fa;
 }
 
 /* Keep these tree overrides scoped to the AI preview. The real DialogEditor tree uses the same renderer classes. */
+.ai-draft-preview-tree__canvas .rst__lineHalfHorizontalRight::before,
+.ai-draft-preview-tree__canvas .rst__lineFullVertical::after,
+.ai-draft-preview-tree__canvas .rst__lineHalfVerticalTop::after,
+.ai-draft-preview-tree__canvas .rst__lineHalfVerticalBottom::after,
+.ai-draft-preview-tree__canvas .rst__lineChildren::after {
+  background-color: #9cadbf;
+}
+
 .ai-draft-preview-tree__canvas .rst__rowWrapper {
-  padding-top: 7px;
-  padding-bottom: 7px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 .ai-draft-preview-tree__canvas .rst__row {
   align-items: stretch;
+  white-space: normal;
 }
 
 .ai-draft-preview-tree__canvas .rst__rowContents {
   align-items: flex-start;
   flex: 0 1 auto;
   width: auto;
-  min-width: 280px;
-  max-width: 540px;
+  min-width: 340px;
+  max-width: 760px;
   height: auto;
-  min-height: 42px;
-  padding: 6px 10px;
-  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.28);
+  min-height: 40px;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px rgba(31, 47, 67, 0.12), 0 3px 10px rgba(31, 47, 67, 0.14);
 }
 
 .ai-draft-preview-tree__canvas .node-renderer__row-contents section {
@@ -277,6 +296,10 @@
 .ai-draft-preview-tree__canvas .node-renderer__row-contents-logic {
   flex: 0 0 auto;
   padding-top: 1px;
+}
+
+.ai-draft-preview-tree__canvas .node-renderer__row-contents-logic .anticon {
+  font-size: 15px !important;
 }
 
 .ai-draft-preview-tree__canvas .rst__rowLabel {
@@ -293,7 +316,8 @@
 }
 
 .ai-draft-preview-tree__canvas .rst__rowTitle {
-  line-height: 1.25;
+  line-height: 1.35;
+  text-wrap: pretty;
 }
 
 .ai-draft-preview-tree__canvas .rst__rowTitleWithSubtitle {
@@ -311,7 +335,7 @@
 }
 
 .ai-draft-preview-tree__canvas .node-renderer__response-row-contents .rst__rowSubtitle {
-  color: #e8e8e8;
+  color: #d8e1ec;
 }
 
 .ai-draft-preview-tree__canvas .rst__rowToolbar {
@@ -323,7 +347,7 @@
   display: inline-flex;
   align-items: center;
   min-height: 20px;
-  max-width: 130px;
+  max-width: 150px;
   overflow: hidden;
   padding: 0 7px;
   border-radius: 3px;
@@ -338,11 +362,15 @@
 }
 
 .ai-draft-preview-tree__canvas .node-renderer__response-row-contents .ai-draft-preview-tree__speaker-badge {
-  background: #262626;
+  background: #243447;
 }
 
 .ai-draft-preview-tree__canvas .rst__moveHandle {
-  flex: 0 0 44px;
+  flex: 0 0 34px;
+  width: 34px;
+  border: 0;
+  border-radius: 4px 0 0 4px;
+  box-shadow: 0 0 0 1px rgba(31, 47, 67, 0.12), 0 3px 10px rgba(31, 47, 67, 0.12);
 }
 
 .ai-draft-preview-tree__canvas .node-renderer__row {
@@ -358,8 +386,17 @@
 }
 
 .ai-draft-preview-tree__canvas .ReactVirtualized__Grid {
-  background: #2f2f2f;
+  background: #f3f6fa;
   outline: none;
+}
+
+.ai-draft-preview-tree__canvas .ReactVirtualized__Grid__innerScrollContainer {
+  padding-bottom: 36px;
+}
+
+.ai-draft-preview-tree__canvas .rst__collapseButton,
+.ai-draft-preview-tree__canvas .rst__expandButton {
+  box-shadow: 0 0 0 1px #7f91a5, 0 2px 4px rgba(31, 47, 67, 0.18);
 }
 
 .ai-draft-artifact-viewer {

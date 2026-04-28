@@ -14,8 +14,16 @@ import { ConversationAssetType, ElementNodeType, OperationCallType, PromptNodeTy
 import { getId } from 'utils/conversation-utils';
 
 type PreviewNodeStore = ConversationTreeNodeStore & {
-  buildTreeData: () => RSTNode[];
+  buildTreeData: () => PreviewTreeNode[];
   recordTreeIndex: (nodeId: string | undefined, treeIndex: number) => void;
+};
+
+type PreviewTreeNode = RSTNode & {
+  previewTreeKey: string;
+};
+
+type PreviewRowHeightProps = {
+  node: PreviewTreeNode;
 };
 
 type Props = {
@@ -28,7 +36,7 @@ export function AiDraftConversationTreePreview({ conversationAsset }: Props) {
   const treeContainerSize = useSize(treeContainerRef);
   const expansionByNodeId = useRef(new Map<string, boolean>());
   const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
-  const [treeData, setTreeData] = useState<RSTNode[]>([]);
+  const [treeData, setTreeData] = useState<PreviewTreeNode[]>([]);
 
   const previewNodeStore = useMemo(
     () => createPreviewNodeStore(conversationAsset, expansionByNodeId.current, setActiveNodeId),
@@ -59,15 +67,15 @@ export function AiDraftConversationTreePreview({ conversationAsset }: Props) {
           <ScalableScrollbar activeNodeId={activeNodeId} width={10} hideScrollOnScale={false}>
             <SortableTree
               treeData={treeData}
-              onChange={(nextTreeData: RSTNode[]) => setTreeData(nextTreeData)}
-              getNodeKey={({ node, treeIndex }: { node: RSTNode; treeIndex: number }) => {
+              onChange={(nextTreeData: PreviewTreeNode[]) => setTreeData(nextTreeData)}
+              getNodeKey={({ node, treeIndex }: { node: PreviewTreeNode; treeIndex: number }) => {
                 previewNodeStore.recordTreeIndex(node.id, treeIndex);
-                return node.id || treeIndex;
+                return node.previewTreeKey || node.id || treeIndex;
               }}
-              rowHeight={56}
+              rowHeight={getPreviewRowHeight}
               canDrag={() => false}
               canDrop={() => false}
-              generateNodeProps={({ node }: { node: RSTNode }) => ({
+              generateNodeProps={({ node }: { node: PreviewTreeNode }) => ({
                 dataStore,
                 nodeStore: previewNodeStore,
                 activeNodeId,
@@ -117,9 +125,12 @@ function createPreviewNodeStore(
       {
         title: conversationAsset.conversation.uiName || 'AI Draft Conversation',
         id: '0',
+        previewTreeKey: 'core-0',
         type: 'core',
         parentId: '-1',
-        children: conversationAsset.conversation.roots.map((root) => buildElementTreeNode(root, 'root', null, previewNodeStore)),
+        children: conversationAsset.conversation.roots.map((root, index) =>
+          buildElementTreeNode(root, 'root', null, `core-0/root-${index}`, previewNodeStore),
+        ),
         expanded: true,
         canDrag: false,
       },
@@ -154,23 +165,30 @@ function buildElementTreeNode(
   elementNode: ElementNodeType,
   type: 'root' | 'response',
   parentId: string | null,
+  previewTreeKey: string,
   previewNodeStore: PreviewNodeStore,
-): RSTNode {
+): PreviewTreeNode {
   const elementNodeId = getId(elementNode);
 
   return {
     title: elementNode.responseText,
     subtitle: formatElementSubtitle(elementNode),
     id: elementNodeId,
+    previewTreeKey,
     parentId,
     type,
     expanded: previewNodeStore.isNodeExpanded(elementNodeId),
     canDrag: false,
-    children: buildElementChildren(elementNode, elementNodeId, previewNodeStore),
+    children: buildElementChildren(elementNode, elementNodeId, previewTreeKey, previewNodeStore),
   };
 }
 
-function buildElementChildren(elementNode: ElementNodeType, elementNodeId: string, previewNodeStore: PreviewNodeStore): RSTNode[] | null {
+function buildElementChildren(
+  elementNode: ElementNodeType,
+  elementNodeId: string,
+  parentTreeKey: string,
+  previewNodeStore: PreviewNodeStore,
+): PreviewTreeNode[] | null {
   if (elementNode.nextNodeIndex === -1) return null;
 
   if (elementNode.auxiliaryLink) {
@@ -179,6 +197,7 @@ function buildElementChildren(elementNode: ElementNodeType, elementNodeId: strin
       {
         title: `[Link to NODE ${elementNode.nextNodeIndex}]`,
         id: `link-${elementNodeId}-${elementNode.nextNodeIndex}`,
+        previewTreeKey: `${parentTreeKey}/link-${elementNode.nextNodeIndex}`,
         type: 'link',
         linkId: linkedPromptNode ? getId(linkedPromptNode) : null,
         linkIndex: elementNode.nextNodeIndex,
@@ -191,22 +210,41 @@ function buildElementChildren(elementNode: ElementNodeType, elementNodeId: strin
   const childPromptNode = previewNodeStore.getPromptNodeByIndex(elementNode.nextNodeIndex);
   if (!childPromptNode) return null;
 
-  return [buildPromptTreeNode(childPromptNode, elementNodeId, previewNodeStore)];
+  return [buildPromptTreeNode(childPromptNode, elementNodeId, `${parentTreeKey}/node-${elementNode.nextNodeIndex}`, previewNodeStore)];
 }
 
-function buildPromptTreeNode(promptNode: PromptNodeType, parentId: string, previewNodeStore: PreviewNodeStore): RSTNode {
+function buildPromptTreeNode(
+  promptNode: PromptNodeType,
+  parentId: string,
+  previewTreeKey: string,
+  previewNodeStore: PreviewNodeStore,
+): PreviewTreeNode {
   const promptNodeId = getId(promptNode);
 
   return {
     title: promptNode.text,
     subtitle: formatPromptSubtitle(promptNode),
     id: promptNodeId,
+    previewTreeKey,
     parentId,
     type: 'node',
     expanded: previewNodeStore.isNodeExpanded(promptNodeId),
     canDrag: false,
-    children: promptNode.branches.map((branch) => buildElementTreeNode(branch, 'response', promptNodeId, previewNodeStore)),
+    children: promptNode.branches.map((branch, index) =>
+      buildElementTreeNode(branch, 'response', promptNodeId, `${previewTreeKey}/response-${index}`, previewNodeStore),
+    ),
   };
+}
+
+function getPreviewRowHeight({ node }: PreviewRowHeightProps): number {
+  const title = typeof node.title === 'string' ? node.title : '';
+  const subtitle = typeof node.subtitle === 'string' ? node.subtitle : '';
+  const estimatedCharactersPerLine = node.type === 'response' ? 70 : 86;
+  const titleLines = Math.max(1, Math.ceil(title.length / estimatedCharactersPerLine));
+  const subtitleLines = subtitle.length > 0 ? Math.max(1, Math.ceil(subtitle.length / 96)) : 0;
+  const estimatedHeight = 40 + titleLines * 18 + subtitleLines * 14;
+
+  return Math.min(180, Math.max(64, estimatedHeight));
 }
 
 function formatPromptSubtitle(promptNode: PromptNodeType): string {
@@ -237,7 +275,7 @@ function formatSpeaker(promptNode: PromptNodeType): string {
   return 'Narration';
 }
 
-function buildPreviewNodeButtons(node: RSTNode, previewNodeStore: PreviewNodeStore): JSX.Element[] {
+function buildPreviewNodeButtons(node: PreviewTreeNode, previewNodeStore: PreviewNodeStore): JSX.Element[] {
   if (node.type !== 'node') return [];
 
   const promptNode = previewNodeStore.getNode(node.id);
