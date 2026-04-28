@@ -1,6 +1,7 @@
 export type { ClipboardType } from './ClipboardType';
 export type {
   AiAcceptedDraftType,
+  AiCastPersonalityType,
   AiDraftArtifactResultType,
   AiBranchExpansionPatchType,
   AiConversationDraftType,

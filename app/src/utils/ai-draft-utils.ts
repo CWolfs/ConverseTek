@@ -19,9 +19,17 @@ import { createConversation, createPromptNode, createResponseNode, createRootNod
 
 const knownCastIds = new Set([
   'DariusDefault',
+  'castDef_DariusDefault',
   'SumireDefault',
+  'castDef_SumireDefault',
   'YangDefault',
+  'castDef_YangDefault',
   'FarahDefault',
+  'castDef_FarahDefault',
+  'KameaDefault',
+  'castDef_KameaDefault',
+  'MadeiraDefault',
+  'castDef_MadeiraDefault',
   'KrakenIsabella',
   'BladesKai',
   'DEFAULT',

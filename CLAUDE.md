@@ -39,6 +39,7 @@ For architecture detail, read the docs under [`docs/architecture/`](./docs/archi
 
 - AI-assisted drafting is advisory until accepted. Keep draft preview data outside `dataStore.unsavedActiveConversationAsset`.
 - Global AI settings live in `config/ai.json`; workspace AI context is keyed by conversation folder inside that file. Do not write loose AI settings into a mod `conversations/` folder.
+- Workspace cast personalities live in `config/ai.json`; built-in default personalities live in `config/ai-personalities.json`. Defaults should remain editable, explicit empty lists should be preserved, and character voice rules should be applied through provider prompts.
 - Backend AI providers go through `Services/AiProviderService.cs`; Codex CLI is the first provider, but provider names should stay generic for future CLIs.
 - Frontend draft conversion lives in `app/src/utils/ai-draft-utils.ts` and should return fresh conversation assets or explicit patch objects.
 - Full drafts use "Turn Into Real Conversation"; node/branch suggestions use "Accept" / "Reject".

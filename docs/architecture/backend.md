@@ -87,11 +87,13 @@ All use a singleton `getInstance()` pattern.
 - Also owns `config/ai.json`. Workspace AI settings are stored inside this file by normalised conversation-folder key; do not create per-mod settings files under `conversations/`.
 - `config/ai.json` has a top-level `Enabled`/`enabled` flag. Missing values default to `true`; setting it to `false` hides AI UI entry points and blocks provider actions.
 - AI model catalogues are cached per provider in `config/ai.json`. Saving other AI settings preserves that cache.
+- Workspace AI settings also store editable cast personalities. Missing personality lists are seeded from `config/ai-personalities.json`; explicit empty lists are preserved so modders can remove them.
 
 ### `AiProviderService`
 - Dispatches AI draft requests to the selected provider. The first provider is `codex`; other provider names are reserved for later CLI integrations.
 - Polls provider model catalogues for the settings UI. Normal requests use the saved provider cache when available; explicit refresh repolls the CLI. An empty model override means "provider default/latest".
 - Loads configured context files/folders as read-only prompt context, with extension and size limits.
+- Adds relevant workspace cast-personality rules to the provider prompt by matching the brief, active conversation, and selected node against configured cast ids, speaker ids, labels, and default keys.
 - The Codex provider writes diagnostics under `logs/ai-drafts/<timestamp>/`: request JSON, prompt, command, stdout, stderr, and the final `draft.json`.
 - Providers return suggestions only. They do not write conversation files or mutate active conversation state.
 

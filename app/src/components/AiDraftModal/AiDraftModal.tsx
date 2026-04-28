@@ -2,7 +2,7 @@ import React, { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { toJS } from 'mobx';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react';
-import { Alert, Button, Col, Form, Icon, Input, message, Row, Select, Spin, Tabs, Tag, Tooltip } from 'antd';
+import { Alert, Button, Checkbox, Col, Form, Icon, Input, message, Row, Select, Spin, Tabs, Tag, Tooltip } from 'antd';
 import classnames from 'classnames';
 
 import { useStore } from 'hooks/useStore';
@@ -22,13 +22,7 @@ import {
   saveAiWorkspaceSettings,
   validateConversationRoundTrip,
 } from 'services/api';
-import {
-  addNodes,
-  getId,
-  updatePromptNode,
-  updateResponseNode,
-  updateRootNode,
-} from 'utils/conversation-utils';
+import { addNodes, getId, updatePromptNode, updateResponseNode, updateRootNode } from 'utils/conversation-utils';
 import {
   buildAcceptedDraft,
   buildPreviewConversationAssetFromDraft,
@@ -37,6 +31,7 @@ import {
   validateAiDraft,
 } from 'utils/ai-draft-utils';
 import {
+  AiCastPersonalityType,
   AiConversationDraftType,
   AiDraftModeType,
   AiDraftRunResultType,
@@ -70,6 +65,7 @@ const emptySettings: AiSettingsType = {
   timeoutSeconds: 300,
   modelCatalogs: {},
   workspaces: {},
+  defaultCastPersonalities: [],
 };
 
 type ProviderUi = {
@@ -133,13 +129,75 @@ function normaliseWorkspaceKey(path: string): string {
   return path.replaceAll('\\', '/').replace(/\/+$/g, '').toLowerCase();
 }
 
-function createWorkspaceSettings(workingDirectory: string): AiWorkspaceSettingsType {
+function createWorkspaceSettings(workingDirectory: string, defaultPersonalities: AiCastPersonalityType[] = []): AiWorkspaceSettingsType {
   return {
     workingDirectory,
     contextPaths: [],
     houseStyleNotes: '',
     defaultCampaignBrief: '',
+    castPersonalities: cloneDefaultCastPersonalities(defaultPersonalities),
   };
+}
+
+function cloneDefaultCastPersonalities(defaultPersonalities: AiCastPersonalityType[]): AiCastPersonalityType[] {
+  return defaultPersonalities.map((personality) => ({
+    ...personality,
+    castIds: [...personality.castIds],
+    speakerIds: [...personality.speakerIds],
+  }));
+}
+
+function makePersonalityId(prefix = 'custom'): string {
+  return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function createCustomCastPersonality(): AiCastPersonalityType {
+  return {
+    id: makePersonalityId(),
+    label: 'New personality',
+    castIds: [],
+    speakerIds: [],
+    rules: '',
+    enabled: true,
+    defaultKey: '',
+  };
+}
+
+function cloneCastPersonality(personality: AiCastPersonalityType): AiCastPersonalityType {
+  return {
+    ...personality,
+    id: makePersonalityId('copy'),
+    label: `${personality.label || 'Personality'} Copy`,
+    castIds: [...personality.castIds],
+    speakerIds: [...personality.speakerIds],
+    defaultKey: '',
+  };
+}
+
+function normaliseIdTags(values: string[]): string[] {
+  const seenValues = new Set<string>();
+  const normalisedValues: string[] = [];
+
+  values
+    .map((value) => value.trim())
+    .filter(Boolean)
+    .forEach((value) => {
+      const key = value.toLowerCase();
+      if (seenValues.has(key)) return;
+      seenValues.add(key);
+      normalisedValues.push(value);
+    });
+
+  return normalisedValues;
+}
+
+function matchesPersonalitySearch(personality: AiCastPersonalityType, searchTerm: string): boolean {
+  const trimmedSearchTerm = searchTerm.trim().toLowerCase();
+  if (trimmedSearchTerm === '') return true;
+
+  return [personality.label, personality.defaultKey, ...personality.castIds, ...personality.speakerIds]
+    .filter(Boolean)
+    .some((value) => value.toLowerCase().includes(trimmedSearchTerm));
 }
 
 function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
@@ -157,6 +215,8 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
   const [diagnosticsPath, setDiagnosticsPath] = useState('');
   const [draftRunResult, setDraftRunResult] = useState<AiDraftRunResultType | null>(null);
   const [activeTab, setActiveTab] = useState('draft');
+  const [personalitySearch, setPersonalitySearch] = useState('');
+  const [selectedPersonalityId, setSelectedPersonalityId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingModels, setIsLoadingModels] = useState(false);
   const [isSavingConfiguration, setIsSavingConfiguration] = useState(false);
@@ -169,6 +229,18 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
   }, [selectedNodeId, nodeStore.activeNode]);
   const providerName = settings.selectedProvider || 'codex';
   const providerUi = getProviderUi(providerName);
+  const castPersonalities = workspaceSettings?.castPersonalities || [];
+  const filteredCastPersonalities = useMemo(
+    () => castPersonalities.filter((personality) => matchesPersonalitySearch(personality, personalitySearch)),
+    [castPersonalities, personalitySearch],
+  );
+  const selectedPersonality = useMemo(
+    () => castPersonalities.find((personality) => personality.id === selectedPersonalityId) || castPersonalities[0] || null,
+    [castPersonalities, selectedPersonalityId],
+  );
+  const selectedDefaultPersonality = selectedPersonality?.defaultKey
+    ? settings.defaultCastPersonalities.find((personality) => personality.defaultKey === selectedPersonality.defaultKey)
+    : null;
 
   const canGenerate = workingDirectory != null && (mode === 'fullConversation' || selectedNode != null);
   const canAccept = draft != null && validation.errors.length === 0;
@@ -246,7 +318,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
 
       if (workingDirectory) {
         const key = normaliseWorkspaceKey(workingDirectory);
-        setWorkspaceSettings(loadedSettings.workspaces[key] || createWorkspaceSettings(workingDirectory));
+        setWorkspaceSettings(loadedSettings.workspaces[key] || createWorkspaceSettings(workingDirectory, loadedSettings.defaultCastPersonalities));
       }
 
       if (refreshModelsForSettingsTab && activeTab === 'settings') {
@@ -273,6 +345,12 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
     setValidation(validateAiDraft(draft, defStore.operations, mode, selectedNode));
   }, [draft, mode, selectedNode, defStore.operations]);
 
+  useEffect(() => {
+    if (workspaceSettings == null) return;
+    if (workspaceSettings.castPersonalities.some((personality) => personality.id === selectedPersonalityId)) return;
+    setSelectedPersonalityId(workspaceSettings.castPersonalities[0]?.id || '');
+  }, [workspaceSettings, selectedPersonalityId]);
+
   const updateSettings = (patch: Partial<AiSettingsType>) => {
     console.log(`${AI_DEBUG_PREFIX} updateSettings`, {
       patch,
@@ -288,9 +366,78 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
 
   const updateWorkspaceSettings = (patch: Partial<AiWorkspaceSettingsType>) => {
     setWorkspaceSettings((previousSettings) => ({
-      ...(previousSettings || createWorkspaceSettings(workingDirectory || '')),
+      ...(previousSettings || createWorkspaceSettings(workingDirectory || '', settings.defaultCastPersonalities)),
       ...patch,
     }));
+  };
+
+  const updateCastPersonalities = (nextPersonalities: AiCastPersonalityType[]) => {
+    updateWorkspaceSettings({ castPersonalities: nextPersonalities });
+  };
+
+  const updateSelectedPersonality = (patch: Partial<AiCastPersonalityType>) => {
+    if (selectedPersonality == null) return;
+
+    updateCastPersonalities(
+      castPersonalities.map((personality) =>
+        personality.id === selectedPersonality.id
+          ? {
+              ...personality,
+              ...patch,
+            }
+          : personality,
+      ),
+    );
+  };
+
+  const addCastPersonality = () => {
+    const personality = createCustomCastPersonality();
+    updateCastPersonalities([...castPersonalities, personality]);
+    setSelectedPersonalityId(personality.id);
+  };
+
+  const duplicateSelectedPersonality = () => {
+    if (selectedPersonality == null) return;
+
+    const personality = cloneCastPersonality(selectedPersonality);
+    updateCastPersonalities([...castPersonalities, personality]);
+    setSelectedPersonalityId(personality.id);
+  };
+
+  const deleteSelectedPersonality = () => {
+    if (selectedPersonality == null) return;
+
+    const nextPersonalities = castPersonalities.filter((personality) => personality.id !== selectedPersonality.id);
+    updateCastPersonalities(nextPersonalities);
+    setSelectedPersonalityId(nextPersonalities[0]?.id || '');
+  };
+
+  const restoreSelectedDefaultPersonality = () => {
+    if (selectedPersonality == null || selectedDefaultPersonality == null) return;
+
+    updateSelectedPersonality({
+      label: selectedDefaultPersonality.label,
+      castIds: [...selectedDefaultPersonality.castIds],
+      speakerIds: [...selectedDefaultPersonality.speakerIds],
+      rules: selectedDefaultPersonality.rules,
+      enabled: selectedDefaultPersonality.enabled,
+      defaultKey: selectedDefaultPersonality.defaultKey,
+    });
+  };
+
+  const restoreMissingDefaultPersonalities = () => {
+    const existingDefaultKeys = new Set(castPersonalities.map((personality) => personality.defaultKey).filter(Boolean));
+    const missingDefaults = cloneDefaultCastPersonalities(settings.defaultCastPersonalities).filter(
+      (personality) => !existingDefaultKeys.has(personality.defaultKey),
+    );
+
+    if (missingDefaults.length === 0) {
+      void message.info('All default cast personalities are already present.');
+      return;
+    }
+
+    updateCastPersonalities([...castPersonalities, ...missingDefaults]);
+    setSelectedPersonalityId(missingDefaults[0].id);
   };
 
   const addContextPath = (path: string) => {
@@ -386,9 +533,9 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
   };
 
   useEffect(() => {
-    const isSettingsTab = activeTab === 'settings';
+    const isConfigurationTab = activeTab === 'settings' || activeTab === 'cast-personalities';
 
-    modalStore.setShowOkButton(isSettingsTab, globalModalId);
+    modalStore.setShowOkButton(isConfigurationTab, globalModalId);
     modalStore.setOkLabel('Save AI Settings', globalModalId);
     modalStore.setDisableOk(isSavingConfiguration, globalModalId);
     modalStore.setIsLoading(isSavingConfiguration, globalModalId);
@@ -651,13 +798,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
           )}
 
           {draft && (
-            <DraftPreview
-              draft={draft}
-              validation={validation}
-              mode={mode}
-              workingDirectory={workingDirectory || ''}
-              selectedNode={selectedNode}
-            />
+            <DraftPreview draft={draft} validation={validation} mode={mode} workingDirectory={workingDirectory || ''} selectedNode={selectedNode} />
           )}
         </TabPane>
 
@@ -701,7 +842,10 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                 </Form.Item>
                 <Form.Item
                   label={
-                    <FieldLabel label={providerUi.modelLabel} help="Fetched from the provider CLI. Leave as provider default/latest to avoid pinning to a specific model." />
+                    <FieldLabel
+                      label={providerUi.modelLabel}
+                      help="Fetched from the provider CLI. Leave as provider default/latest to avoid pinning to a specific model."
+                    />
                   }
                 >
                   <div className="ai-draft-modal__model-row">
@@ -737,7 +881,11 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                     </Tooltip>
                   </div>
                   {modelCatalog && modelCatalog.error && (
-                    <Alert className="ai-draft-modal__inline-alert" type="warning" message={modelCatalog.error || 'Could not load provider models.'} />
+                    <Alert
+                      className="ai-draft-modal__inline-alert"
+                      type="warning"
+                      message={modelCatalog.error || 'Could not load provider models.'}
+                    />
                   )}
                   {modelCatalog?.success && (
                     <div className="ai-draft-modal__field-note">
@@ -839,6 +987,143 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
             </Col>
           </Row>
         </TabPane>
+
+        <TabPane tab="Cast Personalities" key="cast-personalities">
+          <Row gutter={16}>
+            <Col md={9}>
+              <div className="ai-draft-personalities__toolbar">
+                <Input
+                  value={personalitySearch}
+                  prefix={<Icon type="search" />}
+                  placeholder="Search personalities"
+                  onChange={(event) => setPersonalitySearch(event.target.value)}
+                />
+                <Button icon="plus" onClick={addCastPersonality}>
+                  Add
+                </Button>
+              </div>
+
+              <div className="ai-draft-personalities__list">
+                {filteredCastPersonalities.length === 0 ? (
+                  <div className="ai-draft-personalities__empty">No matching personalities.</div>
+                ) : (
+                  filteredCastPersonalities.map((personality) => (
+                    <button
+                      key={personality.id}
+                      type="button"
+                      className={classnames('ai-draft-personalities__item', {
+                        'ai-draft-personalities__item--active': selectedPersonality?.id === personality.id,
+                        'ai-draft-personalities__item--disabled': !personality.enabled,
+                      })}
+                      onClick={() => setSelectedPersonalityId(personality.id)}
+                    >
+                      <span className="ai-draft-personalities__item-header">
+                        <span>{personality.label || 'Untitled personality'}</span>
+                        {personality.defaultKey && <Tag>Default</Tag>}
+                      </span>
+                      <span className="ai-draft-personalities__item-ids">
+                        {[...personality.castIds, ...personality.speakerIds].slice(0, 4).map((id) => (
+                          <Tag key={id}>{id}</Tag>
+                        ))}
+                        {personality.castIds.length + personality.speakerIds.length > 4 && (
+                          <Tag>+{personality.castIds.length + personality.speakerIds.length - 4}</Tag>
+                        )}
+                      </span>
+                    </button>
+                  ))
+                )}
+              </div>
+
+              <div className="ai-draft-personalities__list-actions">
+                <Button icon="copy" disabled={selectedPersonality == null} onClick={duplicateSelectedPersonality}>
+                  Duplicate
+                </Button>
+                <Button icon="delete" disabled={selectedPersonality == null} onClick={deleteSelectedPersonality}>
+                  Delete
+                </Button>
+                <Button icon="reload" onClick={restoreMissingDefaultPersonalities}>
+                  Restore Missing Defaults
+                </Button>
+              </div>
+            </Col>
+
+            <Col md={15}>
+              {selectedPersonality == null ? (
+                <div className="ai-draft-personalities__editor-empty">Add a personality or restore the defaults to start.</div>
+              ) : (
+                <Form layout="vertical" className="ai-draft-personalities__editor">
+                  <div className="ai-draft-personalities__editor-heading">
+                    <Checkbox
+                      checked={selectedPersonality.enabled}
+                      onChange={(event) => updateSelectedPersonality({ enabled: event.target.checked })}
+                    >
+                      Enabled
+                    </Checkbox>
+                    <Button icon="reload" disabled={selectedDefaultPersonality == null} onClick={restoreSelectedDefaultPersonality}>
+                      Restore Selected Default
+                    </Button>
+                  </div>
+
+                  <Form.Item
+                    label={
+                      <FieldLabel
+                        label="Label"
+                        help="Human-readable name for this voice profile. Labels are also used as a hint when matching personalities to a draft request."
+                      />
+                    }
+                  >
+                    <Input value={selectedPersonality.label} onChange={(event) => updateSelectedPersonality({ label: event.target.value })} />
+                  </Form.Item>
+
+                  <Form.Item
+                    label={
+                      <FieldLabel
+                        label="Cast ids"
+                        help="BattleTech cast ids that should use these rules. Include both short ids such as DariusDefault and cast definition ids such as castDef_DariusDefault when useful."
+                      />
+                    }
+                  >
+                    <Select
+                      mode="tags"
+                      tokenSeparators={[',', '\n']}
+                      value={selectedPersonality.castIds}
+                      placeholder="Add cast ids"
+                      onChange={(values: string[]) => updateSelectedPersonality({ castIds: normaliseIdTags(values) })}
+                    />
+                  </Form.Item>
+
+                  <Form.Item
+                    label={<FieldLabel label="Speaker ids" help="Conversation speaker ids from .cvsl speaker lists that should use these rules." />}
+                  >
+                    <Select
+                      mode="tags"
+                      tokenSeparators={[',', '\n']}
+                      value={selectedPersonality.speakerIds}
+                      placeholder="Add speaker ids"
+                      onChange={(values: string[]) => updateSelectedPersonality({ speakerIds: normaliseIdTags(values) })}
+                    />
+                  </Form.Item>
+
+                  <Form.Item
+                    label={
+                      <FieldLabel
+                        label="AI agent rules"
+                        help="Voice and behaviour rules the provider must follow whenever generated dialogue uses a matching cast id or speaker id."
+                      />
+                    }
+                  >
+                    <TextArea
+                      value={selectedPersonality.rules}
+                      rows={9}
+                      placeholder="Describe how this character speaks, what they notice, what they avoid, and how they should react under pressure."
+                      onChange={(event) => updateSelectedPersonality({ rules: event.target.value })}
+                    />
+                  </Form.Item>
+                </Form>
+              )}
+            </Col>
+          </Row>
+        </TabPane>
       </Tabs>
     </div>
   );
@@ -861,10 +1146,7 @@ function DraftPreview({
     () => (mode === 'fullConversation' ? null : buildPreviewConversationAssetFromDraft(draft, mode, workingDirectory, selectedNode)),
     [draft, mode, workingDirectory, selectedNode],
   );
-  const suggestedText = useMemo(
-    () => (mode === 'fullConversation' ? '' : getSuggestedNodeText(draft, selectedNode)),
-    [draft, mode, selectedNode],
-  );
+  const suggestedText = useMemo(() => (mode === 'fullConversation' ? '' : getSuggestedNodeText(draft, selectedNode)), [draft, mode, selectedNode]);
 
   return (
     <div className="ai-draft-preview">

@@ -22,6 +22,7 @@ AI-assisted conversation drafting is advisory only. Drafts must stay outside `da
 
 - Global AI settings live in `config/ai.json`.
 - Workspace AI settings are keyed by conversation folder inside `config/ai.json`; do not create loose settings files in mod `conversations/` folders.
+- Workspace cast personalities live inside `config/ai.json`; built-in default personalities live in `config/ai-personalities.json`. Keep defaults editable, preserve explicit empty lists, and apply them through provider prompts rather than hard-coding character voice into draft conversion.
 - Backend provider work goes through `Services/AiProviderService.cs`; keep provider names generic so Codex, Claude Code, and future CLIs can share the interface.
 - Frontend draft conversion lives in `app/src/utils/ai-draft-utils.ts`; keep these functions pure and return fresh conversation assets or explicit patch objects.
 - Accepting a full draft must use "Turn Into Real Conversation"; node or branch suggestions must remain "Accept" / "Reject" until accepted.

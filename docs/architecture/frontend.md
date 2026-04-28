@@ -43,7 +43,7 @@ Containers consume stores by key: `useStore<DataStore>('data')`, `useStore<NodeS
 ## Major UI surfaces (containers)
 
 - `Header` — File menu (Open Folder, Save, Import/Export, Export All), AI menu, top nav. Reads `dataStore.workingDirectory`, `dataStore.activeConversationAsset`.
-- `AiDraftModal` — AI-assisted conversation drafting and suggestion review. It stores draft preview state locally, validates it, and only applies changes when the user accepts.
+- `AiDraftModal` — AI-assisted conversation drafting, suggestion review, provider settings, and workspace cast-personality editing. It stores draft preview state locally, validates it, and only applies changes when the user accepts.
 - `Conversations` — Top-level layout; loads conversations + definitions on mount; switches between `ConversationEditor` and `SplashScreen`.
 - `ConversationTree` — Left sidebar list of conversations.
 - `ConversationEditor` — Main workspace; hosts `ConversationGeneral`, `ConversationActions`, `ConversationConditions` and the dialogue tree.
@@ -70,6 +70,7 @@ Containers consume stores by key: `useStore<DataStore>('data')`, `useStore<NodeS
 - Whole-conversation drafts are opened from the Header `AI` menu. Node rewrites and branch expansion are opened from the dialogue tree context menu.
 - AI entry points are gated by `config/ai.json` `Enabled`/`enabled`, defaulting to on. When disabled, the Header AI menu and dialogue-tree AI context actions are hidden.
 - The model selector loads the saved provider catalogue first, polls the provider CLI when no cache exists, and only repolls on `Refresh`. It keeps an empty value as "provider default/latest" so drafts are not pinned unless the user chooses a specific model.
+- Workspace AI settings include context paths, house style notes, campaign brief, and editable cast personalities. Cast personalities link rules to cast ids and speaker ids so generated dialogue can stay in character for vanilla and custom casts; built-in restore defaults are supplied by `config/ai-personalities.json`.
 - AI responses are parsed as `AiConversationDraftType`, rendered as a read-only tree preview where possible, and validated before acceptance. Prompt and response diagnostics can be opened from the draft metadata panel.
 - `app/src/utils/ai-draft-utils.ts` converts drafts with pure functions. Full drafts produce a fresh `ConversationAssetType`; branch expansion produces a patch with a cloned parent root/response and new prompt nodes; node suggestions produce replacement text.
 - Accepting a draft is the only point where MobX state changes. The accept handler applies one deliberate action, marks the conversation dirty, and triggers a tree rebuild.

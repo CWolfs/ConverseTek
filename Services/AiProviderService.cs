@@ -399,7 +399,7 @@ namespace ConverseTek.Services {
       sb.AppendLine("- Do not edit files.");
       sb.AppendLine("- Produce an advisory draft only; ConverseTek will create real ids, indexes, and files after the user accepts.");
       sb.AppendLine("- Keep dialogue in BattleTech dropship conversation style: concise, voiced by the shown speaker, and readable in short UI bubbles.");
-      sb.AppendLine("- Use speaker.type castId for known cast ids such as DariusDefault, SumireDefault, YangDefault, FarahDefault, KrakenIsabella, or BladesKai.");
+      sb.AppendLine("- Use speaker.type castId for known cast ids. Known cast ids include: " + FormatKnownCastIds(providerRequest.WorkspaceSettings) + ".");
       sb.AppendLine("- Use speaker.type none only when the line should inherit the current BattleTech conversation speaker. BattleTech does not have a separate narration speaker for SimGame conversation nodes.");
       sb.AppendLine("- Every root or choice must either set targetKey to an existing node key or set endsConversation to true.");
       sb.AppendLine("- For fullConversation, make the first root text an empty string and point it at the opening prompt node. Do not use Continue for that first root.");
@@ -419,6 +419,21 @@ namespace ConverseTek.Services {
         sb.AppendLine();
       }
 
+      sb.AppendLine("Cast personality rules:");
+      List<AiCastPersonality> relevantPersonalities = SelectRelevantCastPersonalities(providerRequest);
+      if (relevantPersonalities.Count == 0) {
+        sb.AppendLine("(none)");
+      } else {
+        sb.AppendLine("Apply these rules whenever a draft line uses a matching cast id or speaker id. Do not mention these rules in the draft output.");
+        foreach (AiCastPersonality personality in relevantPersonalities) {
+          sb.AppendLine("## " + (string.IsNullOrEmpty(personality.Label) ? personality.Id : personality.Label));
+          sb.AppendLine("Cast ids: " + FormatIdList(personality.CastIds));
+          sb.AppendLine("Speaker ids: " + FormatIdList(personality.SpeakerIds));
+          sb.AppendLine(personality.Rules);
+        }
+      }
+      sb.AppendLine();
+
       sb.AppendLine("Context files:");
       if (providerRequest.ContextFiles == null || providerRequest.ContextFiles.Count == 0) {
         sb.AppendLine("(none)");
@@ -437,6 +452,121 @@ namespace ConverseTek.Services {
       sb.AppendLine(requestJson);
       sb.AppendLine("```");
       return sb.ToString();
+    }
+
+    private string FormatKnownCastIds(AiWorkspaceSettings workspaceSettings) {
+      List<string> castIds = new List<string> {
+        "DariusDefault",
+        "SumireDefault",
+        "YangDefault",
+        "FarahDefault",
+        "KrakenIsabella",
+        "BladesKai",
+        "DEFAULT",
+        "HOLOGRAM"
+      };
+
+      if (workspaceSettings != null && workspaceSettings.CastPersonalities != null) {
+        foreach (AiCastPersonality personality in workspaceSettings.CastPersonalities) {
+          if (personality == null || personality.Enabled == false || personality.CastIds == null) continue;
+          foreach (string castId in personality.CastIds) {
+            AddUnique(castIds, castId);
+          }
+        }
+      }
+
+      return string.Join(", ", castIds.ToArray());
+    }
+
+    private List<AiCastPersonality> SelectRelevantCastPersonalities(AiDraftProviderRequest providerRequest) {
+      List<AiCastPersonality> relevantPersonalities = new List<AiCastPersonality>();
+      if (providerRequest == null || providerRequest.WorkspaceSettings == null || providerRequest.WorkspaceSettings.CastPersonalities == null) {
+        return relevantPersonalities;
+      }
+
+      string searchText = BuildCastPersonalitySearchText(providerRequest);
+      foreach (AiCastPersonality personality in providerRequest.WorkspaceSettings.CastPersonalities) {
+        if (!IsUsablePersonality(personality)) continue;
+        if (PersonalityMatchesText(personality, searchText)) {
+          relevantPersonalities.Add(personality);
+        }
+      }
+
+      if (relevantPersonalities.Count > 0) return relevantPersonalities;
+
+      foreach (AiCastPersonality personality in providerRequest.WorkspaceSettings.CastPersonalities) {
+        if (!IsUsablePersonality(personality)) continue;
+        if (!string.IsNullOrEmpty(personality.DefaultKey)) {
+          relevantPersonalities.Add(personality);
+        }
+      }
+
+      return relevantPersonalities;
+    }
+
+    private string BuildCastPersonalitySearchText(AiDraftProviderRequest providerRequest) {
+      if (providerRequest == null || providerRequest.Request == null) return "";
+
+      StringBuilder sb = new StringBuilder();
+      sb.AppendLine(providerRequest.Request.Brief ?? "");
+      sb.AppendLine(providerRequest.Request.ConversationJson ?? "");
+      sb.AppendLine(providerRequest.Request.SelectedNodeJson ?? "");
+      return sb.ToString();
+    }
+
+    private bool IsUsablePersonality(AiCastPersonality personality) {
+      return personality != null && personality.Enabled != false && !string.IsNullOrWhiteSpace(personality.Rules);
+    }
+
+    private bool PersonalityMatchesText(AiCastPersonality personality, string searchText) {
+      if (string.IsNullOrEmpty(searchText)) return false;
+
+      if (ContainsToken(searchText, personality.Label)) return true;
+      if (ContainsToken(searchText, personality.DefaultKey)) return true;
+
+      if (personality.CastIds != null) {
+        foreach (string castId in personality.CastIds) {
+          if (ContainsToken(searchText, castId)) return true;
+          if (!string.IsNullOrEmpty(castId) && castId.StartsWith("castDef_", StringComparison.OrdinalIgnoreCase)) {
+            if (ContainsToken(searchText, castId.Substring("castDef_".Length))) return true;
+          }
+        }
+      }
+
+      if (personality.SpeakerIds != null) {
+        foreach (string speakerId in personality.SpeakerIds) {
+          if (ContainsToken(searchText, speakerId)) return true;
+        }
+      }
+
+      return false;
+    }
+
+    private bool ContainsToken(string searchText, string token) {
+      if (string.IsNullOrWhiteSpace(token)) return false;
+      return searchText.IndexOf(token.Trim(), StringComparison.OrdinalIgnoreCase) >= 0;
+    }
+
+    private string FormatIdList(List<string> ids) {
+      if (ids == null || ids.Count == 0) return "(none)";
+
+      List<string> normalisedIds = new List<string>();
+      foreach (string id in ids) {
+        AddUnique(normalisedIds, id);
+      }
+
+      return normalisedIds.Count == 0 ? "(none)" : string.Join(", ", normalisedIds.ToArray());
+    }
+
+    private void AddUnique(List<string> values, string value) {
+      if (string.IsNullOrWhiteSpace(value)) return;
+
+      string trimmedValue = value.Trim();
+      foreach (string existingValue in values) {
+        if (string.Equals(existingValue, trimmedValue, StringComparison.OrdinalIgnoreCase)) return;
+      }
+
+      values.Add(trimmedValue);
     }
 
     private string CreateRunDirectory() {

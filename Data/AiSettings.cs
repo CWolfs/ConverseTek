@@ -30,14 +30,26 @@ namespace ConverseTek.Data {
     public List<string> ContextPaths { get; set; }
     public string HouseStyleNotes { get; set; }
     public string DefaultCampaignBrief { get; set; }
+    public List<AiCastPersonality> CastPersonalities { get; set; }
 
     public static AiWorkspaceSettings CreateDefault(string workingDirectory) {
       return new AiWorkspaceSettings {
         WorkingDirectory = workingDirectory,
         ContextPaths = new List<string>(),
         HouseStyleNotes = "",
-        DefaultCampaignBrief = ""
+        DefaultCampaignBrief = "",
+        CastPersonalities = null
       };
     }
+  }
+
+  public class AiCastPersonality {
+    public string Id { get; set; }
+    public string Label { get; set; }
+    public List<string> CastIds { get; set; }
+    public List<string> SpeakerIds { get; set; }
+    public string Rules { get; set; }
+    public bool? Enabled { get; set; }
+    public string DefaultKey { get; set; }
   }
 }

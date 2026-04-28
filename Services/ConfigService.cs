@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Chromely.Core.Infrastructure;
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace ConverseTek.Services {
   using ConverseTek.Data;
@@ -18,6 +19,7 @@ namespace ConverseTek.Services {
     private static string QUICKLINKS_PATH = $"{CONFIG_PATH}/quicklinks.json";
     private static string COLOURS_PATH = $"{CONFIG_PATH}/colours.json";
     private static string AI_PATH = $"{CONFIG_PATH}/ai.json";
+    private static string AI_PERSONALITIES_PATH = $"{CONFIG_PATH}/ai-personalities.json";
 
     public static ConfigService getInstance() {
       if (instance == null) instance = new ConfigService();
@@ -164,6 +166,28 @@ namespace ConverseTek.Services {
       return SaveAiSettings(settings);
     }
 
+    public List<AiCastPersonality> GetAiCastPersonalityDefaults() {
+      try {
+        if (!File.Exists(AI_PERSONALITIES_PATH)) return new List<AiCastPersonality>();
+
+        JObject config = JObject.Parse(File.ReadAllText(AI_PERSONALITIES_PATH));
+        JToken personalitiesToken = config["castPersonalities"] ?? config["CastPersonalities"];
+        if (personalitiesToken == null) return new List<AiCastPersonality>();
+
+        List<AiCastPersonality> personalities = JsonConvert.DeserializeObject<List<AiCastPersonality>>(personalitiesToken.ToString());
+        if (personalities == null) return new List<AiCastPersonality>();
+
+        for (int i = 0; i < personalities.Count; i++) {
+          personalities[i] = NormaliseAiCastPersonality(personalities[i]);
+        }
+
+        return personalities;
+      } catch (Exception error) {
+        Log.Error(error.ToString());
+        return new List<AiCastPersonality>();
+      }
+    }
+
     private AiSettings NormaliseAiSettings(AiSettings settings) {
       if (settings == null) settings = AiSettings.CreateDefault();
       if (settings.Enabled == null) settings.Enabled = true;
@@ -174,6 +198,11 @@ namespace ConverseTek.Services {
       if (settings.TimeoutSeconds <= 0) settings.TimeoutSeconds = 300;
       if (settings.ModelCatalogs == null) settings.ModelCatalogs = new Dictionary<string, AiModelCatalogResult>();
       if (settings.Workspaces == null) settings.Workspaces = new Dictionary<string, AiWorkspaceSettings>();
+      foreach (string key in new List<string>(settings.Workspaces.Keys)) {
+        AiWorkspaceSettings workspaceSettings = settings.Workspaces[key];
+        string fallbackWorkingDirectory = workspaceSettings == null ? "" : workspaceSettings.WorkingDirectory;
+        settings.Workspaces[key] = NormaliseAiWorkspaceSettings(workspaceSettings, fallbackWorkingDirectory);
+      }
       return settings;
     }
 
@@ -183,7 +212,23 @@ namespace ConverseTek.Services {
       if (workspaceSettings.ContextPaths == null) workspaceSettings.ContextPaths = new List<string>();
       if (workspaceSettings.HouseStyleNotes == null) workspaceSettings.HouseStyleNotes = "";
       if (workspaceSettings.DefaultCampaignBrief == null) workspaceSettings.DefaultCampaignBrief = "";
+      if (workspaceSettings.CastPersonalities == null) workspaceSettings.CastPersonalities = GetAiCastPersonalityDefaults();
+      for (int i = 0; i < workspaceSettings.CastPersonalities.Count; i++) {
+        workspaceSettings.CastPersonalities[i] = NormaliseAiCastPersonality(workspaceSettings.CastPersonalities[i]);
+      }
       return workspaceSettings;
+    }
+
+    private AiCastPersonality NormaliseAiCastPersonality(AiCastPersonality personality) {
+      if (personality == null) personality = new AiCastPersonality();
+      if (string.IsNullOrEmpty(personality.Id)) personality.Id = Guid.NewGuid().ToString("N");
+      if (personality.Label == null) personality.Label = "";
+      if (personality.CastIds == null) personality.CastIds = new List<string>();
+      if (personality.SpeakerIds == null) personality.SpeakerIds = new List<string>();
+      if (personality.Rules == null) personality.Rules = "";
+      if (personality.Enabled == null) personality.Enabled = true;
+      if (personality.DefaultKey == null) personality.DefaultKey = "";
+      return personality;
     }
 
     private string NormaliseWorkspaceKey(string workingDirectory) {

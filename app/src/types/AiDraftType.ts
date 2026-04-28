@@ -9,6 +9,17 @@ export type AiWorkspaceSettingsType = {
   contextPaths: string[];
   houseStyleNotes: string;
   defaultCampaignBrief: string;
+  castPersonalities: AiCastPersonalityType[];
+};
+
+export type AiCastPersonalityType = {
+  id: string;
+  label: string;
+  castIds: string[];
+  speakerIds: string[];
+  rules: string;
+  enabled: boolean;
+  defaultKey: string;
 };
 
 export type AiSettingsType = {
@@ -20,6 +31,7 @@ export type AiSettingsType = {
   timeoutSeconds: number;
   modelCatalogs: Record<string, AiModelCatalogResultType>;
   workspaces: Record<string, AiWorkspaceSettingsType>;
+  defaultCastPersonalities: AiCastPersonalityType[];
 };
 
 export type AiDraftModeType = 'fullConversation' | 'nodeSuggestion' | 'branchExpansion';

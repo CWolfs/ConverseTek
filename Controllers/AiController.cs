@@ -30,7 +30,7 @@ namespace ConverseTek.Controllers {
       AiSettings settings = configService.GetAiSettings();
 
       ChromelyResponse response = new ChromelyResponse();
-      response.Data = JsonConvert.SerializeObject(settings);
+      response.Data = SerializeAiSettingsResponse(configService, settings);
       return response;
     }
 
@@ -43,7 +43,7 @@ namespace ConverseTek.Controllers {
         AiSettings settings = JsonConvert.DeserializeObject<AiSettings>(data["settings"].ToString());
         settings = configService.SaveAiSettings(settings);
         ChromelyResponse settingsResponse = new ChromelyResponse();
-        settingsResponse.Data = JsonConvert.SerializeObject(settings);
+        settingsResponse.Data = SerializeAiSettingsResponse(configService, settings);
         return settingsResponse;
       }
 
@@ -51,13 +51,19 @@ namespace ConverseTek.Controllers {
         AiWorkspaceSettings workspaceSettings = JsonConvert.DeserializeObject<AiWorkspaceSettings>(data["workspaceSettings"].ToString());
         AiSettings settings = configService.SaveAiWorkspaceSettings(workspaceSettings);
         ChromelyResponse workspaceResponse = new ChromelyResponse();
-        workspaceResponse.Data = JsonConvert.SerializeObject(settings);
+        workspaceResponse.Data = SerializeAiSettingsResponse(configService, settings);
         return workspaceResponse;
       }
 
       ChromelyResponse response = new ChromelyResponse();
-      response.Data = JsonConvert.SerializeObject(configService.GetAiSettings());
+      response.Data = SerializeAiSettingsResponse(configService, configService.GetAiSettings());
       return response;
+    }
+
+    private string SerializeAiSettingsResponse(ConfigService configService, AiSettings settings) {
+      JObject response = JObject.FromObject(settings);
+      response["DefaultCastPersonalities"] = JArray.FromObject(configService.GetAiCastPersonalityDefaults());
+      return response.ToString(Formatting.None);
     }
 
     private ChromelyResponse GetModels(ChromelyRequest request) {

@@ -1,6 +1,7 @@
 import { runInAction } from 'mobx';
 
 import {
+  AiCastPersonalityType,
   AiDraftArtifactResultType,
   AiDraftRequestType,
   AiDraftRunResultType,
@@ -63,6 +64,17 @@ type AiWorkspaceSettingsResponseType = {
   ContextPaths?: string[];
   HouseStyleNotes?: string;
   DefaultCampaignBrief?: string;
+  CastPersonalities?: AiCastPersonalityResponseType[];
+};
+
+type AiCastPersonalityResponseType = {
+  Id?: string;
+  Label?: string;
+  CastIds?: string[];
+  SpeakerIds?: string[];
+  Rules?: string;
+  Enabled?: boolean | null;
+  DefaultKey?: string;
 };
 
 type AiSettingsResponseType = {
@@ -74,6 +86,7 @@ type AiSettingsResponseType = {
   TimeoutSeconds?: number;
   ModelCatalogs?: Record<string, AiModelCatalogResponseType>;
   Workspaces?: Record<string, AiWorkspaceSettingsResponseType>;
+  DefaultCastPersonalities?: AiCastPersonalityResponseType[];
 };
 
 type AiDraftRunResponseType = {
@@ -290,12 +303,25 @@ function normaliseAiModelCatalog(source: AiModelCatalogResponseType): AiModelCat
   };
 }
 
+function normaliseAiCastPersonality(source: AiCastPersonalityResponseType): AiCastPersonalityType {
+  return {
+    id: source.Id ?? '',
+    label: source.Label ?? '',
+    castIds: source.CastIds ?? [],
+    speakerIds: source.SpeakerIds ?? [],
+    rules: source.Rules ?? '',
+    enabled: source.Enabled ?? true,
+    defaultKey: source.DefaultKey ?? '',
+  };
+}
+
 function normaliseAiWorkspaceSettings(source: AiWorkspaceSettingsResponseType): AiWorkspaceSettingsType {
   return {
     workingDirectory: source.WorkingDirectory ?? '',
     contextPaths: source.ContextPaths ?? [],
     houseStyleNotes: source.HouseStyleNotes ?? '',
     defaultCampaignBrief: source.DefaultCampaignBrief ?? '',
+    castPersonalities: (source.CastPersonalities ?? []).map(normaliseAiCastPersonality),
   };
 }
 
@@ -322,6 +348,7 @@ function normaliseAiSettings(source: AiSettingsResponseType): AiSettingsType {
     timeoutSeconds: source.TimeoutSeconds ?? 300,
     modelCatalogs,
     workspaces,
+    defaultCastPersonalities: (source.DefaultCastPersonalities ?? []).map(normaliseAiCastPersonality),
   };
 
   console.log(`${AI_DEBUG_PREFIX} normaliseAiSettings`, {

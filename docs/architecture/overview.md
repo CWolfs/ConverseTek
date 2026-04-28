@@ -62,7 +62,7 @@ Chromely is lightweight and lets the backend stay in C# / .NET so it can reuse B
 | Backend source | `Controllers/`, `Services/`, `Handlers/`, `Data/`, `Json/`, `Program.cs` | Auto-discovered by Chromely's `ScanAssemblies()` |
 | Definition packs | `defs/operations/`, `defs/presets/`, `defs/tags/` | JSON, drives dynamic UI (see `domain-model.md`) |
 | Game DLLs | `libs/` | `ShadowrunDTO.dll`, `ShadowrunSerializer.dll` (gitignored) |
-| User config | `config/quicklinks.json`, `config/colours.json`, `config/ai.json` | Created on first run where needed |
+| User config | `config/quicklinks.json`, `config/colours.json`, `config/ai.json`, `config/ai-personalities.json` | Created or copied where needed |
 | Logs | `logs/conversetek-*.log` | Interface and Chromely core logs |
 | Build tasks | `.vscode/tasks.json` | `Build All`, `UI Build`, `UI Install`, `Fast Run`, `Release` |
 
