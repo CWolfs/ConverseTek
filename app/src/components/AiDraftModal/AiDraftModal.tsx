@@ -861,7 +861,10 @@ function DraftPreview({
     () => (mode === 'fullConversation' ? null : buildPreviewConversationAssetFromDraft(draft, mode, workingDirectory, selectedNode)),
     [draft, mode, workingDirectory, selectedNode],
   );
-  const suggestedText = useMemo(() => getSuggestedNodeText(draft, selectedNode), [draft, selectedNode]);
+  const suggestedText = useMemo(
+    () => (mode === 'fullConversation' ? '' : getSuggestedNodeText(draft, selectedNode)),
+    [draft, mode, selectedNode],
+  );
 
   return (
     <div className="ai-draft-preview">
@@ -885,14 +888,14 @@ function DraftPreview({
         </div>
       )}
 
-      {previewConversationAsset ? (
+      {previewConversationAsset != null ? (
         <AiDraftConversationTreePreview conversationAsset={previewConversationAsset} />
-      ) : (
+      ) : mode !== 'fullConversation' ? (
         <div className="ai-draft-preview__suggestion">
           <h4>Suggested text</h4>
           <p>{suggestedText}</p>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

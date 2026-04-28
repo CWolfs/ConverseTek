@@ -114,6 +114,72 @@ describe('AI draft utilities', () => {
     expect(conversationAsset.conversation.nodes[0].actions?.ops?.[0].functionName).toBe('SetFlag');
   });
 
+  it('converts repeated full-draft targets into auxiliary links after the first structural parent', async () => {
+    const { buildConversationAssetFromDraft } = await import('utils/ai-draft-utils');
+    const draft = makeDraft({
+      nodes: [
+        {
+          ...makeDraft().nodes[0],
+          choices: [
+            {
+              text: 'Ask for the practical version.',
+              targetKey: 'followup',
+              endsConversation: false,
+              auxiliaryLink: false,
+              conditions: [],
+              actions: [],
+            },
+            {
+              text: 'Ask for the cautious version.',
+              targetKey: 'followup',
+              endsConversation: false,
+              auxiliaryLink: false,
+              conditions: [],
+              actions: [],
+            },
+          ],
+        },
+        makeDraft().nodes[1],
+      ],
+    });
+
+    const conversationAsset = buildConversationAssetFromDraft(draft, 'K:/Mods/DeadClaim/conversations');
+    const [firstBranch, secondBranch] = conversationAsset.conversation.nodes[0].branches;
+
+    expect(firstBranch.nextNodeIndex).toBe(1);
+    expect(firstBranch.auxiliaryLink).toBe(false);
+    expect(secondBranch.nextNodeIndex).toBe(1);
+    expect(secondBranch.auxiliaryLink).toBe(true);
+  });
+
+  it('converts backwards full-draft targets into auxiliary links to avoid rendering duplicate branches', async () => {
+    const { buildConversationAssetFromDraft } = await import('utils/ai-draft-utils');
+    const draft = makeDraft({
+      nodes: [
+        makeDraft().nodes[0],
+        {
+          ...makeDraft().nodes[1],
+          choices: [
+            {
+              text: 'Loop back to the opening concern.',
+              targetKey: 'intro',
+              endsConversation: false,
+              auxiliaryLink: false,
+              conditions: [],
+              actions: [],
+            },
+          ],
+        },
+      ],
+    });
+
+    const conversationAsset = buildConversationAssetFromDraft(draft, 'K:/Mods/DeadClaim/conversations');
+    const loopBranch = conversationAsset.conversation.nodes[1].branches[0];
+
+    expect(loopBranch.nextNodeIndex).toBe(0);
+    expect(loopBranch.auxiliaryLink).toBe(true);
+  });
+
   it('builds a branch expansion patch without mutating the selected element node', async () => {
     const { buildBranchExpansionPatch } = await import('utils/ai-draft-utils');
     const root = {

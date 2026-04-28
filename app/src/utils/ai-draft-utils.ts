@@ -28,6 +28,11 @@ const knownCastIds = new Set([
   'HOLOGRAM',
 ]);
 
+type DraftBuildContext = {
+  indexByKey: Map<string, number>;
+  structuralParentByIndex: Map<number, string>;
+};
+
 export function parseAiDraft(draftJson: string): AiConversationDraftType {
   return JSON.parse(draftJson) as AiConversationDraftType;
 }
@@ -184,10 +189,11 @@ export function buildConversationAssetFromDraft(draft: AiConversationDraftType, 
   conversationAsset.filename = `${toFileStem(draft.title)}.${conversationAsset.conversation.idRef.id}.convo`;
   conversationAsset.filepath = `${workingDirectory}/${conversationAsset.filename}.bytes`;
 
-  const nodes = buildPromptNodes(draft);
-  const indexByKey = buildDraftIndexByKey(draft);
+  const context = createDraftBuildContext(draft);
+  const nodes = buildPromptNodeShells(draft);
   conversationAsset.conversation.nodes = nodes;
-  conversationAsset.conversation.roots = draft.roots.map((root) => buildElementNode(root, 'root', '0', nodes, indexByKey));
+  conversationAsset.conversation.roots = draft.roots.map((root) => buildElementNode(root, 'root', '0', nodes, context));
+  populatePromptNodeBranches(draft, nodes, context);
 
   return conversationAsset;
 }
@@ -206,7 +212,8 @@ export function buildPreviewConversationAssetFromDraft(
   conversationAsset.filename = `${toFileStem(draft.title)}.${conversationAsset.conversation.idRef.id}.convo`;
   conversationAsset.filepath = `${workingDirectory}/${conversationAsset.filename}.bytes`;
 
-  const nodes = buildPromptNodes(draft);
+  const context = createDraftBuildContext(draft);
+  const nodes = buildPromptNodeShells(draft);
   const previewRoot = createRootNode();
   previewRoot.parentId = '0';
   previewRoot.responseText = getBranchPreviewRootText(activeNode);
@@ -218,6 +225,10 @@ export function buildPreviewConversationAssetFromDraft(
   }
 
   conversationAsset.conversation.roots = [previewRoot];
+  if (nodes[0]) {
+    context.structuralParentByIndex.set(nodes[0].index, getId(previewRoot));
+  }
+  populatePromptNodeBranches(draft, nodes, context);
   conversationAsset.conversation.nodes = nodes;
 
   return conversationAsset;
@@ -228,7 +239,8 @@ export function buildBranchExpansionPatch(draft: AiConversationDraftType, active
     throw Error('The selected root or response already points to a prompt node. Clear it before accepting a branch expansion.');
   }
 
-  const nodes = buildPromptNodes(draft);
+  const context = createDraftBuildContext(draft);
+  const nodes = buildPromptNodeShells(draft);
   if (nodes.length === 0) {
     throw Error('The draft has no prompt nodes to attach.');
   }
@@ -237,6 +249,8 @@ export function buildBranchExpansionPatch(draft: AiConversationDraftType, active
   parentElementNode.nextNodeIndex = nodes[0].index;
   parentElementNode.auxiliaryLink = false;
   nodes[0].parentId = getId(parentElementNode);
+  context.structuralParentByIndex.set(nodes[0].index, getId(parentElementNode));
+  populatePromptNodeBranches(draft, nodes, context);
 
   return {
     parentElementNode,
@@ -252,9 +266,14 @@ export function getSuggestedNodeText(draft: AiConversationDraftType, activeNode:
   return draft.roots[0]?.text || draft.nodes[0]?.choices[0]?.text || '';
 }
 
-function buildPromptNodes(draft: AiConversationDraftType): PromptNodeType[] {
-  const indexByKey = buildDraftIndexByKey(draft);
+function createDraftBuildContext(draft: AiConversationDraftType): DraftBuildContext {
+  return {
+    indexByKey: buildDraftIndexByKey(draft),
+    structuralParentByIndex: new Map<number, string>(),
+  };
+}
 
+function buildPromptNodeShells(draft: AiConversationDraftType): PromptNodeType[] {
   return draft.nodes.map((draftNode, index) => {
     const node = createPromptNode(index);
     node.text = draftNode.text;
@@ -275,8 +294,13 @@ function buildPromptNodes(draft: AiConversationDraftType): PromptNodeType[] {
       node.speakerOverrideId = '';
     }
 
-    node.branches = draftNode.choices.map((choice) => buildElementNode(choice, 'response', getId(node), draft.nodes, indexByKey));
     return node;
+  });
+}
+
+function populatePromptNodeBranches(draft: AiConversationDraftType, nodes: PromptNodeType[], context: DraftBuildContext): void {
+  draft.nodes.forEach((draftNode, index) => {
+    nodes[index].branches = draftNode.choices.map((choice) => buildElementNode(choice, 'response', getId(nodes[index]), nodes, context));
   });
 }
 
@@ -290,32 +314,41 @@ function buildElementNode(
   choice: AiDraftChoiceType,
   type: 'root' | 'response',
   parentId: string,
-  nodes: PromptNodeType[] | AiConversationDraftType['nodes'],
-  indexByKey?: Map<string, number>,
+  nodes: PromptNodeType[],
+  context: DraftBuildContext,
 ): ElementNodeType {
   const elementNode = type === 'root' ? createRootNode() : createResponseNode();
-  const targetIndex = choice.endsConversation ? -1 : resolveTargetIndex(choice.targetKey, nodes, indexByKey);
+  const targetIndex = choice.endsConversation ? -1 : resolveTargetIndex(choice.targetKey, nodes, context.indexByKey);
+  const hasStructuralParent = targetIndex !== -1 && context.structuralParentByIndex.has(targetIndex);
+  const useAuxiliaryLink = targetIndex !== -1 && (choice.auxiliaryLink || hasStructuralParent);
 
   elementNode.type = type;
   elementNode.parentId = parentId;
   elementNode.responseText = choice.text;
   elementNode.nextNodeIndex = targetIndex;
-  elementNode.auxiliaryLink = choice.auxiliaryLink;
+  elementNode.auxiliaryLink = useAuxiliaryLink;
   elementNode.conditions = buildOperationsContainer(choice.conditions);
   elementNode.actions = buildOperationsContainer(choice.actions);
+
+  if (targetIndex !== -1 && !useAuxiliaryLink) {
+    context.structuralParentByIndex.set(targetIndex, getId(elementNode));
+    const targetNode = nodes.find((node) => node.index === targetIndex);
+    if (targetNode) targetNode.parentId = getId(elementNode);
+  }
 
   return elementNode;
 }
 
 function resolveTargetIndex(
   targetKey: string,
-  nodes: PromptNodeType[] | AiConversationDraftType['nodes'],
-  indexByKey?: Map<string, number>,
+  nodes: PromptNodeType[],
+  indexByKey: Map<string, number>,
 ): number {
   if (!targetKey) return -1;
-  if (indexByKey) return indexByKey.get(targetKey) ?? -1;
+  const indexByDraftKey = indexByKey.get(targetKey);
+  if (indexByDraftKey !== undefined) return indexByDraftKey;
 
-  const targetNode = (nodes as PromptNodeType[]).find((node) => getId(node) === targetKey || node.comment === targetKey);
+  const targetNode = nodes.find((node) => getId(node) === targetKey || node.comment === targetKey);
   return targetNode?.index ?? -1;
 }
 
