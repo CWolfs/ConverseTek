@@ -1,0 +1,10 @@
+{
+  "enabled": true,
+  "selectedProvider": "codex",
+  "codexCommand": "codex",
+  "codexModel": "",
+  "codexProfile": "",
+  "timeoutSeconds": 300,
+  "modelCatalogs": {},
+  "workspaces": {}
+}

@@ -86,14 +86,22 @@ namespace ConverseTek.Services {
       return directories;
     }
 
-    public List<FsFile> GetFiles(string path) {
+    public List<FsFile> GetFiles(string path, List<string> fileExtensions = null) {
       List<FsFile> files = new List<FsFile>();
 
       // Guard: No files at root
       if (path == "{drives}") return files;
 
       try {
-        string[] filePaths = Directory.GetFiles(path, "*.json");
+        List<string> searchExtensions = fileExtensions == null || fileExtensions.Count == 0 ? new List<string> { ".json" } : fileExtensions;
+        List<string> filePaths = new List<string>();
+
+        foreach (string extension in searchExtensions) {
+          string normalisedExtension = extension.StartsWith(".") ? extension : "." + extension;
+          filePaths.AddRange(Directory.GetFiles(path, "*" + normalisedExtension));
+        }
+
+        filePaths.Sort(StringComparer.OrdinalIgnoreCase);
         foreach (string filePath in filePaths) {
           FileInfo fileInfo = new FileInfo(filePath);
           FsFile file = new FsFile();

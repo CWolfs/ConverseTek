@@ -43,8 +43,8 @@ function makePromptNode(index: number, branches: ElementNodeType[] = []): Prompt
 
 function buildFakes(promptNode: PromptNodeType, inboundLinks: ElementNodeType[]) {
   const nodeStore = {
-    getNode: vi.fn((_id: string) => promptNode),
-    getInboundLinksToPromptNodeIndex: vi.fn((_i: number) => inboundLinks),
+    getNode: vi.fn(() => promptNode),
+    getInboundLinksToPromptNodeIndex: vi.fn(() => inboundLinks),
     deleteNodeCascadeById: vi.fn(),
     deleteLink: vi.fn(),
   };
@@ -65,19 +65,24 @@ describe('CT-128: delete flow opens the confirmation modal', () => {
     });
 
     expect(modalStore.setModelContent).toHaveBeenCalledTimes(1);
-    const [componentArg, modalProps, globalModalId] = modalStore.setModelContent.mock.calls[0];
+    const firstModalCall = modalStore.setModelContent.mock.calls[0] as unknown as [
+      unknown,
+      { body: string | string[]; buttons: { onPositive: () => void } },
+      string,
+    ];
+    const [componentArg, modalProps, globalModalId] = firstModalCall;
 
     expect(componentArg).toBe('ModalConfirmationStub');
     expect(globalModalId).toBe('global1');
 
-    const body = (modalProps as { body: string | string[] }).body;
+    const { body } = modalProps;
     expect(Array.isArray(body)).toBe(true);
     const joined = (body as string[]).join(' ');
     expect(joined).toMatch(/1 response node links to this prompt node/i);
     expect(joined).toMatch(/End of Dialogue/);
 
     // Confirming the modal must still trigger the cascade delete.
-    const buttons = (modalProps as { buttons: { onPositive: () => void } }).buttons;
+    const { buttons } = modalProps;
     buttons.onPositive();
     expect(nodeStore.deleteNodeCascadeById).toHaveBeenCalledWith('prompt-5-id');
     expect(nodeStore.deleteLink).not.toHaveBeenCalled();

@@ -1,0 +1,117 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ConverseTek AI Conversation Draft",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "mode", "title", "summary", "cast", "roots", "nodes", "warnings"],
+  "properties": {
+    "version": { "type": "integer" },
+    "mode": {
+      "type": "string",
+      "enum": ["fullConversation", "nodeSuggestion", "branchExpansion"]
+    },
+    "title": { "type": "string" },
+    "summary": { "type": "string" },
+    "cast": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label", "role"],
+        "properties": {
+          "id": { "type": "string" },
+          "label": { "type": "string" },
+          "role": { "type": "string" }
+        }
+      }
+    },
+    "roots": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/choice" }
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["key", "comment", "speaker", "text", "choices", "actions"],
+        "properties": {
+          "key": { "type": "string" },
+          "comment": { "type": "string" },
+          "speaker": { "$ref": "#/definitions/speaker" },
+          "text": { "type": "string" },
+          "choices": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/choice" }
+          },
+          "actions": {
+            "type": "array",
+            "items": { "$ref": "#/definitions/operationIntent" }
+          }
+        }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "definitions": {
+    "speaker": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["castId", "speakerId", "none"]
+        },
+        "id": { "type": "string" }
+      }
+    },
+    "choice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text", "comment", "targetKey", "endsConversation", "auxiliaryLink", "conditions", "actions"],
+      "properties": {
+        "text": { "type": "string" },
+        "comment": { "type": "string" },
+        "targetKey": { "type": "string" },
+        "endsConversation": { "type": "boolean" },
+        "auxiliaryLink": { "type": "boolean" },
+        "conditions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/operationIntent" }
+        },
+        "actions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/operationIntent" }
+        }
+      }
+    },
+    "operationIntent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["functionName", "args", "note"],
+      "properties": {
+        "functionName": { "type": "string" },
+        "args": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type", "value"],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["string", "int", "float", "bool"]
+              },
+              "value": { "type": ["string", "number", "boolean", "null"] }
+            }
+          }
+        },
+        "note": { "type": "string" }
+      }
+    }
+  }
+}

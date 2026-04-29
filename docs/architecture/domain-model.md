@@ -138,6 +138,21 @@ Scope-specific tag lists. Example (`commander.json`): `{ "scope": "commander", "
 - `Controllers/DefinitionController.cs` serves it on `GET /definitions`.
 - `app/src/services/api.ts:getDefinitions()` calls it, runs `lowercasePropertyNames` (PascalCase → camelCase), and stores the result in `defStore` via `setDefinitions`.
 
+## AI conversation drafts
+
+AI drafts are an intermediate authoring format, not a BattleTech runtime format. They are shaped by `app/src/types/AiDraftType.ts` and the provider schema in `config/ai-draft-output.schema.json`.
+
+Important fields:
+- `mode` -> `fullConversation`, `nodeSuggestion`, or `branchExpansion`.
+- `roots[]` -> initial player choices for full drafts. The first root of a full conversation is intentionally blank and points at the opening prompt node.
+- `nodes[]` -> prompt nodes with stable draft `key` values plus readable `comment` authoring notes. For prompt-node text suggestions, `nodes[0].text` carries the replacement text.
+- `choices[]` -> player responses that point to a target draft key or deliberately end the conversation. Their `comment` fields describe the branch purpose or condition context.
+- For root/response text suggestions, `roots[0].text` carries the replacement text and is not treated as a graph edge.
+- `actions[]` / `conditions[]` -> operation intents using existing definition `key` names and typed argument values.
+- Prompt nodes without `sourceInSceneRef` or `speakerOverrideId` inherit the current SimGame conversation speaker at runtime. ConverseTek labels these as `Inherits`; BattleTech does not provide a distinct narration speaker for SimGame conversation nodes.
+
+Draft keys are temporary. ConverseTek generates real BattleTech ids and prompt indexes during acceptance. This keeps AI output advisory and prevents preview rendering from mutating the active observable conversation graph.
+
 ## Other notable types (frontend)
 
 | Type | File | Purpose |

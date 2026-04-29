@@ -10,6 +10,8 @@
     "build": "npm run verify && cross-env NODE_ENV=development CT_ENV=development webpack",
     "prod": "cross-env NODE_ENV=production CT_ENV=production webpack",
     "verify": "npm run ts-check",
+    "lint": "eslint src --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint src --ext .ts,.tsx,.js,.jsx --fix",
     "test": "vitest run",
     "test:watch": "vitest",
     "ts-watch": "tsc --watch",

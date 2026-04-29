@@ -62,7 +62,7 @@ Chromely is lightweight and lets the backend stay in C# / .NET so it can reuse B
 | Backend source | `Controllers/`, `Services/`, `Handlers/`, `Data/`, `Json/`, `Program.cs` | Auto-discovered by Chromely's `ScanAssemblies()` |
 | Definition packs | `defs/operations/`, `defs/presets/`, `defs/tags/` | JSON, drives dynamic UI (see `domain-model.md`) |
 | Game DLLs | `libs/` | `ShadowrunDTO.dll`, `ShadowrunSerializer.dll` (gitignored) |
-| User config | `config/quicklinks.json`, `config/colours.json` | Created on first run |
+| User config | `config/quicklinks.json`, `config/colours.json`, `config/ai.json`, `config/ai-personalities.json` | Created or copied where needed |
 | Logs | `logs/conversetek-*.log` | Interface and Chromely core logs |
 | Build tasks | `.vscode/tasks.json` | `Build All`, `UI Build`, `UI Install`, `Fast Run`, `Release` |
 
@@ -71,6 +71,7 @@ Chromely is lightweight and lets the backend stay in C# / .NET so it can reuse B
 - **Definition-driven UI.** Actions, conditions, presets, and tag scopes are defined as JSON under `defs/`. The backend loads them at startup and the frontend renders argument inputs dynamically from these definitions — no UI code change is needed to add a new action. See `domain-model.md`.
 - **Reuse of game assemblies.** Binary `.bytes` files are read/written through BattleTech's own protobuf types via `protobuf-net`, sidestepping a from-scratch reverse engineering effort.
 - **Tree-based dialogue editor.** Nodes are PromptNodes (NPC/game-spoken) with `branches[]` of ElementNodes (player responses). Loops are expressed as link nodes pointing back to existing nodes.
+- **Advisory AI drafting.** Codex CLI can draft whole conversations, node rewrites, or branch expansions through a generic provider layer. Drafts stay outside the MobX conversation graph until the user accepts them.
 
 ## Build & run, briefly
 

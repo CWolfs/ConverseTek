@@ -1,0 +1,70 @@
+.ai-context-path-picker {
+  display: flex;
+  flex-direction: column;
+  min-height: 360px;
+}
+
+.ai-context-path-picker__alert {
+  margin-bottom: 10px;
+}
+
+.ai-context-path-picker__path {
+  margin-bottom: 8px;
+  padding: 6px 8px;
+  background: #fafafa;
+  color: #262626;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.ai-context-path-picker__list {
+  min-height: 300px;
+  max-height: 52vh;
+  overflow: auto;
+}
+
+.ai-context-path-picker__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 260px;
+}
+
+.ai-context-path-picker__item {
+  cursor: pointer;
+  padding: 0;
+}
+
+.ai-context-path-picker__item-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 40px;
+  padding: 10px 8px;
+}
+
+.ai-context-path-picker__item:hover,
+.ai-context-path-picker__item:focus,
+.ai-context-path-picker__item--active {
+  background-color: #2ab0f77d;
+}
+
+.ai-context-path-picker__directory-icon,
+.ai-context-path-picker__file-icon {
+  flex: 0 0 auto;
+  margin-right: 10px;
+}
+
+.ai-context-path-picker__name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  line-height: 1.25;
+}
+
+.ai-context-path-picker__kind {
+  flex: 0 0 auto;
+  margin-left: 10px;
+  color: #595959;
+  font-size: 12px;
+}

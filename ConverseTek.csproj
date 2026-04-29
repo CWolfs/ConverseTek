@@ -65,10 +65,16 @@
   </ItemGroup>
 
   <Target Name="BuildServer" DependsOnTargets="Build">
+    <ItemGroup>
+      <ConfigFiles Include="$(ProjectDir)config\**\*.*" Exclude="$(ProjectDir)config\ai.json" />
+    </ItemGroup>
+
     <Exec Command="xcopy &quot;$(ProjectDir)dist&quot; &quot;$(TargetDir)dist&quot;   /i /s /r /y /c&#xD;&#xA;" />
     <Exec Command="xcopy &quot;$(ProjectDir)libs&quot; &quot;$(TargetDir)&quot;   /i /s /r /y /c&#xD;&#xA;" />
     <Exec Command="xcopy &quot;$(ProjectDir)defs&quot; &quot;$(TargetDir)defs&quot;   /i /s /r /y /c&#xD;&#xA;" />
-    <Exec Command="xcopy &quot;$(ProjectDir)config&quot; &quot;$(TargetDir)config&quot;   /i /s /r /y /c&#xD;&#xA;" />
+    <MakeDir Directories="$(TargetDir)config" />
+    <Copy SourceFiles="@(ConfigFiles)" DestinationFiles="@(ConfigFiles->'$(TargetDir)config\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="$(ProjectDir)config\ai.json" DestinationFiles="$(TargetDir)config\ai.json" Condition="!Exists('$(TargetDir)config\ai.json')" />
   </Target>
 
   <Target Name="BuildDebug" Condition=" '$(Configuration)' == 'Debug' ">

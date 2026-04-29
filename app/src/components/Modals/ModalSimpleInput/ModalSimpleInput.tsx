@@ -26,6 +26,8 @@ type Props = {
 };
 
 function renderTitleWithType(title: string, type: string) {
+  void type;
+
   return (
     <>
       {/* <Icon type="exclamation-circle" theme="twoTone" twoToneColor="orange" className="modal-confirmation__icon--warning" /> */}

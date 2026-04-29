@@ -8,7 +8,7 @@ Repo root contains the `.csproj`, `Program.cs`, and the source folders described
 
 - `Program.Main()` (lines ~59–136) bootstraps a Chromely CefSharp WinForms host (.NET 4.7.2, win10-x64).
 - **Start URL**: `local://dist/index.html` — serves the React bundle copied to `bin/x64/Debug/net472/dist/` (or release equivalent).
-- **Window**: 1480×900 default, responsive to screen size.
+- **Window**: 1720x1000 default, responsive to screen size.
 - **Logging**: `logs/conversetek-interface.log` and `logs/conversetek-core.log`.
 - **Scheme handlers**:
   - `UseDefaultResourceSchemeHandler("local", ...)` — serves bundle assets.
@@ -26,6 +26,8 @@ Repo root contains the `.csproj`, `Program.cs`, and the source folders described
 5. The matched controller method receives a `ChromelyRequest` (parameters + JSON post data) and returns a `ChromelyResponse` whose `Data` is JSON-serialised back to the JS callback.
 
 Only **GET** and **POST** verbs are exposed by the Chromely version in use — see [`notes.md`](./notes.md).
+
+Avoid registering GET and POST handlers on the exact same path. This Chromely version can collide or shadow routes by path even when the verb differs, which can leave the frontend promise waiting forever. Use unique route paths for paired read/write operations, for example `GET /ai/settings/current` and `POST /ai/settings`.
 
 ## Controllers — `Controllers/`
 
@@ -49,6 +51,14 @@ All controllers register routes in their constructors. Three controllers exist:
 - `GET  /colour-config` → reads `config/colours.json`.
 - `POST /working-directory` → sets `FileSystemService.WorkingDirectory`, the folder used for subsequent conversation loads.
 - `GET  /dependency-status` → checks for `ShadowrunDTO.dll` and `ShadowrunSerializer.dll` in `BaseDirectory`.
+
+### `AiController` (Route prefix: `ai`)
+- `GET  /ai/settings/current` -> returns AI provider and workspace settings from `config/ai.json`. This deliberately avoids sharing the same path as the save endpoint because Chromely can clash GET and POST routes on the same path.
+- `POST /ai/settings` -> saves either global settings or one workspace settings block keyed by conversation folder.
+- `POST /ai/models` -> polls the selected provider CLI for the current model catalogue. Codex uses `codex debug models`.
+- `POST /ai/draft` -> runs the selected provider and returns an advisory structured draft plus diagnostic file paths.
+- `POST /ai/draft-artifact` -> reads prompt/response diagnostics from `logs/ai-drafts` for review in the UI. It must remain restricted to that folder.
+- `POST /ai/validate-conversation` -> serialises and reloads a posted conversation asset to check it can round-trip as BattleTech protobuf data before a full AI draft is accepted.
 
 ## Services — `Services/`
 
@@ -74,6 +84,18 @@ All use a singleton `getInstance()` pattern.
 ### `ConfigService`
 - Reads/writes user prefs: `config/quicklinks.json`, `config/colours.json`.
 - Initialises the `config/` directory and placeholder JSON on first use.
+- Also owns `config/ai.json`. Workspace AI settings are stored inside this file by normalised conversation-folder key; do not create per-mod settings files under `conversations/`.
+- `config/ai.json` has a top-level `Enabled`/`enabled` flag. Missing values default to `true`; setting it to `false` hides AI UI entry points and blocks provider actions.
+- AI model catalogues are cached per provider in `config/ai.json`. Saving other AI settings preserves that cache.
+- Workspace AI settings also store editable cast personalities. Missing personality lists are seeded from `config/ai-personalities.json`; explicit empty lists are preserved so modders can remove them.
+
+### `AiProviderService`
+- Dispatches AI draft requests to the selected provider. The first provider is `codex`; other provider names are reserved for later CLI integrations.
+- Polls provider model catalogues for the settings UI. Normal requests use the saved provider cache when available; explicit refresh repolls the CLI. An empty model override means "provider default/latest".
+- Loads configured context files/folders as read-only prompt context, with extension and size limits.
+- Adds relevant workspace cast-personality rules to the provider prompt by matching the brief, active conversation, and selected node against configured cast ids, speaker ids, labels, and default keys.
+- The Codex provider writes diagnostics under `logs/ai-drafts/<timestamp>/`: request JSON, prompt, command, stdout, stderr, and the final `draft.json`.
+- Providers return suggestions only. They do not write conversation files or mutate active conversation state.
 
 ## Handlers — `Handlers/`
 

@@ -6,8 +6,6 @@ import forEachRight from 'lodash.foreachright';
 
 import { ElementNodeType, PromptNodeType, ConversationAssetType, IdRef } from 'types';
 
-import { dataStore } from '../stores';
-
 /* eslint-disable no-param-reassign, no-return-assign */
 export function generateId(): string {
   return `9c${md5(uuidv4()).slice(10)}`;
@@ -22,7 +20,7 @@ export function regenerateNodeIds(conversationAsset: ConversationAssetType): voi
 }
 
 export function regenerateConversationId(conversationAsset: ConversationAssetType): void {
-  dataStore.setConversationId(conversationAsset, generateId());
+  conversationAsset.conversation.idRef.id = generateId();
 }
 
 /*

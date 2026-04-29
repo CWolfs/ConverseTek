@@ -1,7 +1,6 @@
 type ResolveType<T> = (value: T | PromiseLike<T>) => void;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type RejectType = (reason?: any) => void;
+type RejectType = (reason?: unknown) => void;
 
 type Response = {
   ResponseText: string;
@@ -36,17 +35,15 @@ export function infoTemp() {
  * request - a Json object
  * response - callback response method
  */
-export function get<T>(url: string, parameters: object | null = null): Promise<any> {
+export function get<T = unknown>(url: string, parameters: object | null = null): Promise<T> {
   return new Promise<T>((resolve, reject) => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     boundControllerAsync.getJson(url, parameters, (response: Response) => promiseSupportedCallback<T>(response, resolve, reject));
   });
 }
 
-export function post<T>(url: string, parameters: object, postData?: object): Promise<any> {
+export function post<T = unknown>(url: string, parameters: object, postData?: object): Promise<T> {
   const postJsonData = JSON.stringify(postData);
   return new Promise<T>((resolve, reject) => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     boundControllerAsync.postJson(url, parameters, postJsonData, (response: Response) => promiseSupportedCallback<T>(response, resolve, reject));
   });
 }

@@ -236,6 +236,8 @@ class DefStore {
 
   getRawArgType(arg: OperationArgType): 'operation' | 'string' | 'float' | 'int' {
     const { intValue, boolValue, floatValue, stringValue, callValue, variableRefValue } = arg;
+    void boolValue;
+    void variableRefValue;
 
     // Use same logic BT uses
     if (callValue) return 'operation';
@@ -248,6 +250,8 @@ class DefStore {
     if (arg == null) return { type: null, value: null };
 
     const { intValue, boolValue, floatValue, stringValue, callValue, variableRefValue, type } = arg;
+    void boolValue;
+    void variableRefValue;
 
     if (type) {
       if (type === 'operation') return { type, value: callValue };
@@ -267,7 +271,7 @@ class DefStore {
       callValue: null,
       floatValue: type === 'float' && defaultValue != null ? Number(defaultValue) : 0,
       intValue: type === 'int' && defaultValue != null ? Number(defaultValue) : 0,
-      stringValue: type === 'string' && defaultValue != null ? defaultValue : '',
+      stringValue: type === 'string' && defaultValue != null ? String(defaultValue) : '',
       type,
       variableRefValue: null,
     };
@@ -405,7 +409,7 @@ class DefStore {
       arg.callValue = this.setOperation(opLogic, opLogic.functionName);
     } else if (types.includes('string')) {
       arg.type = 'string';
-      if (defaultValue != null) arg.stringValue = defaultValue;
+      if (defaultValue != null) arg.stringValue = String(defaultValue);
     } else if (types.includes('float')) {
       arg.type = 'float';
       if (defaultValue != null) arg.floatValue = Number(defaultValue);

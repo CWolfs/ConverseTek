@@ -69,6 +69,18 @@ In parallel, definitions are fetched once via `getDefinitions()` → `GET /defin
 4. **Frontend** — `lowercasePropertyNames(response, true)` (PascalCase → camelCase) → `defStore.setDefinitions(typed)`.
 5. **Consumption** — `EditableLogic` and `ViewableLogic` look up an operation by `functionName` via `defStore.getDefinition(...)` and render inputs from its `inputs[]` schema. No code change is needed to add a new action — drop a JSON file into `defs/operations/` and rebuild.
 
+## 8. Drafting with AI
+
+1. **UI** -> Header AI menu opens a full-conversation draft, or the dialogue tree context menu opens a node rewrite / branch expansion.
+2. **Settings** -> `AiDraftModal` loads `getAiSettings()` and edits global provider options plus workspace context paths, house style notes, campaign brief, and cast personalities. Built-in personality restore defaults come from `config/ai-personalities.json`.
+3. **Model polling** -> `getAiModels()` posts current provider settings to `POST /ai/models`. Backend returns the saved provider catalogue when present; otherwise Codex runs `codex debug models`. Refresh forces a new poll. A blank model selection means provider default/latest.
+4. **Request** -> `createAiDraft()` posts the brief, active conversation JSON, selected node JSON, definitions JSON, and working directory to `POST /ai/draft`.
+5. **Backend** -> `AiController` calls `AiProviderService`, which loads configured context files, selects relevant cast-personality rules, builds a provider prompt, and runs the selected CLI provider. Codex is the first provider.
+6. **Diagnostics** -> the provider writes prompt/request/stdout/stderr/command/output files under `logs/ai-drafts/<timestamp>/` and returns the structured draft JSON.
+7. **Preview** -> the frontend parses and validates the draft as `AiConversationDraftType`; warnings and errors are shown before acceptance.
+8. **Accept** -> full drafts are round-trip validated through `POST /ai/validate-conversation`, then turned into a fresh active conversation. Node rewrites replace selected text. Branch expansions apply a patch under the selected root/response.
+9. **Dirty state** -> acceptance marks the conversation dirty and triggers a tree rebuild. Rejection discards the draft without touching `unsavedActiveConversationAsset`.
+
 ## Summary diagram
 
 ```
@@ -80,4 +92,5 @@ Export single    | UI -> POST /conversations/export       -> Save (JSON)
 Export all       | UI -> POST /conversations/export-all   -> Loop Save (JSON)
 Import           | UI -> POST /conversations/import       -> Read JSON, Save (BINARY)
 Definitions      | once -> GET /definitions -> DefinitionService.Load -> defStore
+AI draft         | UI -> POST /ai/draft -> AiProviderService -> preview -> explicit accept
 ```
