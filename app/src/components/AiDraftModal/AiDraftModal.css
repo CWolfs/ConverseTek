@@ -91,6 +91,17 @@
   min-height: 32px;
 }
 
+.ai-draft-modal__quick-shots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.ai-draft-modal__quick-shots .ant-btn {
+  min-height: 28px;
+}
+
 .ai-draft-modal__alert {
   margin-bottom: 12px;
   white-space: pre-line;
@@ -383,9 +394,10 @@
 }
 
 .ai-draft-preview__summary p,
-.ai-draft-preview__suggestion p {
+.ai-draft-preview__text-card p {
   margin: 0;
   white-space: pre-wrap;
+  text-wrap: pretty;
 }
 
 .ai-draft-preview__cast {
@@ -398,14 +410,76 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 12px;
-  border: 1px solid #d9d9d9;
-  background: #fff;
+  padding: 12px 0 0;
 }
 
 .ai-draft-preview__suggestion h4 {
   margin: 0;
   color: #262626;
+}
+
+.ai-draft-preview__versions {
+  display: grid;
+  gap: 8px;
+}
+
+.ai-draft-preview__text-card {
+  display: block;
+  margin: 0;
+  padding: 11px 12px;
+  border-radius: 4px;
+  background: #fff;
+  color: #262626;
+  box-shadow: 0 0 0 1px rgba(31, 47, 67, 0.12), 0 2px 8px rgba(31, 47, 67, 0.08);
+}
+
+.ai-draft-preview__text-card--version {
+  cursor: pointer;
+  transition-property: background, box-shadow;
+  transition-duration: 140ms;
+  transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+.ai-draft-preview__text-card--version:hover,
+.ai-draft-preview__text-card--version:focus-within {
+  background: #f6f8fb;
+  box-shadow: 0 0 0 1px rgba(31, 95, 139, 0.3), 0 4px 12px rgba(31, 47, 67, 0.12);
+}
+
+.ai-draft-preview__text-card--selected {
+  background: #eef6fb;
+  box-shadow: 0 0 0 2px rgba(31, 95, 139, 0.34), 0 4px 12px rgba(31, 47, 67, 0.14);
+}
+
+.ai-draft-preview__text-card--empty {
+  background: #fafafa;
+}
+
+.ai-draft-preview__text-card--original {
+  position: relative;
+  padding-left: 16px;
+  background: linear-gradient(90deg, #f0f3f7 0, #fafafa 100%);
+  box-shadow: inset 4px 0 0 #7d8da1, 0 0 0 1px rgba(31, 47, 67, 0.16), 0 2px 8px rgba(31, 47, 67, 0.06);
+}
+
+.ai-draft-preview__text-card .ant-radio-wrapper {
+  display: flex;
+  align-items: center;
+  min-height: 24px;
+  margin-bottom: 6px;
+  margin-right: 0;
+  color: #262626;
+  font-weight: 600;
+}
+
+.ai-draft-preview__text-label {
+  display: block;
+  margin-bottom: 6px;
+  color: #595959;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 20px;
+  text-transform: uppercase;
 }
 
 .ai-draft-preview-tree {

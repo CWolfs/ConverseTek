@@ -2,7 +2,7 @@ import React, { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { toJS } from 'mobx';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react';
-import { Alert, Button, Checkbox, Col, Form, Icon, Input, message, Row, Select, Spin, Tabs, Tag, Tooltip } from 'antd';
+import { Alert, Button, Checkbox, Col, Form, Icon, Input, message, Radio, Row, Select, Spin, Tabs, Tag, Tooltip } from 'antd';
 import classnames from 'classnames';
 
 import { useStore } from 'hooks/useStore';
@@ -26,7 +26,8 @@ import { addNodes, getId, updatePromptNode, updateResponseNode, updateRootNode }
 import {
   buildAcceptedDraft,
   buildPreviewConversationAssetFromDraft,
-  getSuggestedNodeText,
+  getOriginalNodeText,
+  getSuggestedNodeTexts,
   parseAiDraft,
   validateAiDraft,
 } from 'utils/ai-draft-utils';
@@ -49,6 +50,21 @@ const { TextArea } = Input;
 const { Option } = Select;
 const { TabPane } = Tabs;
 const AI_DEBUG_PREFIX = '[ConverseTek AI Modal]';
+
+const quickShotPrompts = [
+  {
+    label: 'Give me alternate versions',
+    prompt: 'Give me alternate versions with clearly different flavours, not minor wording tweaks.',
+  },
+  {
+    label: 'Make it tighter',
+    prompt: 'Make the result shorter, punchier, and suitable for quick BattleTech dialogue bubbles.',
+  },
+  {
+    label: 'Push character voice',
+    prompt: "Lean harder into the selected speaker's voice while keeping the line natural and in British English.",
+  },
+];
 
 type Props = {
   globalModalId: string;
@@ -215,6 +231,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
   const [diagnosticsPath, setDiagnosticsPath] = useState('');
   const [draftRunResult, setDraftRunResult] = useState<AiDraftRunResultType | null>(null);
   const [activeTab, setActiveTab] = useState('draft');
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(0);
   const [personalitySearch, setPersonalitySearch] = useState('');
   const [selectedPersonalityId, setSelectedPersonalityId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -440,6 +457,13 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
     setSelectedPersonalityId(missingDefaults[0].id);
   };
 
+  const appendQuickShotPrompt = (prompt: string) => {
+    setBrief((previousBrief) => {
+      const trimmedBrief = previousBrief.trim();
+      return trimmedBrief ? `${trimmedBrief}\n\n${prompt}` : prompt;
+    });
+  };
+
   const addContextPath = (path: string) => {
     const existingPaths = workspaceSettings?.contextPaths || [];
     if (existingPaths.includes(path)) return;
@@ -553,6 +577,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
 
     setIsLoading(true);
     setDraft(null);
+    setSelectedSuggestionIndex(0);
     setDiagnosticsPath('');
     setDraftRunResult(null);
 
@@ -588,7 +613,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
     if (draft == null || workingDirectory == null) return;
 
     try {
-      const acceptedDraft = buildAcceptedDraft(draft, mode, workingDirectory, selectedNode);
+      const acceptedDraft = buildAcceptedDraft(draft, mode, workingDirectory, selectedNode, selectedSuggestionIndex);
 
       if (acceptedDraft.kind === 'fullConversation') {
         const roundTripResult = await validateConversationRoundTrip(acceptedDraft.conversationAsset);
@@ -712,6 +737,18 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                     rows={draft ? 4 : 7}
                     placeholder="Describe the scene, tone, required beats, choices, tags, and anything the AI must avoid."
                   />
+                  <div className="ai-draft-modal__quick-shots">
+                    {quickShotPrompts.map((quickShotPrompt) => (
+                      <Button
+                        key={quickShotPrompt.label}
+                        size="small"
+                        disabled={isLoading}
+                        onClick={() => appendQuickShotPrompt(quickShotPrompt.prompt)}
+                      >
+                        {quickShotPrompt.label}
+                      </Button>
+                    ))}
+                  </div>
                 </Form.Item>
               </Form>
             </Col>
@@ -798,7 +835,15 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
           )}
 
           {draft && (
-            <DraftPreview draft={draft} validation={validation} mode={mode} workingDirectory={workingDirectory || ''} selectedNode={selectedNode} />
+            <DraftPreview
+              draft={draft}
+              validation={validation}
+              mode={mode}
+              workingDirectory={workingDirectory || ''}
+              selectedNode={selectedNode}
+              selectedSuggestionIndex={selectedSuggestionIndex}
+              onSelectedSuggestionIndexChange={setSelectedSuggestionIndex}
+            />
           )}
         </TabPane>
 
@@ -1135,18 +1180,26 @@ function DraftPreview({
   mode,
   workingDirectory,
   selectedNode,
+  selectedSuggestionIndex,
+  onSelectedSuggestionIndexChange,
 }: {
   draft: AiConversationDraftType;
   validation: AiDraftValidationResultType;
   mode: AiDraftModeType;
   workingDirectory: string;
   selectedNode: PromptNodeType | ElementNodeType | null;
+  selectedSuggestionIndex: number;
+  onSelectedSuggestionIndexChange: (index: number) => void;
 }) {
   const previewConversationAsset = useMemo(
     () => (mode === 'fullConversation' ? null : buildPreviewConversationAssetFromDraft(draft, mode, workingDirectory, selectedNode)),
     [draft, mode, workingDirectory, selectedNode],
   );
-  const suggestedText = useMemo(() => (mode === 'fullConversation' ? '' : getSuggestedNodeText(draft, selectedNode)), [draft, mode, selectedNode]);
+  const originalText = useMemo(() => (mode === 'nodeSuggestion' ? getOriginalNodeText(selectedNode) : ''), [mode, selectedNode]);
+  const suggestedTexts = useMemo(
+    () => (mode === 'nodeSuggestion' ? getSuggestedNodeTexts(draft, selectedNode).slice(0, 3) : []),
+    [draft, mode, selectedNode],
+  );
 
   return (
     <div className="ai-draft-preview">
@@ -1170,13 +1223,40 @@ function DraftPreview({
         </div>
       )}
 
-      {previewConversationAsset != null ? (
-        <AiDraftConversationTreePreview conversationAsset={previewConversationAsset} />
-      ) : mode !== 'fullConversation' ? (
+      {mode === 'nodeSuggestion' ? (
         <div className="ai-draft-preview__suggestion">
-          <h4>Suggested text</h4>
-          <p>{suggestedText}</p>
+          <h4>Node text comparison</h4>
+          <div className="ai-draft-preview__text-card ai-draft-preview__text-card--original">
+            <span className="ai-draft-preview__text-label">Original</span>
+            <p>{originalText}</p>
+          </div>
+          {suggestedTexts.length > 0 ? (
+            <Radio.Group
+              className="ai-draft-preview__versions"
+              value={selectedSuggestionIndex}
+              onChange={(event) => onSelectedSuggestionIndexChange(Number(event.target.value))}
+            >
+              {suggestedTexts.map((suggestedText, index) => (
+                <label
+                  key={`${index}-${suggestedText}`}
+                  className={classnames('ai-draft-preview__text-card', 'ai-draft-preview__text-card--version', {
+                    'ai-draft-preview__text-card--selected': selectedSuggestionIndex === index,
+                  })}
+                >
+                  <Radio value={index}>Version {index + 1}</Radio>
+                  <p>{suggestedText}</p>
+                </label>
+              ))}
+            </Radio.Group>
+          ) : (
+            <div className="ai-draft-preview__text-card ai-draft-preview__text-card--empty">
+              <span className="ai-draft-preview__text-label">Versions</span>
+              <p>No suggested text returned.</p>
+            </div>
+          )}
         </div>
+      ) : previewConversationAsset != null ? (
+        <AiDraftConversationTreePreview conversationAsset={previewConversationAsset} />
       ) : null}
     </div>
   );

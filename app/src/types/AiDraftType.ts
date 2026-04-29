@@ -156,6 +156,7 @@ export type AiAcceptedDraftType =
   | {
       kind: 'nodeText';
       text: string;
+      versionIndex: number;
     }
   | {
       kind: 'branchExpansion';

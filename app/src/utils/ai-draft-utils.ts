@@ -71,7 +71,13 @@ export function validateAiDraft(
       errors.push('Node suggestion drafts need a selected node.');
     }
 
-    if (getSuggestedNodeText(draft, activeNode).trim() === '') {
+    const suggestedTexts = getSuggestedNodeTexts(draft, activeNode);
+
+    if (suggestedTexts[0]?.trim() !== '') {
+      if (suggestedTexts.length < 3) {
+        warnings.push(`Node suggestion draft returned ${suggestedTexts.length} version${suggestedTexts.length === 1 ? '' : 's'} instead of 3.`);
+      }
+    } else {
       errors.push('Node suggestion drafts need suggested text.');
     }
 
@@ -183,6 +189,7 @@ export function buildAcceptedDraft(
   mode: AiDraftModeType,
   workingDirectory: string,
   activeNode: PromptNodeType | ElementNodeType | null,
+  selectedSuggestionIndex = 0,
 ): AiAcceptedDraftType {
   if (mode === 'fullConversation') {
     return {
@@ -194,7 +201,8 @@ export function buildAcceptedDraft(
   if (mode === 'nodeSuggestion') {
     return {
       kind: 'nodeText',
-      text: getSuggestedNodeText(draft, activeNode),
+      text: getSuggestedNodeText(draft, activeNode, selectedSuggestionIndex),
+      versionIndex: selectedSuggestionIndex,
     };
   }
 
@@ -285,12 +293,31 @@ export function buildBranchExpansionPatch(draft: AiConversationDraftType, active
   };
 }
 
-export function getSuggestedNodeText(draft: AiConversationDraftType, activeNode: PromptNodeType | ElementNodeType | null): string {
+export function getSuggestedNodeText(
+  draft: AiConversationDraftType,
+  activeNode: PromptNodeType | ElementNodeType | null,
+  selectedSuggestionIndex = 0,
+): string {
+  return getSuggestedNodeTexts(draft, activeNode)[selectedSuggestionIndex] || '';
+}
+
+export function getSuggestedNodeTexts(draft: AiConversationDraftType, activeNode: PromptNodeType | ElementNodeType | null): string[] {
   if (activeNode?.type === 'node') {
-    return draft.nodes?.[0]?.text || '';
+    return (draft.nodes || []).map((node) => node.text || '').filter((text) => text.trim() !== '');
   }
 
-  return draft.roots?.[0]?.text || draft.nodes?.[0]?.choices?.[0]?.text || '';
+  const rootTexts = (draft.roots || []).map((root) => root.text || '').filter((text) => text.trim() !== '');
+  if (rootTexts.length > 0) return rootTexts;
+
+  return (draft.nodes || [])
+    .flatMap((node) => node.choices || [])
+    .map((choice) => choice.text || '')
+    .filter((text) => text.trim() !== '');
+}
+
+export function getOriginalNodeText(activeNode: PromptNodeType | ElementNodeType | null): string {
+  if (activeNode?.type === 'node') return activeNode.text || '';
+  return activeNode?.responseText || '';
 }
 
 function createDraftBuildContext(draft: AiConversationDraftType): DraftBuildContext {

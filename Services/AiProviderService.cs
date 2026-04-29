@@ -404,7 +404,7 @@ namespace ConverseTek.Services {
       sb.AppendLine("- Every root or choice must either set targetKey to an existing node key or set endsConversation to true.");
       sb.AppendLine("- For fullConversation, make the first root text an empty string and point it at the opening prompt node. Do not use Continue for that first root.");
       sb.AppendLine("- For every other root or choice, use explicit short choices such as Understood, Ask Yang, or End conversation.");
-      sb.AppendLine("- For nodeSuggestion, return a text rewrite only. If the selected node is a prompt node, put the rewrite in nodes[0].text. If the selected node is a root or response, put the rewrite in roots[0].text. Leave the unused array empty.");
+      sb.AppendLine("- For nodeSuggestion, return exactly three different rewrite versions only. If the selected node is a prompt node, put the three versions in nodes[0].text, nodes[1].text, and nodes[2].text. If the selected node is a root or response, put the three versions in roots[0].text, roots[1].text, and roots[2].text. Leave the unused array empty. Make version 1 a faithful polish, version 2 a sharper or more dramatic flavour, and version 3 a shorter or more restrained flavour.");
       sb.AppendLine("- Write comment fields as short authoring notes that explain the beat, branch purpose, or condition context. Do not use draft keys such as darius_check as comments.");
       sb.AppendLine("- For operation intents, only use operation names present in the supplied definitions JSON. If unsure, leave operations empty and describe the concern in warnings.");
       sb.AppendLine("- Use mode from the request exactly.");

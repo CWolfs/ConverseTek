@@ -5,7 +5,7 @@
       "label": "Darius Oliveira",
       "castIds": ["DariusDefault", "castDef_DariusDefault"],
       "speakerIds": ["598cd3f26230355c18000069"],
-      "rules": "Write Darius as the company's professional executive officer: cautious, practical, operations-focused, and usually the person weighing contracts, risk, money, and fallout. He can be dry under pressure, but he should not become flippant or reckless.",
+      "rules": "Role: Darius is the company's Executive Officer and the person most likely to reduce a crisis to contracts, risk, money, logistics, reputation, and fallout. Voice: professional, restrained, dry when stressed, and quietly protective of the company; he is pragmatic rather than cynical. Priorities: keep the outfit solvent, keep the Commander informed, check intelligence before acting, and make sure a dangerous job is at least survivable and worth the pay. Mannerisms and phrases: addresses the player as \"Commander\"; often frames points as brief risk assessments; uses measured phrases such as \"for what it's worth\", \"the bottom line\", \"our options\", and \"I don't like it, but\". Stress behaviour: gets more clipped, precise, and security-minded; warns about uncertified employers, ambushes, political traps, and the cost of being wrong. Avoid: do not make him reckless, goofy, sentimental in public, or eager for heroics without a practical reason.",
       "enabled": true,
       "defaultKey": "darius-oliveira"
     },
@@ -14,7 +14,7 @@
       "label": "Sumire Meyer",
       "castIds": ["SumireDefault", "castDef_SumireDefault"],
       "speakerIds": ["598cd3a06230355c18000067"],
-      "rules": "Write Sumire with blunt pilot pragmatism: informal, loyal, and direct about travel, debt, danger, and keeping the company alive. She should sound like someone who sees the map, the fuel bill, and the escape vector all at once.",
+      "rules": "Role: Sumire is the Leopard pilot, navigator, and the crew member who sees the route, fuel bill, landing zone, and escape vector at the same time. Voice: blunt, informal, loyal, impatient with fantasy, and more emotionally open than Darius; she can be funny, but usually because the situation is bad enough to need it. Priorities: get the crew paid, keep the ship moving, avoid needless exposure, and call out plans that smell like traps, ghost stories, or wishful thinking. Mannerisms and phrases: addresses the player as \"Commander\"; starts with plain spoken markers like \"Look\", \"Okay\", \"Roger that\", or \"I'm just saying\"; uses pilot language around approach vectors, burns, comms, fuel, jumps, and landing zones. Stress behaviour: gets sharper, swears lightly when danger or debt piles up, and focuses on extraction, comms, and whether the company can afford the risk. Avoid: do not make her mystical, reckless, flowery, or detached from the crew's survival.",
       "enabled": true,
       "defaultKey": "sumire-meyer"
     },
@@ -23,7 +23,7 @@
       "label": "Yang Virtanen",
       "castIds": ["YangDefault", "castDef_YangDefault"],
       "speakerIds": ["598cd3f36230355c1800006a"],
-      "rules": "Write Yang as a plain-spoken chief MechTech: practical, mechanically minded, good-humoured, and risk-aware. He often calls the Commander \"Boss\" and should ground tension in repairs, machines, logistics, and what might break next.",
+      "rules": "Role: Yang is the Chief MechTech: the practical engineer responsible for keeping battered BattleMechs, the Mech Bay, and the crew's hardware alive. Voice: warm, plain spoken, mechanically minded, good humoured, and risk-aware; he talks like someone who has fixed worse with fewer parts. Priorities: salvage, repair time, replacement parts, structural damage, MechWarrior safety, and the ugly difference between what is possible and what is sensible. Mannerisms and phrases: often calls the Commander \"Boss\"; uses workshop idioms, gallows humour, and tactile machine language; phrases like \"good news and bad news\", \"she'll hold\", \"that's gonna cost us\", and \"I can make it work\" fit him when earned. Stress behaviour: jokes less, becomes more direct, and names what will break next if the plan goes wrong. Avoid: do not make him a technobabble scientist, a clown, or careless with lives; his humour should come from experience, not stupidity.",
       "enabled": true,
       "defaultKey": "yang-virtanen"
     },
@@ -32,7 +32,7 @@
       "label": "Farah Murad",
       "castIds": ["FarahDefault", "castDef_FarahDefault"],
       "speakerIds": ["59b98a97623035ac140056c6"],
-      "rules": "Write Farah as a brilliant engineer who is excitable, precise, and sometimes apologetic when her enthusiasm or flippancy gets ahead of the situation. She should notice ship systems, technical constraints, and the wonder or danger of old technology.",
+      "rules": "Role: Dr. Farah Murad is a brilliant ship engineer and systems specialist, especially around the Argo, LosTech, derelicts, and ancient machinery. Voice: excitable, precise, curious, fast-moving, and occasionally apologetic when enthusiasm or nerves outrun the moment; she can be flippant, then immediately self-correct. Priorities: understand the machine, keep the ship alive, respect technical limits, and push for discoveries that matter ethically as well as scientifically. Mannerisms and phrases: introduces qualifications with \"technically\", \"in theory\", \"I mean\", \"so, uh\", or \"sorry\"; calls people by title when formal, such as \"Commander\", \"Mr. Virtanen\", or \"Lord Madeira\"; uses detailed system language around power, sensors, interfaces, drives, locks, and failsafes. Stress behaviour: over-explains, narrows onto the technical problem, and may sound breathless or guilty if people are in danger. Avoid: do not make her cold, smug, or random; her wonder should sit beside competence and moral concern.",
       "enabled": true,
       "defaultKey": "farah-murad"
     },
@@ -41,7 +41,7 @@
       "label": "Kamea Arano",
       "castIds": ["KameaDefault", "castDef_KameaDefault"],
       "speakerIds": ["59baac916230356416000354"],
-      "rules": "Write Kamea with regal sincerity and the weight of duty. She should sound composed, principled, and Restoration-focused, with personal warmth when speaking to trusted allies and gravity when discussing the Directorate or her people.",
+      "rules": "Role: Kamea Arano is the High Lady of the Aurigan Restoration, carrying personal grief, public duty, and the political burden of reclaiming the Reach. Voice: composed, regal, sincere, and principled; she is warm with trusted allies but formal when speaking as a ruler. Priorities: protect her people, restore lawful government, prove she is not her uncle, and balance mercy with the hard necessities of war. Mannerisms and phrases: addresses the player as \"Commander\" or by name when intimate; speaks of \"my people\", \"the Reach\", \"the Restoration\", \"the Directorate\", and \"our duty\"; uses clear declarative vows when resolved. Stress behaviour: becomes solemn, direct, and morally explicit; she frames action through legitimacy, sacrifice, and responsibility rather than revenge. Avoid: do not make her naive, melodramatic, bloodthirsty, or casually royal; her authority should feel earned and burdened.",
       "enabled": true,
       "defaultKey": "kamea-arano"
     },
@@ -50,7 +50,7 @@
       "label": "Alexander Madeira",
       "castIds": ["MadeiraDefault", "castDef_MadeiraDefault"],
       "speakerIds": ["59b97f45623035ac140054ca"],
-      "rules": "Write Alexander Madeira as formal, strategic, and security-minded. He should be diplomatic and careful with information, often framing decisions in terms of legitimacy, logistics, intelligence, and the Restoration's long-term position.",
+      "rules": "Role: Lord Alexander Madeira is Kamea's adviser, noble strategist, and security-minded political operator for the Restoration. Voice: formal, diplomatic, careful with information, and quietly intense; he is courteous even when warning people that the situation is dangerous. Priorities: protect Lady Arano, preserve the Restoration's legitimacy, manage intelligence, logistics, alliances, and the long-term political position. Mannerisms and phrases: addresses Kamea as \"Lady Arano\" or \"my lady\" and the player as \"Commander\"; favours phrases such as \"with respect\", \"our intelligence suggests\", \"we must consider\", and \"the political cost\"; speaks in structured assessments rather than outbursts. Stress behaviour: becomes more exact, guarded, and security-focused, especially around leaks, assassins, supply lines, and diplomatic consequences. Avoid: do not make him pompous, cowardly, sarcastic, or emotionally careless; his restraint should read as loyalty and discipline.",
       "enabled": true,
       "defaultKey": "alexander-madeira"
     }

@@ -1,46 +1,28 @@
-import { RefObject, useEffect, useState } from 'react';
+import { RefObject, useEffect } from 'react';
 
 export const useControlWheel = (targetRef: RefObject<HTMLElement>, onControlWheel: (increaseZoom: boolean) => void) => {
-  const [controlPressed, setControlPressed] = useState(false);
-  const [, setWheelEvent] = useState(false);
-
   useEffect(() => {
     if (!targetRef.current) return;
     const targetElement = targetRef.current;
 
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Control') {
-        setControlPressed(true);
-      }
-    };
-
-    const handleKeyUp = (event: KeyboardEvent) => {
-      if (event.key === 'Control') {
-        setControlPressed(false);
-      }
-    };
-
     const handleWheel = (event: WheelEvent) => {
       const { deltaY } = event;
 
-      if (controlPressed) {
-        const mouseWheelMovedAwayFromUser = deltaY < 0;
+      if (!event.ctrlKey || deltaY === 0) return;
 
-        setWheelEvent(true);
-        onControlWheel(mouseWheelMovedAwayFromUser);
-      } else {
-        setWheelEvent(false);
-      }
+      event.preventDefault();
+      event.stopPropagation();
+
+      const mouseWheelMovedAwayFromUser = deltaY < 0;
+
+      onControlWheel(mouseWheelMovedAwayFromUser);
     };
+    const wheelListenerOptions: AddEventListenerOptions = { capture: true, passive: false };
 
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-    targetElement.addEventListener('wheel', handleWheel);
+    targetElement.addEventListener('wheel', handleWheel, wheelListenerOptions);
 
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-      targetElement.removeEventListener('wheel', handleWheel);
+      targetElement.removeEventListener('wheel', handleWheel, wheelListenerOptions);
     };
-  }, [controlPressed, onControlWheel]);
+  }, [targetRef, onControlWheel]);
 };

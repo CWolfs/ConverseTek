@@ -266,12 +266,43 @@ describe('AI draft utilities', () => {
   });
 
   it('uses node text for prompt suggestions and response text for element suggestions', async () => {
-    const { getSuggestedNodeText } = await import('utils/ai-draft-utils');
+    const { getSuggestedNodeText, getSuggestedNodeTexts } = await import('utils/ai-draft-utils');
     const draft = makeDraft({ mode: 'nodeSuggestion' });
     const prompt = { type: 'node' } as PromptNodeType;
     const response = { type: 'response' } as ElementNodeType;
 
     expect(getSuggestedNodeText(draft, prompt)).toBe(draft.nodes[0].text);
     expect(getSuggestedNodeText(draft, response)).toBe(draft.roots[0].text);
+    expect(getSuggestedNodeTexts(draft, prompt)).toEqual(draft.nodes.map((node) => node.text));
+  });
+
+  it('accepts the selected node suggestion version', async () => {
+    const { buildAcceptedDraft } = await import('utils/ai-draft-utils');
+    const draft = makeDraft({
+      mode: 'nodeSuggestion',
+      nodes: [
+        { ...makeDraft().nodes[0], text: 'Version one.' },
+        { ...makeDraft().nodes[0], text: 'Version two.' },
+        { ...makeDraft().nodes[0], text: 'Version three.' },
+      ],
+      roots: [],
+    });
+
+    const acceptedDraft = buildAcceptedDraft(draft, 'nodeSuggestion', 'K:/Mods/DeadClaim/conversations', { type: 'node' } as PromptNodeType, 1);
+
+    expect(acceptedDraft).toEqual({
+      kind: 'nodeText',
+      text: 'Version two.',
+      versionIndex: 1,
+    });
+  });
+
+  it('reports when a node suggestion returns fewer than three versions', async () => {
+    const { validateAiDraft } = await import('utils/ai-draft-utils');
+    const draft = makeDraft({ mode: 'nodeSuggestion' });
+
+    const result = validateAiDraft(draft, operations, 'nodeSuggestion', { type: 'node' } as PromptNodeType);
+
+    expect(result.warnings).toContain('Node suggestion draft returned 2 versions instead of 3.');
   });
 });
