@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { Icon } from 'antd';
+import { Icon, Tooltip } from 'antd';
 import defer from 'lodash.defer';
 import tinycolor from 'tinycolor2';
 
@@ -12,6 +12,9 @@ import type { PromptNodeType, ElementNodeType, ColourConfigType } from 'types';
 
 import { isDescendant } from 'utils/tree-data-utils';
 import { detectType } from 'utils/node-utils';
+import { getId } from 'utils/conversation-utils';
+import { formatSpeakerIdLabel, type SpeakerProjection } from 'utils/speaker-projection-utils';
+import type { CameraProjection } from 'utils/camera-projection-utils';
 
 import { DataStore } from 'stores/dataStore/data-store';
 
@@ -70,6 +73,8 @@ export type ConverseTekNodeRendererProps = {
   parentNode: RSTNode | null;
   rowDirection: string;
   zoomLevel: number;
+  speakerProjectionByNodeId?: Map<string, SpeakerProjection>;
+  cameraProjectionByNodeId?: Map<string, CameraProjection>;
 };
 
 function hasActionsAndConditions(node: PromptNodeType | ElementNodeType | null): { hasActions: boolean; hasConditions: boolean } {
@@ -117,8 +122,14 @@ function getTruncatedLinkText(nodeStore: ConversationTreeNodeStore, linkIndex: n
   return text.length < maxLength ? text : `${text.substring(0, maxLength)}...`;
 }
 
-function getPromptSpeakerBadge(node: PromptNodeType | ElementNodeType | null): { label: string; title: string } | null {
+function getPromptSpeakerBadge(
+  node: PromptNodeType | ElementNodeType | null,
+  speakerProjectionByNodeId?: Map<string, SpeakerProjection>,
+): SpeakerProjection | null {
   if (node == null || node.type !== 'node') return null;
+
+  const projectedSpeaker = speakerProjectionByNodeId?.get(getId(node));
+  if (projectedSpeaker) return projectedSpeaker;
 
   const castId = node.sourceInSceneRef?.id || '';
   const speakerId = node.speakerOverrideId || '';
@@ -129,12 +140,14 @@ function getPromptSpeakerBadge(node: PromptNodeType | ElementNodeType | null): {
     return {
       label: 'Inherits',
       title: 'No node speaker; BattleTech reuses the current conversation speaker',
+      variant: 'default',
     };
   }
 
   return {
-    label: speaker.replace(/Default$/i, '') || speaker,
+    label: formatSpeakerIdLabel(speaker),
     title: `${speakerType || 'speaker'} ${speaker}`,
+    variant: 'default',
   };
 }
 
@@ -181,6 +194,8 @@ export const ConverseTekNodeRenderer = observer(
     parentNode = null, // Needed for dndManager
     rowDirection = 'ltr',
     zoomLevel,
+    speakerProjectionByNodeId,
+    cameraProjectionByNodeId,
     ...otherProps
   }: ConverseTekNodeRendererProps) => {
     const nodeRef = useRef<HTMLDivElement>(null);
@@ -360,7 +375,15 @@ export const ConverseTekNodeRenderer = observer(
           })
         : nodeTitle;
     const hasNodeTitle = typeof resolvedNodeTitle === 'string' && resolvedNodeTitle.length > 0;
-    const speakerBadge = getPromptSpeakerBadge(storedNode);
+    const speakerBadge = getPromptSpeakerBadge(storedNode, speakerProjectionByNodeId);
+    const speakerBadgeClasses = classnames('node-renderer__speaker-badge', {
+      'node-renderer__speaker-badge--multiple': speakerBadge?.variant === 'multiple',
+    });
+    const cameraBadge = storedNode?.type === 'node' ? cameraProjectionByNodeId?.get(getId(storedNode)) : null;
+    const cameraBadgeClasses = classnames('node-renderer__camera-badge', {
+      'node-renderer__camera-badge--multiple': cameraBadge?.variant === 'multiple',
+      'node-renderer__camera-badge--hard-lock': cameraBadge?.variant === 'hardLock',
+    });
 
     const rowContents = (
       <div
@@ -424,9 +447,18 @@ export const ConverseTekNodeRenderer = observer(
 
             <div className={labelClasses}>
               {speakerBadge && (
-                <span className="node-renderer__speaker-badge" title={speakerBadge.title}>
-                  {speakerBadge.label}
-                </span>
+                <Tooltip title={speakerBadge.title} mouseEnterDelay={0.35}>
+                  <span className={speakerBadgeClasses}>{speakerBadge.label}</span>
+                </Tooltip>
+              )}
+              {cameraBadge && (
+                <Tooltip title={cameraBadge.title} mouseEnterDelay={0.35}>
+                  <span className={cameraBadgeClasses}>
+                    {cameraBadge.variant === 'hardLock' && <Icon type="lock" />}
+                    <Icon type="video-camera" />
+                    <span className="node-renderer__camera-badge-label">{cameraBadge.label}</span>
+                  </span>
+                </Tooltip>
               )}
               <span className={titleClasses}>{resolvedNodeTitle}</span>
 
