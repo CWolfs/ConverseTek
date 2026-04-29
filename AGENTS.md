@@ -16,6 +16,10 @@ Read `docs/architecture/overview.md` before larger changes, then the specific ar
 
 Do not register GET and POST handlers on the exact same route path. This Chromely version can collide or shadow routes by path even when the HTTP verb differs, causing frontend GET promises to never resolve. Use distinct paths such as `GET /ai/settings/current` and `POST /ai/settings`.
 
+## Frontend CSS
+
+The embedded Chromely/CEF runtime may lag behind modern browser CSS support. Avoid relying on `gap` for flex layouts in app UI; use explicit margins or margin fallbacks for spacing between flex children, especially in modal controls, tag lists, toolbars, and wrapped button rows. CSS Grid `gap` is acceptable where already verified in the runtime.
+
 ## AI Drafting
 
 AI-assisted conversation drafting is advisory only. Drafts must stay outside `dataStore.unsavedActiveConversationAsset` until the user accepts them.

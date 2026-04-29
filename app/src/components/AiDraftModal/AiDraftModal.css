@@ -171,11 +171,19 @@
   margin-left: 10px;
 }
 
+.ai-draft-personalities {
+  padding-top: 16px;
+}
+
 .ai-draft-personalities__toolbar {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 8px;
-  margin-bottom: 10px;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.ai-draft-personalities__toolbar .ant-btn {
+  min-width: 80px;
 }
 
 .ai-draft-personalities__toolbar .ant-btn,
@@ -187,16 +195,15 @@
 .ai-draft-personalities__list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
   max-height: calc(100vh - 380px);
   min-height: 320px;
   overflow-y: auto;
-  padding: 2px;
+  padding: 2px 3px 2px 2px;
 }
 
 .ai-draft-personalities__empty,
 .ai-draft-personalities__editor-empty {
-  padding: 14px;
+  padding: 16px;
   background: #fafafa;
   color: #595959;
   box-shadow: inset 0 0 0 1px rgba(31, 47, 67, 0.1);
@@ -206,10 +213,9 @@
 .ai-draft-personalities__item {
   display: flex;
   flex-direction: column;
-  gap: 7px;
   width: 100%;
-  min-height: 72px;
-  padding: 10px;
+  min-height: 76px;
+  padding: 11px 12px;
   border: 0;
   border-radius: 4px;
   background: #fff;
@@ -220,6 +226,10 @@
   transition-property: background, box-shadow, opacity, transform;
   transition-duration: 140ms;
   transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+.ai-draft-personalities__item + .ai-draft-personalities__item {
+  margin-top: 8px;
 }
 
 .ai-draft-personalities__item:hover,
@@ -246,8 +256,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
   min-width: 0;
+  margin-bottom: 8px;
   font-weight: 600;
 }
 
@@ -261,22 +271,35 @@
 .ai-draft-personalities__item-ids {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  margin: -3px -5px -3px 0;
 }
 
 .ai-draft-personalities__item-ids .ant-tag,
 .ai-draft-personalities__item-header .ant-tag {
   max-width: 100%;
-  margin-right: 0;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.ai-draft-personalities__item-header .ant-tag {
+  flex: 0 0 auto;
+  margin-right: 0;
+  margin-left: 8px;
+}
+
+.ai-draft-personalities__item-ids .ant-tag {
+  margin: 3px 5px 3px 0;
 }
 
 .ai-draft-personalities__list-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
+  margin-top: 12px;
+}
+
+.ai-draft-personalities__list-actions .ant-btn {
+  margin-right: 10px;
+  margin-bottom: 8px;
 }
 
 .ai-draft-personalities__editor {
@@ -288,19 +311,57 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  min-height: 40px;
-  margin-bottom: 12px;
-  padding-bottom: 10px;
+  gap: 12px;
+  min-height: 42px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
   box-shadow: inset 0 -1px 0 rgba(31, 47, 67, 0.12);
 }
 
+.ai-draft-personalities__editor .ant-form-item {
+  margin-bottom: 18px;
+}
+
+.ai-draft-personalities__editor .ant-form-item:last-child {
+  margin-bottom: 0;
+}
+
+.ai-draft-personalities__editor .ant-form-item-label {
+  padding-bottom: 4px;
+}
+
 .ai-draft-personalities__editor .ant-select-selection--multiple {
-  min-height: 40px;
+  min-height: 34px;
+  padding-bottom: 2px;
+}
+
+.ai-draft-personalities__editor .ant-select-selection--multiple .ant-select-selection__rendered {
+  min-height: 30px;
+  margin-right: 6px;
+  margin-bottom: -2px;
+  margin-left: 6px;
+  line-height: 30px;
 }
 
 .ai-draft-personalities__editor .ant-select-selection__choice {
   max-width: 100%;
+}
+
+.ai-draft-personalities__editor .ant-select-selection--multiple .ant-select-selection__choice {
+  height: 24px;
+  margin-right: 5px;
+  margin-top: 4px;
+  line-height: 22px;
+}
+
+.ai-draft-personalities__editor .ant-select-selection--multiple .ant-select-search--inline {
+  height: 28px;
+  line-height: 28px;
+}
+
+.ai-draft-personalities__editor .ant-select-selection--multiple .ant-select-search__field {
+  height: 24px;
+  margin-top: 3px;
 }
 
 .ai-draft-preview {

@@ -1,5 +1,7 @@
 declare module 'react-sortable-tree';
 
+declare module '*.css';
+
 declare module '@ungap/structured-clone' {
   const structuredClone: <T>(input: T) => T;
   export = structuredClone;

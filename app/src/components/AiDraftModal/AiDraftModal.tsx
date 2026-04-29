@@ -989,7 +989,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
         </TabPane>
 
         <TabPane tab="Cast Personalities" key="cast-personalities">
-          <Row gutter={16}>
+          <Row gutter={24} className="ai-draft-personalities">
             <Col md={9}>
               <div className="ai-draft-personalities__toolbar">
                 <Input
