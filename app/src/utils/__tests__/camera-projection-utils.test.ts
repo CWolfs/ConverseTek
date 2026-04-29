@@ -73,6 +73,24 @@ describe('camera projection utilities', () => {
     });
   });
 
+  it('shows direct camera lock badges on response links with camera actions', () => {
+    const conversationAsset = createConversation('K:/Mods/Test/conversations');
+    const prompt = createPromptNode(0);
+    const response = makeBranch(-1);
+    response.actions = { ops: [makeStringAction('Set BattleTech Camera Lock', 'KAMEA')] };
+    prompt.branches = [response];
+
+    conversationAsset.conversation.nodes = [prompt];
+    conversationAsset.conversation.roots = [makeRoot(0)];
+
+    const projections = buildPromptCameraProjectionMap(conversationAsset);
+
+    expect(projections.get(getId(response))).toMatchObject({
+      label: 'Kamea',
+      variant: 'default',
+    });
+  });
+
   it('clears a vanilla camera lock when the target is not a BattleTech camera enum', () => {
     const conversationAsset = createConversation('K:/Mods/Test/conversations');
     const hologram = createPromptNode(0);

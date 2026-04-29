@@ -148,6 +148,10 @@ function applyActions(actions: { ops: OperationCallType[] | null } | null, camer
   return actions.ops.reduce((currentCamera, op) => applyOperation(op, currentCamera), camera);
 }
 
+function hasCameraAction(linkOrNode: ElementNodeType | PromptNodeType): boolean {
+  return !!linkOrNode.actions?.ops?.some((op) => op.functionName === cameraLockAction || op.functionName === cameraHardLockAction);
+}
+
 function getTargetNode(conversationAsset: ConversationAssetType, link: ElementNodeType): PromptNodeType | null {
   if (link.nextNodeIndex < 0) return null;
 
@@ -189,6 +193,7 @@ function buildProjectedProjection(cameraKeys: Set<string>): CameraProjection | n
 export function buildPromptCameraProjectionMap(conversationAsset: ConversationAssetType): Map<string, CameraProjection> {
   const { nodes, roots } = conversationAsset.conversation;
   const possibleCamerasByNodeId = new Map<string, Set<string>>();
+  const directCameraByElementId = new Map<string, CameraReference | null>();
   const visited = new Set<string>();
   const queue: { link: ElementNodeType; inheritedCamera: CameraReference | null }[] = roots.map((link) => ({
     link,
@@ -198,6 +203,8 @@ export function buildPromptCameraProjectionMap(conversationAsset: ConversationAs
   while (queue.length > 0) {
     const { link, inheritedCamera } = queue.shift() as { link: ElementNodeType; inheritedCamera: CameraReference | null };
     const cameraAfterLink = applyActions(link.actions, inheritedCamera);
+    if (hasCameraAction(link)) directCameraByElementId.set(getId(link), cameraAfterLink);
+
     const targetNode = getTargetNode(conversationAsset, link);
     if (targetNode == null) continue;
 
@@ -220,6 +227,11 @@ export function buildPromptCameraProjectionMap(conversationAsset: ConversationAs
   }
 
   const projections = new Map<string, CameraProjection>();
+  directCameraByElementId.forEach((camera, elementId) => {
+    const projection = buildProjectedProjection(new Set([getCameraKey(camera)]));
+    if (projection) projections.set(elementId, projection);
+  });
+
   nodes.forEach((node) => {
     const projection = buildProjectedProjection(possibleCamerasByNodeId.get(getId(node)) || new Set([noCameraKey]));
     if (projection) projections.set(getId(node), projection);

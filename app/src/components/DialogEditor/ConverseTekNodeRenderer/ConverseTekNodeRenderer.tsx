@@ -155,10 +155,17 @@ function getMoveHandleIcon(isRoot: boolean, isNode: boolean, isResponse: boolean
   const handleIconStyle = { color: 'white', fontSize: '20px' };
 
   if (isRoot) return <Icon type="ant-design" style={handleIconStyle} />;
-  if (isNode) return <Icon type="message" theme="filled" style={handleIconStyle} />;
-  if (isResponse) return <Icon className="node-renderer__response-handle-icon" type="wechat" style={handleIconStyle} />;
+  if (isNode || isResponse) return null;
 
   return null;
+}
+
+function getActionsTooltip(isRoot: boolean, isNode: boolean, isResponse: boolean): string {
+  if (isNode) return 'Prompt actions run when this node is entered, before its text is shown.';
+  if (isRoot) return 'Root actions run when this conversation entry link is resolved, before the target prompt is shown.';
+  if (isResponse) return 'Response actions run after this response is selected, before the target prompt is shown.';
+
+  return 'Actions are configured on this item.';
 }
 
 /* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
@@ -379,7 +386,7 @@ export const ConverseTekNodeRenderer = observer(
     const speakerBadgeClasses = classnames('node-renderer__speaker-badge', {
       'node-renderer__speaker-badge--multiple': speakerBadge?.variant === 'multiple',
     });
-    const cameraBadge = storedNode?.type === 'node' ? cameraProjectionByNodeId?.get(getId(storedNode)) : null;
+    const cameraBadge = storedNode ? cameraProjectionByNodeId?.get(getId(storedNode)) : null;
     const cameraBadgeClasses = classnames('node-renderer__camera-badge', {
       'node-renderer__camera-badge--multiple': cameraBadge?.variant === 'multiple',
       'node-renderer__camera-badge--hard-lock': cameraBadge?.variant === 'hardLock',
@@ -441,26 +448,32 @@ export const ConverseTekNodeRenderer = observer(
               {isBaseCore && <Icon type="profile" style={coreStyle} />}
               {isIsolatedCore && <Icon type="branches" style={coreStyle} />}
               {hasConditions && <Icon type="question-circle" theme="filled" style={logicStyle} />}
-              {hasActions && <Icon type="right-circle" theme="filled" style={actionsIconStyle} />}
+              {hasActions && (
+                <Tooltip title={getActionsTooltip(isRoot, isNode, isResponse)} mouseEnterDelay={0.35}>
+                  <Icon type="right-circle" theme="filled" style={actionsIconStyle} />
+                </Tooltip>
+              )}
               {!hasNodeTitle && <Icon type="enter" style={responseContinueStyle} />}
             </div>
 
             <div className={labelClasses}>
-              {speakerBadge && (
-                <Tooltip title={speakerBadge.title} mouseEnterDelay={0.35}>
-                  <span className={speakerBadgeClasses}>{speakerBadge.label}</span>
-                </Tooltip>
-              )}
-              {cameraBadge && (
-                <Tooltip title={cameraBadge.title} mouseEnterDelay={0.35}>
-                  <span className={cameraBadgeClasses}>
-                    {cameraBadge.variant !== 'multiple' && <Icon type="lock" />}
-                    <Icon type="video-camera" />
-                    <span className="node-renderer__camera-badge-label">{cameraBadge.label}</span>
-                  </span>
-                </Tooltip>
-              )}
-              <span className={titleClasses}>{resolvedNodeTitle}</span>
+              <span className="node-renderer__title-strip">
+                {speakerBadge && (
+                  <Tooltip title={speakerBadge.title} mouseEnterDelay={0.35}>
+                    <span className={speakerBadgeClasses}>{speakerBadge.label}</span>
+                  </Tooltip>
+                )}
+                {cameraBadge && (
+                  <Tooltip title={cameraBadge.title} mouseEnterDelay={0.35}>
+                    <span className={cameraBadgeClasses}>
+                      {cameraBadge.variant !== 'multiple' && <Icon type="lock" />}
+                      <Icon type="video-camera" />
+                      <span className="node-renderer__camera-badge-label">{cameraBadge.label}</span>
+                    </span>
+                  </Tooltip>
+                )}
+                <span className={titleClasses}>{resolvedNodeTitle}</span>
+              </span>
 
               {nodeSubtitle && (
                 <span className="rst__rowSubtitle">
