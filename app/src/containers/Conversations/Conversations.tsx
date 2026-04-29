@@ -21,8 +21,11 @@ const Conversations = () => {
   const { definitionCount } = defStore;
 
   useEffect(() => {
-    if (conversationAssets.size <= 0) void getConversations();
     if (definitionCount <= 0) void getDefinitions();
+  }, [definitionCount]);
+
+  useEffect(() => {
+    if (definitionCount > 0 && conversationAssets.size <= 0) void getConversations();
   }, [conversationAssets.size, definitionCount]);
 
   const mainView = activeConversationAsset ? <ConversationEditor conversationAsset={activeConversationAsset} /> : <SplashScreen />;

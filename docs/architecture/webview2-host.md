@@ -1,6 +1,6 @@
 # WebView2 Host
 
-ConverseTek is now hosted in a WinForms `WebView2` shell rather than the old Chromely/CefSharp shell.
+ConverseTek is hosted in a WinForms `WebView2` shell. The UI runs on Edge Chromium, while the backend remains a .NET Framework 4.7.2 desktop process so it can keep using the BattleTech/Shadowrun assemblies for binary conversation serialisation.
 
 ## Runtime Shape
 
@@ -11,6 +11,8 @@ ConverseTek is now hosted in a WinForms `WebView2` shell rather than the old Chr
   - `dist/` -> `https://conversetek.local/`
   - entry point -> `https://conversetek.local/index.html`
 - Backend logging goes through `Infrastructure/Log.cs`.
+- In debug/dev builds, backend logs are mirrored into the WebView2 DevTools console with a `[ConverseTek backend]` prefix.
+- WebView2 supplies modern Chromium CSS support in the production desktop app.
 
 ## Bridge Shape
 
@@ -59,7 +61,7 @@ Controllers expose `RegisterRoutes(AppRouteDispatcher dispatcher)` and receive a
 - `AppRequest`
 - `AppResponse`
 
-This keeps the backend route surface close to the previous desktop bridge while removing Chromely-specific controller inheritance and request types.
+This keeps the backend route surface explicit and keeps controller code free of host-specific request types.
 
 ## Frontend Development
 
@@ -79,5 +81,4 @@ When `CT: Fast Dev` starts Vite itself, it leaves that server running so later r
 ## Notes
 
 - PUT and DELETE style actions are still sent as POSTs with a `method` value in the payload because the frontend API layer already uses that convention.
-- The old `Handlers/` folder is excluded from compilation while the branch migrates away from the CEF-specific handlers.
 - The BattleTech/Shadowrun conversation DLLs are intentionally unchanged in this branch.

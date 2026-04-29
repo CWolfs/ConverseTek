@@ -125,18 +125,20 @@ function ConversationEditor({ conversationAsset }: Props) {
         <Row gutter={16}>
           <Col span={11}>
             <FormItem {...formItemLayout} label="Id">
-              <Input className="conversation-editor__id-input" value={conversationId} onChange={handleIdChange} />
-              <Popconfirm
-                title="Are you sure you want to regenerate the conversation id?"
-                placement="bottomRight"
-                onConfirm={onRegenerateConversationIdButtonClicked}
-                okText="Yes"
-                cancelText="No"
-              >
-                <Button className="conversation-editor__regenerate-ids-button button-secondary" size="small">
-                  <Icon type="retweet" />
-                </Button>
-              </Popconfirm>
+              <div className="conversation-editor__id-control">
+                <Input className="conversation-editor__id-input" value={conversationId} onChange={handleIdChange} />
+                <Popconfirm
+                  title="Are you sure you want to regenerate the conversation id?"
+                  placement="bottomRight"
+                  onConfirm={onRegenerateConversationIdButtonClicked}
+                  okText="Yes"
+                  cancelText="No"
+                >
+                  <Button className="conversation-editor__regenerate-conversation-id-button button-secondary" size="small">
+                    <Icon type="retweet" />
+                  </Button>
+                </Popconfirm>
+              </div>
             </FormItem>
           </Col>
           <Col span={12}>

@@ -3,6 +3,8 @@ import React, { MouseEvent, ElementType } from 'react';
 import { observable, action, makeObservable } from 'mobx';
 import { ButtonType } from 'antd/lib/button';
 
+import { getDevPreservedStore } from '../dev-preserved-store';
+
 export type OnOkType = ((event: MouseEvent<HTMLElement>, value?: string) => void) | null;
 export type OnCancelType = ((event: MouseEvent<HTMLElement>) => void) | null;
 
@@ -243,6 +245,6 @@ class ModalStore {
   };
 }
 
-export const modalStore = new ModalStore();
+export const modalStore = getDevPreservedStore('__conversetekModalStore', () => new ModalStore(), ModalStore.prototype);
 
 export { ModalStore };

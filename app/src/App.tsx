@@ -1,12 +1,11 @@
-import React, { createContext, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route, BrowserRouter as Router } from 'react-router-dom';
 import { Provider, observer } from 'mobx-react';
 
 import stores from './stores';
+import { storeContext } from './stores/store-context';
 import { DependencyStatusType } from 'types';
 import { getDependencyStatus, getColourConfig } from 'services/api';
-import { useStore } from 'hooks/useStore';
-import { ModalStore } from 'stores/modalStore/modal-store';
 import { ModalConfirmation } from 'components/Modals/ModalConfirmation';
 
 import { MainLayout } from './layouts/MainLayout';
@@ -14,10 +13,8 @@ import { MainLayout } from './layouts/MainLayout';
 import 'antd/dist/antd.css';
 import './css/styles.css';
 
-export const storeContext = createContext(stores);
-
 const App = () => {
-  const modalStore = useStore<ModalStore>('modal');
+  const { modalStore } = stores;
 
   useEffect(() => {
     void getDependencyStatus().then((dependencyStatus: DependencyStatusType): void => {
@@ -45,13 +42,15 @@ const App = () => {
   }, []);
 
   return (
-    <Provider {...stores}>
-      <Router>
-        <Routes>
-          <Route path="/*" element={<MainLayout />} />
-        </Routes>
-      </Router>
-    </Provider>
+    <storeContext.Provider value={stores}>
+      <Provider {...stores}>
+        <Router>
+          <Routes>
+            <Route path="/*" element={<MainLayout />} />
+          </Routes>
+        </Router>
+      </Provider>
+    </storeContext.Provider>
   );
 };
 

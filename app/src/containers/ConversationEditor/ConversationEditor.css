@@ -10,9 +10,20 @@
     display: inline-block;
   }
 
+  &__id-control {
+    display: flex;
+    align-items: center;
+    gap: $tinySpace;
+    width: 100%;
+  }
+
   &__id-input {
-    width: 86%;
-    margin-right: $tinySpace;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  &__regenerate-conversation-id-button {
+    flex: 0 0 auto;
   }
 
   &__toolbar {
@@ -39,7 +50,7 @@
     overflow: hidden;
     padding-top: 1px;
 
-    .ant-row {
+    > .ant-row {
       height: 100%;
     }
 
@@ -63,9 +74,12 @@
 
       .ant-tabs {
         color: white;
+        display: flex;
+        flex-direction: column;
         height: 100%;
 
         &-bar {
+          flex: 0 0 auto;
           margin: 0;
         }
       }
@@ -89,6 +103,14 @@
       }
 
       .ant-tabs-content {
+        background-color: $backgroundPrimary;
+        flex: 1 1 auto;
+        height: auto;
+        min-height: 0;
+      }
+
+      .ant-tabs-tabpane {
+        background-color: $backgroundPrimary;
         height: 100%;
       }
     }

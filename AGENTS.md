@@ -18,11 +18,11 @@ Frontend calls go through `app/src/services/rest.ts`, which sends typed bridge m
 
 ## Frontend CSS
 
-The desktop host uses WebView2/Edge Chromium. Modern CSS is available, but keep CEF-era margin fallbacks in older UI code until the relevant views have been smoke tested in the WebView2 runtime.
+The desktop host uses WebView2/Edge Chromium. Modern CSS is available in the app runtime, so prefer clear, current CSS such as flex/grid gaps, `min()`/`max()`/`clamp()`, logical properties, and modern selectors where they make the UI simpler.
 
 ## Frontend Workflow
 
-The frontend uses Vite. Use `CT: Fast Dev` for the normal hot reload workflow; it starts or reuses the Vite server, then starts the WebView2 desktop shell with `CT_WEB_URL=http://127.0.0.1:5173/` so the backend bridge remains available. Keep `CT: UI Build` for static builds into `dist/` and the debug output folder. Webpack remains available through `npm run webpack-build` only as a fallback while the migration settles.
+The frontend uses Vite. Use `CT: Fast Dev` for the normal hot reload workflow; it starts or reuses the Vite server, then starts the WebView2 desktop shell with `CT_WEB_URL=http://127.0.0.1:5173/` so the backend bridge remains available. Keep `CT: UI Build` for static builds into `dist/` and the debug output folder.
 
 ## AI Drafting
 

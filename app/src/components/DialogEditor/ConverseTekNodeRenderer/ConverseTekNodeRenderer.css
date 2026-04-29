@@ -68,10 +68,9 @@
     }
 
     &-handle {
-      background-image: resolve('node-icon.svg');
-      background-size: 45%;
-      background-repeat: no-repeat;
-      background-position: center;
+      align-items: center;
+      display: flex !important;
+      justify-content: center;
     }
   }
 
@@ -94,10 +93,13 @@
 
     &-handle {
       background-color: #ceae04 !important;
-      background-image: resolve('response-icon.svg');
-      background-size: 55%;
-      background-repeat: no-repeat;
-      background-position: center;
+      align-items: center;
+      display: flex !important;
+      justify-content: center;
+    }
+
+    &-handle-icon {
+      transform: scaleX(-1);
     }
   }
 

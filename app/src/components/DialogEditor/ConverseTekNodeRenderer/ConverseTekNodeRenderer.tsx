@@ -140,6 +140,16 @@ function getPromptSpeakerBadge(node: PromptNodeType | ElementNodeType | null): {
   };
 }
 
+function getMoveHandleIcon(isRoot: boolean, isNode: boolean, isResponse: boolean): JSX.Element | null {
+  const handleIconStyle = { color: 'white', fontSize: '20px' };
+
+  if (isRoot) return <Icon type="ant-design" style={handleIconStyle} />;
+  if (isNode) return <Icon type="message" theme="filled" style={handleIconStyle} />;
+  if (isResponse) return <Icon className="node-renderer__response-handle-icon" type="wechat" style={handleIconStyle} />;
+
+  return null;
+}
+
 /* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
 export const ConverseTekNodeRenderer = observer(
   ({
@@ -302,12 +312,9 @@ export const ConverseTekNodeRenderer = observer(
         );
       } else {
         // Show the handle used to initiate a drag-and-drop
-        handle = connectDragSource(
-          <div className={moveHandleClasses}>{isRoot && <Icon type="ant-design" style={{ color: 'white', fontSize: '20px' }} />}</div>,
-          {
-            dropEffect: 'copy',
-          },
-        );
+        handle = connectDragSource(<div className={moveHandleClasses}>{getMoveHandleIcon(isRoot, isNode, isResponse)}</div>, {
+          dropEffect: 'copy',
+        });
       }
     }
 

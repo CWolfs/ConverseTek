@@ -1,96 +1,102 @@
 # Frontend Architecture
 
-The frontend is a React + TypeScript SPA using MobX for state and Ant Design for UI primitives. It runs inside the Chromely Chromium shell and talks to the .NET backend via a JS bridge object (`boundControllerAsync`).
+The frontend is a React + TypeScript SPA using MobX for state and Ant Design for UI primitives. It runs inside the WebView2 / Edge Chromium desktop shell and talks to the .NET backend through `window.chrome.webview`.
 
-Source root: `app/src/`. Build with `npm run build` (or `start` for dev server) from `app/`.
+Source root: `app/src/`. Build with `npm run build` from `app/`, or use `CT: Fast Dev` for the normal hot reload workflow inside the desktop shell.
 
-## Directory layout (`app/src/`)
+## Directory Layout (`app/src/`)
 
 | Directory | Role |
 |---|---|
 | `assets/` | Static images |
-| `components/` | Presentational, reusable widgets (e.g. `EditableLogic`, `ViewableLogic`, `FileTree`, `DialogEditor`, `Modals`) |
-| `containers/` | Smart components that consume stores (`Header`, `Conversations`, `ConversationTree`, `ConversationEditor`, `ConversationActions`, `ConversationConditions`, `Footer`, `GlobalModal`, `SplashScreen`) |
-| `css/` | Global styles, colour tokens, ant overrides |
+| `components/` | Presentational, reusable widgets such as `EditableLogic`, `ViewableLogic`, `FileTree`, `DialogEditor`, and modals |
+| `containers/` | Smart components that consume stores (`Header`, `Conversations`, `ConversationTree`, `ConversationEditor`, `Footer`, `GlobalModal`, `SplashScreen`) |
+| `css/` | Global styles, colour tokens, Ant Design overrides |
 | `hooks/` | `useStore`, `useControlWheel`, `useWindowSize` |
 | `layouts/` | `MainLayout` |
-| `services/` | Backend bridge (`rest.ts`), high-level API (`api.ts`), and snake_case ↔ camelCase mappings (`mappings/`) |
+| `services/` | Backend bridge (`rest.ts`), high-level API (`api.ts`), and snake_case <-> camelCase mappings (`mappings/`) |
 | `stores/` | MobX singletons: `dataStore`, `nodeStore`, `modalStore`, `defStore`, `errorStore` |
 | `types/` | Domain TypeScript types |
-| `utils/` | Pure helpers for trees, nodes, conversations, numbers |
+| `utils/` | Pure helpers for trees, nodes, conversations, numbers, and draft conversion |
 
 ## Bootstrap
 
-1. `app/src/index.tsx` — mounts `<App />` to `#root`.
-2. `app/src/App.tsx` — instantiates the store map, wraps the tree in MobX `<Provider {...stores}>`, runs initial dependency / colour-config checks, exports as `observer(App)`.
-3. `app/src/stores/index.ts` — defines the singletons (`export const dataStore = new DataStore()` etc.).
-4. `app/src/hooks/useStore.ts` — typed accessor: `const data = useStore<DataStore>('data')`.
+1. `app/src/index.tsx` mounts `<App />` to `#root`.
+2. `app/src/App.tsx` instantiates the store map, wraps the tree in MobX `<Provider {...stores}>`, runs initial dependency / colour-config checks, and exports as `observer(App)`.
+3. `app/src/stores/index.ts` defines the singletons.
+4. `app/src/hooks/useStore.ts` provides the typed store accessor.
 
-## State management (MobX)
+## State Management
 
-Five stores, all singletons:
+Stores are MobX singletons. Containers consume stores by key with `useStore<T>('data')`, `useStore<T>('node')`, etc. Wrap any component that reads observables in `observer(...)` from `mobx-react`.
 
-| Store | File | Owns | Notable observables / actions |
-|---|---|---|---|
-| `DataStore` | `stores/dataStore/data-store.ts` | Working directory, all loaded conversations, the active + unsaved-active assets, dirty flag | `workingDirectory`, `conversationAssets` (Map), `activeConversationAsset`, `unsavedActiveConversationAsset`, `isConversationDirty`; `setConversations`, `setActiveConversation`, `createNewConversation`, Ctrl+S handler |
-| `NodeStore` | `stores/nodeStore/node-store.ts` | Currently selected tree node, expansion state, clipboard, tree rebuild signal | `activeNode`, `expandMap`, `clipboard`, `rebuild`; `setActiveNode`, `addPromptNode`, `addResponseNode`, `deleteNodeCascade`, `pasteAsLinkFromClipboard` |
-| `ModalStore` | `stores/modalStore/modal-store.tsx` | Global modal stack | `modals`, `options`; `setModelContent`, `closeModal`, `setOnOk`, `setOnCancel` |
-| `DefStore` | `stores/defStore/def-store.ts` | Loaded operation / preset / tag definitions | `operations`, `presets`, `tags`, `definitionCount`; `setDefinitions`, `getDefinition`, `setArgValue`, `setOperation` |
-| `ErrorStore` | `stores/errorStore/error-store.ts` | Auth / HTTP error map | `authErrors`; `setError`, `reset` |
+| Store | Owns |
+|---|---|
+| `DataStore` | Working directory, loaded conversations, active/unsaved assets, dirty state |
+| `NodeStore` | Selected tree node, expansion state, clipboard, tree rebuild signal |
+| `ModalStore` | Global modal stack |
+| `DefStore` | Operation, preset, and tag definitions |
+| `ErrorStore` | Auth / HTTP error map |
 
-Containers consume stores by key: `useStore<DataStore>('data')`, `useStore<NodeStore>('node')`, etc. Wrap any container or component that reads observables in `observer(...)` from `mobx-react`.
+## Major UI Surfaces
 
-## Major UI surfaces (containers)
+- `Header` - File menu, AI menu, top navigation.
+- `AiDraftModal` - Drafting, suggestion review, provider settings, and workspace cast-personality editing. Draft preview state stays local until accepted.
+- `Conversations` - Top-level layout; loads conversations + definitions on mount.
+- `ConversationTree` - Left sidebar list of conversations.
+- `ConversationEditor` - Main workspace; hosts conversation metadata, actions, conditions, and the dialogue tree.
+- `GlobalModal` - Renders modals from `modalStore`.
+- `Footer`, `SplashScreen` - Status bar and empty state.
 
-- `Header` — File menu (Open Folder, Save, Import/Export, Export All), AI menu, top nav. Reads `dataStore.workingDirectory`, `dataStore.activeConversationAsset`.
-- `AiDraftModal` — AI-assisted conversation drafting, suggestion review, provider settings, and workspace cast-personality editing. It stores draft preview state locally, validates it, and only applies changes when the user accepts.
-- `Conversations` — Top-level layout; loads conversations + definitions on mount; switches between `ConversationEditor` and `SplashScreen`.
-- `ConversationTree` — Left sidebar list of conversations.
-- `ConversationEditor` — Main workspace; hosts `ConversationGeneral`, `ConversationActions`, `ConversationConditions` and the dialogue tree.
-- `ConversationActions` / `ConversationConditions` — Edit operation lists on the active node, driven by `defStore`.
-- `GlobalModal` — Renders modals from `modalStore`.
-- `Footer`, `SplashScreen` — Status bar / empty state.
-
-## Backend communication
+## Backend Communication
 
 `app/src/services/rest.ts`
+
 - Exports `get<T>(url, params?)` and `post<T>(url, params, postData?)`.
-- Both delegate to `boundControllerAsync.getJson(...)` / `postJson(...)` — a JS object exposed by Chromely's `UseDefautJsHandler("boundControllerAsync", true)` (see `Program.cs:84`).
-- Responses come back wrapped: `{ ResponseText: JSON.stringify({ ReadyState, Status, Data }) }` and are unwrapped by `promiseSupportedCallback`.
-- Chromely's pinned version only supports GET and POST. PUT / DELETE are emulated by sending POST with a `method: 'PUT'` field in `postData`, which the backend reads.
+- Sends a bridge request through `window.chrome.webview.postMessage(...)`.
+- Each request includes an id, method, url, parameters, and body.
+- Responses include the same id plus status, data, and optional error text. This lets multiple requests be in flight at the same time.
+- PUT / DELETE style actions are still emulated by sending POST with a `method: 'PUT'` or `method: 'DELETE'` field in `postData`.
 
 `app/src/services/api.ts`
-- High-level operations layered over `rest.ts`. Knows the routes (`/conversations`, `/conversations/put`, `/conversations/export`, `/conversations/export-all`, `/conversations/import`, `/conversations/delete`, `/definitions`, `/filesystem`, `/directories`, `/quicklinks`, `/colour-config`, `/working-directory`, `/dependency-status`).
-- Also wraps AI routes (`/ai/settings`, `/ai/models`, `/ai/draft`, `/ai/validate-conversation`) for provider settings, model polling, draft generation, and backend round-trip validation.
+
+- High-level operations layered over `rest.ts`. It owns the route names used by the UI.
+- Wraps conversation, definition, file-system, colour config, dependency, and AI routes.
 - Handles preprocessing (`consolidateSpeaker`, `removeAllOldFillerNodes`, `rebuildNodeIndexes`) before sending writes.
 - Updates stores after responses (`dataStore.setConversations`, `defStore.setDefinitions`, etc.).
 
-## AI drafting flow
+## AI Drafting Flow
 
 - Whole-conversation drafts are opened from the Header `AI` menu. Node rewrites and branch expansion are opened from the dialogue tree context menu.
-- AI entry points are gated by `config/ai.json` `Enabled`/`enabled`, defaulting to on. When disabled, the Header AI menu and dialogue-tree AI context actions are hidden.
-- The model selector loads the saved provider catalogue first, polls the provider CLI when no cache exists, and only repolls on `Refresh`. It keeps an empty value as "provider default/latest" so drafts are not pinned unless the user chooses a specific model.
+- AI entry points are gated by `config/ai.json` `Enabled`/`enabled`, defaulting to on.
+- The model selector loads the saved provider catalogue first, polls the provider CLI when no cache exists, and only repolls on `Refresh`.
 - Workspace AI settings include context paths, house style notes, campaign brief, and editable cast personalities. Cast personalities link rules to cast ids and speaker ids so generated dialogue can stay in character for vanilla and custom casts; built-in restore defaults are supplied by `config/ai-personalities.json`.
 - AI responses are parsed as `AiConversationDraftType`, rendered as a read-only tree preview where possible, and validated before acceptance. Prompt and response diagnostics can be opened from the draft metadata panel.
-- `app/src/utils/ai-draft-utils.ts` converts drafts with pure functions. Full drafts produce a fresh `ConversationAssetType`; branch expansion produces a patch with a cloned parent root/response and new prompt nodes; node suggestions produce replacement text.
-- Accepting a draft is the only point where MobX state changes. The accept handler applies one deliberate action, marks the conversation dirty, and triggers a tree rebuild.
+- `app/src/utils/ai-draft-utils.ts` converts drafts with pure functions. Full drafts produce a fresh `ConversationAssetType`; branch expansion produces a patch; node suggestions produce replacement text.
+- Accepting a draft is the only point where MobX state changes.
 
-## Snake_case ↔ camelCase mapping
+## Snake_case <-> CamelCase Mapping
 
 `app/src/services/mappings/`
-- The .NET backend uses PascalCase / snake_case (BattleTech names like `default_speaker_id`, `int_value`); the frontend uses camelCase.
+
+- The .NET backend uses PascalCase / snake_case for BattleTech-flavoured fields such as `default_speaker_id`, `int_value`, and `call_value`; the frontend uses camelCase.
 - `mapToType<T>(obj, mapping)` recursively renames keys.
-- `fullConversationAssetMapping` — incoming (snake_case → camelCase), used after GET `/conversations`.
-- `reversedFullConversationAssetMapping` — outgoing (camelCase → snake_case), used before POST `/conversations/put` and `/conversations/export`.
-- `lowercasePropertyNames(obj, firstCharLower)` — used for the definitions response which is PascalCase across the board.
+- `fullConversationAssetMapping` - incoming (snake_case -> camelCase), used after GET `/conversations`.
+- `reversedFullConversationAssetMapping` - outgoing (camelCase -> snake_case), used before POST `/conversations/put` and `/conversations/export`.
+- `lowercasePropertyNames(obj, firstCharLower)` - used for PascalCase responses such as definitions.
 
 If you add a field that crosses the wire, update both directions.
 
-## Build & tooling
+## CSS Runtime
 
-- **Webpack** — `app/webpack.config.js` plus mode-specific files in `app/webpack/`. Three modes via `CT_ENV`: `local` (dev server), `development` (debug bundle to `dist/`), `production` (minified bundle to `dist/`).
-- **TypeScript** — `app/tsconfig.json`. Strict mode, no emit (Babel/webpack handle output). Path aliases mirror the webpack aliases (`components/*`, `containers/*`, `services/*`, `stores/*`, `hooks/*`, `types/*`, `utils/*`).
-- **Babel** — `.babelrc` with preset-env, preset-react, preset-typescript, decorators, class properties.
-- **PostCSS** — `postcss.config.js` (autoprefixer, nested, simple-vars).
-- **Linting** — Prettier (`prettier.config.js`) and TypeScript via `npm run ts-check`.
-- **Pre-push hook** — `app/package.json` `simple-git-hooks` runs `npm run verify` (which runs `ts-check`).
+The desktop shell runs modern Edge Chromium through WebView2. Production UI code can use current CSS features such as flex/grid gaps, container-friendly sizing, logical properties, `min()`/`max()`/`clamp()`, and modern selectors. Prefer the simpler modern CSS when it makes layout clearer.
+
+## Build & Tooling
+
+- **Vite** - `app/vite.config.ts` is the normal dev and build path. `npm start` starts Vite on `http://127.0.0.1:5173/`; `CT: Fast Dev` starts or reuses that server and launches the desktop shell with `CT_WEB_URL` set.
+- **Static build** - `npm run build` runs verification and emits `dist/`. `CT: UI Build` copies `dist/` to `bin/x64/Debug/net472/dist/` for `CT: Fast Run`.
+- **TypeScript** - `app/tsconfig.json`. Strict mode, no emit. Path aliases mirror Vite aliases (`components/*`, `containers/*`, `services/*`, `stores/*`, `hooks/*`, `types/*`, `utils/*`).
+- **Babel/PostCSS** - Vite uses the configured React/Babel and PostCSS pipeline.
+- **Linting** - TypeScript via `npm run ts-check`, ESLint via `npm run lint`, and Prettier via `prettier.config.js`.
+- **React DevTools** - `CT: RTool` starts the standalone React DevTools process. In Vite dev mode the app injects the connector script so it can attach inside WebView2.
+- **Pre-push hook** - `app/package.json` `simple-git-hooks` runs `npm run verify`.

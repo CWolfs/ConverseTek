@@ -1,6 +1,6 @@
 # Development & Setup Guide
 
-Thank you for your interest in contributing! This project uses **Chromely with CefSharp**, and is based on **.NET Framework 4.7.2**. Because of this, some setup steps differ from modern .NET (.NET 6/8) projects.
+Thank you for your interest in contributing. ConverseTek is a **.NET Framework 4.7.2** desktop app with a **WebView2 / Edge Chromium** shell and a **React + TypeScript + MobX** frontend built with Vite.
 
 Please follow the steps below to get the project running locally.
 
@@ -8,17 +8,12 @@ Please follow the steps below to get the project running locally.
 
 ### 1 - Install the .NET Framework 4.7.2 Developer Pack
 
-> ❗ This is **required** to build and run the project. The **runtime alone is not enough** — you need the **Developer Pack**, which includes reference assemblies for the compiler and IDE.
+This is required to build and run the project. The runtime alone is not enough; you need the Developer Pack, which includes reference assemblies for the compiler and IDE.
 
-📥 [Download .NET Framework 4.7.2 Developer Pack (Official Microsoft Link)](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net472)
+- [Download .NET Framework 4.7.2 Developer Pack](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net472)
+- [Direct offline installer link](https://dotnet.microsoft.com/en-us/download/dotnet-framework/thank-you/net472-developer-pack-offline-installer)
 
-Or direct link to the offline installer:
-
-📥 [DIRECT LINK - .NET Framework 4.7.2 Developer Pack (Official Microsoft Link)](https://dotnet.microsoft.com/en-us/download/dotnet-framework/thank-you/net472-developer-pack-offline-installer)
-
-### ✅ Already have .NET Framework 4.8?
-
-You're covered! The 4.8 Developer Pack is **fully backward compatible** with 4.7.2 projects — no extra install needed.
+If you already have the .NET Framework 4.8 Developer Pack, you are covered. It is backward compatible with 4.7.2 projects.
 
 You can check your installed version using PowerShell:
 
@@ -27,55 +22,83 @@ Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\' |
   Get-ItemPropertyValue -Name Release
 ```
 
-A result of:
+Useful results:
 
-- 461808 → .NET Framework 4.7.2 (✅ Compatible)
-- 533325 → .NET Framework 4.8 (✅ Compatible)
+- `461808` - .NET Framework 4.7.2 compatible
+- `533325` - .NET Framework 4.8 compatible
 
 ### 2 - Install NodeJS
 
-Used to build the frontend (in the /app directory):
+Used to build the frontend in `app/`.
 
-- v20.19.2 (✅ Compatible)
+- v20.19.2 is known compatible.
 
-### 3 - VSCode Task Plugin
+### 3 - Install the WebView2 Runtime
+
+Most modern Windows systems already have the evergreen WebView2 runtime through Microsoft Edge. If the app fails to start because WebView2 is missing, install the Microsoft Edge WebView2 Runtime.
+
+### 4 - VS Code Task Plugin
 
 We use the Task Runner extension by actboy168 to simplify build steps.
 
-🔌 [Download the extension from the Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=actboy168.tasks)
+- [Download the extension from the Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=actboy168.tasks)
 
-Once installed you will see the tasks at buttons in the bottom status bar of VSCode.
+Once installed, the tasks appear as buttons in the bottom status bar of VS Code. They are defined in `.vscode/tasks.json`.
 
-This helps automate:
+These tasks are VS Code-specific and will not work in Visual Studio.
 
-- Frontend builds
-- Copying files into dist/, libs/, etc.
-- Deploy-to-output steps
+### 5 - Install Game-Related Dependencies
 
-The tasks are defined in `.vscode/tasks.json`.
+ConverseTek uses two BattleTech C# assemblies. Copy them from the game into the ConverseTek `libs/` folder before building:
 
-💡 These tasks are **VS Code-specific** and won't work in Visual Studio.
+- `ShadowrunDTO.dll`
+- `ShadowrunSerializer.dll`
 
-### 4 - Install Game-Related Dependencies
+They are found under `BATTLETECH/BattleTech_Data/Managed`.
 
-ConverseTek makes use of two BattleTech C# assemblies (.dll files). These are required to be copied from the game into the ConverseTek 'libs' folder before building the project.
+### 6 - Install Frontend Dependencies
 
-- ShadowrunDTO.dll
-- ShadowrunSerializer.dll
+- Run the task `CT: UI Install`.
+- Alternatively, navigate into `app/` and run `npm install`.
 
-These are found in the BattleTech game folder under `BATTLETECH/BattleTech_Data/Managed`.
+## Build & Run
 
-### 5 - Install Frontend Dependencies
+### Normal Fast Development
 
-- Run the task `UI Install`
-- Alternatively, navigate into the `app` folder and run `npm install`
+1. Run `CT: Build Server` once to build the backend exe.
+2. Run `CT: Fast Dev`.
 
-### 6 - Build Project
+`CT: Fast Dev` starts or reuses Vite at `http://127.0.0.1:5173/`, then starts the WebView2 desktop shell with `CT_WEB_URL` set. This gives frontend hot reload while keeping the backend bridge available.
 
-- Run the task `Build All`
-- Alternatively, run `dotnet build /t:BuildDebug` from inside the project directory
+Backend changes require another `CT: Build Server` and a restart of the desktop app.
 
-### 7 - Run Project
+### Static Debug Build
 
-- Run the task `Fast Run`, which runs the tool from the `bin` folder
-- Alternatively, run `bin/x64/Debug/net472/ConverseTek.exe`
+1. Run `CT: UI Build` to build the frontend and copy `dist/` into the debug output folder.
+2. Run `CT: Fast Run` to launch `bin/x64/Debug/net472/ConverseTek.exe`.
+
+### Full Build
+
+- Run `CT: Build All`.
+- Alternatively, run `dotnet build ConverseTek.csproj /t:BuildDebug` from the project directory.
+
+## Useful Frontend Commands
+
+Run these from `app/` unless using `npm --prefix app ...` from the repo root.
+
+```bash
+npm run ts-check
+npm run lint
+npm run lint:fix
+npm run test
+npm run build
+npm start
+```
+
+`npm start` only starts the Vite server. For real app testing, prefer `CT: Fast Dev` so WebView2 and the backend bridge are available.
+
+## DevTools
+
+F12 opens the WebView2 inspector in debug/dev builds. Backend logs are mirrored into the console with a `[ConverseTek backend]` prefix.
+
+For React component inspection, run `CT: RTool` before or during `CT: Fast Dev`; the Vite dev page injects the standalone React DevTools connector.

@@ -4,36 +4,37 @@ ConverseTek is a desktop dialogue editor for HBS BattleTech. It edits BattleTech
 
 This document is the entry point. Drill into the area-specific docs for detail:
 
-- [`frontend.md`](./frontend.md) — React + TypeScript + MobX UI in `app/`
-- [`backend.md`](./backend.md) — C# / .NET Framework 4.7.2 backend at the repo root
-- [`domain-model.md`](./domain-model.md) — Conversation, node, operation, and definition types
-- [`data-flow.md`](./data-flow.md) — End-to-end flows: open folder, edit, save, export
-- [`notes.md`](./notes.md) — Quirks, conventions, and traps
+- [`webview2-host.md`](./webview2-host.md) - WebView2 desktop host, route bridge, DevTools, and Vite dev loop
+- [`frontend.md`](./frontend.md) - React + TypeScript + MobX UI in `app/`
+- [`backend.md`](./backend.md) - C# / .NET Framework 4.7.2 backend at the repo root
+- [`domain-model.md`](./domain-model.md) - Conversation, node, operation, and definition types
+- [`data-flow.md`](./data-flow.md) - End-to-end flows: open folder, edit, save, export
+- [`notes.md`](./notes.md) - Quirks, conventions, and traps
 
-## Shape of the system
+## Shape of the System
 
-```
+```text
 +-----------------------------------+
 |  React + TS + MobX (app/src/)     |
 |  - Containers, components, stores |
 |  - app/src/services/rest.ts       |
 +----------------|------------------+
-                 |  boundControllerAsync.{getJson, postJson}
-                 |  (Chromely JS bridge — only GET / POST supported)
+                 |  window.chrome.webview.postMessage
+                 |  typed request/response bridge
                  v
 +-----------------------------------+
-|  Chromely (CefSharp) host shell   |
-|  Program.cs                       |
-|  - Resolves /local/dist/index.html|
-|  - Routes JS calls to controllers |
+|  WebView2 / Edge Chromium shell   |
+|  Host/WebViewHostForm.cs          |
+|  - Loads Vite or built dist/      |
+|  - Routes JS calls to dispatcher  |
 +----------------|------------------+
-                 |  ChromelyRequest -> Controllers/*.cs
+                 |  AppRequest -> Controllers/*.cs
                  v
 +-----------------------------------+
-|  .NET 4.7.2 backend               |
+|  .NET Framework 4.7.2 backend     |
 |  - Controllers/  (route handlers) |
 |  - Services/     (singletons)     |
-|  - Data/, Json/, Handlers/        |
+|  - Host/, Data/, Json/            |
 |  - libs/ ShadowrunDTO,            |
 |         ShadowrunSerializer,      |
 |         protobuf-net              |
@@ -49,36 +50,36 @@ This document is the entry point. Drill into the area-specific docs for detail:
 +-----------------------------------+
 ```
 
-## Why Chromely (not Electron)
+## Why WebView2
 
-Chromely is lightweight and lets the backend stay in C# / .NET so it can reuse BattleTech's own pre-compiled assemblies (`ShadowrunDTO.dll`, `ShadowrunSerializer.dll`) for binary serialisation. This avoids reimplementing the protobuf schema in JavaScript.
+WebView2 keeps the app as a lightweight Windows desktop tool while giving the frontend a current Edge Chromium runtime. That means modern CSS and modern DevTools are available in the same runtime users run, without moving the backend away from C# / .NET Framework 4.7.2 or losing access to BattleTech's own pre-compiled assemblies (`ShadowrunDTO.dll`, `ShadowrunSerializer.dll`) for binary serialisation.
 
-## Where things live
+## Where Things Live
 
 | Area | Path | Notes |
 |---|---|---|
 | Frontend source | `app/src/` | TS + React + MobX |
-| Frontend build output | `dist/` | Copied into `bin/.../dist/` by the `UI Build` task |
-| Backend source | `Controllers/`, `Services/`, `Handlers/`, `Data/`, `Json/`, `Program.cs` | Auto-discovered by Chromely's `ScanAssemblies()` |
-| Definition packs | `defs/operations/`, `defs/presets/`, `defs/tags/` | JSON, drives dynamic UI (see `domain-model.md`) |
+| Frontend build output | `dist/` | Copied into `bin/.../dist/` by `CT: UI Build` |
+| Backend source | `Controllers/`, `Services/`, `Host/`, `Data/`, `Json/`, `Program.cs` | Routes are registered in `Host/AppRoutes.cs` |
+| Definition packs | `defs/operations/`, `defs/presets/`, `defs/tags/` | JSON, drives dynamic UI |
 | Game DLLs | `libs/` | `ShadowrunDTO.dll`, `ShadowrunSerializer.dll` (gitignored) |
 | User config | `config/quicklinks.json`, `config/colours.json`, `config/ai.json`, `config/ai-personalities.json` | Created or copied where needed |
-| Logs | `logs/conversetek-*.log` | Interface and Chromely core logs |
-| Build tasks | `.vscode/tasks.json` | `Build All`, `UI Build`, `UI Install`, `Fast Run`, `Release` |
+| Logs | `logs/` | App logs and AI draft diagnostics |
+| Build tasks | `.vscode/tasks.json` | `CT: Build All`, `CT: Build Server`, `CT: UI Build`, `CT: Fast Run`, `CT: Fast Dev`, `CT: RTool`, `CT: Release` |
 
-## Key innovations
+## Key Systems
 
-- **Definition-driven UI.** Actions, conditions, presets, and tag scopes are defined as JSON under `defs/`. The backend loads them at startup and the frontend renders argument inputs dynamically from these definitions — no UI code change is needed to add a new action. See `domain-model.md`.
+- **Definition-driven UI.** Actions, conditions, presets, and tag scopes are defined as JSON under `defs/`. The backend loads them and the frontend renders argument inputs dynamically from those definitions.
 - **Reuse of game assemblies.** Binary `.bytes` files are read/written through BattleTech's own protobuf types via `protobuf-net`, sidestepping a from-scratch reverse engineering effort.
-- **Tree-based dialogue editor.** Nodes are PromptNodes (NPC/game-spoken) with `branches[]` of ElementNodes (player responses). Loops are expressed as link nodes pointing back to existing nodes.
-- **Advisory AI drafting.** Codex CLI can draft whole conversations, node rewrites, or branch expansions through a generic provider layer. Drafts stay outside the MobX conversation graph until the user accepts them.
+- **Tree-based dialogue editor.** Nodes are PromptNodes with `branches[]` of ElementNodes. Loops are expressed as link nodes pointing back to existing nodes.
+- **Advisory drafting.** Codex CLI can draft whole conversations, node rewrites, or branch expansions through a generic provider layer. Drafts stay outside the MobX conversation graph until the user accepts them.
 
-## Build & run, briefly
+## Build & Run, Briefly
 
-1. `npm install` in `app/` (`UI Install` task).
-2. `npm run build` in `app/` produces `dist/`.
-3. `dotnet build /t:BuildDebug` from the repo root produces `bin/x64/Debug/net472/ConverseTek.exe`.
-4. The `UI Build` task does step 2 and copies `dist/` next to the exe.
-5. `Fast Run` task launches the exe.
+1. `npm install` in `app/` (`CT: UI Install` task).
+2. `dotnet build ConverseTek.csproj /t:BuildServer` from the repo root builds the desktop backend.
+3. `CT: Fast Dev` starts or reuses Vite and launches the WebView2 shell for hot reload with the backend bridge available.
+4. `CT: UI Build` runs the static Vite build and copies `dist/` next to the debug exe.
+5. `CT: Fast Run` launches the exe against the copied static bundle.
 
-Full setup: `docs/development.md`.
+Full setup: [`docs/development.md`](../development.md).

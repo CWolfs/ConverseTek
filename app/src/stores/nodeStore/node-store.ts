@@ -28,6 +28,7 @@ import { findTreeNodeParentWithDataNodeId } from 'utils/custom-tree-data-utils';
 
 import { dataStore } from '../dataStore';
 import { modalStore } from '../modalStore';
+import { getDevPreservedStore } from '../dev-preserved-store';
 
 /* eslint-disable no-return-assign, no-param-reassign, class-methods-use-this */
 class NodeStore {
@@ -1427,6 +1428,6 @@ class NodeStore {
   };
 }
 
-export const nodeStore = new NodeStore();
+export const nodeStore = getDevPreservedStore('__conversetekNodeStore', () => new NodeStore(), NodeStore.prototype);
 
 export { NodeStore };
