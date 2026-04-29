@@ -103,8 +103,8 @@ export function FileSystemPicker() {
       modalStore.setDisableOk(!clickedItem.active, globalModalId);
       if (fileMode && clickedItem.isDirectory) modalStore.setDisableOk(true, globalModalId);
 
-      setDirectories(newFsItems.filter((fsItem) => fsItem.isDirectory) as DirectoryItemType[]);
-      setFiles(newFsItems.filter((fsItem) => fsItem.isFile) as FileItemSystemType[]);
+      setDirectories(newFsItems.filter((fsItem) => fsItem.isDirectory));
+      setFiles(newFsItems.filter((fsItem) => fsItem.isFile));
       setSelectedItem(clickedItem.active ? clickedItem : null);
 
       debouncedClickEvents = [];

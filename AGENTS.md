@@ -8,17 +8,21 @@ Use UK English in prose, docs, comments, commit messages, PR text, and issue tex
 
 ## Project Shape
 
-ConverseTek is a React + TypeScript + MobX frontend in `app/`, hosted by a C#/.NET Framework 4.7.2 Chromely backend at the repository root. The backend reads and writes BattleTech protobuf `.bytes` conversation files through the game DLLs in `libs/`.
+ConverseTek is a React + TypeScript + MobX frontend in `app/`, hosted by a C#/.NET Framework 4.7.2 WebView2 desktop shell at the repository root. The backend reads and writes BattleTech protobuf `.bytes` conversation files through the game DLLs in `libs/`.
 
 Read `docs/architecture/overview.md` before larger changes, then the specific architecture document for the area being touched.
 
-## Chromely Routing
+## Desktop Bridge Routing
 
-Do not register GET and POST handlers on the exact same route path. This Chromely version can collide or shadow routes by path even when the HTTP verb differs, causing frontend GET promises to never resolve. Use distinct paths such as `GET /ai/settings/current` and `POST /ai/settings`.
+Frontend calls go through `app/src/services/rest.ts`, which sends typed bridge messages to the WebView2 host. Backend routes are registered in the app-owned dispatcher under `Host/`; keep route registration keyed by method and path, and keep frontend API calls inside `app/src/services/api.ts`.
 
 ## Frontend CSS
 
-The embedded Chromely/CEF runtime may lag behind modern browser CSS support. Avoid relying on `gap` for flex layouts in app UI; use explicit margins or margin fallbacks for spacing between flex children, especially in modal controls, tag lists, toolbars, and wrapped button rows. CSS Grid `gap` is acceptable where already verified in the runtime.
+The desktop host uses WebView2/Edge Chromium. Modern CSS is available, but keep CEF-era margin fallbacks in older UI code until the relevant views have been smoke tested in the WebView2 runtime.
+
+## Frontend Workflow
+
+The frontend uses Vite. Use `CT: Fast Dev` for the normal hot reload workflow; it starts or reuses the Vite server, then starts the WebView2 desktop shell with `CT_WEB_URL=http://127.0.0.1:5173/` so the backend bridge remains available. Keep `CT: UI Build` for static builds into `dist/` and the debug output folder. Webpack remains available through `npm run webpack-build` only as a fallback while the migration settles.
 
 ## AI Drafting
 

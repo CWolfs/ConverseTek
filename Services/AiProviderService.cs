@@ -5,11 +5,11 @@ namespace ConverseTek.Services {
   using System.IO;
   using System.Text;
 
-  using Chromely.Core.Infrastructure;
   using Newtonsoft.Json;
   using Newtonsoft.Json.Linq;
 
   using ConverseTek.Data;
+  using ConverseTek.Infrastructure;
 
   public interface IAiProvider {
     AiDraftRunResult RunDraft(AiDraftProviderRequest request);

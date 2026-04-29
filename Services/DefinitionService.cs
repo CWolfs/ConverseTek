@@ -3,11 +3,10 @@ namespace ConverseTek.Services {
   using System.IO;
   using System.Collections.Generic;
 
-  using Chromely.Core.Infrastructure;
-
   using Newtonsoft.Json;
 
   using ConverseTek.Data;
+  using ConverseTek.Infrastructure;
   using ConverseTek.Json;
 
   public class DefinitionService {

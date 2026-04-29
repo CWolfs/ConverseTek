@@ -178,7 +178,7 @@ type DefinitionsResponseType = {
 };
 
 /*
- * CHROMELY DOESN'T SUPPORT PUTS SO PUTS AND DELETES ARE CURRENTLY POSTS WITH method DATA
+ * The desktop bridge exposes GET and POST routes, so PUT and DELETE style actions are sent as POSTs with method data.
  * e.g. { method: 'DELETE' }
  */
 

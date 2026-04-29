@@ -342,7 +342,7 @@ class NodeStore {
           tree.scrollTop += 200;
         }
 
-        requestAnimationFrame(() => this.scrollToNode(nodeId, direction, tree as HTMLElement, skipHorizontalScroll));
+        requestAnimationFrame(() => this.scrollToNode(nodeId, direction, tree, skipHorizontalScroll));
       }
     });
   }

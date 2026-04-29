@@ -44,12 +44,14 @@ let config = {
     modules: [path.resolve(__dirname), 'node_modules'],
   },
 
-  cache: {
-    type: 'filesystem',
-    buildDependencies: {
-      config: [__filename],
-    },
-  },
+  cache: isLocal
+    ? {
+      type: 'filesystem',
+      buildDependencies: {
+        config: [__filename],
+      },
+    }
+    : false,
 
   module: {
     rules: [],

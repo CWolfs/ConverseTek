@@ -3,8 +3,6 @@ namespace ConverseTek.Services {
   using System.IO;
   using System.Collections.Generic;
 
-  using Chromely.Core.Infrastructure;
-
   using Newtonsoft.Json;
 
   using isogame;
@@ -12,6 +10,7 @@ namespace ConverseTek.Services {
   using ProtoBuf.Meta;
 
   using ConverseTek.Data;
+  using ConverseTek.Infrastructure;
 
   public class ConversationService {
     private static ConversationService instance;

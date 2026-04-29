@@ -4,7 +4,7 @@ Guidance for Claude Code when working in this repository. `AGENTS.md` is the can
 
 ## What this project is
 
-ConverseTek is a tree-based dialogue editor for HBS BattleTech. It's a desktop app: a **React + TypeScript + MobX** frontend (`app/`) hosted in a **Chromely (CefSharp) Chromium shell** with a **C# / .NET Framework 4.7.2 backend** at the repo root. The backend reads/writes BattleTech's binary protobuf `.bytes` conversation files using the game's own assemblies (`ShadowrunDTO.dll`, `ShadowrunSerializer.dll`).
+ConverseTek is a tree-based dialogue editor for HBS BattleTech. It's a desktop app: a **React + TypeScript + MobX** frontend (`app/`) hosted in a **WebView2 / Edge Chromium shell** with a **C# / .NET Framework 4.7.2 backend** at the repo root. The backend reads/writes BattleTech's binary protobuf `.bytes` conversation files using the game's own assemblies (`ShadowrunDTO.dll`, `ShadowrunSerializer.dll`).
 
 For architecture detail, read the docs under [`docs/architecture/`](./docs/architecture/) — start with `overview.md`, then drop into `frontend.md`, `backend.md`, `domain-model.md`, `data-flow.md`, or `notes.md` as needed.
 
@@ -30,8 +30,9 @@ For architecture detail, read the docs under [`docs/architecture/`](./docs/archi
 ## Code conventions
 
 - Frontend uses module-aliased imports (`components/...`, `containers/...`, `services/...`, `stores/...`, `hooks/...`, `types/...`, `utils/...`) — see `webpack.config.js` and `tsconfig.json`. Prefer the alias over relative paths.
+- Vite is the normal frontend dev/build path. Use `CT: Fast Dev` for hot reload inside the WebView2 desktop shell; `npm run webpack-build` is only a fallback while the migration settles.
 - Stores are MobX singletons exported from `app/src/stores/index.ts` and accessed in components via `useStore<T>(key)` from `app/src/hooks/useStore`.
-- API calls go through `app/src/services/api.ts`, which wraps the Chromely bridge in `app/src/services/rest.ts`. Don't call the bridge directly from components.
+- API calls go through `app/src/services/api.ts`, which wraps the WebView2 bridge in `app/src/services/rest.ts`. Don't call the bridge directly from components.
 - Backend controllers live in `Controllers/`, services in `Services/`. Services follow a singleton `getInstance()` pattern.
 - Prefer editing existing files over creating new ones. Don't add comments that explain *what* the code does — only *why* when non-obvious.
 
@@ -46,10 +47,10 @@ For architecture detail, read the docs under [`docs/architecture/`](./docs/archi
 
 ## Important quirks
 
-- Chromely's pinned version only supports `GET` and `POST` over the JS bridge. PUT/DELETE are emulated as POSTs with a `method` field — see `app/src/services/api.ts` calls like `post(url, params, { method: 'PUT', ... })`.
+- The desktop bridge exposes `GET` and `POST` route helpers. PUT/DELETE style actions are emulated as POSTs with a `method` field — see `app/src/services/api.ts` calls like `post(url, params, { method: 'PUT', ... })`.
 - The frontend uses camelCase, but the backend serialises to/from BattleTech-flavoured snake_case and PascalCase. Translation happens via `app/src/services/mappings/` (`fullConversationAssetMapping`, `reversedFullConversationAssetMapping`, `lowercasePropertyNames`). When you add a new field that crosses the wire, update the mapping in both directions.
 - Source-of-truth conversation files are `*.bytes` (protobuf). JSON files are export-only, *not* auto-loaded on folder open.
-- Chromely route paths in JS look like `/conversations/export`, but the backend controller is registered with `Route="conversations"` and the rest is mapped via `RegisterPostRequest("/path", method)` — see `Controllers/` and `docs/architecture/backend.md`.
+- WebView2 route paths in JS look like `/conversations/export` and are dispatched through the app-owned route dispatcher under `Host/` — see `Controllers/` and `docs/architecture/backend.md`.
 
 ## When in doubt
 

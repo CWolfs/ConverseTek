@@ -11,6 +11,7 @@ import { ModalConfirmation } from 'components/Modals/ModalConfirmation';
 
 import { MainLayout } from './layouts/MainLayout';
 
+import 'antd/dist/antd.css';
 import './css/styles.css';
 
 export const storeContext = createContext(stores);

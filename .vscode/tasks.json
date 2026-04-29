@@ -79,10 +79,33 @@
       "type": "shell"
     },
     {
-      "label": "CT: UI-Only Run",
-      "command": "npm start",
+      "label": "CT: Fast Dev",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\.vscode\\start-fast-dev.ps1"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "type": "shell",
+      "runOptions": {
+        "instanceLimit": 5
+      }
+    },
+    {
+      "label": "CT: RTool",
+      "command": "npm run react-devtools",
       "options": {
         "cwd": "${workspaceFolder}/app/"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
       },
       "type": "shell"
     }

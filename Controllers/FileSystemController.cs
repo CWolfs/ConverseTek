@@ -3,44 +3,42 @@ namespace ConverseTek.Controllers {
   using System.Linq;
   using System.IO;
   using System.Collections.Generic;
-  using System.Diagnostics.CodeAnalysis;
 
   using Newtonsoft.Json;
   using Newtonsoft.Json.Linq;
 
-  using Chromely.Core.RestfulService;
-  using Chromely.Core.Infrastructure;
-
   using ConverseTek.Data;
+  using ConverseTek.Host;
+  using ConverseTek.Infrastructure;
   using ConverseTek.Services;
 
-  [ControllerProperty(Name = "FileSystemController", Route = "filesystem")]
-  public class FileSystemController : ChromelyController {
+  public class FileSystemController {
     private string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
-    public FileSystemController() {
-      this.RegisterGetRequest("/filesystem", this.GetRootDrives);
-      this.RegisterGetRequest("/directories", this.GetDirectories);
-      this.RegisterGetRequest("/quicklinks", this.GetQuickLinks);
-      this.RegisterPostRequest("/add-quicklink", this.AddQuickLink);
-      this.RegisterPostRequest("/remove-quicklink", this.RemoveQuickLink);
-      this.RegisterGetRequest("/colour-config", this.GetColourConfig);
-      this.RegisterPostRequest("/working-directory", this.SetWorkingDirectory);
-      this.RegisterGetRequest("/dependency-status", this.GetDependencyStatus);
+    public void RegisterRoutes(AppRouteDispatcher dispatcher) {
+      dispatcher.RegisterGet("/filesystem", this.GetRootDrives);
+      dispatcher.RegisterGet("/directories", this.GetDirectories);
+      dispatcher.RegisterGet("/quicklinks", this.GetQuickLinks);
+      dispatcher.RegisterPost("/add-quicklink", this.AddQuickLink);
+      dispatcher.RegisterPost("/remove-quicklink", this.RemoveQuickLink);
+      dispatcher.RegisterGet("/colour-config", this.GetColourConfig);
+      dispatcher.RegisterPost("/working-directory", this.SetWorkingDirectory);
+      dispatcher.RegisterGet("/dependency-status", this.GetDependencyStatus);
     }
 
-    private ChromelyResponse GetRootDrives(ChromelyRequest request) {
+    private AppResponse GetRootDrives(AppRequest request) {
       FileSystemService fileSystemService = FileSystemService.getInstance();
       List<FsDirectory> rootDrives = fileSystemService.GetRootDrives();
+      Log.Debug($"[FileSystemController] Returning {rootDrives.Count} root drives.");
 
       string rootDrivesJson = JsonConvert.SerializeObject(rootDrives);
 
-      ChromelyResponse response = new ChromelyResponse();
+      AppResponse response = new AppResponse();
       response.Data = rootDrivesJson;
       return response;
     }
 
-    private ChromelyResponse GetDirectories(ChromelyRequest request) {
+    private AppResponse GetDirectories(AppRequest request) {
       try {
         IDictionary<string, object> requestParams = request.Parameters;
         string path = (string)requestParams["path"];
@@ -78,7 +76,7 @@ namespace ConverseTek.Controllers {
 
         string fsJson = JsonConvert.SerializeObject(fsView);
 
-        ChromelyResponse response = new ChromelyResponse();
+        AppResponse response = new AppResponse();
         response.Data = fsJson;
         return response;
       } catch (Exception e) {
@@ -87,17 +85,17 @@ namespace ConverseTek.Controllers {
       }
     }
 
-    private ChromelyResponse GetQuickLinks(ChromelyRequest request) {
+    private AppResponse GetQuickLinks(AppRequest request) {
       ConfigService configService = ConfigService.getInstance();
       Dictionary<string, string> quickLinks = configService.GetQuickLinksConfig();
       string quickLinksJson = JsonConvert.SerializeObject(quickLinks);
 
-      ChromelyResponse response = new ChromelyResponse();
+      AppResponse response = new AppResponse();
       response.Data = quickLinksJson;
       return response;
     }
 
-    private ChromelyResponse AddQuickLink(ChromelyRequest request) {
+    private AppResponse AddQuickLink(AppRequest request) {
       try {
         ConfigService configService = ConfigService.getInstance();
         IDictionary<string, object> requestParams = request.Parameters;
@@ -107,7 +105,7 @@ namespace ConverseTek.Controllers {
         Dictionary<string, string> quickLinks = configService.AddQuickLink(title, path);
         string quickLinksJson = JsonConvert.SerializeObject(quickLinks);
 
-        ChromelyResponse response = new ChromelyResponse();
+        AppResponse response = new AppResponse();
         response.Data = quickLinksJson;
         return response;
       } catch (Exception e) {
@@ -116,7 +114,7 @@ namespace ConverseTek.Controllers {
       }
     }
 
-    private ChromelyResponse RemoveQuickLink(ChromelyRequest request) {
+    private AppResponse RemoveQuickLink(AppRequest request) {
       try {
         ConfigService configService = ConfigService.getInstance();
         IDictionary<string, object> requestParams = request.Parameters;
@@ -126,7 +124,7 @@ namespace ConverseTek.Controllers {
         Dictionary<string, string> quickLinks = configService.RemoveQuickLink(title, path);
         string quickLinksJson = JsonConvert.SerializeObject(quickLinks);
 
-        ChromelyResponse response = new ChromelyResponse();
+        AppResponse response = new AppResponse();
         response.Data = quickLinksJson;
         return response;
       } catch (Exception e) {
@@ -135,19 +133,19 @@ namespace ConverseTek.Controllers {
       }
     }
 
-    private ChromelyResponse GetColourConfig(ChromelyRequest request) {
+    private AppResponse GetColourConfig(AppRequest request) {
       ConfigService configService = ConfigService.getInstance();
       Dictionary<string, Dictionary<string, string>> colourConfig = configService.GetColourConfig();
       string colourConfigJson = JsonConvert.SerializeObject(colourConfig);
 
-      ChromelyResponse response = new ChromelyResponse();
+      AppResponse response = new AppResponse();
       response.Data = colourConfigJson;
       Log.Info(colourConfigJson);
 
       return response;
     }
 
-    private ChromelyResponse SetWorkingDirectory(ChromelyRequest request) {
+    private AppResponse SetWorkingDirectory(AppRequest request) {
       try {
         IDictionary<string, object> requestParams = request.Parameters;
         string path = (string)requestParams["path"];
@@ -155,7 +153,7 @@ namespace ConverseTek.Controllers {
         FileSystemService fileSystemService = FileSystemService.getInstance();
         fileSystemService.WorkingDirectory = path;
 
-        ChromelyResponse response = new ChromelyResponse();
+        AppResponse response = new AppResponse();
         return response;
       } catch (Exception e) {
         Log.Error(e);
@@ -163,7 +161,7 @@ namespace ConverseTek.Controllers {
       }
     }
 
-    private ChromelyResponse GetDependencyStatus(ChromelyRequest request) {
+    private AppResponse GetDependencyStatus(AppRequest request) {
       List<string> dependencyNames = new List<string> { "ShadowrunDTO.dll", "ShadowrunSerializer.dll" };
       List<string> missingDependencies = new List<string>();
 
@@ -178,7 +176,7 @@ namespace ConverseTek.Controllers {
 
       string serialisedResponseData = JsonConvert.SerializeObject(responseData);
 
-      ChromelyResponse response = new ChromelyResponse();
+      AppResponse response = new AppResponse();
       response.Data = serialisedResponseData;
       return response;
     }
