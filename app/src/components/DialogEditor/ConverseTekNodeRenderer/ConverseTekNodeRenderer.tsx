@@ -454,7 +454,7 @@ export const ConverseTekNodeRenderer = observer(
               {cameraBadge && (
                 <Tooltip title={cameraBadge.title} mouseEnterDelay={0.35}>
                   <span className={cameraBadgeClasses}>
-                    {cameraBadge.variant === 'hardLock' && <Icon type="lock" />}
+                    {cameraBadge.variant !== 'multiple' && <Icon type="lock" />}
                     <Icon type="video-camera" />
                     <span className="node-renderer__camera-badge-label">{cameraBadge.label}</span>
                   </span>

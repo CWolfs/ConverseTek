@@ -30,6 +30,7 @@ class DataStore {
   public activeConversationAsset: ConversationAssetType | null;
   public unsavedActiveConversationAsset: ConversationAssetType | null;
   public isConversationDirty: boolean;
+  public conversationMutationRevision: number;
   public colourConfig: ColourConfigType | null;
 
   constructor() {
@@ -41,6 +42,7 @@ class DataStore {
       activeConversationAsset: observable,
       unsavedActiveConversationAsset: observable,
       isConversationDirty: observable,
+      conversationMutationRevision: observable,
       setWorkingDirectory: action,
       createNewConversation: action,
       setConversations: action,
@@ -62,6 +64,7 @@ class DataStore {
     this.activeConversationAsset = null;
     this.unsavedActiveConversationAsset = null;
     this.isConversationDirty = false;
+    this.conversationMutationRevision = 0;
     this.workingDirectory = null;
     this.workingDirectoryName = null;
     this.colourConfig = null;
@@ -123,6 +126,7 @@ class DataStore {
 
   setConversationDirty(flag: boolean): void {
     this.isConversationDirty = flag;
+    if (flag) this.conversationMutationRevision += 1;
   }
 
   getConversationAsset(id: string): ConversationAssetType | null {

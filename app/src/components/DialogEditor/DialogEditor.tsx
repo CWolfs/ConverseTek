@@ -115,7 +115,10 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
     () => buildPromptSpeakerProjectionMap(conversationAsset),
     [conversationAsset, rebuild, speakerRevision],
   );
-  const cameraProjectionByNodeId = useMemo(() => buildPromptCameraProjectionMap(conversationAsset), [conversationAsset, rebuild]);
+  const cameraProjectionByNodeId = useMemo(
+    () => buildPromptCameraProjectionMap(conversationAsset),
+    [conversationAsset, rebuild, dataStore.conversationMutationRevision],
+  );
 
   const onMove = (nodeContainer: RSTNodeOnMoveContainer) => {
     const { node, nextParentNode } = nodeContainer;

@@ -160,7 +160,7 @@ function buildProjection(camera: EffectiveCameraReference): CameraProjection {
   return {
     label: target,
     title: camera.hardLock
-      ? `Camera hard-locked to ${target}. ExtendedConversations keeps this hard lock until conversation end or another hard lock changes it.`
+      ? `Camera hard-locked to ${target}. Useful for 1-on-1 conversations and keeping the camera on one target while another character speaks. ExtendedConversations keeps this hard lock until conversation end or another hard lock changes it.`
       : `Camera locked to ${target}. BattleTech uses this target instead of following the current speaker while the lock is active.`,
     variant: camera.hardLock ? 'hardLock' : 'default',
   };
