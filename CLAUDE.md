@@ -52,6 +52,7 @@ For architecture detail, read the docs under [`docs/architecture/`](./docs/archi
 - The desktop bridge exposes typed `GET` and `POST` messages over `window.chrome.webview.postMessage`. PUT/DELETE style actions are emulated as POSTs with a `method` field - see `app/src/services/api.ts` calls like `post(url, params, { method: 'PUT', ... })`.
 - The frontend uses camelCase, but the backend serialises to/from BattleTech-flavoured snake_case and PascalCase. Translation happens via `app/src/services/mappings/` (`fullConversationAssetMapping`, `reversedFullConversationAssetMapping`, `lowercasePropertyNames`). When you add a new field that crosses the wire, update the mapping in both directions.
 - Source-of-truth conversation files are `*.bytes` (protobuf). JSON files are export-only, *not* auto-loaded on folder open.
+- Do not add new properties to conversation data that is saved back into the Shadowrun/BattleTech protobuf format. Transient editor state is fine only if it stays outside the serialised graph or is stripped/recomputed before persistence. Prompt speaker priority follows BattleTech: `sourceInSceneRef.id` wins, then `speaker_override_id`, then inherited speaker.
 - WebView2 route paths in JS look like `/conversations/export` and are dispatched through the app-owned route dispatcher under `Host/` - see `Controllers/` and `docs/architecture/backend.md`.
 
 ## When in doubt

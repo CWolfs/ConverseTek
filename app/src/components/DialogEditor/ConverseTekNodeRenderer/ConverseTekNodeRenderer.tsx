@@ -120,12 +120,10 @@ function getTruncatedLinkText(nodeStore: ConversationTreeNodeStore, linkIndex: n
 function getPromptSpeakerBadge(node: PromptNodeType | ElementNodeType | null): { label: string; title: string } | null {
   if (node == null || node.type !== 'node') return null;
 
-  let speaker = '';
-  if (node.speakerType === 'castId') {
-    speaker = node.sourceInSceneRef?.id || '';
-  } else if (node.speakerType === 'speakerId') {
-    speaker = node.speakerOverrideId || '';
-  }
+  const castId = node.sourceInSceneRef?.id || '';
+  const speakerId = node.speakerOverrideId || '';
+  const speakerType = castId ? 'castId' : speakerId ? 'speakerId' : null;
+  const speaker = castId || speakerId;
 
   if (!speaker) {
     return {
@@ -136,7 +134,7 @@ function getPromptSpeakerBadge(node: PromptNodeType | ElementNodeType | null): {
 
   return {
     label: speaker.replace(/Default$/i, '') || speaker,
-    title: `${node.speakerType || 'speaker'} ${speaker}`,
+    title: `${speakerType || 'speaker'} ${speaker}`,
   };
 }
 

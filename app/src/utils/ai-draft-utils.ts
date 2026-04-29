@@ -308,15 +308,12 @@ function buildPromptNodeShells(draft: AiConversationDraftType): PromptNodeType[]
     node.actions = buildOperationsContainer(draftNode.actions);
 
     if (draftNode.speaker.type === 'castId') {
-      node.speakerType = 'castId';
       node.sourceInSceneRef = { id: draftNode.speaker.id };
       node.speakerOverrideId = '';
     } else if (draftNode.speaker.type === 'speakerId') {
-      node.speakerType = 'speakerId';
       node.sourceInSceneRef = null;
       node.speakerOverrideId = draftNode.speaker.id;
     } else {
-      node.speakerType = null;
       node.sourceInSceneRef = null;
       node.speakerOverrideId = '';
     }

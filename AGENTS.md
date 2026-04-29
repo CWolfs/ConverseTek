@@ -12,6 +12,14 @@ ConverseTek is a React + TypeScript + MobX frontend in `app/`, hosted by a C#/.N
 
 Read `docs/architecture/overview.md` before larger changes, then the specific architecture document for the area being touched.
 
+## BattleTech Conversation Format
+
+Do not add new properties to conversation assets, prompt nodes, response nodes, roots, operation calls, or other data that is saved back into the binary Shadowrun/BattleTech protobuf conversation format. The `.bytes` files are written through the game DLL types, so only fields that already exist in those types can be relied on to round-trip.
+
+Transient editor-only state is fine, but keep it outside the serialised conversation graph or strip/recompute it before persistence, for example in a UI store, config file, or separate metadata structure keyed by stable ids. AI draft/intermediate types may have their own fields, but conversion into a real conversation must only populate real BattleTech fields.
+
+For prompt speakers, follow the FAQ behaviour: `sourceInSceneRef.id` is the cast id and takes priority in BattleTech. If a prompt should use `speakerOverrideId` instead, `sourceInSceneRef` must be cleared. If both are absent, the node inherits the current conversation speaker.
+
 ## Desktop Bridge Routing
 
 Frontend calls go through `app/src/services/rest.ts`, which sends typed bridge messages to the WebView2 host. Backend routes are registered in the app-owned dispatcher under `Host/`; keep route registration keyed by method and path, and keep frontend API calls inside `app/src/services/api.ts`.

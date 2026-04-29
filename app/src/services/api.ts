@@ -213,11 +213,32 @@ export function getConversations(): Promise<ConversationAssetType[]> {
   });
 }
 
+function stripTransientConversationFields(conversationAsset: ConversationAssetType): void {
+  const conversation = conversationAsset.conversation as unknown as {
+    roots?: Record<string, unknown>[];
+    nodes?: (Record<string, unknown> & { branches?: Record<string, unknown>[] })[];
+  };
+
+  conversation.roots?.forEach((root) => {
+    delete root.deleting;
+  });
+
+  conversation.nodes?.forEach((node) => {
+    delete node.deleting;
+    delete node.speakerType;
+
+    node.branches?.forEach((branch) => {
+      delete branch.deleting;
+    });
+  });
+}
+
 export function updateConversation(id: string, conversationAsset: ConversationAssetType): Promise<ConversationAssetType[]> {
   runInAction(() => {
     consolidateSpeaker(conversationAsset);
     removeAllOldFillerNodes(conversationAsset); // This only exists to fix old conversations pre-v1.4
     rebuildNodeIndexes(conversationAsset);
+    stripTransientConversationFields(conversationAsset);
 
     const nodeID = nodeStore.getActiveNodeId();
     if (nodeID) {
@@ -242,6 +263,7 @@ export function exportConversation(id: string, conversationAsset: ConversationAs
     consolidateSpeaker(conversationAsset);
     removeAllOldFillerNodes(conversationAsset); // This only exists to fix old conversations pre-v1.4
     rebuildNodeIndexes(conversationAsset);
+    stripTransientConversationFields(conversationAsset);
 
     const nodeID = nodeStore.getActiveNodeId();
     if (nodeID) {
@@ -260,6 +282,7 @@ export function exportAllConversations(id: string, conversationAsset: Conversati
       consolidateSpeaker(conversationAsset);
       removeAllOldFillerNodes(conversationAsset); // This only exists to fix old conversations pre-v1.4
       rebuildNodeIndexes(conversationAsset);
+      stripTransientConversationFields(conversationAsset);
 
       const nodeID = nodeStore.getActiveNodeId();
       if (nodeID) {
@@ -547,6 +570,7 @@ export function getAiModels(settings: AiSettingsType, forceRefresh = false): Pro
 }
 
 export function validateConversationRoundTrip(conversationAsset: ConversationAssetType): Promise<ConversationValidationResultType> {
+  stripTransientConversationFields(conversationAsset);
   const apiMappedConversation = mapToType<object>(conversationAsset, reversedFullConversationAssetMapping);
   return post<ConversationValidationResponseType>('/ai/validate-conversation', {}, { conversationAsset: apiMappedConversation }).then(
     normaliseConversationValidation,

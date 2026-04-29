@@ -702,19 +702,27 @@ class NodeStore {
   }
 
   setPromptNodeSpeakerType(node: PromptNodeType, value: 'castId' | 'speakerId'): void {
-    node.speakerType = value;
     if (value === 'speakerId') node.sourceInSceneRef = null;
+    if (value === 'castId') node.speakerOverrideId = '';
 
     dataStore.setConversationDirty(true);
     this.bumpSpeakerRevision();
   }
 
   setPromptNodeSourceInSceneId(node: PromptNodeType, id: string): void {
+    if (!id) {
+      node.sourceInSceneRef = null;
+      dataStore.setConversationDirty(true);
+      this.bumpSpeakerRevision();
+      return;
+    }
+
     if (!node.sourceInSceneRef) {
       node.sourceInSceneRef = { id };
     } else {
       node.sourceInSceneRef.id = id;
     }
+    node.speakerOverrideId = '';
 
     dataStore.setConversationDirty(true);
     this.bumpSpeakerRevision();

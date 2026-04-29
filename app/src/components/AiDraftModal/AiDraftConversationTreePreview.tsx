@@ -270,9 +270,13 @@ function formatElementSubtitle(elementNode: ElementNodeType): string {
 }
 
 function formatSpeaker(promptNode: PromptNodeType): string {
-  if (promptNode.speakerType === 'castId' && promptNode.sourceInSceneRef?.id) return promptNode.sourceInSceneRef.id;
-  if (promptNode.speakerType === 'speakerId' && promptNode.speakerOverrideId) return promptNode.speakerOverrideId;
-  return 'Inherits';
+  return promptNode.sourceInSceneRef?.id || promptNode.speakerOverrideId || 'Inherits';
+}
+
+function formatSpeakerType(promptNode: PromptNodeType): string {
+  if (promptNode.sourceInSceneRef?.id) return 'castId';
+  if (promptNode.speakerOverrideId) return 'speakerId';
+  return 'none';
 }
 
 function buildPreviewNodeButtons(node: PreviewTreeNode, previewNodeStore: PreviewNodeStore): JSX.Element[] {
@@ -287,7 +291,7 @@ function buildPreviewNodeButtons(node: PreviewTreeNode, previewNodeStore: Previe
   return [
     <span
       className="ai-draft-preview-tree__speaker-badge"
-      title={`${promptNode.speakerType || 'none'} ${speaker}`}
+      title={`${formatSpeakerType(promptNode)} ${speaker}`}
     >
       {displaySpeaker}
     </span>,

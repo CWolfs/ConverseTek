@@ -41,7 +41,7 @@ Two kinds:
 
 ### `PromptNodeType` (NPC / game-spoken)
 - `app/src/types/PromptNodeType.ts`.
-- Fields: `idRef`, `index`, `parentId`, `text`, `branches[]` (player responses), `nodeType`, `truthValue`, `autoFollowBranchDelay`, `inputMaxLength`, `speakerType`, `speakerOverrideId`, `actions`, `comment`.
+- Fields: `idRef`, `index`, `parentId`, `text`, `branches[]` (player responses), `nodeType`, `truthValue`, `autoFollowBranchDelay`, `inputMaxLength`, `sourceInSceneRef`, `speakerOverrideId`, `actions`, `comment`.
 - `type` is always `'node'`.
 - Plays the game / NPC line, then offers `branches[]` of player responses.
 
@@ -149,7 +149,7 @@ Important fields:
 - `choices[]` -> player responses that point to a target draft key or deliberately end the conversation. Their `comment` fields describe the branch purpose or condition context.
 - For root/response text suggestions, `roots[0].text` carries the replacement text and is not treated as a graph edge.
 - `actions[]` / `conditions[]` -> operation intents using existing definition `key` names and typed argument values.
-- Prompt nodes without `sourceInSceneRef` or `speakerOverrideId` inherit the current SimGame conversation speaker at runtime. ConverseTek labels these as `Inherits`; BattleTech does not provide a distinct narration speaker for SimGame conversation nodes.
+- Prompt node speaker priority follows BattleTech's real fields: `sourceInSceneRef.id` is the cast id and takes priority. If `sourceInSceneRef` is set, BattleTech uses that cast definition. If the prompt should use `speakerOverrideId`, ConverseTek must clear `sourceInSceneRef`. Prompt nodes without `sourceInSceneRef` or `speakerOverrideId` inherit the current SimGame conversation speaker at runtime. ConverseTek labels these as `Inherits`; BattleTech does not provide a distinct narration speaker for SimGame conversation nodes.
 
 Draft keys are temporary. ConverseTek generates real BattleTech ids and prompt indexes during acceptance. This keeps AI output advisory and prevents preview rendering from mutating the active observable conversation graph.
 

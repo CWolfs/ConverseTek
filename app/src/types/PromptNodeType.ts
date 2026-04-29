@@ -21,7 +21,6 @@ export type PromptNodeType = {
     id: string;
   } | null;
   sourceWithTagInScene: null; // Not used in BT
-  speakerType: 'speakerId' | 'castId' | null;
   overrideSpeaker: null; // Not used in BT
   speakerOverrideId: string;
   actions: {
