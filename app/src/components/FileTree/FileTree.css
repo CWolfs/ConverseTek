@@ -11,6 +11,11 @@
   &__tree {
     height: 97%;
 
+    .file-tree__scroll {
+      height: calc(100% - 1px);
+      overflow: auto;
+    }
+
     &__conversation {
       .anticon {
         color: gold !important;

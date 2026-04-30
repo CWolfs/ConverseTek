@@ -120,6 +120,6 @@ h3[type='secondary'] {
   background: $backgroundTertiary;
 }
 
-.ReactVirtualized__Grid {
+.conversation-tree__list {
   overflow-x: scroll !important;
 }
