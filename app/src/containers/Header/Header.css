@@ -9,3 +9,7 @@
     transition: none;
   }
 }
+
+.header__submenu-popup {
+  padding-top: $tinySpace;
+}

@@ -1,6 +1,7 @@
 /* eslint-disable operator-linebreak */
 import React, { useState, useEffect, CSSProperties, Fragment, useRef } from 'react';
-import { List, Icon } from 'antd';
+import { List } from 'antd';
+import { BookTwoTone, DesktopOutlined, FileTextOutlined, FolderAddOutlined, FolderOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
 import remove from 'lodash.remove';
 import sortBy from 'lodash.sortby';
@@ -22,9 +23,9 @@ const ListItem = List.Item;
 const rootDrivePathPattern = /^[a-zA-Z]:[\\/]{1}$/;
 
 function getItemIcon(item: FileSystemItemType) {
-  if (item.isDirectory && item.hasChildren) return <Icon type="folder-add" className="file-system-picker__directory-icon" />;
-  if (item.isFile) return <Icon type="file-text" className="file-system-picker__file-icon" />;
-  return <Icon type="folder" className="file-system-picker__directory-icon" />;
+  if (item.isDirectory && item.hasChildren) return <FolderAddOutlined className="file-system-picker__directory-icon" />;
+  if (item.isFile) return <FileTextOutlined className="file-system-picker__file-icon" />;
+  return <FolderOutlined className="file-system-picker__directory-icon" />;
 }
 
 let debouncedClickEvents: DebouncedFunc<() => void>[] = [];
@@ -244,22 +245,22 @@ export function FileSystemPicker() {
     <div className="file-system-picker">
       <FileSystemPickerContextMenu id="filesystempicker-context-menu" selectedItem={contextSelectedItem} setQuickLinks={setQuickLinks} />
       <div className="file-system-picker__quick-links">
-        <IconButton style={quicklinkButtonStyle} className="button-primary-pale" icon="desktop" onClick={() => onDirectNavigation('Desktop')} />
+        <IconButton style={quicklinkButtonStyle} className="button-primary-pale" icon={<DesktopOutlined />} onClick={() => onDirectNavigation('Desktop')} />
         <div style={quicklinkLabelStyle}>Desktop</div>
 
-        <IconButton style={quicklinkButtonStyle} className="button-primary-pale" icon="desktop" onClick={() => onDirectNavigation('MyComputer')} />
+        <IconButton style={quicklinkButtonStyle} className="button-primary-pale" icon={<DesktopOutlined />} onClick={() => onDirectNavigation('MyComputer')} />
         <div style={quicklinkLabelStyle}>My Computer</div>
 
-        <IconButton style={quicklinkButtonStyle} className="button-primary-pale" icon="desktop" onClick={() => onDirectNavigation('MyDocuments')} />
+        <IconButton style={quicklinkButtonStyle} className="button-primary-pale" icon={<DesktopOutlined />} onClick={() => onDirectNavigation('MyDocuments')} />
         <div style={quicklinkLabelStyle}>My Documents</div>
 
-        <IconButton style={quicklinkButtonStyle} className="button-primary-pale" icon="desktop" onClick={() => onDirectNavigation('Favourites')} />
+        <IconButton style={quicklinkButtonStyle} className="button-primary-pale" icon={<DesktopOutlined />} onClick={() => onDirectNavigation('Favourites')} />
         <div style={quicklinkLabelStyle}>Favourites</div>
 
         {quickLinks &&
           quickLinks.map(({ title, path }) => (
             <Fragment key={title}>
-              <IconButton className="button-secondary-pale" style={quicklinkButtonStyle} icon="book" onClick={() => onDirectNavigation(path)} />
+              <IconButton className="button-secondary-pale" style={quicklinkButtonStyle} icon={<BookTwoTone />} onClick={() => onDirectNavigation(path)} />
               <div style={quicklinkLabelStyle}>{title}</div>
             </Fragment>
           ))}
@@ -289,7 +290,7 @@ export function FileSystemPicker() {
                 >
                   {getItemIcon(item)}
                   <span className="file-system-picker__directory-name">{item.name}</span>
-                  {item.isDirectory && item.isQuickLink && <Icon style={{ marginLeft: 8 }} type="book" theme="twoTone" />}
+                  {item.isDirectory && item.isQuickLink && <BookTwoTone style={{ marginLeft: 8 }} />}
                 </div>
               </ListItem>
             );

@@ -27,6 +27,10 @@
         color: grey;
       }
     }
+
+    &__conversation_header > .ant-tree-switcher {
+      display: none;
+    }
   }
 
   .ant-tree {

@@ -3,7 +3,6 @@ import React, { CSSProperties } from 'react';
 import { observer } from 'mobx-react';
 import { Input, AutoComplete } from 'antd';
 import { SelectValue } from 'antd/lib/select';
-import { DataSourceItemType } from 'antd/lib/auto-complete';
 
 type Props = {
   value: string | null;
@@ -56,14 +55,19 @@ function EditableInput({ value = null, options = null, onChange, onBlur, optionL
       }
     }
 
+    const autoCompleteOptions = options.map((option) => {
+      if (typeof option === 'object') return { value: option.value, label: option.text };
+      return { value: option, label: option };
+    });
+
     return (
       <section style={style}>
         <AutoComplete
           {...conditionalProps}
           style={style}
-          dataSource={options as DataSourceItemType[]}
+          options={autoCompleteOptions}
           filterOption={(inputValue, option) => {
-            const autocompleteValueTitle = option.props.children as string; // Preset Def value strings: 'SimGameScope', 'SimGameFadeValues', 'DoesOrDoesNot', 'has', 'doesn't have' etc
+            const autocompleteValueTitle = String(option?.label || option?.value || ''); // Preset Def value strings: 'SimGameScope', 'SimGameFadeValues', 'DoesOrDoesNot', 'has', 'doesn't have' etc
             if (typeof inputValue === 'number') {
               return autocompleteValueTitle.indexOf(inputValue) !== -1;
             } else if (typeof inputValue === 'string') {
@@ -73,7 +77,7 @@ function EditableInput({ value = null, options = null, onChange, onBlur, optionL
             return false;
           }}
           onChange={onChange}
-          onBlur={onBlur}
+          onBlur={() => onBlur?.(value || '')}
         />
         {optionLabelProp && (
           <span style={valueLabelStyle}>

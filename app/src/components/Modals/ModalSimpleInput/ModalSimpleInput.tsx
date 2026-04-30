@@ -4,6 +4,7 @@ import { Input } from 'antd';
 
 import { useStore } from 'hooks/useStore';
 import { ModalStore, OnCancelType, OnOkType } from 'stores/modalStore/modal-store';
+import { LegacyButtonType } from 'utils/antd-button-utils';
 
 import './ModalSimpleInput.css';
 
@@ -15,9 +16,9 @@ type Props = {
   body: string;
   width: string;
   buttons: {
-    positiveType?: 'link' | 'primary' | 'default' | 'ghost' | 'dashed' | 'danger' | undefined;
+    positiveType?: LegacyButtonType;
     positiveLabel: string;
-    negativeType?: 'link' | 'primary' | 'default' | 'ghost' | 'dashed' | 'danger' | undefined;
+    negativeType?: LegacyButtonType;
     negativeLabel?: string;
     onNegative: OnCancelType;
     onPositive: OnOkType;
@@ -30,7 +31,6 @@ function renderTitleWithType(title: string, type: string) {
 
   return (
     <>
-      {/* <Icon type="exclamation-circle" theme="twoTone" twoToneColor="orange" className="modal-confirmation__icon--warning" /> */}
       {title}
     </>
   );

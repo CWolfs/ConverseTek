@@ -142,18 +142,41 @@
   }
 }
 
+.ant-btn-icon-only {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+  padding: 0;
+
+  .anticon {
+    line-height: 1;
+  }
+
+  .anticon svg {
+    display: block;
+  }
+}
+
 .ant-tree,
 .ant-tree li .ant-tree-node-content-wrapper {
+  background: transparent;
   color: $textColourPrimary;
 }
 
-.ant-tree.ant-tree-show-line li span.ant-tree-switcher {
+.ant-tree .ant-tree-node-content-wrapper {
+  color: $textColourPrimary;
+}
+
+.ant-tree.ant-tree-show-line li span.ant-tree-switcher,
+.ant-tree.ant-tree-show-line .ant-tree-switcher {
   background-color: $backgroundTertiary;
   color: white;
 }
 
 .ant-tree li .ant-tree-node-content-wrapper:hover,
-.ant-tree li .ant-tree-node-content-wrapper.ant-tree-node-selected {
+.ant-tree li .ant-tree-node-content-wrapper.ant-tree-node-selected,
+.ant-tree .ant-tree-node-content-wrapper:hover,
+.ant-tree .ant-tree-node-content-wrapper.ant-tree-node-selected {
   background-color: #2ab0f77d;
   color: white;
 }
@@ -176,7 +199,7 @@
   background: transparent;
   border-bottom: none;
   color: white;
-  line-height: 12px;
+  line-height: 35px;
 }
 
 .ant-menu-horizontal > .ant-menu-item:hover,
@@ -187,8 +210,40 @@
 .ant-menu-horizontal > .ant-menu-submenu-open,
 .ant-menu-horizontal > .ant-menu-item-selected,
 .ant-menu-horizontal > .ant-menu-submenu-selected {
-  border-bottom: none;
-  color: white;
+  border-bottom-color: transparent !important;
+  color: white !important;
+}
+
+.ant-menu-horizontal > .ant-menu-item:hover,
+.ant-menu-horizontal > .ant-menu-submenu:hover,
+.ant-menu-horizontal > .ant-menu-item-active,
+.ant-menu-horizontal > .ant-menu-submenu-active {
+  border-bottom-color: $linkColourPrimary !important;
+}
+
+.ant-menu-horizontal > .ant-menu-item::after,
+.ant-menu-horizontal > .ant-menu-submenu::after,
+.ant-menu-horizontal > .ant-menu-item-selected::after,
+.ant-menu-horizontal > .ant-menu-submenu-selected::after,
+.ant-menu-horizontal > .ant-menu-item-open::after,
+.ant-menu-horizontal > .ant-menu-submenu-open::after {
+  border-bottom-color: transparent !important;
+}
+
+.ant-menu-horizontal > .ant-menu-item:hover::after,
+.ant-menu-horizontal > .ant-menu-submenu:hover::after,
+.ant-menu-horizontal > .ant-menu-item-active::after,
+.ant-menu-horizontal > .ant-menu-submenu-active::after {
+  border-bottom-color: $linkColourPrimary !important;
+}
+
+.ant-menu-horizontal > .ant-menu-item:hover a,
+.ant-menu-horizontal > .ant-menu-submenu:hover .ant-menu-submenu-title,
+.ant-menu-horizontal > .ant-menu-item-active a,
+.ant-menu-horizontal > .ant-menu-submenu-active .ant-menu-submenu-title,
+.ant-menu-horizontal > .ant-menu-item-open a,
+.ant-menu-horizontal > .ant-menu-submenu-open .ant-menu-submenu-title {
+  color: white !important;
 }
 
 .ant-menu-item:active {
@@ -198,11 +253,33 @@
 .ant-menu-horizontal > .ant-menu-item,
 .ant-menu-horizontal > .ant-menu-submenu {
   border-bottom: none;
-  padding: 12px 0;
+  height: 35px;
+  line-height: 35px;
+  margin-top: 0;
+  padding: 0 12px;
+}
+
+.ant-menu-horizontal > .ant-menu-item:hover,
+.ant-menu-horizontal > .ant-menu-submenu:hover,
+.ant-menu-horizontal > .ant-menu-item-active,
+.ant-menu-horizontal > .ant-menu-submenu-active,
+.ant-menu-horizontal > .ant-menu-item-open,
+.ant-menu-horizontal > .ant-menu-submenu-open,
+.ant-menu-horizontal > .ant-menu-item-selected,
+.ant-menu-horizontal > .ant-menu-submenu-selected {
+  background-color: transparent;
 }
 
 .ant-menu-submenu > .ant-menu {
   border-radius: 2px;
+}
+
+.ant-menu-submenu-popup {
+  padding-top: 0;
+}
+
+.ant-menu-submenu-popup.ant-menu-submenu-placement-bottomLeft {
+  margin-top: 0;
 }
 
 .ant-menu-vertical > .ant-menu-item,
@@ -217,11 +294,17 @@
   height: 32px;
 }
 
-.ant-menu-item:hover,
-.ant-menu-item-active,
-.ant-menu:not(.ant-menu-inline) .ant-menu-submenu-open,
-.ant-menu-submenu-active,
-.ant-menu-submenu-title:hover {
+.ant-menu-vertical .ant-menu-item:hover,
+.ant-menu-vertical .ant-menu-item-active,
+.ant-menu-vertical-left .ant-menu-item:hover,
+.ant-menu-vertical-left .ant-menu-item-active,
+.ant-menu-vertical-right .ant-menu-item:hover,
+.ant-menu-vertical-right .ant-menu-item-active,
+.ant-menu-inline .ant-menu-item:hover,
+.ant-menu-inline .ant-menu-item-active,
+.ant-menu-submenu-popup .ant-menu-item:hover,
+.ant-menu-submenu-popup .ant-menu-item-active,
+.ant-menu-submenu-popup .ant-menu-submenu-title:hover {
   color: $linkColourTertiary;
   background-color: $backgroundQuaternary;
 }

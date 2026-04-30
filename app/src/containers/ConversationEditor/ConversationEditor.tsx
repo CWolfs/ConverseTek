@@ -2,7 +2,8 @@ import React, { ChangeEvent, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react';
-import { message, Button, Row, Col, Form, Input, Icon, Tabs, Popconfirm } from 'antd';
+import { message, Button, Row, Col, Form, Input, Tabs, Popconfirm } from 'antd';
+import { ArrowRightOutlined, MenuFoldOutlined, MenuUnfoldOutlined, RetweetOutlined, SaveOutlined } from '@ant-design/icons';
 import { Split } from '@geoffcox/react-splitter';
 
 import { updateConversation } from 'services/api';
@@ -22,7 +23,7 @@ import { ConversationActions } from '../ConversationActions';
 import './ConversationEditor.css';
 
 const FormItem = Form.Item;
-const { TabPane } = Tabs;
+type TabsItems = NonNullable<React.ComponentProps<typeof Tabs>['items']>;
 
 type Props = {
   conversationAsset: ConversationAssetType;
@@ -118,6 +119,25 @@ function ConversationEditor({ conversationAsset }: Props) {
   const conversationId = conversation.idRef.id;
   const { type } = activeNode || { type: null };
   const { isRoot, isResponse } = detectType(type);
+  const detailTabs = activeNode
+    ? ([
+        {
+          children: <ConversationGeneral node={activeNode} />,
+          key: '1',
+          label: 'General',
+        },
+        (isRoot || isResponse) && {
+          children: <ConversationConditions node={activeNode as ElementNodeType} />,
+          key: '2',
+          label: 'Conditions',
+        },
+        {
+          children: <ConversationActions node={activeNode} />,
+          key: '3',
+          label: 'Actions',
+        },
+      ].filter(Boolean) as TabsItems)
+    : [];
 
   return (
     <div className="conversation-editor">
@@ -134,9 +154,7 @@ function ConversationEditor({ conversationAsset }: Props) {
                   okText="Yes"
                   cancelText="No"
                 >
-                  <Button className="conversation-editor__regenerate-conversation-id-button button-secondary" size="small">
-                    <Icon type="retweet" />
-                  </Button>
+                  <Button className="conversation-editor__regenerate-conversation-id-button button-secondary" size="small" icon={<RetweetOutlined />} />
                 </Popconfirm>
               </div>
             </FormItem>
@@ -151,9 +169,12 @@ function ConversationEditor({ conversationAsset }: Props) {
 
       <div className="conversation-editor__toolbar">
         <div className="conversation-editor__tool-buttons">
-          <Button className="conversation-editor__expand-nodes button-secondary" size="small" onClick={() => setIsAllExpanded(!isAllExpanded)}>
-            <Icon type={isAllExpanded ? 'menu-fold' : 'menu-unfold'} />
-          </Button>
+          <Button
+            className="conversation-editor__expand-nodes button-secondary"
+            size="small"
+            icon={isAllExpanded ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
+            onClick={() => setIsAllExpanded(!isAllExpanded)}
+          />
           <Button
             className="conversation-editor__go-to-node-button button-secondary"
             type="primary"
@@ -162,9 +183,8 @@ function ConversationEditor({ conversationAsset }: Props) {
             onClick={() => {
               nodeStore.scrollToActiveNode(true);
             }}
-          >
-            <Icon type="arrow-right" />
-          </Button>
+            icon={<ArrowRightOutlined />}
+          />
         </div>
 
         <div className="conversation-editor__buttons">
@@ -175,13 +195,9 @@ function ConversationEditor({ conversationAsset }: Props) {
             okText="Yes"
             cancelText="No"
           >
-            <Button className="conversation-editor__regenerate-ids-button button-secondary" type="primary" size="small">
-              <Icon type="retweet" />
-            </Button>
+            <Button className="conversation-editor__regenerate-ids-button button-secondary" type="primary" size="small" icon={<RetweetOutlined />} />
           </Popconfirm>
-          <Button className="conversation-editor__save-button" type="primary" size="small" onClick={onSaveButtonClicked}>
-            <Icon type="save" />
-          </Button>
+          <Button className="conversation-editor__save-button" type="primary" size="small" icon={<SaveOutlined />} onClick={onSaveButtonClicked} />
         </div>
       </div>
 
@@ -198,26 +214,13 @@ function ConversationEditor({ conversationAsset }: Props) {
                     type="primary"
                     size="small"
                     onClick={() => nodeStore.scrollToActiveNode()}
-                  >
-                    <Icon type="arrow-right" />
-                  </Button>
+                    icon={<ArrowRightOutlined />}
+                  />
                 </div>
                 <DialogTextArea node={activeNode} />
               </Col>
               <Col md={12} className="conversation-editor__details-right">
-                <Tabs defaultActiveKey="1">
-                  <TabPane tab="General" key="1">
-                    <ConversationGeneral node={activeNode} />
-                  </TabPane>
-                  {(isRoot || isResponse) && (
-                    <TabPane tab="Conditions" key="2">
-                      <ConversationConditions node={activeNode as ElementNodeType} />
-                    </TabPane>
-                  )}
-                  <TabPane tab="Actions" key="3">
-                    <ConversationActions node={activeNode} />
-                  </TabPane>
-                </Tabs>
+                <Tabs defaultActiveKey="1" items={detailTabs} />
               </Col>
             </Row>
           </div>

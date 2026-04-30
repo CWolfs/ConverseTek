@@ -1,6 +1,7 @@
 import React, { useState, useEffect, ChangeEvent } from 'react';
 import PropTypes from 'prop-types';
-import { Card, Row, Col, Input, Select, Tooltip, Icon, Checkbox } from 'antd';
+import { Card, Row, Col, Input, Select, Tooltip, Checkbox } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { SelectValue } from 'antd/lib/select';
 import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import { observer } from 'mobx-react';
@@ -145,7 +146,7 @@ function ConversationGeneral({ node }: Props) {
           <Col {...colOneLayout}>
             <div className="conversation-general__speaker-group-label">
               <Tooltip title="'Cast Id' will not be saved if 'Speaker Id' is selected">
-                <Icon type="exclamation-circle-o" />
+                <ExclamationCircleOutlined />
               </Tooltip>
               <div className="conversation-general__label">Speaker</div>
             </div>

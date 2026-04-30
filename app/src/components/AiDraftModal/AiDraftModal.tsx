@@ -2,7 +2,18 @@ import React, { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { toJS } from 'mobx';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react';
-import { Alert, Button, Checkbox, Col, Form, Icon, Input, message, Radio, Row, Select, Spin, Tabs, Tag, Tooltip } from 'antd';
+import { Alert, Button, Checkbox, Col, Form, Input, message, Radio, Row, Select, Spin, Tabs, Tag, Tooltip } from 'antd';
+import {
+  CodeOutlined,
+  CopyOutlined,
+  DeleteOutlined,
+  FileTextOutlined,
+  FolderOpenOutlined,
+  PlusOutlined,
+  QuestionCircleOutlined,
+  ReloadOutlined,
+  SearchOutlined,
+} from '@ant-design/icons';
 import classnames from 'classnames';
 
 import { useStore } from 'hooks/useStore';
@@ -50,7 +61,7 @@ import './AiDraftModal.css';
 
 const { TextArea } = Input;
 const { Option } = Select;
-const { TabPane } = Tabs;
+type TabsItems = NonNullable<React.ComponentProps<typeof Tabs>['items']>;
 const AI_DEBUG_PREFIX = '[ConverseTek AI Modal]';
 
 const fallbackReasoningEfforts = [
@@ -219,7 +230,7 @@ function FieldLabel({ label, help }: { label: string; help: string }) {
     <span className="ai-draft-modal__field-label">
       <span>{label}</span>
       <Tooltip title={help}>
-        <Icon className="ai-draft-modal__help-icon" type="question-circle" />
+        <QuestionCircleOutlined className="ai-draft-modal__help-icon" />
       </Tooltip>
     </span>
   );
@@ -825,7 +836,8 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
         {getAcceptLabel(mode)}
       </Button>
       <Button
-        type={draft != null ? 'danger' : 'default'}
+        type="default"
+        danger={draft != null}
         className="ai-draft-modal__action-button"
         disabled={draft == null || isLoading}
         onClick={() => setDraft(null)}
@@ -835,10 +847,10 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
     </div>
   );
 
-  return (
-    <div className={classnames('ai-draft-modal', draft && 'ai-draft-modal--has-draft')}>
-      <Tabs activeKey={activeTab} onChange={changeTab}>
-        <TabPane tab="Draft" key="draft">
+  const tabsItems: TabsItems = [
+    {
+      children: (
+        <>
           {!canGenerate && (
             <Alert
               className="ai-draft-modal__alert"
@@ -920,7 +932,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                     <div>
                       <Button
                         size="small"
-                        icon="file-text"
+                        icon={<FileTextOutlined />}
                         disabled={!draftRunResult.promptPath}
                         onClick={() => {
                           void openDraftArtifact('AI Prompt Sent', draftRunResult.promptPath);
@@ -930,7 +942,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                       </Button>
                       <Button
                         size="small"
-                        icon="code"
+                        icon={<CodeOutlined />}
                         disabled={!draftRunResult.outputPath}
                         onClick={() => {
                           void openDraftArtifact('AI Response Received', draftRunResult.outputPath);
@@ -968,9 +980,14 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
           )}
 
           {draft != null && draftActions}
-        </TabPane>
-
-        <TabPane tab="Settings" key="settings">
+        </>
+      ),
+      key: 'draft',
+      label: 'Draft',
+    },
+    {
+      children: (
+        <>
           <Row gutter={16}>
             <Col md={10}>
               <Form layout="vertical">
@@ -1038,7 +1055,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                     </Select>
                     <Tooltip title="Poll the provider CLI again for the latest model catalogue.">
                       <Button
-                        icon="reload"
+                        icon={<ReloadOutlined />}
                         loading={isLoadingModels}
                         onClick={() => {
                           void loadModelCatalog(settings, true);
@@ -1073,7 +1090,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                   >
                     <Select
                       value={settings.codexReasoningEffort || ''}
-                      dropdownClassName="ai-draft-modal__reasoning-dropdown"
+                      popupClassName="ai-draft-modal__reasoning-dropdown"
                       optionLabelProp="label"
                       onChange={(value: string) => updateSettings({ codexReasoningEffort: value })}
                     >
@@ -1154,7 +1171,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                     }
                   />
                   <div className="ai-draft-modal__field-actions">
-                    <Button icon="folder-open" onClick={openContextPathPicker}>
+                    <Button icon={<FolderOpenOutlined />} onClick={openContextPathPicker}>
                       Browse...
                     </Button>
                   </div>
@@ -1192,19 +1209,24 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
               </Form>
             </Col>
           </Row>
-        </TabPane>
-
-        <TabPane tab="Cast Personalities" key="cast-personalities">
+        </>
+      ),
+      key: 'settings',
+      label: 'Settings',
+    },
+    {
+      children: (
+        <>
           <Row gutter={24} className="ai-draft-personalities">
             <Col md={9}>
               <div className="ai-draft-personalities__toolbar">
                 <Input
                   value={personalitySearch}
-                  prefix={<Icon type="search" />}
+                  prefix={<SearchOutlined />}
                   placeholder="Search personalities"
                   onChange={(event) => setPersonalitySearch(event.target.value)}
                 />
-                <Button icon="plus" onClick={addCastPersonality}>
+                <Button icon={<PlusOutlined />} onClick={addCastPersonality}>
                   Add
                 </Button>
               </div>
@@ -1241,13 +1263,13 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
               </div>
 
               <div className="ai-draft-personalities__list-actions">
-                <Button icon="copy" disabled={selectedPersonality == null} onClick={duplicateSelectedPersonality}>
+                <Button icon={<CopyOutlined />} disabled={selectedPersonality == null} onClick={duplicateSelectedPersonality}>
                   Duplicate
                 </Button>
-                <Button icon="delete" disabled={selectedPersonality == null} onClick={deleteSelectedPersonality}>
+                <Button icon={<DeleteOutlined />} disabled={selectedPersonality == null} onClick={deleteSelectedPersonality}>
                   Delete
                 </Button>
-                <Button icon="reload" onClick={restoreMissingDefaultPersonalities}>
+                <Button icon={<ReloadOutlined />} onClick={restoreMissingDefaultPersonalities}>
                   Restore Missing Defaults
                 </Button>
               </div>
@@ -1265,7 +1287,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                     >
                       Enabled
                     </Checkbox>
-                    <Button icon="reload" disabled={selectedDefaultPersonality == null} onClick={restoreSelectedDefaultPersonality}>
+                    <Button icon={<ReloadOutlined />} disabled={selectedDefaultPersonality == null} onClick={restoreSelectedDefaultPersonality}>
                       Restore Selected Default
                     </Button>
                   </div>
@@ -1329,8 +1351,16 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
               )}
             </Col>
           </Row>
-        </TabPane>
-      </Tabs>
+        </>
+      ),
+      key: 'cast-personalities',
+      label: 'Cast Personalities',
+    },
+  ];
+
+  return (
+    <div className={classnames('ai-draft-modal', draft && 'ai-draft-modal--has-draft')}>
+      <Tabs activeKey={activeTab} onChange={changeTab} items={tabsItems} />
     </div>
   );
 }

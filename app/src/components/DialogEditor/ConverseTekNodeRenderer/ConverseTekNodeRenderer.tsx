@@ -3,7 +3,17 @@
 import React, { CSSProperties, useEffect, useRef, useState } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { Icon, Popover, Tooltip } from 'antd';
+import { Popover, Tooltip } from 'antd';
+import {
+  AntDesignOutlined,
+  BranchesOutlined,
+  EnterOutlined,
+  LockOutlined,
+  ProfileOutlined,
+  QuestionCircleFilled,
+  RightCircleFilled,
+  VideoCameraOutlined,
+} from '@ant-design/icons';
 import defer from 'lodash.defer';
 import tinycolor from 'tinycolor2';
 
@@ -159,7 +169,7 @@ function getPromptSpeakerBadge(
 function getMoveHandleIcon(isRoot: boolean, isNode: boolean, isResponse: boolean): JSX.Element | null {
   const handleIconStyle = { color: 'white', fontSize: '20px' };
 
-  if (isRoot) return <Icon type="ant-design" style={handleIconStyle} />;
+  if (isRoot) return <AntDesignOutlined style={handleIconStyle} />;
   if (isNode || isResponse) return null;
 
   return null;
@@ -555,8 +565,8 @@ export const ConverseTekNodeRenderer = observer(
         {!isLink && (
           <section>
             <div className="node-renderer__row-contents-logic">
-              {isBaseCore && <Icon type="profile" style={coreStyle} />}
-              {isIsolatedCore && <Icon type="branches" style={coreStyle} />}
+              {isBaseCore && <ProfileOutlined style={coreStyle} />}
+              {isIsolatedCore && <BranchesOutlined style={coreStyle} />}
               {hasConditions && (
                 <Popover
                   overlayClassName="node-renderer__logic-popover"
@@ -566,7 +576,7 @@ export const ConverseTekNodeRenderer = observer(
                   destroyTooltipOnHide
                   trigger="hover"
                 >
-                  <Icon type="question-circle" theme="filled" style={logicStyle} />
+                  <QuestionCircleFilled style={logicStyle} />
                 </Popover>
               )}
               {hasActions && (
@@ -578,12 +588,11 @@ export const ConverseTekNodeRenderer = observer(
                   destroyTooltipOnHide
                   trigger="hover"
                 >
-                  <Icon type="right-circle" theme="filled" style={actionsIconStyle} />
+                  <RightCircleFilled style={actionsIconStyle} />
                 </Popover>
               )}
               {!hasNodeTitle && (
-                <Icon
-                  type="enter"
+                <EnterOutlined
                   className={classnames('node-renderer__continue-icon', {
                     'node-renderer__continue-icon--before-badge': speakerBadge || cameraBadge,
                   })}
@@ -602,8 +611,8 @@ export const ConverseTekNodeRenderer = observer(
                 {cameraBadge && (
                   <Tooltip title={cameraBadge.title} mouseEnterDelay={0.35}>
                     <span className={cameraBadgeClasses}>
-                      {cameraBadge.variant !== 'multiple' && <Icon type="lock" />}
-                      <Icon type="video-camera" />
+                      {cameraBadge.variant !== 'multiple' && <LockOutlined />}
+                      <VideoCameraOutlined />
                       <span className="node-renderer__camera-badge-label">{cameraBadge.label}</span>
                     </span>
                   </Tooltip>

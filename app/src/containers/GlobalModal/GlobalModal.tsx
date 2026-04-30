@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 
 import { useStore } from 'hooks/useStore';
 import { ModalStore } from 'stores/modalStore/modal-store';
+import { getAntdButtonType, isAntdButtonDanger } from 'utils/antd-button-utils';
 
 import './GlobalModal.css';
 
@@ -39,13 +40,13 @@ function GlobalModal({ id }: { id: string }) {
 
   const footer = [
     showCancelButton ? (
-      <Button key="cancel" type={cancelType} onClick={onCancel || undefined}>
+      <Button key="cancel" type={getAntdButtonType(cancelType)} danger={isAntdButtonDanger(cancelType)} onClick={onCancel || undefined}>
         {cancelLabel ? cancelLabel : 'Cancel'}
       </Button>
     ) : null,
 
     showOkButton ? (
-      <Button key="submit" type={okType} onClick={onOk || undefined} loading={isLoading} disabled={disableOk}>
+      <Button key="submit" type={getAntdButtonType(okType)} danger={isAntdButtonDanger(okType)} onClick={onOk || undefined} loading={isLoading} disabled={disableOk}>
         {isLoading ? loadingLabel : okLabel}
       </Button>
     ) : null,
@@ -54,7 +55,7 @@ function GlobalModal({ id }: { id: string }) {
   return (
     <Modal
       title={title}
-      visible={isVisible}
+      open={isVisible}
       confirmLoading={confirmLoading}
       onCancel={onCancel || undefined}
       footer={footer}
@@ -66,7 +67,7 @@ function GlobalModal({ id }: { id: string }) {
       transitionName=""
       maskTransitionName=""
     >
-      {content}
+      {React.isValidElement(content) ? content : null}
     </Modal>
   );
 }

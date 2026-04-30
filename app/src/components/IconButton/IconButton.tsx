@@ -1,14 +1,15 @@
-import React, { CSSProperties, MouseEvent } from 'react';
+import React, { CSSProperties, MouseEvent, ReactNode } from 'react';
 import { Button, Tooltip } from 'antd';
 import { TooltipPlacement } from 'antd/lib/tooltip';
+import { getAntdButtonType, isAntdButtonDanger, LegacyButtonType } from 'utils/antd-button-utils';
 
 import './IconButton.css';
 
 type Props = ButtonProps & TooltipProps;
 
 type ButtonProps = {
-  type?: 'link' | 'default' | 'ghost' | 'primary' | 'dashed' | 'danger' | undefined;
-  icon: string;
+  type?: LegacyButtonType;
+  icon: ReactNode;
   shape?: 'circle' | 'round' | 'circle-outline' | undefined;
   onClick: (event: MouseEvent<HTMLElement>) => void;
   className?: string;
@@ -21,7 +22,16 @@ type TooltipProps = {
 };
 
 export const IconButton = ({ type, icon, shape = 'circle', onClick, className, style = {}, title, placement = 'left' }: Props) => {
-  let component = <Button className={className} type={type} shape={shape} icon={icon} onClick={onClick} />;
+  let component = (
+    <Button
+      className={className}
+      type={getAntdButtonType(type)}
+      danger={isAntdButtonDanger(type)}
+      shape={shape === 'circle-outline' ? 'circle' : shape}
+      icon={icon}
+      onClick={onClick}
+    />
+  );
 
   if (title != null) {
     component = (
