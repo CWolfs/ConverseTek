@@ -2,14 +2,12 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { useState, useEffect, useRef, useMemo, MouseEvent } from 'react';
 import { observer } from 'mobx-react';
-import SortableTree from 'react-sortable-tree';
+import { Tree, NodeApi, NodeRendererProps, RowRendererProps, CursorProps, DragPreviewProps, TreeApi } from 'react-arborist';
 import { useContextMenu } from 'react-contexify';
 import { useSize } from 'ahooks';
 import throttle from 'lodash/throttle';
 import classnames from 'classnames';
 import defer from 'lodash.defer';
-
-import 'react-sortable-tree/style.css';
 
 import { DataStore } from 'stores/dataStore/data-store';
 import { DefStore } from 'stores/defStore/def-store';
@@ -27,9 +25,18 @@ import { buildPromptSpeakerProjectionMap } from 'utils/speaker-projection-utils'
 import { buildPromptCameraProjectionMap } from 'utils/camera-projection-utils';
 
 import { ScalableScrollbar } from 'components/ScalableScrollbar';
+import { LinkIcon } from 'components/Svg';
 
-import { ConverseTekNodeRenderer, ConverseTekNodeRendererProps } from './ConverseTekNodeRenderer';
+import { ConverseTekNodeRenderer } from './ConverseTekNodeRenderer';
 import { DialogEditorContextMenu } from '../ContextMenus/DialogEditorContextMenu';
+import {
+  buildInitialOpenState,
+  findConversationTreeMaxRightEdge,
+  getConversationTreeNodeId,
+  getConversationTreePath,
+  getConversationTreeScaffoldLines,
+  moveConversationTreeNode,
+} from './conversation-tree-adapter';
 
 import './DialogEditor.css';
 
@@ -83,6 +90,40 @@ function buildTreeDataFromNode(nodeStore: NodeStore, node: PromptNodeType | Elem
 }
 
 const zoomLevelIncrement = 0.05;
+const scaffoldBlockPxWidth = 44;
+const rootScaffoldOffsetPx = scaffoldBlockPxWidth;
+const dragPreviewHandleAnchorX = 17;
+const dragPreviewHandleAnchorY = 12;
+
+function getNodeLayoutStyle(style: React.CSSProperties): React.CSSProperties {
+  const paddingLeft = typeof style.paddingLeft === 'number' ? style.paddingLeft : parseFloat(String(style.paddingLeft || 0));
+
+  return {
+    ...style,
+    paddingLeft: (Number.isNaN(paddingLeft) ? 0 : paddingLeft) + rootScaffoldOffsetPx,
+  };
+}
+
+function ConversationTreeRow({ attrs, innerRef, children }: RowRendererProps<RSTNode>) {
+  return (
+    <div
+      {...attrs}
+      ref={innerRef}
+      className={classnames(attrs.className, 'conversation-tree__row')}
+      onFocus={(event) => event.stopPropagation()}
+    >
+      {children}
+    </div>
+  );
+}
+
+function ConversationTreeCursor({ top, left }: CursorProps) {
+  return <div className="conversation-tree__drop-cursor" style={{ top, left: left + rootScaffoldOffsetPx }} />;
+}
+
+function getNodePathNode(node: NodeApi<RSTNode> | null): RSTNode | null {
+  return node == null || node.isRoot ? null : node.data;
+}
 
 function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationAsset: ConversationAssetType; rebuild: boolean; expandAll: boolean }) {
   const dataStore = useStore<DataStore>('data');
@@ -97,10 +138,12 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
   const activeIsolateOnNodeId = useRef<string | null>(null);
 
   const [treeData, setTreeData] = useState<RSTNode[] | null>(null);
+  const [treeVersion, setTreeVersion] = useState(0);
   const [treeWidth, setTreeWidth] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [isContextMenuVisible, setIsContextMenuVisible] = useState(false);
   const treeElement = useRef<HTMLDivElement>(null);
+  const arboristTreeRef = useRef<TreeApi<RSTNode> | null>(null);
   const { show } = useContextMenu({
     id: 'dialog-context-menu',
   });
@@ -122,25 +165,48 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
     [conversationAsset, rebuild, dataStore.conversationMutationRevision],
   );
 
-  const onMove = (nodeContainer: RSTNodeOnMoveContainer) => {
-    const { node, nextParentNode } = nodeContainer;
-    const { id: nodeId, type: nodeType, parentId: nodeParentId } = node;
+  const replaceTreeData = (nextTreeData: RSTNode[] | null) => {
+    setTreeData(nextTreeData);
+    setTreeVersion((currentVersion) => currentVersion + 1);
+  };
+
+  const commitMove = (node: RSTNode, nextParentNode: RSTNode, previousParentId: string | null) => {
+    const { id: nodeId, type: nodeType } = node;
     const { id: nextParentNodeId, children: parentChildren } = nextParentNode;
 
     const { isRoot, isNode, isResponse } = detectType(nodeType);
 
     if (isRoot) {
-      const rootIds = parentChildren.map((child) => child.id);
+      const rootIds = (parentChildren || []).map((child) => child.id).filter((id): id is string => id != null);
       nodeStore.setRootNodesByIds(rootIds);
     } else if (isNode) {
-      if (nodeId == null || nodeParentId == null) return;
+      if (nodeId == null || previousParentId == null || nextParentNodeId == null) return;
 
-      nodeStore.movePromptNode(nodeId, nextParentNodeId, nodeParentId);
+      nodeStore.movePromptNode(nodeId, nextParentNodeId, previousParentId);
     } else if (isResponse) {
-      if (nodeId == null) return;
+      if (nodeId == null || nextParentNodeId == null) return;
 
-      nodeStore.moveResponseNode(nodeId, nextParentNodeId, parentChildren);
+      nodeStore.moveResponseNode(
+        nodeId,
+        nextParentNodeId,
+        (parentChildren || []).filter((child): child is RSTNode & { id: string } => child.id != null),
+      );
     }
+  };
+
+  const onMove = ({ dragIds, parentId, index }: { dragIds: string[]; parentId: string | null; index: number }) => {
+    const dragId = dragIds[0];
+    if (dragId == null) return;
+
+    setTreeData((currentTreeData) => {
+      if (currentTreeData == null) return currentTreeData;
+
+      const moveResult = moveConversationTreeNode(currentTreeData, dragId, parentId, index);
+      if (moveResult == null) return currentTreeData;
+
+      commitMove(moveResult.movedNode, moveResult.nextParentNode, moveResult.previousParentId);
+      return moveResult.treeData;
+    });
   };
 
   const resize = () => {
@@ -150,11 +216,8 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
     }
   };
 
-  const canDrop = (nodeContainer: RSTNodeCanDropContainer) => {
-    const { nextParent, node } = nodeContainer;
-
-    // GUARD - Don't allow drop at the very top of the tree
-    if (nextParent === null) return false;
+  const canDrop = (node: RSTNode, nextParent: RSTNode | null) => {
+    if (nextParent == null) return false;
 
     const { type: nodeType } = node;
     const { isRoot, isNode, isResponse } = detectType(nodeType);
@@ -197,13 +260,18 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
     return allowDrop;
   };
 
+  const disableDrop = ({ parentNode, dragNodes }: { parentNode: NodeApi<RSTNode>; dragNodes: NodeApi<RSTNode>[]; index: number }) => {
+    const dragNode = dragNodes[0];
+    if (dragNode == null || parentNode == null || parentNode.isRoot) return true;
+
+    return !canDrop(dragNode.data, parentNode.data);
+  };
+
   const onClicked = (event: MouseEvent<HTMLElement>) => {
     const target = event.target as HTMLElement;
-    if (
-      target.className === 'rst__node' ||
-      target.className === 'rst__lineBlock' ||
-      (target.className.includes && target.className.includes('ReactVirtualized__Grid'))
-    ) {
+    if (target.closest('.conversation-node-renderer__toggle-button')) return;
+
+    if (!target.closest('.conversation-node-renderer__row-contents')) {
       nodeStore.clearActiveNode();
     }
   };
@@ -232,37 +300,6 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
 
   const windowSize = useWindowSize();
 
-  const findMaxRightEdge = (node: HTMLElement | null): number => {
-    let maxRight = 0;
-    if (node) {
-      node.childNodes.forEach((child) => {
-        if (child instanceof HTMLElement) {
-          if (child.classList.contains('rst__rowWrapper')) {
-            const rect = child.getBoundingClientRect();
-            const left = child.parentElement?.parentElement?.style.left;
-            let leftValue = 0;
-
-            if (left) {
-              leftValue = parseFloat(left);
-            }
-
-            const rightEdge = rect.width + leftValue;
-            if (rightEdge > maxRight) {
-              maxRight = rightEdge;
-            }
-          }
-
-          // handle the child's children
-          const childMaxRight = findMaxRightEdge(child);
-          if (childMaxRight > maxRight) {
-            maxRight = childMaxRight;
-          }
-        }
-      });
-    }
-    return maxRight;
-  };
-
   const reset = () => {
     activeIsolateOnNodeId.current = null;
     defer(() => nodeStore.scrollToTop());
@@ -270,21 +307,21 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
 
   useEffect(() => {
     if (treeElement.current) {
-      const maxWidth = findMaxRightEdge(treeElement.current);
+      const maxWidth = findConversationTreeMaxRightEdge(treeElement.current);
       nodeStore.setMaxTreeHorizontalNodePosition(maxWidth);
     }
   });
 
   const handleScroll = throttle(() => {
     if (treeElement.current) {
-      const maxWidth = findMaxRightEdge(treeElement.current);
+      const maxWidth = findConversationTreeMaxRightEdge(treeElement.current);
       nodeStore.setMaxTreeHorizontalNodePosition(maxWidth);
     }
   }, 100);
 
   useEffect(() => {
     if (treeElement.current) {
-      const scrollList = document.querySelector('.ReactVirtualized__List');
+      const scrollList = treeElement.current.querySelector('.conversation-tree__list');
 
       if (scrollList) {
         scrollList.addEventListener('scroll', handleScroll);
@@ -304,7 +341,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
     activeIsolateOnNodeId.current = null;
     nodeStore.resetMaxTreeHorizontalNodePosition();
     nodeStore.init(conversationAsset);
-    setTreeData(buildTreeDataFromConversation(nodeStore, conversationAsset));
+    replaceTreeData(buildTreeDataFromConversation(nodeStore, conversationAsset));
   }, []);
 
   // OnConversationChange or rebuild
@@ -319,9 +356,9 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
       if (activeIsolateOnNodeId.current) {
         wholeTreeData.current = buildTreeDataFromConversation(nodeStore, conversationAsset);
         const node = nodeStore.getNode(activeIsolateOnNodeId.current);
-        setTreeData(buildTreeDataFromNode(nodeStore, node));
+        replaceTreeData(buildTreeDataFromNode(nodeStore, node));
       } else {
-        setTreeData(buildTreeDataFromConversation(nodeStore, conversationAsset));
+        replaceTreeData(buildTreeDataFromConversation(nodeStore, conversationAsset));
       }
 
       setIsContextMenuVisible(false);
@@ -335,9 +372,9 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
     // in isolation mode
     if (wholeTreeData.current && activeIsolateOnNodeId.current) {
       const node = nodeStore.getNode(activeIsolateOnNodeId.current);
-      setTreeData(buildTreeDataFromNode(nodeStore, node));
+      replaceTreeData(buildTreeDataFromNode(nodeStore, node));
     } else {
-      setTreeData(buildTreeDataFromConversation(nodeStore, conversationAsset));
+      replaceTreeData(buildTreeDataFromConversation(nodeStore, conversationAsset));
     }
 
     setIsContextMenuVisible(false);
@@ -365,7 +402,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
       expanded: expandAll,
     }) as RSTNode[];
 
-    setTreeData(updatedTreeData);
+    replaceTreeData(updatedTreeData);
   }, [expandAll]);
 
   // To collapse all other branches except the provided branch starting at the node id
@@ -377,7 +414,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
       nodeStore.setNodeExpansion(node.id, false);
     });
 
-    setTreeData(updatedTreeData);
+    replaceTreeData(updatedTreeData);
     nodeStore.setCollapseOthersOnNodeId(null);
   }, [collapseOthersOnNodeId]);
 
@@ -395,7 +432,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
       false,
     );
 
-    setTreeData(updatedTreeData);
+    replaceTreeData(updatedTreeData);
     nodeStore.setCollapseOnNodeId(null);
   }, [collapseOnNodeId]);
 
@@ -413,7 +450,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
       true,
     );
 
-    setTreeData(updatedTreeData);
+    replaceTreeData(updatedTreeData);
     nodeStore.setExpandOnNodeId(null);
   }, [expandOnNodeId]);
 
@@ -426,7 +463,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
       nodeStore.setNodeExpansion(node.id, true);
     });
 
-    setTreeData(updatedTreeData);
+    replaceTreeData(updatedTreeData);
     nodeStore.setExpandFromCoreToNodeId(null);
   }, [expandFromCoreToNodeId]);
 
@@ -436,7 +473,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
 
     if (isolateOnNodeId === 'exit') {
       // Restore the whole tree
-      setTreeData(wholeTreeData.current);
+      replaceTreeData(wholeTreeData.current);
       wholeTreeData.current = null;
       activeIsolateOnNodeId.current = null;
 
@@ -453,7 +490,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
       }
 
       // Set the tree data starting from the selected node
-      setTreeData(buildTreeDataFromNode(nodeStore, node));
+      replaceTreeData(buildTreeDataFromNode(nodeStore, node));
     }
 
     nodeStore.setIsolateOnNodeId(null);
@@ -466,6 +503,103 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
   const dialogeEditorClasses = classnames('dialog-editor', {
     'dialog-editor--isolated': wholeTreeData.current,
   });
+  const treeHeight = (dialogEditorSize ? dialogEditorSize.height / zoomLevel : 0) - 1;
+  const measuredTreeWidth = dialogEditorSize ? dialogEditorSize.width / zoomLevel : 0;
+  const arboristTreeWidth = treeWidth || measuredTreeWidth;
+  const initialOpenState = buildInitialOpenState(treeData);
+  const TreeNodeRenderer = (props: NodeRendererProps<RSTNode>) => {
+    const { node, tree, style, dragHandle } = props;
+    const treeNode = node.data;
+    const treeIndex = node.rowIndex ?? 0;
+    if (treeNode.id) nodeStore.addNodeIdAndTreeIndexPair(treeNode.id, treeIndex);
+
+    const draggedNode = tree.dragNode?.data || null;
+    const nodeParent = getNodePathNode(node.parent);
+    const dragSource = (element: JSX.Element) => React.cloneElement(element, { ref: dragHandle });
+    const toggleChildrenVisibility = ({ node: currentNode }: { node: RSTNode; path: RSTPath; treeIndex: number }) => {
+      const arboristNode = tree.get(getConversationTreeNodeId(currentNode));
+      if (arboristNode == null) return;
+
+      arboristNode.toggle();
+      nodeStore.setNodeExpansion(currentNode.id, !arboristNode.isOpen);
+    };
+
+    return (
+      <ConverseTekNodeRenderer
+        dataStore={dataStore}
+        nodeStore={nodeStore}
+        activeNodeId={activeNodeId}
+        previousNodeId={previousNodeId}
+        onNodeContextMenu={onNodeContextMenu}
+        isContextMenuVisible={isContextMenuVisible}
+        scaffoldBlockPxWidth={scaffoldBlockPxWidth}
+        toggleChildrenVisibility={treeNode.children && treeNode.children.length > 0 ? toggleChildrenVisibility : null}
+        connectDragPreview={(element: JSX.Element) => element}
+        connectDragSource={dragSource}
+        isDragging={draggedNode != null}
+        canDrop={node.willReceiveDrop ? tree.canDrop() : true}
+        canDrag={treeNode.canDrag !== false && treeNode.id !== '0'}
+        node={{ ...treeNode, expanded: node.isOpen }}
+        title={treeNode.title}
+        subtitle={treeNode.subtitle || null}
+        draggedNode={draggedNode}
+        path={getConversationTreePath(node)}
+        treeIndex={treeIndex}
+        isSearchMatch={false}
+        isSearchFocus={false}
+        buttons={[]}
+        className=""
+        style={getNodeLayoutStyle(style)}
+        didDrop={false}
+        treeId="conversation-tree"
+        isOver={node.willReceiveDrop}
+        parentNode={nodeParent}
+        rowDirection="ltr"
+        zoomLevel={zoomLevel}
+        scaffoldLines={getConversationTreeScaffoldLines(node, scaffoldBlockPxWidth)}
+        speakerProjectionByNodeId={speakerProjectionByNodeId}
+        cameraProjectionByNodeId={cameraProjectionByNodeId}
+        operationDefinitions={defStore.operations}
+      />
+    );
+  };
+  const TreeDragPreview = ({ mouse, id, isDragging }: DragPreviewProps) => {
+    if (!isDragging || mouse == null || id == null) return null;
+
+    const treeNode = arboristTreeRef.current?.get(id)?.data;
+    if (treeNode == null) return null;
+    const treeRect = treeElement.current?.getBoundingClientRect();
+    if (treeRect == null) return null;
+
+    const storedNode = treeNode.id ? nodeStore.getNode(treeNode.id) : null;
+    const { isRoot, isNode, isResponse, isLink } = detectType(treeNode.type);
+    const anchorX = isLink ? 0 : dragPreviewHandleAnchorX;
+    const previewX = (mouse.x - treeRect.left) / zoomLevel - anchorX;
+    const previewY = (mouse.y - treeRect.top) / zoomLevel - dragPreviewHandleAnchorY;
+    const previewTitle =
+      storedNode == null
+        ? treeNode.title
+        : storedNode.type === 'node'
+        ? storedNode.text
+        : storedNode.responseText;
+
+    return (
+      <div className="conversation-tree__drag-preview-layer">
+        <div
+          className={classnames('conversation-tree__drag-preview', {
+            'conversation-tree__drag-preview--root': isRoot,
+            'conversation-tree__drag-preview--node': isNode,
+            'conversation-tree__drag-preview--response': isResponse,
+            'conversation-tree__drag-preview--link': isLink,
+          })}
+          style={{ transform: `translate(${previewX}px, ${previewY}px)` }}
+        >
+          <span className="conversation-tree__drag-preview-handle">{isLink && <LinkIcon />}</span>
+          <span className="conversation-tree__drag-preview-title">{previewTitle}</span>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div ref={dialogEditorRef} className={dialogeEditorClasses}>
@@ -482,41 +616,34 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
         }}
       >
         <ScalableScrollbar activeNodeId={activeNodeId} width={10 / zoomLevel}>
-          <SortableTree
-            treeData={treeData}
-            onChange={(data: RSTNode[]) => setTreeData(data)}
-            getNodeKey={({ node, treeIndex }: { node: RSTNode; treeIndex: number }) => {
-              if (node.treeIndex !== treeIndex) {
-                // eslint-disable-next-line no-param-reassign
-                node.treeIndex = treeIndex;
-              }
-              if (!node.id) return treeIndex;
-
-              nodeStore.addNodeIdAndTreeIndexPair(node.id, treeIndex);
-              return node.id;
-            }}
+          <Tree<RSTNode>
+            key={treeVersion}
+            ref={arboristTreeRef}
+            data={treeData}
+            idAccessor={getConversationTreeNodeId}
+            childrenAccessor={(node) => node.children || null}
+            initialOpenState={initialOpenState}
             rowHeight={40}
-            canDrag={(nodeContainer: RSTNodeCanDragContainer) => !(nodeContainer.node.id === '0')}
-            canDrop={canDrop}
-            onMoveNode={onMove}
-            generateNodeProps={() => ({
-              dataStore,
-              nodeStore,
-              activeNodeId,
-              previousNodeId,
-              onNodeContextMenu,
-              isContextMenuVisible,
-              zoomLevel,
-              speakerProjectionByNodeId,
-              cameraProjectionByNodeId,
-              operationDefinitions: defStore.operations,
-            })}
-            nodeContentRenderer={(props: ConverseTekNodeRendererProps) => <ConverseTekNodeRenderer {...props} />}
-            reactVirtualizedListProps={{
-              width: treeWidth,
+            indent={scaffoldBlockPxWidth}
+            width={arboristTreeWidth}
+            height={treeHeight}
+            disableMultiSelection
+            selection={activeNodeId || undefined}
+            disableDrag={(node) => node.id === '0' || node.canDrag === false}
+            disableDrop={disableDrop}
+            onMove={onMove}
+            onToggle={(nodeId) => {
+              const node = arboristTreeRef.current?.get(nodeId);
+              if (node) nodeStore.setNodeExpansion(node.data.id, node.isOpen);
             }}
-            slideRegionSize={100 / zoomLevel}
-          />
+            renderRow={ConversationTreeRow}
+            renderDragPreview={TreeDragPreview}
+            renderCursor={ConversationTreeCursor}
+            className="conversation-tree__list"
+            dndRootElement={treeElement.current}
+          >
+            {TreeNodeRenderer}
+          </Tree>
         </ScalableScrollbar>
       </div>
     </div>

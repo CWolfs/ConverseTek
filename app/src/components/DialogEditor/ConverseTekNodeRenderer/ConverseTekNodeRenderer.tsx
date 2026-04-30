@@ -1,6 +1,6 @@
 /* eslint-disable function-paren-newline */
 /* eslint-disable indent */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { CSSProperties, useEffect, useRef, useState } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Icon, Popover, Tooltip } from 'antd';
@@ -8,6 +8,7 @@ import defer from 'lodash.defer';
 import tinycolor from 'tinycolor2';
 
 import type { OnNodeContextMenuProps } from '../DialogEditor';
+import type { ConversationTreeScaffoldLine } from '../conversation-tree-adapter';
 import type { PromptNodeType, ElementNodeType, ColourConfigType, OperationArgType, OperationCallType, OperationDefinitionType } from 'types';
 
 import { isDescendant } from 'utils/tree-data-utils';
@@ -52,14 +53,14 @@ export type ConverseTekNodeRendererProps = {
   isContextMenuVisible: boolean;
   scaffoldBlockPxWidth: number;
   toggleChildrenVisibility: (({ node, path, treeIndex }: NodeStateProps) => void) | null;
-  connectDragPreview: (element: JSX.Element) => void;
-  connectDragSource: (element: JSX.Element, effect: { dropEffect: string }) => void;
+  connectDragPreview: (element: JSX.Element) => JSX.Element;
+  connectDragSource: (element: JSX.Element, effect: { dropEffect: string }) => JSX.Element;
   isDragging: boolean;
   canDrop: boolean;
   canDrag: boolean;
   node: RSTNode;
-  title: ((nodeState: NodeStateProps) => string | JSX.Element) | JSX.Element | null;
-  subtitle: ((nodeState: NodeStateProps) => string | JSX.Element) | JSX.Element | null;
+  title: ((nodeState: NodeStateProps) => string | JSX.Element) | string | JSX.Element | null;
+  subtitle: ((nodeState: NodeStateProps) => string | JSX.Element) | string | JSX.Element | null;
   draggedNode: RSTNode | null;
   path: RSTPath;
   treeIndex: number;
@@ -67,13 +68,14 @@ export type ConverseTekNodeRendererProps = {
   isSearchFocus: boolean;
   buttons: JSX.Element[];
   className: string;
-  style: object;
+  style: CSSProperties;
   didDrop: boolean;
   treeId: string;
   isOver: boolean;
   parentNode: RSTNode | null;
   rowDirection: string;
   zoomLevel: number;
+  scaffoldLines?: ConversationTreeScaffoldLine[];
   speakerProjectionByNodeId?: Map<string, SpeakerProjection>;
   cameraProjectionByNodeId?: Map<string, CameraProjection>;
   rowCommentTooltip?: string;
@@ -292,6 +294,7 @@ export const ConverseTekNodeRenderer = observer(
     parentNode = null, // Needed for dndManager
     rowDirection = 'ltr',
     zoomLevel,
+    scaffoldLines = [],
     speakerProjectionByNodeId,
     cameraProjectionByNodeId,
     rowCommentTooltip = '',
@@ -319,9 +322,11 @@ export const ConverseTekNodeRenderer = observer(
 
     const { hasActions, hasConditions } = hasActionsAndConditions(storedNode);
     const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node);
-    const isLandingPadActive = !didDrop && isDragging;
+    const isLandingPadActive = !didDrop && isDragging && isOver;
 
     const { isCore, isBaseCore, isIsolatedCore, isRoot, isNode, isResponse, isLink } = detectType(nodeType);
+    const hasVisibleChildren = node.children && (node.children.length > 0 || typeof node.children === 'function');
+    const showRootConnector = isCore && !!toggleChildrenVisibility && !!hasVisibleChildren;
 
     const contextMenuId = node.id || Math.random().toString();
     const { parentId } = node;
@@ -347,14 +352,14 @@ export const ConverseTekNodeRenderer = observer(
                                         2px 0px 10px ${highlightColour.toRgbString()},
                                         -2px 0px 10px ${highlightColour.toRgbString()}`;
 
-    const moveHandleClasses = classnames('rst__moveHandle', {
+    const moveHandleClasses = classnames('conversation-node-renderer__move-handle', 'rst__moveHandle', {
       'node-renderer__root-handle': isRoot,
       'node-renderer__node-handle': isNode,
       'node-renderer__response-handle': isResponse,
       'node-renderer__comment-handle': !!rowCommentTooltip,
     });
 
-    const labelClasses = classnames('rst__rowLabel', rowDirectionClass, {
+    const labelClasses = classnames('conversation-node-renderer__row-label', 'rst__rowLabel', rowDirectionClass, {
       'node-renderer__root-label': isRoot,
       'node-renderer__node-label': isNode,
       'node-renderer__response-label': isResponse,
@@ -362,7 +367,7 @@ export const ConverseTekNodeRenderer = observer(
       'node-renderer__core-label': isCore,
     });
 
-    const titleClasses = classnames('rst__rowTitle', node.subtitle && 'rst__rowTitleWithSubtitle', {
+    const titleClasses = classnames('conversation-node-renderer__row-title', 'rst__rowTitle', node.subtitle && 'rst__rowTitleWithSubtitle', {
       'node-renderer__root-title': isRoot,
       'node-renderer__node-title': isNode,
       'node-renderer__response-title': isResponse,
@@ -370,6 +375,7 @@ export const ConverseTekNodeRenderer = observer(
     });
 
     const rowContentsClasses = classnames(
+      'conversation-node-renderer__row-contents',
       'rst__rowContents',
       'node-renderer__row-contents',
       {
@@ -383,6 +389,7 @@ export const ConverseTekNodeRenderer = observer(
     );
 
     const rowClasses = classnames(
+      'conversation-node-renderer__row',
       'rst__row',
       'node-renderer__row',
       {
@@ -397,8 +404,8 @@ export const ConverseTekNodeRenderer = observer(
         'node-renderer__response-row--active': isResponse,
         'node-renderer__link-row--active': isLink,
       },
-      isLandingPadActive && 'rst__rowLandingPad',
-      isLandingPadActive && !canDrop && 'rst__rowCancelPad',
+      isLandingPadActive && 'conversation-node-renderer__row--drop-target',
+      isLandingPadActive && !canDrop && 'conversation-node-renderer__row--drop-target-invalid',
       isSearchMatch && 'rst__rowSearchMatch',
       isSearchFocus && 'rst__rowSearchFocus',
       rowDirectionClass,
@@ -470,8 +477,6 @@ export const ConverseTekNodeRenderer = observer(
     const responseContinueStyle = {
       ...logicStyle,
       transform: 'rotate(270deg)',
-      fontSize: 22,
-      paddingRight: 4,
     };
 
     if ((!nodeTitle || (typeof nodeTitle === 'string' && nodeTitle.length <= 0)) && hasActions) {
@@ -557,6 +562,8 @@ export const ConverseTekNodeRenderer = observer(
                   overlayClassName="node-renderer__logic-popover"
                   content={getConditionsTooltip(storedNode, operationDefinitions)}
                   mouseEnterDelay={0.35}
+                  transitionName=""
+                  destroyTooltipOnHide
                   trigger="hover"
                 >
                   <Icon type="question-circle" theme="filled" style={logicStyle} />
@@ -567,12 +574,22 @@ export const ConverseTekNodeRenderer = observer(
                   overlayClassName="node-renderer__logic-popover"
                   content={getActionsTooltipTitle(storedNode, isRoot, isNode, isResponse, operationDefinitions)}
                   mouseEnterDelay={0.35}
+                  transitionName=""
+                  destroyTooltipOnHide
                   trigger="hover"
                 >
                   <Icon type="right-circle" theme="filled" style={actionsIconStyle} />
                 </Popover>
               )}
-              {!hasNodeTitle && <Icon type="enter" style={responseContinueStyle} />}
+              {!hasNodeTitle && (
+                <Icon
+                  type="enter"
+                  className={classnames('node-renderer__continue-icon', {
+                    'node-renderer__continue-icon--before-badge': speakerBadge || cameraBadge,
+                  })}
+                  style={responseContinueStyle}
+                />
+              )}
             </div>
 
             <div className={labelClasses}>
@@ -628,19 +645,47 @@ export const ConverseTekNodeRenderer = observer(
       if (nodeRef.current) {
         const parentElement = nodeRef.current.parentElement;
         if (parentElement) {
-          setSpacerLeftPosition(nodeStore.getMaxTreeHorizontalNodePosition() - parseFloat(nodeRef.current.parentElement.style.left));
+          setSpacerLeftPosition(nodeStore.getMaxTreeHorizontalNodePosition() - nodeRef.current.offsetLeft);
         }
       }
     }, [maxTreeHorPos, nodeRef.current]);
 
     return (
-      <div ref={nodeRef} style={{ height: '100%' }} data-node-id={node.id} {...otherProps}>
-        {toggleChildrenVisibility && node.children && (node.children.length > 0 || typeof node.children === 'function') && (
-          <div>
+      <div
+        ref={nodeRef}
+        className="conversation-node-renderer"
+        style={{
+          height: '100%',
+          ...style,
+        }}
+        data-node-id={node.id}
+        {...otherProps}
+      >
+        <div className="conversation-node-renderer__node-content">
+          {scaffoldLines.map((line) => (
+            <span
+              key={line.key}
+              className={classnames(
+                'conversation-node-renderer__scaffold-line',
+                `conversation-node-renderer__scaffold-line--${line.kind}`,
+              )}
+              style={{ left: line.left }}
+            />
+          ))}
+          {(scaffoldLines.length > 0 || showRootConnector) && (
+            <span className="conversation-node-renderer__scaffold-horizontal" style={{ left: -0.5 * scaffoldBlockPxWidth }} />
+          )}
+
+          {toggleChildrenVisibility && hasVisibleChildren && (
+            <div>
             <button
               type="button"
               aria-label={node.expanded ? 'Collapse' : 'Expand'}
-              className={classnames(node.expanded ? 'rst__collapseButton' : 'rst__expandButton', rowDirectionClass)}
+              className={classnames(
+                'conversation-node-renderer__toggle-button',
+                node.expanded ? 'rst__collapseButton' : 'rst__expandButton',
+                rowDirectionClass,
+              )}
               style={buttonStyle}
               onClick={() => {
                 const isNodeExpanded = nodeStore.isNodeExpanded(node.id);
@@ -656,12 +701,15 @@ export const ConverseTekNodeRenderer = observer(
             />
 
             {node.expanded && !isDragging && (
-              <div style={{ width: scaffoldBlockPxWidth }} className={classnames('rst__lineChildren', rowDirectionClass)} />
+              <div
+                style={{ width: scaffoldBlockPxWidth }}
+                className={classnames('conversation-node-renderer__line-children', 'rst__lineChildren', rowDirectionClass)}
+              />
             )}
-          </div>
-        )}
+            </div>
+          )}
 
-        <div className={classnames('rst__rowWrapper', rowDirectionClass)} style={{ display: 'inline-block' }}>
+          <div className={classnames('conversation-node-renderer__row-wrapper', 'rst__rowWrapper', rowDirectionClass)} style={{ display: 'inline-block' }}>
           {/* Set the row preview to be used during drag and drop */}
           {connectDragPreview(
             <div
@@ -673,7 +721,6 @@ export const ConverseTekNodeRenderer = observer(
                   ? 1
                   : colourConfig.dialogueNodeTree.nonActiveOpacity,
                 boxShadow: isActiveNode || (!isAnyNodeActive && wasPreviousActiveNode) || isHoveringOver ? hoverActiveBoxShadowStyle : undefined,
-                ...style,
               }}
               onMouseEnter={() => setIsHoveringOver(true)}
               onMouseLeave={() => setIsHoveringOver(false)}
@@ -683,10 +730,11 @@ export const ConverseTekNodeRenderer = observer(
               {rowContents}
             </div>,
           )}
-        </div>
+          </div>
 
-        <div className="faker" style={{ position: 'absolute', display: 'inline-block', visibility: 'hidden', left: spacerLeftPosition }}>
+          <div className="faker" style={{ position: 'absolute', display: 'inline-block', visibility: 'hidden', left: spacerLeftPosition }}>
           spacer
+          </div>
         </div>
       </div>
     );

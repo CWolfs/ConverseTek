@@ -653,7 +653,7 @@
   cursor: default;
 }
 
-.ai-draft-preview-tree__canvas .ReactVirtualized__Grid {
+.ai-draft-preview-tree__canvas .conversation-tree__list {
   overflow-x: scroll !important;
   overflow-y: auto !important;
   scrollbar-gutter: stable;
@@ -661,6 +661,13 @@
 
 .ai-draft-preview-tree__row--has-comment {
   position: relative;
+}
+
+.ai-draft-preview-tree__canvas .conversation-node-renderer:has(.node-renderer__comment-handle:hover),
+.ai-draft-preview-tree__canvas .conversation-node-renderer__node-content:has(.node-renderer__comment-handle:hover),
+.ai-draft-preview-tree__canvas .rst__rowWrapper:has(.node-renderer__comment-handle:hover),
+.ai-draft-preview-tree__canvas .ai-draft-preview-tree__row--has-comment:has(.node-renderer__comment-handle:hover) {
+  z-index: 200;
 }
 
 .ai-draft-preview-tree__canvas .node-renderer__comment-handle {
@@ -713,7 +720,7 @@
   position: absolute;
   top: 100%;
   left: 4px;
-  z-index: 40;
+  z-index: 220;
   width: max-content;
   max-width: min(560px, 60vw);
   height: auto;

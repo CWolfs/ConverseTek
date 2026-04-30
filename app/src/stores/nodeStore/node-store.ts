@@ -303,7 +303,7 @@ class NodeStore {
   }
 
   public scrollToTop(): void {
-    const tree = window.document.querySelector('.ReactVirtualized__Grid');
+    const tree = window.document.querySelector('.conversation-tree__list');
     if (tree) tree.scrollTop = 0;
   }
 
@@ -313,19 +313,20 @@ class NodeStore {
     // Quickly scroll in the given direction to force the virtual tree to load
     // At the same time check for the required node
     requestAnimationFrame(() => {
-      const tree = cachedTree || window.document.querySelector('.ReactVirtualized__Grid');
+      const tree = cachedTree || window.document.querySelector('.conversation-tree__list');
       const element = window.document.querySelector(`[data-node-id="${nodeId}"]`) as HTMLElement;
 
       if (tree == null) throw Error('Tree not found for autoscroll to node. This should not happen.');
 
       if (element) {
-        const offsetTop = ((element.offsetParent as HTMLElement)?.offsetParent as HTMLElement)?.offsetTop;
+        const rowElement = element.closest<HTMLElement>('.conversation-tree__row');
+        const offsetTop = rowElement?.offsetTop ?? element.offsetTop;
         let scrollTop = offsetTop;
         if (direction === 'down') {
           scrollTop = offsetTop - tree.clientHeight + horizontalScrollBarHeight + element.getBoundingClientRect().height;
         }
 
-        const scrollLeft = (element.offsetParent as HTMLElement)?.offsetLeft - 50;
+        const scrollLeft = element.offsetLeft - 50;
         tree.scrollTop = scrollTop;
         if (!skipHorizontalScroll) tree.scrollLeft = scrollLeft;
       } else if (!element) {

@@ -4,8 +4,6 @@ import { Button, Icon, Collapse, Popconfirm } from 'antd';
 import classnames from 'classnames';
 import { useUpdate } from 'ahooks';
 
-import 'react-custom-scroll/dist/customScroll.css';
-
 import { ViewableLogic } from 'components/ViewableLogic';
 import { EditableLogic } from 'components/EditableLogic';
 import { useStore } from 'hooks/useStore';

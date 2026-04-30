@@ -1,5 +1,3 @@
-declare module 'react-sortable-tree';
-
 declare module '*.css';
 
 declare module '@ungap/structured-clone' {

@@ -13,7 +13,7 @@
        "allowJs": true,
        "isolatedModules": true,
        "noEmit": true,
-       "jsx": "react", // change to "react-jsx" when upgrading to React 18
+       "jsx": "react-jsx",
        "paths": {
          "components/*": ["./src/components/*"],
          "containers/*": ["./src/containers/*"],

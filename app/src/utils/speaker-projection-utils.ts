@@ -1,5 +1,6 @@
 import type { ConversationAssetType, ElementNodeType, PromptNodeType } from 'types';
 import { getId } from './conversation-utils';
+import { getKnownSpeaker } from './known-speakers';
 
 export type SpeakerProjectionVariant = 'default' | 'multiple';
 
@@ -44,16 +45,34 @@ export function formatSpeakerIdLabel(speakerId: string): string {
   );
 }
 
+function getSpeakerDisplayName(speaker: SpeakerReference): string {
+  if (speaker.type === 'speakerId') {
+    const knownSpeaker = getKnownSpeaker(speaker.id);
+    if (knownSpeaker != null) return formatSpeakerIdLabel(knownSpeaker.speakerName);
+  }
+
+  return formatSpeakerIdLabel(speaker.id);
+}
+
+function getSpeakerSourceLabel(speaker: SpeakerReference): string {
+  if (speaker.type === 'speakerId') {
+    const knownSpeaker = getKnownSpeaker(speaker.id);
+    if (knownSpeaker != null) return `speakerName ${knownSpeaker.speakerName}, speakerId ${speaker.id}`;
+  }
+
+  return `${speaker.type} ${speaker.id}`;
+}
+
 function formatSpeakerName(speaker: SpeakerReference | null): string {
   if (speaker == null) return 'unknown inherited speaker';
 
-  return formatSpeakerIdLabel(speaker.id);
+  return getSpeakerDisplayName(speaker);
 }
 
 function formatSpeakerTitle(speaker: SpeakerReference | null): string {
   if (speaker == null) return 'unknown inherited speaker';
 
-  return `${formatSpeakerName(speaker)} (${speaker.type} ${speaker.id})`;
+  return `${formatSpeakerName(speaker)} (${getSpeakerSourceLabel(speaker)})`;
 }
 
 function getExplicitSpeaker(node: PromptNodeType): SpeakerReference | null {
@@ -84,7 +103,7 @@ function buildSingleProjection(speaker: SpeakerReference | null, isExplicit: boo
   const label = formatSpeakerName(speaker);
   return {
     label,
-    title: isExplicit ? `${speaker.type} ${speaker.id}` : `Projected speaker: ${formatSpeakerTitle(speaker)}`,
+    title: isExplicit ? getSpeakerSourceLabel(speaker) : `Projected speaker: ${formatSpeakerTitle(speaker)}`,
     variant: 'default',
   };
 }

@@ -63,6 +63,8 @@ function GlobalModal({ id }: { id: string }) {
       closable={closable}
       maskClosable={maskClosable}
       centered={centered}
+      transitionName=""
+      maskTransitionName=""
     >
       {content}
     </Modal>

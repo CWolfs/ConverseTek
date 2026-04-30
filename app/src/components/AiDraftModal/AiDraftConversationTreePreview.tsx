@@ -1,12 +1,17 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Icon } from 'antd';
 import { useSize } from 'ahooks';
-import SortableTree from 'react-sortable-tree';
+import { Tree, NodeRendererProps, RowRendererProps, CursorProps, TreeApi } from 'react-arborist';
 
-import 'react-sortable-tree/style.css';
-
-import { ConverseTekNodeRenderer, ConversationTreeNodeStore, ConverseTekNodeRendererProps } from 'components/DialogEditor/ConverseTekNodeRenderer';
+import { ConverseTekNodeRenderer, ConversationTreeNodeStore } from 'components/DialogEditor/ConverseTekNodeRenderer';
 import type { OnNodeContextMenuProps } from 'components/DialogEditor/DialogEditor';
+import {
+  buildInitialOpenState,
+  findConversationTreeMaxRightEdge,
+  getConversationTreeNodeId,
+  getConversationTreePath,
+  getConversationTreeScaffoldLines,
+} from 'components/DialogEditor/conversation-tree-adapter';
 import { ScalableScrollbar } from 'components/ScalableScrollbar';
 import { useStore } from 'hooks/useStore';
 import { DataStore } from 'stores/dataStore/data-store';
@@ -15,6 +20,30 @@ import { ConversationAssetType, ElementNodeType, PromptNodeType } from 'types';
 import { getId } from 'utils/conversation-utils';
 
 import 'components/DialogEditor/DialogEditor.css';
+
+const scaffoldBlockPxWidth = 44;
+const rootScaffoldOffsetPx = scaffoldBlockPxWidth;
+
+function getPreviewNodeLayoutStyle(style: React.CSSProperties): React.CSSProperties {
+  const paddingLeft = typeof style.paddingLeft === 'number' ? style.paddingLeft : parseFloat(String(style.paddingLeft || 0));
+
+  return {
+    ...style,
+    paddingLeft: (Number.isNaN(paddingLeft) ? 0 : paddingLeft) + rootScaffoldOffsetPx,
+  };
+}
+
+function PreviewTreeRow({ attrs, innerRef, children }: RowRendererProps<PreviewTreeNode>) {
+  return (
+    <div {...attrs} ref={innerRef} className={`${attrs.className || ''} conversation-tree__row`} onFocus={(event) => event.stopPropagation()}>
+      {children}
+    </div>
+  );
+}
+
+function PreviewTreeCursor({ top, left }: CursorProps) {
+  return <div className="conversation-tree__drop-cursor" style={{ top, left }} />;
+}
 
 type PreviewNodeStore = ConversationTreeNodeStore & {
   buildTreeData: () => PreviewTreeNode[];
@@ -33,6 +62,7 @@ export function AiDraftConversationTreePreview({ conversationAsset }: Props) {
   const dataStore = useStore<DataStore>('data');
   const defStore = useStore<DefStore>('def');
   const treeContainerRef = useRef<HTMLDivElement>(null);
+  const arboristTreeRef = useRef<TreeApi<PreviewTreeNode> | null>(null);
   const treeContainerSize = useSize(treeContainerRef);
   const expansionByNodeId = useRef(new Map<string, boolean>());
   const maxHorizontalNodePositionRef = useRef(0);
@@ -55,7 +85,7 @@ export function AiDraftConversationTreePreview({ conversationAsset }: Props) {
 
   useEffect(() => {
     const animationFrameId = requestAnimationFrame(() => {
-      const nextMaxPosition = findMaxRightEdge(treeContainerRef.current);
+      const nextMaxPosition = findConversationTreeMaxRightEdge(treeContainerRef.current);
       setMaxHorizontalNodePosition((previousMaxPosition) => {
         const measuredMaxPosition = Math.max(previousMaxPosition, nextMaxPosition);
         maxHorizontalNodePositionRef.current = measuredMaxPosition;
@@ -73,6 +103,64 @@ export function AiDraftConversationTreePreview({ conversationAsset }: Props) {
   const ignoreContextMenu = ({ event }: OnNodeContextMenuProps) => {
     event.preventDefault();
   };
+  const getPreviewTreeNodeId = (node: PreviewTreeNode) => node.previewTreeKey || getConversationTreeNodeId(node);
+  const initialOpenState = buildInitialOpenState(treeData, getPreviewTreeNodeId);
+  const PreviewNodeRenderer = (props: NodeRendererProps<PreviewTreeNode>) => {
+    const { node, tree, style } = props;
+    const treeNode = node.data;
+    const treeIndex = node.rowIndex ?? 0;
+    previewNodeStore.recordTreeIndex(treeNode.id, treeIndex);
+
+    const comment = getPreviewNodeComment(treeNode, previewNodeStore);
+
+    return (
+      <ConverseTekNodeRenderer
+        dataStore={dataStore}
+        nodeStore={previewNodeStore}
+        activeNodeId={activeNodeId}
+        previousNodeId={null}
+        onNodeContextMenu={ignoreContextMenu}
+        isContextMenuVisible={false}
+        scaffoldBlockPxWidth={scaffoldBlockPxWidth}
+        toggleChildrenVisibility={
+          treeNode.children && treeNode.children.length > 0
+            ? ({ node: currentNode }: { node: RSTNode; path: RSTPath; treeIndex: number }) => {
+                const arboristNode = tree.get(getPreviewTreeNodeId(currentNode as PreviewTreeNode));
+                if (arboristNode == null) return;
+
+                arboristNode.toggle();
+                previewNodeStore.setNodeExpansion(currentNode.id, !arboristNode.isOpen);
+              }
+            : null
+        }
+        connectDragPreview={(element: JSX.Element) => element}
+        connectDragSource={(element: JSX.Element) => element}
+        isDragging={false}
+        canDrop={false}
+        canDrag={false}
+        node={{ ...treeNode, expanded: node.isOpen }}
+        title={treeNode.title}
+        subtitle={treeNode.subtitle || null}
+        draggedNode={null}
+        path={getConversationTreePath(node)}
+        treeIndex={treeIndex}
+        isSearchMatch={false}
+        isSearchFocus={false}
+        buttons={[]}
+        className={comment ? 'ai-draft-preview-tree__row--has-comment' : ''}
+        style={getPreviewNodeLayoutStyle(style)}
+        didDrop={false}
+        treeId="ai-draft-preview-tree"
+        isOver={false}
+        parentNode={node.parent == null || node.parent.isRoot ? null : node.parent.data}
+        rowDirection="ltr"
+        scaffoldLines={getConversationTreeScaffoldLines(node, scaffoldBlockPxWidth)}
+        rowCommentTooltip={comment}
+        zoomLevel={1}
+        operationDefinitions={defStore.operations}
+      />
+    );
+  };
 
   return (
     <div className="ai-draft-preview-tree">
@@ -85,38 +173,26 @@ export function AiDraftConversationTreePreview({ conversationAsset }: Props) {
       <div ref={treeContainerRef} className="ai-draft-preview-tree__canvas dialog-editor">
         {treeData.length > 0 && treeWidth > 0 && (
           <ScalableScrollbar activeNodeId={activeNodeId} width={10} hideScrollOnScale={false}>
-            <SortableTree
-              treeData={treeData}
-              onChange={(nextTreeData: PreviewTreeNode[]) => setTreeData(nextTreeData)}
-              getNodeKey={({ node, treeIndex }: { node: PreviewTreeNode; treeIndex: number }) => {
-                previewNodeStore.recordTreeIndex(node.id, treeIndex);
-                return node.previewTreeKey || node.id || treeIndex;
-              }}
+            <Tree<PreviewTreeNode>
+              ref={arboristTreeRef}
+              data={treeData}
+              idAccessor={getPreviewTreeNodeId}
+              childrenAccessor={(node) => (node.children || null) as readonly PreviewTreeNode[] | null}
+              initialOpenState={initialOpenState}
               rowHeight={40}
-              canDrag={() => false}
-              canDrop={() => false}
-              generateNodeProps={({ node }: { node: PreviewTreeNode }) => {
-                const comment = getPreviewNodeComment(node, previewNodeStore);
-                return {
-                  dataStore,
-                  nodeStore: previewNodeStore,
-                  activeNodeId,
-                  previousNodeId: null,
-                  onNodeContextMenu: ignoreContextMenu,
-                  isContextMenuVisible: false,
-                  buttons: [],
-                  className: comment ? 'ai-draft-preview-tree__row--has-comment' : '',
-                  rowCommentTooltip: comment,
-                  zoomLevel: 1,
-                  operationDefinitions: defStore.operations,
-                };
-              }}
-              nodeContentRenderer={(rendererProps: ConverseTekNodeRendererProps) => <ConverseTekNodeRenderer {...rendererProps} />}
-              reactVirtualizedListProps={{
-                width: treeWidth,
-              }}
-              slideRegionSize={100}
-            />
+              indent={scaffoldBlockPxWidth}
+              width={treeWidth}
+              height={treeContainerSize?.height || 0}
+              disableDrag
+              disableDrop
+              disableMultiSelection
+              renderRow={PreviewTreeRow}
+              renderCursor={PreviewTreeCursor}
+              className="conversation-tree__list"
+              dndRootElement={treeContainerRef.current}
+            >
+              {PreviewNodeRenderer}
+            </Tree>
           </ScalableScrollbar>
         )}
       </div>
@@ -194,26 +270,6 @@ function createPreviewNodeStore(
   };
 
   return previewNodeStore;
-}
-
-function findMaxRightEdge(node: HTMLElement | null): number {
-  let maxRight = 0;
-  if (node == null) return maxRight;
-
-  node.childNodes.forEach((child) => {
-    if (!(child instanceof HTMLElement)) return;
-
-    if (child.classList.contains('rst__rowWrapper')) {
-      const rect = child.getBoundingClientRect();
-      const left = child.parentElement?.parentElement?.style.left;
-      const leftValue = left ? parseFloat(left) : 0;
-      maxRight = Math.max(maxRight, rect.width + leftValue);
-    }
-
-    maxRight = Math.max(maxRight, findMaxRightEdge(child));
-  });
-
-  return maxRight;
 }
 
 function buildElementTreeNode(

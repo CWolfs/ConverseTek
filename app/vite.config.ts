@@ -64,24 +64,16 @@ export default defineConfig({
     global: 'globalThis',
   },
   resolve: {
-    alias: [
-      {
-        find: /^react-sortable-tree$/,
-        replacement: path.resolve(__dirname, 'node_modules/react-sortable-tree/dist/index.cjs.js'),
-      },
-      {
-        find: /^react-virtualized$/,
-        replacement: path.resolve(__dirname, 'node_modules/react-virtualized/dist/commonjs/index.js'),
-      },
-      { find: 'components', replacement: path.resolve(__dirname, 'src/components/') },
-      { find: 'containers', replacement: path.resolve(__dirname, 'src/containers/') },
-      { find: 'services', replacement: path.resolve(__dirname, 'src/services/') },
-      { find: 'hooks', replacement: path.resolve(__dirname, 'src/hooks/') },
-      { find: 'stores', replacement: path.resolve(__dirname, 'src/stores/') },
-      { find: 'utils', replacement: path.resolve(__dirname, 'src/utils/') },
-      { find: 'types', replacement: path.resolve(__dirname, 'src/types/') },
-      { find: 'package.json', replacement: path.resolve(__dirname, 'package.json') },
-    ],
+    alias: {
+      components: path.resolve(__dirname, 'src/components'),
+      containers: path.resolve(__dirname, 'src/containers'),
+      services: path.resolve(__dirname, 'src/services'),
+      hooks: path.resolve(__dirname, 'src/hooks'),
+      stores: path.resolve(__dirname, 'src/stores'),
+      utils: path.resolve(__dirname, 'src/utils'),
+      types: path.resolve(__dirname, 'src/types'),
+      'package.json': path.resolve(__dirname, 'package.json'),
+    },
   },
   server: {
     host: '127.0.0.1',
