@@ -253,17 +253,16 @@
 .ai-draft-modal__actions {
   display: flex;
   flex-wrap: wrap;
-  margin: 8px 0 12px;
+  gap: 8px;
+  margin: 8px 0 0;
+}
+
+.ai-draft-modal--has-draft .ai-draft-modal__actions {
+  margin-top: 12px;
 }
 
 .ai-draft-modal__actions .ant-btn {
-  margin-right: 8px;
-  margin-bottom: 8px;
   min-height: 32px;
-}
-
-.ai-draft-modal__actions .ant-btn:last-child {
-  margin-right: 0;
 }
 
 .ai-draft-modal__actions .ant-btn.ai-draft-modal__action-button--generate:not([disabled]) {
@@ -277,17 +276,6 @@
   border-color: #0f5f9d;
   background-color: #0f5f9d;
   color: #fff;
-}
-
-.ai-draft-modal__loading {
-  display: flex;
-  align-items: center;
-  padding: 10px 0;
-  color: #595959;
-}
-
-.ai-draft-modal__loading span {
-  margin-left: 10px;
 }
 
 .ai-draft-personalities {
@@ -522,7 +510,11 @@
 
 .ai-draft-preview__summary p,
 .ai-draft-preview__text-card p {
+  display: block;
   margin: 0;
+  color: inherit;
+  font-size: 13px;
+  line-height: 1.45;
   white-space: pre-wrap;
   text-wrap: pretty;
 }
@@ -574,6 +566,7 @@
   max-height: min(340px, 34vh);
   overflow-y: auto;
   padding: 2px 4px 4px 2px;
+  font-size: 14px;
 }
 
 .ai-draft-preview__text-card {

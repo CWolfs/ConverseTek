@@ -2,7 +2,7 @@ import React, { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { toJS } from 'mobx';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react';
-import { Alert, Button, Checkbox, Col, Form, Input, message, Radio, Row, Select, Spin, Tabs, Tag, Tooltip } from 'antd';
+import { Alert, Button, Checkbox, Col, Form, Input, message, Radio, Row, Select, Tabs, Tag, Tooltip } from 'antd';
 import {
   CodeOutlined,
   CopyOutlined,
@@ -823,7 +823,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
           void generateDraft();
         }}
       >
-        Generate Preview
+        {isLoading ? 'Generating Draft...' : 'Generate Preview'}
       </Button>
       <Button
         type={draft != null ? 'primary' : 'default'}
@@ -958,13 +958,6 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
           </Row>
 
           {draft == null && draftActions}
-
-          {isLoading && (
-            <div className="ai-draft-modal__loading">
-              <Spin />
-              <span>Waiting for AI draft...</span>
-            </div>
-          )}
 
           {draft && (
             <DraftPreview
@@ -1435,23 +1428,30 @@ function DraftPreview({
             <p>{originalText}</p>
           </div>
           {suggestedTexts.length > 0 ? (
-            <Radio.Group
-              className="ai-draft-preview__versions"
-              value={selectedSuggestionIndex}
-              onChange={(event) => onSelectedSuggestionIndexChange(Number(event.target.value))}
-            >
+            <div className="ai-draft-preview__versions" role="radiogroup" aria-label="Suggested node text versions">
               {suggestedTexts.map((suggestedText, index) => (
-                <label
+                <div
                   key={`${index}-${suggestedText}`}
                   className={classnames('ai-draft-preview__text-card', 'ai-draft-preview__text-card--version', {
                     'ai-draft-preview__text-card--selected': selectedSuggestionIndex === index,
                   })}
+                  role="radio"
+                  aria-checked={selectedSuggestionIndex === index}
+                  tabIndex={0}
+                  onClick={() => onSelectedSuggestionIndexChange(index)}
+                  onKeyDown={(event) => {
+                    if (event.key !== 'Enter' && event.key !== ' ') return;
+                    event.preventDefault();
+                    onSelectedSuggestionIndexChange(index);
+                  }}
                 >
-                  <Radio value={index}>Version {index + 1}</Radio>
+                  <Radio checked={selectedSuggestionIndex === index} value={index} onChange={() => onSelectedSuggestionIndexChange(index)}>
+                    Version {index + 1}
+                  </Radio>
                   <p>{suggestedText}</p>
-                </label>
+                </div>
               ))}
-            </Radio.Group>
+            </div>
           ) : (
             <div className="ai-draft-preview__text-card ai-draft-preview__text-card--empty">
               <span className="ai-draft-preview__text-label">Versions</span>
