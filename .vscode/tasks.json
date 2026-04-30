@@ -2,6 +2,11 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "CT: Fast Run",
+      "command": "${workspaceFolder}/bin/x64/Debug/net472/ConverseTek.exe",
+      "type": "shell"
+    },
+    {
       "label": "CT: Release",
       "command": "dotnet",
       "type": "process",
@@ -74,15 +79,33 @@
       }
     },
     {
-      "label": "CT: Fast Run",
-      "command": "${workspaceFolder}/bin/x64/Debug/net472/ConverseTek.exe",
-      "type": "shell"
+      "label": "CT: Fast Dev",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\.vscode\\start-fast-dev.ps1"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "type": "shell",
+      "runOptions": {
+        "instanceLimit": 5
+      }
     },
     {
-      "label": "CT: UI-Only Run",
-      "command": "npm start",
+      "label": "CT: RTool",
+      "command": "npm run react-devtools",
       "options": {
         "cwd": "${workspaceFolder}/app/"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
       },
       "type": "shell"
     }

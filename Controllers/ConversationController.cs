@@ -1,44 +1,40 @@
 namespace ConverseTek.Controllers {
   using System;
-  using System.IO;
   using System.Collections.Generic;
-  using System.Diagnostics.CodeAnalysis;
 
   using Newtonsoft.Json;
   using Newtonsoft.Json.Linq;
 
-  using Chromely.Core.RestfulService;
-  using Chromely.Core.Infrastructure;
-
   using ConverseTek.Data;
+  using ConverseTek.Host;
+  using ConverseTek.Infrastructure;
   using ConverseTek.Services;
 
-  [ControllerProperty(Name = "ConversationController", Route = "conversations")]
-  public class ConversationController : ChromelyController {
+  public class ConversationController {
 
-    public ConversationController() {
-      this.RegisterGetRequest("/conversations", this.GetConversations);
-      this.RegisterPostRequest("/conversations/put", this.UpdateConversations);
-      this.RegisterPostRequest("/conversations/export", this.ExportConversations);
-      this.RegisterPostRequest("/conversations/export-all", this.ExportAllConversations);
-      this.RegisterPostRequest("/conversations/import", this.ImportConversation);
-      this.RegisterPostRequest("/conversations/delete", this.DeleteConversation);
+    public void RegisterRoutes(AppRouteDispatcher dispatcher) {
+      dispatcher.RegisterGet("/conversations", this.GetConversations);
+      dispatcher.RegisterPost("/conversations/put", this.UpdateConversations);
+      dispatcher.RegisterPost("/conversations/export", this.ExportConversations);
+      dispatcher.RegisterPost("/conversations/export-all", this.ExportAllConversations);
+      dispatcher.RegisterPost("/conversations/import", this.ImportConversation);
+      dispatcher.RegisterPost("/conversations/delete", this.DeleteConversation);
     }
 
-    private ChromelyResponse GetConversations(ChromelyRequest request) {
+    private AppResponse GetConversations(AppRequest request) {
       ConversationService conversationService = ConversationService.getInstance();
       List<ConversationAsset> conversations = conversationService.LoadConversations();
 
       string conversationsJson = JsonConvert.SerializeObject(conversations);
 
-      ChromelyResponse response = new ChromelyResponse();
+      AppResponse response = new AppResponse();
       response.Data = conversationsJson;
       return response;
     }
 
-    private ChromelyResponse UpdateConversations(ChromelyRequest request) {
+    private AppResponse UpdateConversations(AppRequest request) {
       IDictionary<string, object> parameters = request.Parameters;
-      string postDataJson = (string)request.PostData.EnsureJson();
+      string postDataJson = request.PostData;
       JObject data = JObject.Parse(postDataJson);
 
       ConversationService conversationService = ConversationService.getInstance();
@@ -52,14 +48,14 @@ namespace ConverseTek.Controllers {
 
       List<ConversationAsset> conversations = conversationService.LoadConversations();
       string conversationsJson = JsonConvert.SerializeObject(conversations);
-      ChromelyResponse response = new ChromelyResponse();
+      AppResponse response = new AppResponse();
       response.Data = conversationsJson;
       return response;
     }
 
-    private ChromelyResponse ExportConversations(ChromelyRequest request) {
+    private AppResponse ExportConversations(AppRequest request) {
       IDictionary<string, object> parameters = request.Parameters;
-      string postDataJson = (string)request.PostData.EnsureJson();
+      string postDataJson = request.PostData;
       JObject data = JObject.Parse(postDataJson);
 
       ConversationService conversationService = ConversationService.getInstance();
@@ -73,12 +69,12 @@ namespace ConverseTek.Controllers {
 
       List<ConversationAsset> conversations = conversationService.LoadConversations();
       string conversationsJson = JsonConvert.SerializeObject(conversations);
-      ChromelyResponse response = new ChromelyResponse();
+      AppResponse response = new AppResponse();
       response.Data = conversationsJson;
       return response;
     }
 
-    private ChromelyResponse ImportConversation(ChromelyRequest request) {
+    private AppResponse ImportConversation(AppRequest request) {
       IDictionary<string, object> requestParams = request.Parameters;
       string path = (string)requestParams["path"];
 
@@ -93,14 +89,14 @@ namespace ConverseTek.Controllers {
 
       List<ConversationAsset> conversations = conversationService.LoadConversations();
       string conversationsJson = JsonConvert.SerializeObject(conversations);
-      ChromelyResponse response = new ChromelyResponse();
+      AppResponse response = new AppResponse();
       response.Data = conversationsJson;
       return response;
     }
 
-    private ChromelyResponse ExportAllConversations(ChromelyRequest request) {
+    private AppResponse ExportAllConversations(AppRequest request) {
       IDictionary<string, object> parameters = request.Parameters;
-      string postDataJson = (string)request.PostData.EnsureJson();
+      string postDataJson = request.PostData;
       JObject data = JObject.Parse(postDataJson);
 
       ConversationService conversationService = ConversationService.getInstance();
@@ -123,13 +119,13 @@ namespace ConverseTek.Controllers {
 
       List<ConversationAsset> updatedConversations = conversationService.LoadConversations();
       string conversationsJson = JsonConvert.SerializeObject(updatedConversations);
-      ChromelyResponse response = new ChromelyResponse();
+      AppResponse response = new AppResponse();
       response.Data = conversationsJson;
       return response;
     }
 
 
-    private ChromelyResponse DeleteConversation(ChromelyRequest request) {
+    private AppResponse DeleteConversation(AppRequest request) {
       IDictionary<string, object> requestParams = request.Parameters;
       string path = (string)requestParams["path"];
 
@@ -146,7 +142,7 @@ namespace ConverseTek.Controllers {
 
       List<ConversationAsset> conversations = conversationService.LoadConversations();
       string conversationsJson = JsonConvert.SerializeObject(conversations);
-      ChromelyResponse response = new ChromelyResponse();
+      AppResponse response = new AppResponse();
       response.Data = conversationsJson;
       return response;
     }

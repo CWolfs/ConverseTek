@@ -28,6 +28,7 @@ import { findTreeNodeParentWithDataNodeId } from 'utils/custom-tree-data-utils';
 
 import { dataStore } from '../dataStore';
 import { modalStore } from '../modalStore';
+import { getDevPreservedStore } from '../dev-preserved-store';
 
 /* eslint-disable no-return-assign, no-param-reassign, class-methods-use-this */
 class NodeStore {
@@ -342,7 +343,7 @@ class NodeStore {
           tree.scrollTop += 200;
         }
 
-        requestAnimationFrame(() => this.scrollToNode(nodeId, direction, tree as HTMLElement, skipHorizontalScroll));
+        requestAnimationFrame(() => this.scrollToNode(nodeId, direction, tree, skipHorizontalScroll));
       }
     });
   }
@@ -701,19 +702,27 @@ class NodeStore {
   }
 
   setPromptNodeSpeakerType(node: PromptNodeType, value: 'castId' | 'speakerId'): void {
-    node.speakerType = value;
     if (value === 'speakerId') node.sourceInSceneRef = null;
+    if (value === 'castId') node.speakerOverrideId = '';
 
     dataStore.setConversationDirty(true);
     this.bumpSpeakerRevision();
   }
 
   setPromptNodeSourceInSceneId(node: PromptNodeType, id: string): void {
+    if (!id) {
+      node.sourceInSceneRef = null;
+      dataStore.setConversationDirty(true);
+      this.bumpSpeakerRevision();
+      return;
+    }
+
     if (!node.sourceInSceneRef) {
       node.sourceInSceneRef = { id };
     } else {
       node.sourceInSceneRef.id = id;
     }
+    node.speakerOverrideId = '';
 
     dataStore.setConversationDirty(true);
     this.bumpSpeakerRevision();
@@ -1427,6 +1436,6 @@ class NodeStore {
   };
 }
 
-export const nodeStore = new NodeStore();
+export const nodeStore = getDevPreservedStore('__conversetekNodeStore', () => new NodeStore(), NodeStore.prototype);
 
 export { NodeStore };

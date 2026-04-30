@@ -1,27 +1,50 @@
 @import '../../css/constants.css';
 
-.conversation-general {
+.conversation-general.ant-card {
   background-color: $backgroundPrimary;
+  box-sizing: border-box;
+  height: 100%;
 
   &.ant-card-bordered {
     border: 1px solid $borderTertiary;
   }
 
+  .ant-card-body {
+    box-sizing: border-box;
+    background-color: $backgroundPrimary;
+    color: $textColourPrimary;
+    min-height: 0;
+  }
+}
+
+.conversation-general {
   &__label {
     color: $textColourQuaternary;
+    line-height: 32px;
     text-align: right;
   }
 
   &__speaker-group {
     display: flex;
+    align-items: center;
+    gap: $tinySpace;
+    width: 100%;
+
+    .ant-input {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
   }
 
   &__speaker-group-label {
     display: flex;
     justify-content: flex-end;
-    align-items: baseline;
+    align-items: center;
+    height: 32px;
 
     .anticon {
+      flex: 0 0 auto;
+      line-height: 1;
       margin-right: $smallSpace;
       color: gold;
     }
@@ -29,6 +52,6 @@
 
   &__speaker-select {
     flex: 0 0 115px;
-    margin-right: $tinySpace;
+    width: 115px;
   }
 }

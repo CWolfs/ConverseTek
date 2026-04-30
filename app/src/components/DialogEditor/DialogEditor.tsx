@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import React, { useState, useEffect, useRef, MouseEvent } from 'react';
+import React, { useState, useEffect, useRef, useMemo, MouseEvent } from 'react';
 import { observer } from 'mobx-react';
 import SortableTree from 'react-sortable-tree';
 import { useContextMenu } from 'react-contexify';
@@ -12,6 +12,7 @@ import defer from 'lodash.defer';
 import 'react-sortable-tree/style.css';
 
 import { DataStore } from 'stores/dataStore/data-store';
+import { DefStore } from 'stores/defStore/def-store';
 import { NodeStore } from 'stores/nodeStore/node-store';
 import { ConversationAssetType, ElementNodeType, PromptNodeType } from 'types';
 
@@ -22,6 +23,8 @@ import { detectType, isElementNodeType, isPromptNodeType } from 'utils/node-util
 import { getId } from 'utils/conversation-utils';
 import { toggleExpandedForAll } from 'utils/tree-data-utils';
 import { collapseOrExpandBranches, collapseOtherBranches, expandFromCoreToNode } from 'utils/custom-tree-data-utils';
+import { buildPromptSpeakerProjectionMap } from 'utils/speaker-projection-utils';
+import { buildPromptCameraProjectionMap } from 'utils/camera-projection-utils';
 
 import { ScalableScrollbar } from 'components/ScalableScrollbar';
 
@@ -83,6 +86,7 @@ const zoomLevelIncrement = 0.05;
 
 function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationAsset: ConversationAssetType; rebuild: boolean; expandAll: boolean }) {
   const dataStore = useStore<DataStore>('data');
+  const defStore = useStore<DefStore>('def');
   const nodeStore = useStore<NodeStore>('node');
 
   const dialogEditorRef = useRef<HTMLDivElement>(null);
@@ -108,6 +112,15 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
   const collapseOthersOnNodeId = nodeStore.getCollapseOthersOnNodeId();
   const expandFromCoreToNodeId = nodeStore.getExpandFromCoreToNodeId();
   const isolateOnNodeId = nodeStore.getIsolateOnNodeId();
+  const speakerRevision = nodeStore.getSpeakerRevision();
+  const speakerProjectionByNodeId = useMemo(
+    () => buildPromptSpeakerProjectionMap(conversationAsset),
+    [conversationAsset, rebuild, speakerRevision],
+  );
+  const cameraProjectionByNodeId = useMemo(
+    () => buildPromptCameraProjectionMap(conversationAsset),
+    [conversationAsset, rebuild, dataStore.conversationMutationRevision],
+  );
 
   const onMove = (nodeContainer: RSTNodeOnMoveContainer) => {
     const { node, nextParentNode } = nodeContainer;
@@ -494,6 +507,9 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
               onNodeContextMenu,
               isContextMenuVisible,
               zoomLevel,
+              speakerProjectionByNodeId,
+              cameraProjectionByNodeId,
+              operationDefinitions: defStore.operations,
             })}
             nodeContentRenderer={(props: ConverseTekNodeRendererProps) => <ConverseTekNodeRenderer {...props} />}
             reactVirtualizedListProps={{

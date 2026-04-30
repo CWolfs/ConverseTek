@@ -5,7 +5,7 @@ namespace ConverseTek.Services {
 
   using ConverseTek.Data;
 
-  using Chromely.Core.Infrastructure;
+  using ConverseTek.Infrastructure;
 
   using Newtonsoft.Json;
   using Newtonsoft.Json.Linq;
@@ -25,23 +25,35 @@ namespace ConverseTek.Services {
     public List<FsDirectory> GetRootDrives() {
       List<FsDirectory> rootDrives = new List<FsDirectory>();
 
-      try {
-        DriveInfo[] allDrives = DriveInfo.GetDrives();
-        foreach (DriveInfo drive in allDrives) {
+      DriveInfo[] allDrives = DriveInfo.GetDrives();
+      foreach (DriveInfo drive in allDrives) {
+        try {
           if (drive.IsReady) {
             FsDirectory directory = new FsDirectory();
             directory.Name = drive.Name;
             directory.Path = drive.Name;
             directory.IsDirectory = true;
-            directory.HasChildren = Directory.GetDirectories(drive.Name).Length > 0;
+            directory.HasChildren = HasVisibleDirectories(drive.Name);
             rootDrives.Add(directory);
           }
+        } catch (Exception error) {
+          Log.Error($"[FileSystemService] Could not inspect drive {drive.Name}: {error}");
         }
-      } catch (Exception error) {
-         Log.Error(error.ToString());
       }
 
+      Log.Debug($"[FileSystemService] Root drive count: {rootDrives.Count}");
       return rootDrives;
+    }
+
+    private bool HasVisibleDirectories(string path) {
+      try {
+        using (IEnumerator<string> directoryEnumerator = Directory.EnumerateDirectories(path).GetEnumerator()) {
+          return directoryEnumerator.MoveNext();
+        }
+      } catch (Exception error) {
+        Log.Error($"[FileSystemService] Could not inspect child directories for {path}: {error.Message}");
+        return false;
+      }
     }
 
     public List<FsDirectory> GetDirectories(string path) {

@@ -10,8 +10,11 @@ import type { OnNodeContextMenuProps } from 'components/DialogEditor/DialogEdito
 import { ScalableScrollbar } from 'components/ScalableScrollbar';
 import { useStore } from 'hooks/useStore';
 import { DataStore } from 'stores/dataStore/data-store';
-import { ConversationAssetType, ElementNodeType, OperationCallType, PromptNodeType } from 'types';
+import { DefStore } from 'stores/defStore/def-store';
+import { ConversationAssetType, ElementNodeType, PromptNodeType } from 'types';
 import { getId } from 'utils/conversation-utils';
+
+import 'components/DialogEditor/DialogEditor.css';
 
 type PreviewNodeStore = ConversationTreeNodeStore & {
   buildTreeData: () => PreviewTreeNode[];
@@ -22,37 +25,54 @@ type PreviewTreeNode = RSTNode & {
   previewTreeKey: string;
 };
 
-type PreviewRowHeightProps = {
-  node: PreviewTreeNode;
-};
-
 type Props = {
   conversationAsset: ConversationAssetType;
 };
 
 export function AiDraftConversationTreePreview({ conversationAsset }: Props) {
   const dataStore = useStore<DataStore>('data');
+  const defStore = useStore<DefStore>('def');
   const treeContainerRef = useRef<HTMLDivElement>(null);
   const treeContainerSize = useSize(treeContainerRef);
   const expansionByNodeId = useRef(new Map<string, boolean>());
+  const maxHorizontalNodePositionRef = useRef(0);
   const [activeNodeId, setActiveNodeId] = useState<string | null>(null);
+  const [maxHorizontalNodePosition, setMaxHorizontalNodePosition] = useState(0);
   const [treeData, setTreeData] = useState<PreviewTreeNode[]>([]);
+  const treeWidth = treeContainerSize?.width || 0;
 
   const previewNodeStore = useMemo(
-    () => createPreviewNodeStore(conversationAsset, expansionByNodeId.current, setActiveNodeId),
+    () => createPreviewNodeStore(conversationAsset, expansionByNodeId.current, setActiveNodeId, maxHorizontalNodePositionRef),
     [conversationAsset],
   );
 
   useEffect(() => {
     setActiveNodeId(null);
+    maxHorizontalNodePositionRef.current = 0;
+    setMaxHorizontalNodePosition(0);
     setTreeData(previewNodeStore.buildTreeData());
   }, [previewNodeStore]);
+
+  useEffect(() => {
+    const animationFrameId = requestAnimationFrame(() => {
+      const nextMaxPosition = findMaxRightEdge(treeContainerRef.current);
+      setMaxHorizontalNodePosition((previousMaxPosition) => {
+        const measuredMaxPosition = Math.max(previousMaxPosition, nextMaxPosition);
+        maxHorizontalNodePositionRef.current = measuredMaxPosition;
+        return measuredMaxPosition;
+      });
+    });
+
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [treeData, treeWidth]);
+
+  useEffect(() => {
+    maxHorizontalNodePositionRef.current = maxHorizontalNodePosition;
+  }, [maxHorizontalNodePosition]);
 
   const ignoreContextMenu = ({ event }: OnNodeContextMenuProps) => {
     event.preventDefault();
   };
-
-  const treeWidth = treeContainerSize?.width || 0;
 
   return (
     <div className="ai-draft-preview-tree">
@@ -62,7 +82,7 @@ export function AiDraftConversationTreePreview({ conversationAsset }: Props) {
         </span>
         <span>Read-only</span>
       </div>
-      <div ref={treeContainerRef} className="ai-draft-preview-tree__canvas">
+      <div ref={treeContainerRef} className="ai-draft-preview-tree__canvas dialog-editor">
         {treeData.length > 0 && treeWidth > 0 && (
           <ScalableScrollbar activeNodeId={activeNodeId} width={10} hideScrollOnScale={false}>
             <SortableTree
@@ -72,19 +92,25 @@ export function AiDraftConversationTreePreview({ conversationAsset }: Props) {
                 previewNodeStore.recordTreeIndex(node.id, treeIndex);
                 return node.previewTreeKey || node.id || treeIndex;
               }}
-              rowHeight={getPreviewRowHeight}
+              rowHeight={40}
               canDrag={() => false}
               canDrop={() => false}
-              generateNodeProps={({ node }: { node: PreviewTreeNode }) => ({
-                dataStore,
-                nodeStore: previewNodeStore,
-                activeNodeId,
-                previousNodeId: null,
-                onNodeContextMenu: ignoreContextMenu,
-                isContextMenuVisible: false,
-                buttons: buildPreviewNodeButtons(node, previewNodeStore),
-                zoomLevel: 1,
-              })}
+              generateNodeProps={({ node }: { node: PreviewTreeNode }) => {
+                const comment = getPreviewNodeComment(node, previewNodeStore);
+                return {
+                  dataStore,
+                  nodeStore: previewNodeStore,
+                  activeNodeId,
+                  previousNodeId: null,
+                  onNodeContextMenu: ignoreContextMenu,
+                  isContextMenuVisible: false,
+                  buttons: [],
+                  className: comment ? 'ai-draft-preview-tree__row--has-comment' : '',
+                  rowCommentTooltip: comment,
+                  zoomLevel: 1,
+                  operationDefinitions: defStore.operations,
+                };
+              }}
               nodeContentRenderer={(rendererProps: ConverseTekNodeRendererProps) => <ConverseTekNodeRenderer {...rendererProps} />}
               reactVirtualizedListProps={{
                 width: treeWidth,
@@ -102,6 +128,7 @@ function createPreviewNodeStore(
   conversationAsset: ConversationAssetType,
   expansionByNodeId: Map<string, boolean>,
   setActiveNodeId: (nodeId: string | null) => void,
+  maxHorizontalNodePositionRef: React.MutableRefObject<number>,
 ): PreviewNodeStore {
   const nodeById = new Map<string, PromptNodeType | ElementNodeType>();
   const promptNodeByIndex = new Map<number, PromptNodeType>();
@@ -121,20 +148,28 @@ function createPreviewNodeStore(
   });
 
   const previewNodeStore: PreviewNodeStore = {
-    buildTreeData: () => [
-      {
-        title: conversationAsset.conversation.uiName || 'AI Draft Conversation',
-        id: '0',
-        previewTreeKey: 'core-0',
-        type: 'core',
-        parentId: '-1',
-        children: conversationAsset.conversation.roots.map((root, index) =>
-          buildElementTreeNode(root, 'root', null, `core-0/root-${index}`, previewNodeStore),
-        ),
-        expanded: true,
-        canDrag: false,
-      },
-    ],
+    buildTreeData: () => {
+      if (conversationAsset.conversation.roots.length === 0) {
+        return conversationAsset.conversation.nodes
+          .filter((node) => node.parentId === '0')
+          .map((node, index) => buildPromptTreeNode(node, '0', `node-${index}`, previewNodeStore));
+      }
+
+      return [
+        {
+          title: conversationAsset.conversation.uiName || 'AI Draft Conversation',
+          id: '0',
+          previewTreeKey: 'core-0',
+          type: 'core',
+          parentId: '-1',
+          children: conversationAsset.conversation.roots.map((root, index) =>
+            buildElementTreeNode(root, 'root', null, `core-0/root-${index}`, previewNodeStore),
+          ),
+          expanded: true,
+          canDrag: false,
+        },
+      ];
+    },
     recordTreeIndex: (nodeId, treeIndex) => {
       if (nodeId) treeIndexByNodeId.set(nodeId, treeIndex);
     },
@@ -148,7 +183,7 @@ function createPreviewNodeStore(
     initScrollToNode: () => undefined,
     isNodeVisible: () => true,
     setFocusedTreeNode: () => undefined,
-    getMaxTreeHorizontalNodePosition: () => 0,
+    getMaxTreeHorizontalNodePosition: () => maxHorizontalNodePositionRef.current,
     setNodeExpansion: (nodeId, flag) => {
       if (nodeId) expansionByNodeId.set(nodeId, flag);
     },
@@ -159,6 +194,26 @@ function createPreviewNodeStore(
   };
 
   return previewNodeStore;
+}
+
+function findMaxRightEdge(node: HTMLElement | null): number {
+  let maxRight = 0;
+  if (node == null) return maxRight;
+
+  node.childNodes.forEach((child) => {
+    if (!(child instanceof HTMLElement)) return;
+
+    if (child.classList.contains('rst__rowWrapper')) {
+      const rect = child.getBoundingClientRect();
+      const left = child.parentElement?.parentElement?.style.left;
+      const leftValue = left ? parseFloat(left) : 0;
+      maxRight = Math.max(maxRight, rect.width + leftValue);
+    }
+
+    maxRight = Math.max(maxRight, findMaxRightEdge(child));
+  });
+
+  return maxRight;
 }
 
 function buildElementTreeNode(
@@ -172,13 +227,11 @@ function buildElementTreeNode(
 
   return {
     title: elementNode.responseText,
-    subtitle: formatElementSubtitle(elementNode),
     id: elementNodeId,
     previewTreeKey,
     parentId,
     type,
     expanded: previewNodeStore.isNodeExpanded(elementNodeId),
-    canDrag: false,
     children: buildElementChildren(elementNode, elementNodeId, previewTreeKey, previewNodeStore),
   };
 }
@@ -223,80 +276,18 @@ function buildPromptTreeNode(
 
   return {
     title: promptNode.text,
-    subtitle: formatPromptSubtitle(promptNode),
     id: promptNodeId,
     previewTreeKey,
     parentId,
     type: 'node',
     expanded: previewNodeStore.isNodeExpanded(promptNodeId),
-    canDrag: false,
     children: promptNode.branches.map((branch, index) =>
       buildElementTreeNode(branch, 'response', promptNodeId, `${previewTreeKey}/response-${index}`, previewNodeStore),
     ),
   };
 }
 
-function getPreviewRowHeight({ node }: PreviewRowHeightProps): number {
-  const title = typeof node.title === 'string' ? node.title : '';
-  const subtitle = typeof node.subtitle === 'string' ? node.subtitle : '';
-  const estimatedCharactersPerLine = node.type === 'response' ? 70 : 86;
-  const titleLines = Math.max(1, Math.ceil(title.length / estimatedCharactersPerLine));
-  const subtitleLines = subtitle.length > 0 ? Math.max(1, Math.ceil(subtitle.length / 96)) : 0;
-  const estimatedHeight = 40 + titleLines * 18 + subtitleLines * 14;
-
-  return Math.min(180, Math.max(64, estimatedHeight));
-}
-
-function formatPromptSubtitle(promptNode: PromptNodeType): string {
-  return [
-    `NODE ${promptNode.index}`,
-    promptNode.comment ? `draft key ${promptNode.comment}` : '',
-    formatOperationCount('action', promptNode.actions?.ops),
-  ]
-    .filter(Boolean)
-    .join(' | ');
-}
-
-function formatElementSubtitle(elementNode: ElementNodeType): string {
-  const target = elementNode.nextNodeIndex === -1 ? 'END' : `${elementNode.auxiliaryLink ? 'link to' : 'to'} NODE ${elementNode.nextNodeIndex}`;
-
-  return [
-    target,
-    formatOperationCount('condition', elementNode.conditions?.ops),
-    formatOperationCount('action', elementNode.actions?.ops),
-  ]
-    .filter(Boolean)
-    .join(' | ');
-}
-
-function formatSpeaker(promptNode: PromptNodeType): string {
-  if (promptNode.speakerType === 'castId' && promptNode.sourceInSceneRef?.id) return promptNode.sourceInSceneRef.id;
-  if (promptNode.speakerType === 'speakerId' && promptNode.speakerOverrideId) return promptNode.speakerOverrideId;
-  return 'Inherits';
-}
-
-function buildPreviewNodeButtons(node: PreviewTreeNode, previewNodeStore: PreviewNodeStore): JSX.Element[] {
-  if (node.type !== 'node') return [];
-
-  const promptNode = previewNodeStore.getNode(node.id);
-  if (promptNode == null || promptNode.type !== 'node') return [];
-
-  const speaker = formatSpeaker(promptNode);
-  const displaySpeaker = speaker.replace(/Default$/i, '') || speaker;
-
-  return [
-    <span
-      className="ai-draft-preview-tree__speaker-badge"
-      title={`${promptNode.speakerType || 'none'} ${speaker}`}
-    >
-      {displaySpeaker}
-    </span>,
-  ];
-}
-
-function formatOperationCount(label: string, operations: OperationCallType[] | null | undefined): string {
-  const operationCount = operations?.length || 0;
-  if (operationCount === 0) return '';
-
-  return `${operationCount} ${label}${operationCount === 1 ? '' : 's'}`;
+function getPreviewNodeComment(node: PreviewTreeNode, previewNodeStore: PreviewNodeStore): string {
+  const storedNode = previewNodeStore.getNode(node.id);
+  return storedNode?.comment?.trim() || '';
 }

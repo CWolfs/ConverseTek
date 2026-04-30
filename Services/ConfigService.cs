@@ -3,7 +3,7 @@ using System.IO;
 using System.Windows;
 using System.Collections.Generic;
 
-using Chromely.Core.Infrastructure;
+using ConverseTek.Infrastructure;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -194,6 +194,7 @@ namespace ConverseTek.Services {
       if (string.IsNullOrEmpty(settings.SelectedProvider)) settings.SelectedProvider = "codex";
       if (string.IsNullOrEmpty(settings.CodexCommand)) settings.CodexCommand = "codex";
       if (settings.CodexModel == null) settings.CodexModel = "";
+      settings.CodexReasoningEffort = NormaliseCodexReasoningEffort(settings.CodexReasoningEffort);
       if (settings.CodexProfile == null) settings.CodexProfile = "";
       if (settings.TimeoutSeconds <= 0) settings.TimeoutSeconds = 300;
       if (settings.ModelCatalogs == null) settings.ModelCatalogs = new Dictionary<string, AiModelCatalogResult>();
@@ -229,6 +230,21 @@ namespace ConverseTek.Services {
       if (personality.Enabled == null) personality.Enabled = true;
       if (personality.DefaultKey == null) personality.DefaultKey = "";
       return personality;
+    }
+
+    private string NormaliseCodexReasoningEffort(string effort) {
+      if (string.IsNullOrWhiteSpace(effort)) return "";
+
+      string normalisedEffort = effort.Trim().ToLowerInvariant();
+      if (normalisedEffort == "auto" || normalisedEffort == "default") return "";
+      if (normalisedEffort == "low" ||
+        normalisedEffort == "medium" ||
+        normalisedEffort == "high" ||
+        normalisedEffort == "xhigh") {
+        return normalisedEffort;
+      }
+
+      return "";
     }
 
     private string NormaliseWorkspaceKey(string workingDirectory) {

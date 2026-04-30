@@ -4,6 +4,7 @@
   display: flex;
 
   &__quick-links {
+    flex: 0 0 78px;
     margin-right: 20px;
     text-align: center;
     max-height: 55vh;
@@ -20,11 +21,15 @@
   &__directory-item {
     cursor: pointer;
     padding: 0;
+    min-height: 30px;
   }
 
   &__directory-item-subcontainer {
-    padding: 12px 8px;
+    display: flex;
+    align-items: center;
     width: 100%;
+    min-height: 30px;
+    padding: 4px 8px;
   }
 
   &__directory-item:hover,
@@ -36,6 +41,7 @@
   &__directory-icon,
   &__file-icon {
     margin-right: $smallMediumSpace;
+    font-size: 14px;
   }
 
   &__directory-name {

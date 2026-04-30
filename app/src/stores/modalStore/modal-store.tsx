@@ -3,6 +3,8 @@ import React, { MouseEvent, ElementType } from 'react';
 import { observable, action, makeObservable } from 'mobx';
 import { ButtonType } from 'antd/lib/button';
 
+import { getDevPreservedStore } from '../dev-preserved-store';
+
 export type OnOkType = ((event: MouseEvent<HTMLElement>, value?: string) => void) | null;
 export type OnCancelType = ((event: MouseEvent<HTMLElement>) => void) | null;
 
@@ -35,6 +37,7 @@ type ModalOptions = {
   centered: boolean;
   isVisible: boolean;
   closable: boolean;
+  maskClosable: boolean;
 };
 
 class ModalStore {
@@ -62,6 +65,7 @@ class ModalStore {
       setIsLoading: action,
       setLoadingLabel: action,
       setClosable: action,
+      setMaskClosable: action,
       showModal: action,
       closeModal: action,
       setProps: action,
@@ -97,6 +101,7 @@ class ModalStore {
       centered: false,
       isVisible: false,
       closable: true,
+      maskClosable: true,
 
       ...props,
     };
@@ -214,6 +219,13 @@ class ModalStore {
     modalOptions.closable = closable;
   }
 
+  setMaskClosable(maskClosable: boolean, globalModalId: string): void {
+    const modalOptions = this.options.get(globalModalId);
+    if (modalOptions == null) return;
+
+    modalOptions.maskClosable = maskClosable;
+  }
+
   showModal(flag: boolean, globalModalId: string): void {
     const modalOptions = this.options.get(globalModalId);
     if (modalOptions == null) return;
@@ -243,6 +255,6 @@ class ModalStore {
   };
 }
 
-export const modalStore = new ModalStore();
+export const modalStore = getDevPreservedStore('__conversetekModalStore', () => new ModalStore(), ModalStore.prototype);
 
 export { ModalStore };

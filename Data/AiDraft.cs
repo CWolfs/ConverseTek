@@ -54,7 +54,13 @@ namespace ConverseTek.Data {
     public string DisplayName { get; set; }
     public string Description { get; set; }
     public string DefaultReasoningLevel { get; set; }
+    public List<AiReasoningLevel> SupportedReasoningLevels { get; set; }
     public int Priority { get; set; }
+  }
+
+  public class AiReasoningLevel {
+    public string Effort { get; set; }
+    public string Description { get; set; }
   }
 
   public class AiModelCatalogResult {

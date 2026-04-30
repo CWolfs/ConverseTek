@@ -120,7 +120,6 @@ export function createPromptNode(index: number): PromptNodeType {
     speakerOverrideId: '',
     actions: null,
     comment: '',
-    speakerType: null,
   };
 }
 
@@ -146,10 +145,8 @@ export function createResponseNode(): ElementNodeType {
 export function consolidateSpeaker(conversationAsset: ConversationAssetType): void {
   const { nodes } = conversationAsset.conversation;
   nodes.forEach((node) => {
-    const { speakerType } = node;
-    if (speakerType === 'speakerId') {
-      node.sourceInSceneRef = null;
-    }
+    if (node.sourceInSceneRef?.id === '') node.sourceInSceneRef = null;
+    if (node.sourceInSceneRef?.id) node.speakerOverrideId = '';
   });
 }
 

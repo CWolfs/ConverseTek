@@ -5,44 +5,41 @@ namespace ConverseTek.Controllers {
   using Newtonsoft.Json;
   using Newtonsoft.Json.Linq;
 
-  using Chromely.Core.RestfulService;
-  using Chromely.Core.Infrastructure;
-
   using ProtoBuf.Meta;
   using isogame;
 
   using ConverseTek.Data;
+  using ConverseTek.Host;
   using ConverseTek.Services;
 
-  [ControllerProperty(Name = "AiController", Route = "ai")]
-  public class AiController : ChromelyController {
-    public AiController() {
-      this.RegisterGetRequest("/ai/settings/current", this.GetSettings);
-      this.RegisterPostRequest("/ai/settings", this.SaveSettings);
-      this.RegisterPostRequest("/ai/models", this.GetModels);
-      this.RegisterPostRequest("/ai/draft", this.CreateDraft);
-      this.RegisterPostRequest("/ai/draft-artifact", this.GetDraftArtifact);
-      this.RegisterPostRequest("/ai/validate-conversation", this.ValidateConversation);
+  public class AiController {
+    public void RegisterRoutes(AppRouteDispatcher dispatcher) {
+      dispatcher.RegisterGet("/ai/settings/current", this.GetSettings);
+      dispatcher.RegisterPost("/ai/settings", this.SaveSettings);
+      dispatcher.RegisterPost("/ai/models", this.GetModels);
+      dispatcher.RegisterPost("/ai/draft", this.CreateDraft);
+      dispatcher.RegisterPost("/ai/draft-artifact", this.GetDraftArtifact);
+      dispatcher.RegisterPost("/ai/validate-conversation", this.ValidateConversation);
     }
 
-    private ChromelyResponse GetSettings(ChromelyRequest request) {
+    private AppResponse GetSettings(AppRequest request) {
       ConfigService configService = ConfigService.getInstance();
       AiSettings settings = configService.GetAiSettings();
 
-      ChromelyResponse response = new ChromelyResponse();
+      AppResponse response = new AppResponse();
       response.Data = SerializeAiSettingsResponse(configService, settings);
       return response;
     }
 
-    private ChromelyResponse SaveSettings(ChromelyRequest request) {
-      string postDataJson = (string)request.PostData.EnsureJson();
+    private AppResponse SaveSettings(AppRequest request) {
+      string postDataJson = request.PostData;
       JObject data = JObject.Parse(postDataJson);
       ConfigService configService = ConfigService.getInstance();
 
       if (data["settings"] != null) {
         AiSettings settings = JsonConvert.DeserializeObject<AiSettings>(data["settings"].ToString());
         settings = configService.SaveAiSettings(settings);
-        ChromelyResponse settingsResponse = new ChromelyResponse();
+        AppResponse settingsResponse = new AppResponse();
         settingsResponse.Data = SerializeAiSettingsResponse(configService, settings);
         return settingsResponse;
       }
@@ -50,12 +47,12 @@ namespace ConverseTek.Controllers {
       if (data["workspaceSettings"] != null) {
         AiWorkspaceSettings workspaceSettings = JsonConvert.DeserializeObject<AiWorkspaceSettings>(data["workspaceSettings"].ToString());
         AiSettings settings = configService.SaveAiWorkspaceSettings(workspaceSettings);
-        ChromelyResponse workspaceResponse = new ChromelyResponse();
+        AppResponse workspaceResponse = new AppResponse();
         workspaceResponse.Data = SerializeAiSettingsResponse(configService, settings);
         return workspaceResponse;
       }
 
-      ChromelyResponse response = new ChromelyResponse();
+      AppResponse response = new AppResponse();
       response.Data = SerializeAiSettingsResponse(configService, configService.GetAiSettings());
       return response;
     }
@@ -66,8 +63,8 @@ namespace ConverseTek.Controllers {
       return response.ToString(Formatting.None);
     }
 
-    private ChromelyResponse GetModels(ChromelyRequest request) {
-      ChromelyResponse response = new ChromelyResponse();
+    private AppResponse GetModels(AppRequest request) {
+      AppResponse response = new AppResponse();
 
       try {
         if (ConfigService.getInstance().GetAiSettings().Enabled == false) {
@@ -79,7 +76,7 @@ namespace ConverseTek.Controllers {
           return response;
         }
 
-        string postDataJson = (string)request.PostData.EnsureJson();
+        string postDataJson = request.PostData;
         JObject data = JObject.Parse(postDataJson);
         bool forceRefresh = data["forceRefresh"] != null && data["forceRefresh"].Value<bool>();
         AiSettings settings = data["settings"] == null
@@ -99,8 +96,8 @@ namespace ConverseTek.Controllers {
       return response;
     }
 
-    private ChromelyResponse CreateDraft(ChromelyRequest request) {
-      ChromelyResponse response = new ChromelyResponse();
+    private AppResponse CreateDraft(AppRequest request) {
+      AppResponse response = new AppResponse();
 
       try {
         if (ConfigService.getInstance().GetAiSettings().Enabled == false) {
@@ -112,7 +109,7 @@ namespace ConverseTek.Controllers {
           return response;
         }
 
-        string postDataJson = (string)request.PostData.EnsureJson();
+        string postDataJson = request.PostData;
         JObject data = JObject.Parse(postDataJson);
         AiDraftRequest draftRequest = JsonConvert.DeserializeObject<AiDraftRequest>(data["request"].ToString());
         AiDraftRunResult result = AiProviderService.getInstance().RunDraft(draftRequest);
@@ -128,8 +125,8 @@ namespace ConverseTek.Controllers {
       return response;
     }
 
-    private ChromelyResponse GetDraftArtifact(ChromelyRequest request) {
-      ChromelyResponse response = new ChromelyResponse();
+    private AppResponse GetDraftArtifact(AppRequest request) {
+      AppResponse response = new AppResponse();
       AiDraftArtifactResult result = new AiDraftArtifactResult {
         Success = false,
         Error = "",
@@ -145,7 +142,7 @@ namespace ConverseTek.Controllers {
           return response;
         }
 
-        string postDataJson = (string)request.PostData.EnsureJson();
+        string postDataJson = request.PostData;
         JObject data = JObject.Parse(postDataJson);
         string path = data["path"] == null ? "" : data["path"].ToString();
         result.Path = path;
@@ -190,15 +187,15 @@ namespace ConverseTek.Controllers {
       return response;
     }
 
-    private ChromelyResponse ValidateConversation(ChromelyRequest request) {
-      ChromelyResponse response = new ChromelyResponse();
+    private AppResponse ValidateConversation(AppRequest request) {
+      AppResponse response = new AppResponse();
       ConversationValidationResult result = new ConversationValidationResult {
         Success = false,
         Error = ""
       };
 
       try {
-        string postDataJson = (string)request.PostData.EnsureJson();
+        string postDataJson = request.PostData;
         JObject data = JObject.Parse(postDataJson);
         ConversationAsset conversationAsset = JsonConvert.DeserializeObject<ConversationAsset>(data["conversationAsset"].ToString());
 

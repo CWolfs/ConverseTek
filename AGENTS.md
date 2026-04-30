@@ -8,17 +8,29 @@ Use UK English in prose, docs, comments, commit messages, PR text, and issue tex
 
 ## Project Shape
 
-ConverseTek is a React + TypeScript + MobX frontend in `app/`, hosted by a C#/.NET Framework 4.7.2 Chromely backend at the repository root. The backend reads and writes BattleTech protobuf `.bytes` conversation files through the game DLLs in `libs/`.
+ConverseTek is a React + TypeScript + MobX frontend in `app/`, hosted by a C#/.NET Framework 4.7.2 WebView2 desktop shell at the repository root. The backend reads and writes BattleTech protobuf `.bytes` conversation files through the game DLLs in `libs/`.
 
 Read `docs/architecture/overview.md` before larger changes, then the specific architecture document for the area being touched.
 
-## Chromely Routing
+## BattleTech Conversation Format
 
-Do not register GET and POST handlers on the exact same route path. This Chromely version can collide or shadow routes by path even when the HTTP verb differs, causing frontend GET promises to never resolve. Use distinct paths such as `GET /ai/settings/current` and `POST /ai/settings`.
+Do not add new properties to conversation assets, prompt nodes, response nodes, roots, operation calls, or other data that is saved back into the binary Shadowrun/BattleTech protobuf conversation format. The `.bytes` files are written through the game DLL types, so only fields that already exist in those types can be relied on to round-trip.
+
+Transient editor-only state is fine, but keep it outside the serialised conversation graph or strip/recompute it before persistence, for example in a UI store, config file, or separate metadata structure keyed by stable ids. AI draft/intermediate types may have their own fields, but conversion into a real conversation must only populate real BattleTech fields.
+
+For prompt speakers, follow the FAQ behaviour: `sourceInSceneRef.id` is the cast id and takes priority in BattleTech. If a prompt should use `speakerOverrideId` instead, `sourceInSceneRef` must be cleared. If both are absent, the node inherits the current conversation speaker.
+
+## Desktop Bridge Routing
+
+Frontend calls go through `app/src/services/rest.ts`, which sends typed bridge messages to the WebView2 host. Backend routes are registered in the app-owned dispatcher under `Host/`; keep route registration keyed by method and path, and keep frontend API calls inside `app/src/services/api.ts`.
 
 ## Frontend CSS
 
-The embedded Chromely/CEF runtime may lag behind modern browser CSS support. Avoid relying on `gap` for flex layouts in app UI; use explicit margins or margin fallbacks for spacing between flex children, especially in modal controls, tag lists, toolbars, and wrapped button rows. CSS Grid `gap` is acceptable where already verified in the runtime.
+The desktop host uses WebView2/Edge Chromium. Modern CSS is available in the app runtime, so prefer clear, current CSS such as flex/grid gaps, `min()`/`max()`/`clamp()`, logical properties, and modern selectors where they make the UI simpler.
+
+## Frontend Workflow
+
+The frontend uses Vite. Use `CT: Fast Dev` for the normal hot reload workflow; it starts or reuses the Vite server, then starts the WebView2 desktop shell with `CT_WEB_URL=http://127.0.0.1:5173/` so the backend bridge remains available. Keep `CT: UI Build` for static builds into `dist/` and the debug output folder.
 
 ## AI Drafting
 

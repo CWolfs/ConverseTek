@@ -7,6 +7,21 @@ import type { ColourConfigType, ConversationAssetType } from 'types';
 import { deleteConversation, updateConversation } from 'services/api';
 import { createConversation, getId } from 'utils/conversation-utils';
 import { defStore } from '../defStore';
+import { getDevPreservedStore } from '../dev-preserved-store';
+
+const ACTIVE_CONVERSATION_SESSION_KEY = 'conversetek.activeConversationId';
+
+function readActiveConversationId(): string | null {
+  return window.sessionStorage.getItem(ACTIVE_CONVERSATION_SESSION_KEY);
+}
+
+function writeActiveConversationId(id: string): void {
+  window.sessionStorage.setItem(ACTIVE_CONVERSATION_SESSION_KEY, id);
+}
+
+function clearActiveConversationId(): void {
+  window.sessionStorage.removeItem(ACTIVE_CONVERSATION_SESSION_KEY);
+}
 
 class DataStore {
   public workingDirectory: string | null;
@@ -15,6 +30,7 @@ class DataStore {
   public activeConversationAsset: ConversationAssetType | null;
   public unsavedActiveConversationAsset: ConversationAssetType | null;
   public isConversationDirty: boolean;
+  public conversationMutationRevision: number;
   public colourConfig: ColourConfigType | null;
 
   constructor() {
@@ -26,6 +42,7 @@ class DataStore {
       activeConversationAsset: observable,
       unsavedActiveConversationAsset: observable,
       isConversationDirty: observable,
+      conversationMutationRevision: observable,
       setWorkingDirectory: action,
       createNewConversation: action,
       setConversations: action,
@@ -47,6 +64,7 @@ class DataStore {
     this.activeConversationAsset = null;
     this.unsavedActiveConversationAsset = null;
     this.isConversationDirty = false;
+    this.conversationMutationRevision = 0;
     this.workingDirectory = null;
     this.workingDirectoryName = null;
     this.colourConfig = null;
@@ -89,11 +107,17 @@ class DataStore {
   }
 
   setConversations(conversationAssets: ConversationAssetType[]): void {
+    const activeConversationId = this.activeConversationAsset?.conversation.idRef.id ?? readActiveConversationId();
+
     this.conversationAssets.clear();
     conversationAssets.forEach((conversationAsset: ConversationAssetType) => {
       this.conversationAssets.set(conversationAsset.conversation.idRef.id, conversationAsset);
       defStore.setLogicTypeByConversation(conversationAsset);
     });
+
+    if (activeConversationId != null && this.conversationAssets.has(activeConversationId)) {
+      this.setActiveConversation(activeConversationId);
+    }
   }
 
   setConversation(conversationAsset: ConversationAssetType): void {
@@ -102,6 +126,7 @@ class DataStore {
 
   setConversationDirty(flag: boolean): void {
     this.isConversationDirty = flag;
+    if (flag) this.conversationMutationRevision += 1;
   }
 
   getConversationAsset(id: string): ConversationAssetType | null {
@@ -116,6 +141,8 @@ class DataStore {
 
   clearActiveConversation(): void {
     this.activeConversationAsset = null;
+    this.unsavedActiveConversationAsset = null;
+    clearActiveConversationId();
   }
 
   deleteConversation(id: string): void {
@@ -138,6 +165,7 @@ class DataStore {
       if (conversationAsset) {
         this.activeConversationAsset = conversationAsset;
         this.setUnsavedActiveConversation(this.activeConversationAsset);
+        writeActiveConversationId(id);
       }
     }
   }
@@ -172,10 +200,12 @@ class DataStore {
     this.activeConversationAsset = null;
     this.unsavedActiveConversationAsset = null;
     this.workingDirectory = null;
+    this.workingDirectoryName = null;
+    clearActiveConversationId();
     this.setConversationDirty(false);
   };
 }
 
-export const dataStore = new DataStore();
+export const dataStore = getDevPreservedStore('__conversetekDataStore', () => new DataStore(), DataStore.prototype);
 
 export { DataStore };

@@ -91,7 +91,7 @@ export function Header() {
           )}
         </SubMenu>
         {workingDirectory && aiFeatureEnabled && (
-          <SubMenu title="AI">
+          <SubMenu title="Draft Assist">
             <MenuItem onClick={() => modalStore.setModelContent(AiDraftModal, { mode: 'fullConversation' }, 'global1')}>
               Draft Conversation...
             </MenuItem>

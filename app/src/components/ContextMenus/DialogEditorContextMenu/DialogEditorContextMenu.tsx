@@ -152,7 +152,7 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
       {!isCore && <Item onClick={onDeleteClicked}>Delete</Item>}
       {showAiActions && <Separator />}
       {showAiActions && <Item onClick={onAiSuggestNode}>AI Suggest Rewrite</Item>}
-      {aiFeatureEnabled && (isResponse || isRoot) && <Item onClick={onAiExpandBranch}>AI Expand Branch</Item>}
+      {showAiActions && <Item onClick={onAiExpandBranch}>AI Expand Branch</Item>}
       {showBranchActions && <Separator />}
       {(isNode || isResponse) && <Item onClick={onIsolateBranch}>Isolate Branch</Item>}
       {(isNode || isResponse || isRoot) && <Item onClick={onExpandBranch}>Expand Branch</Item>}

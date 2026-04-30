@@ -4,6 +4,8 @@ Conversation editor for HBS's [Battletech](http://battletechgame.com/).
 
 Battletech uses a binary data format for its conversations. It isn't possible to edit those files directly so this tool is being developed to allow for editing and creating new conversations.
 
+ConverseTek is a Windows desktop app with a React/TypeScript frontend hosted in WebView2 / Edge Chromium and a C# backend that reads and writes BattleTech's protobuf conversation files.
+
 ![Example Conversation Edit](./docs/images/conversetek-example.png)
 ![ConverseTek](./docs/images/conversetek.png)
 
@@ -31,6 +33,7 @@ Latest release: **v1.8.0** | [Download](https://github.com/CWolfs/ConverseTek/re
 ## Installation Instructions
 
 - Download and install [.NET framework](https://dotnet.microsoft.com/en-us/download/dotnet-framework) (no earlier than [.NET 4.72 Runtime](https://www.microsoft.com/net/download/thank-you/net472))
+- Install the Microsoft Edge WebView2 Runtime if it is not already present on your system
 - Download the [latest release](https://github.com/CWolfs/ConverseTek/releases/) and unzip it
 - Copy `ShadowrunDTO.dll` and `ShadowrunSerializer.dll` from your `BATTLETECH/BattleTech_Data/Managed` directory into the `ConverseTek` application folder
 - Run `ConverseTek.exe` from the `ConverseTek` application folder

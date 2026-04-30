@@ -47,7 +47,13 @@ type AiModelOptionResponseType = {
   DisplayName?: string;
   Description?: string;
   DefaultReasoningLevel?: string;
+  SupportedReasoningLevels?: AiReasoningLevelResponseType[];
   Priority?: number;
+};
+
+type AiReasoningLevelResponseType = {
+  Effort?: string;
+  Description?: string;
 };
 
 type AiModelCatalogResponseType = {
@@ -82,6 +88,7 @@ type AiSettingsResponseType = {
   SelectedProvider?: string;
   CodexCommand?: string;
   CodexModel?: string;
+  CodexReasoningEffort?: string;
   CodexProfile?: string;
   TimeoutSeconds?: number;
   ModelCatalogs?: Record<string, AiModelCatalogResponseType>;
@@ -178,7 +185,7 @@ type DefinitionsResponseType = {
 };
 
 /*
- * CHROMELY DOESN'T SUPPORT PUTS SO PUTS AND DELETES ARE CURRENTLY POSTS WITH method DATA
+ * The desktop bridge exposes GET and POST routes, so PUT and DELETE style actions are sent as POSTs with method data.
  * e.g. { method: 'DELETE' }
  */
 
@@ -213,11 +220,32 @@ export function getConversations(): Promise<ConversationAssetType[]> {
   });
 }
 
+function stripTransientConversationFields(conversationAsset: ConversationAssetType): void {
+  const conversation = conversationAsset.conversation as unknown as {
+    roots?: Record<string, unknown>[];
+    nodes?: (Record<string, unknown> & { branches?: Record<string, unknown>[] })[];
+  };
+
+  conversation.roots?.forEach((root) => {
+    delete root.deleting;
+  });
+
+  conversation.nodes?.forEach((node) => {
+    delete node.deleting;
+    delete node.speakerType;
+
+    node.branches?.forEach((branch) => {
+      delete branch.deleting;
+    });
+  });
+}
+
 export function updateConversation(id: string, conversationAsset: ConversationAssetType): Promise<ConversationAssetType[]> {
   runInAction(() => {
     consolidateSpeaker(conversationAsset);
     removeAllOldFillerNodes(conversationAsset); // This only exists to fix old conversations pre-v1.4
     rebuildNodeIndexes(conversationAsset);
+    stripTransientConversationFields(conversationAsset);
 
     const nodeID = nodeStore.getActiveNodeId();
     if (nodeID) {
@@ -242,6 +270,7 @@ export function exportConversation(id: string, conversationAsset: ConversationAs
     consolidateSpeaker(conversationAsset);
     removeAllOldFillerNodes(conversationAsset); // This only exists to fix old conversations pre-v1.4
     rebuildNodeIndexes(conversationAsset);
+    stripTransientConversationFields(conversationAsset);
 
     const nodeID = nodeStore.getActiveNodeId();
     if (nodeID) {
@@ -260,6 +289,7 @@ export function exportAllConversations(id: string, conversationAsset: Conversati
       consolidateSpeaker(conversationAsset);
       removeAllOldFillerNodes(conversationAsset); // This only exists to fix old conversations pre-v1.4
       rebuildNodeIndexes(conversationAsset);
+      stripTransientConversationFields(conversationAsset);
 
       const nodeID = nodeStore.getActiveNodeId();
       if (nodeID) {
@@ -286,6 +316,10 @@ function normaliseAiModelOption(model: AiModelOptionResponseType): AiModelOption
     displayName: model.DisplayName ?? '',
     description: model.Description ?? '',
     defaultReasoningLevel: model.DefaultReasoningLevel ?? '',
+    supportedReasoningLevels: (model.SupportedReasoningLevels ?? []).map((level) => ({
+      effort: level.Effort ?? '',
+      description: level.Description ?? '',
+    })),
     priority: model.Priority ?? 0,
   };
 }
@@ -344,6 +378,7 @@ function normaliseAiSettings(source: AiSettingsResponseType): AiSettingsType {
     selectedProvider: source.SelectedProvider ?? 'codex',
     codexCommand: source.CodexCommand ?? 'codex',
     codexModel: source.CodexModel ?? '',
+    codexReasoningEffort: source.CodexReasoningEffort ?? '',
     codexProfile: source.CodexProfile ?? '',
     timeoutSeconds: source.TimeoutSeconds ?? 300,
     modelCatalogs,
@@ -355,9 +390,11 @@ function normaliseAiSettings(source: AiSettingsResponseType): AiSettingsType {
     rawSelectedProvider: source.SelectedProvider,
     rawEnabled: source.Enabled,
     rawCodexModel: source.CodexModel,
+    rawCodexReasoningEffort: source.CodexReasoningEffort,
     normalisedEnabled: settings.enabled,
     normalisedSelectedProvider: settings.selectedProvider,
     normalisedCodexModel: settings.codexModel,
+    normalisedCodexReasoningEffort: settings.codexReasoningEffort,
     modelCatalogKeys: Object.keys(settings.modelCatalogs),
     workspaceKeys: Object.keys(settings.workspaces),
     rawKeys: Object.keys(source),
@@ -497,6 +534,7 @@ export function saveAiSettings(settings: AiSettingsType): Promise<AiSettingsType
   console.log(`${AI_DEBUG_PREFIX} saveAiSettings request`, {
     selectedProvider: settings.selectedProvider,
     codexModel: settings.codexModel,
+    codexReasoningEffort: settings.codexReasoningEffort,
     modelCatalogKeys: Object.keys(settings.modelCatalogs || {}),
   });
 
@@ -547,6 +585,7 @@ export function getAiModels(settings: AiSettingsType, forceRefresh = false): Pro
 }
 
 export function validateConversationRoundTrip(conversationAsset: ConversationAssetType): Promise<ConversationValidationResultType> {
+  stripTransientConversationFields(conversationAsset);
   const apiMappedConversation = mapToType<object>(conversationAsset, reversedFullConversationAssetMapping);
   return post<ConversationValidationResponseType>('/ai/validate-conversation', {}, { conversationAsset: apiMappedConversation }).then(
     normaliseConversationValidation,

@@ -1,5 +1,7 @@
 import { observable, action, makeObservable } from 'mobx';
 
+import { getDevPreservedStore } from '../dev-preserved-store';
+
 class ErrorStore {
   authErrors = observable.map<number, string>();
 
@@ -27,6 +29,6 @@ class ErrorStore {
   }
 }
 
-export const errorStore = new ErrorStore();
+export const errorStore = getDevPreservedStore('__conversetekErrorStore', () => new ErrorStore(), ErrorStore.prototype);
 
 export { ErrorStore };

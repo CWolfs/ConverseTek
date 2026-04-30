@@ -20,6 +20,7 @@ import {
 
 import { modalStore } from '../modalStore';
 import { dataStore } from '../dataStore';
+import { getDevPreservedStore } from '../dev-preserved-store';
 
 /* eslint-disable class-methods-use-this, no-param-reassign */
 class DefStore {
@@ -463,6 +464,6 @@ class DefStore {
   };
 }
 
-export const defStore = new DefStore();
+export const defStore = getDevPreservedStore('__conversetekDefStore', () => new DefStore(), DefStore.prototype);
 
 export { DefStore };

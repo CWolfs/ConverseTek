@@ -32,6 +32,7 @@ function GlobalModal({ id }: { id: string }) {
     width,
     centered,
     closable,
+    maskClosable,
   } = modalOptions;
 
   const content = modalStore.getModal(id);
@@ -60,7 +61,7 @@ function GlobalModal({ id }: { id: string }) {
       wrapClassName="global-modal"
       width={width}
       closable={closable}
-      maskClosable={closable}
+      maskClosable={maskClosable}
       centered={centered}
     >
       {content}

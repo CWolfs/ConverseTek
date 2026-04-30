@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 
-import { storeContext } from '../App';
+import { storeContext } from 'stores/store-context';
 import { NodeStore } from 'stores/nodeStore/node-store';
 import { DataStore } from 'stores/dataStore/data-store';
 import { ErrorStore } from 'stores/errorStore/error-store';
@@ -9,6 +9,10 @@ import { DefStore } from 'stores/defStore/def-store';
 
 export const useStore = <T extends DataStore | NodeStore | ModalStore | DefStore | ErrorStore>(storeType: string): T => {
   const store = useContext(storeContext);
+
+  if (store == null) {
+    throw new Error('useStore must be used inside storeContext.Provider');
+  }
 
   if (storeType === 'data') return store.dataStore as T;
   if (storeType === 'node') return store.nodeStore as T;

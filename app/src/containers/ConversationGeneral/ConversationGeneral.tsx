@@ -155,7 +155,6 @@ function ConversationGeneral({ node }: Props) {
               <Select
                 className="conversation-general__speaker-select"
                 value={selectedSpeakerType}
-                style={{ width: 115 }}
                 onChange={handleSpeakerChange}
               >
                 <Option value="castId">Cast Id</Option>
