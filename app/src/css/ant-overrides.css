@@ -322,20 +322,43 @@
   padding-bottom: 12px;
 }
 
-.ant-select-selection {
+.ant-select:not(.ant-select-customize-input) .ant-select-selector {
   background-color: $backgroundTertiary;
+  border-color: $borderTertiary;
   color: $textColourPrimary;
 }
 
-.ant-select-arrow {
+.ant-select-single .ant-select-selector .ant-select-selection-item,
+.ant-select-single .ant-select-selector .ant-select-selection-placeholder,
+.ant-select:not(.ant-select-customize-input) .ant-select-selector .ant-select-selection-search-input {
+  color: $textColourPrimary;
+}
+
+.ant-select-arrow,
+.ant-select-clear {
   color: $textColourQuaternary;
+  opacity: 1;
+}
+
+.ant-select-arrow svg {
+  display: block;
+}
+
+.ant-select-multiple .ant-select-selection-item {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: $borderTertiary;
+  color: $textColourPrimary;
+}
+
+.ant-select-multiple .ant-select-selection-item-remove {
+  color: $textColourPrimary;
 }
 
 .ant-select-dropdown {
   background-color: $backgroundTertiary;
   color: $textColourPrimary;
 
-  &-menu-item {
+  .ant-select-item {
     background-color: $backgroundTertiary;
     color: $textColourPrimary;
 
@@ -343,20 +366,30 @@
       background-color: $highlightColourPrimary;
       color: white;
     }
+  }
 
-    &:hover:not(.ant-select-dropdown-menu-item-disabled) {
-      background-color: $highlightColourPrimary;
-    }
+  .ant-select-item-option-content {
+    color: inherit;
+  }
 
-    &-selected {
-      background-color: $backgroundTertiary;
-      color: $textColourTertiary;
-    }
+  .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+    background-color: $highlightColourPrimary;
+    color: white;
+  }
 
-    &-active:not(.ant-select-dropdown-menu-item-disabled) {
-      background-color: $highlightColourPrimary;
-      color: white;
-    }
+  .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+    border-left: 3px solid $linkColourPrimary;
+    background-color: rgba(42, 176, 247, 0.14);
+    color: white;
+    font-weight: 600;
+  }
+
+  .ant-select-item-option-selected:not(.ant-select-item-option-disabled) .ant-select-item-option-state {
+    color: white;
+  }
+
+  .ant-select-item-option-disabled {
+    color: $c2grey6;
   }
 }
 
@@ -365,8 +398,11 @@
   color: black;
 }
 
-.ant-tooltip-arrow::before {
-  background-color: gold;
+.ant-tooltip-arrow::before,
+.ant-tooltip-arrow-content,
+.ant-tooltip-arrow-content::before {
+  --antd-arrow-background-color: gold;
+  background: gold;
 }
 
 .ant-input::-webkit-input-placeholder {

@@ -1220,12 +1220,14 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
           <Row gutter={24} className="ai-draft-personalities">
             <Col md={9}>
               <div className="ai-draft-personalities__toolbar">
-                <Input
-                  value={personalitySearch}
-                  prefix={<SearchOutlined />}
-                  placeholder="Search personalities"
-                  onChange={(event) => setPersonalitySearch(event.target.value)}
-                />
+                <div className="ai-draft-personalities__search">
+                  <Input
+                    value={personalitySearch}
+                    prefix={<SearchOutlined />}
+                    placeholder="Search personalities"
+                    onChange={(event) => setPersonalitySearch(event.target.value)}
+                  />
+                </div>
                 <Button icon={<PlusOutlined />} onClick={addCastPersonality}>
                   Add
                 </Button>
