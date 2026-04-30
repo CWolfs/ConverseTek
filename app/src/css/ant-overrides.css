@@ -157,8 +157,7 @@
   }
 }
 
-.ant-tree,
-.ant-tree li .ant-tree-node-content-wrapper {
+.ant-tree {
   background: transparent;
   color: $textColourPrimary;
 }
@@ -167,14 +166,11 @@
   color: $textColourPrimary;
 }
 
-.ant-tree.ant-tree-show-line li span.ant-tree-switcher,
 .ant-tree.ant-tree-show-line .ant-tree-switcher {
   background-color: $backgroundTertiary;
   color: white;
 }
 
-.ant-tree li .ant-tree-node-content-wrapper:hover,
-.ant-tree li .ant-tree-node-content-wrapper.ant-tree-node-selected,
 .ant-tree .ant-tree-node-content-wrapper:hover,
 .ant-tree .ant-tree-node-content-wrapper.ant-tree-node-selected {
   background-color: #2ab0f77d;
