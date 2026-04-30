@@ -34,6 +34,7 @@ class DefStore {
       operations: observable,
       presets: observable,
       tags: observable,
+      definitionCount: observable,
       setLogicTypeByConversation: action,
       setLogicTypeByOperation: action,
       setDefinitions: action,

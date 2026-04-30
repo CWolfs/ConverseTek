@@ -87,7 +87,10 @@ function ViewableLogic({ logic }: Props) {
             }
           }
 
-          return <span key={index}>{displayValue} </span>;
+          const renderedDisplayValue =
+            typeof displayValue === 'string' || typeof displayValue === 'number' || displayValue == null ? displayValue : JSON.stringify(displayValue);
+
+          return <span key={index}>{renderedDisplayValue} </span>;
         })}
       {args.length <= 0 && logicDef.inputs.length > 0 && <span>...</span>}
       {view.includes('result') && renderResult(args)}

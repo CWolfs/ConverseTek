@@ -41,7 +41,7 @@
 }
 
 .ai-draft-modal .ant-input,
-.ai-draft-modal .ant-select-selection {
+.ai-draft-modal .ant-select:not(.ant-select-customize-input) .ant-select-selector {
   border-color: #5f6b7a;
 }
 
@@ -122,23 +122,32 @@
 }
 
 .ai-draft-modal__reasoning-dropdown .ai-draft-modal__select-option span {
-  color: #dbe7f3;
+  color: #d2d2d2;
 }
 
 .ai-draft-modal__reasoning-dropdown .ai-draft-modal__select-option small {
-  color: #8fb2d2;
+  color: #2ab0f7;
 }
 
-.ai-draft-modal__reasoning-dropdown .ant-select-dropdown-menu-item:hover .ai-draft-modal__select-option span,
-.ai-draft-modal__reasoning-dropdown .ant-select-dropdown-menu-item-active .ai-draft-modal__select-option span,
-.ai-draft-modal__reasoning-dropdown .ant-select-dropdown-menu-item-selected .ai-draft-modal__select-option span {
+.ai-draft-modal__reasoning-dropdown .ant-select-item-option:not(.ant-select-item-option-selected):hover .ai-draft-modal__select-option span,
+.ai-draft-modal__reasoning-dropdown .ant-select-item-option-active:not(.ant-select-item-option-selected) .ai-draft-modal__select-option span {
   color: #ffffff;
 }
 
-.ai-draft-modal__reasoning-dropdown .ant-select-dropdown-menu-item:hover .ai-draft-modal__select-option small,
-.ai-draft-modal__reasoning-dropdown .ant-select-dropdown-menu-item-active .ai-draft-modal__select-option small,
-.ai-draft-modal__reasoning-dropdown .ant-select-dropdown-menu-item-selected .ai-draft-modal__select-option small {
-  color: #d7ebff;
+.ai-draft-modal__reasoning-dropdown .ant-select-item-option:not(.ant-select-item-option-selected):hover .ai-draft-modal__select-option small,
+.ai-draft-modal__reasoning-dropdown .ant-select-item-option-active:not(.ant-select-item-option-selected) .ai-draft-modal__select-option small {
+  color: #ffffff;
+}
+
+.ai-draft-modal__reasoning-dropdown .ant-select-item-option-selected .ai-draft-modal__select-option span,
+.ai-draft-modal__reasoning-dropdown .ant-select-item-option-selected .ai-draft-modal__select-option small {
+  color: #ffffff;
+}
+
+.ai-draft-modal__reasoning-dropdown .ant-select-item-option-selected:hover,
+.ai-draft-modal__reasoning-dropdown .ant-select-item-option-selected.ant-select-item-option-active {
+  background-color: rgba(42, 176, 247, 0.14);
+  color: #ffffff;
 }
 
 .ai-draft-modal__field-actions {
@@ -296,6 +305,23 @@
   min-width: 80px;
 }
 
+.ai-draft-personalities__search {
+  min-width: 0;
+}
+
+.ai-draft-personalities__search .ant-input-affix-wrapper {
+  padding-left: 12px;
+}
+
+.ai-draft-personalities__search .ant-input-affix-wrapper .ant-input-prefix {
+  margin-right: 12px;
+  color: #40556c;
+}
+
+.ai-draft-personalities__search .ant-input-affix-wrapper > input.ant-input {
+  padding-left: 10px !important;
+}
+
 .ai-draft-personalities__toolbar .ant-btn,
 .ai-draft-personalities__list-actions .ant-btn,
 .ai-draft-personalities__editor-heading .ant-btn {
@@ -342,20 +368,23 @@
   margin-top: 8px;
 }
 
-.ai-draft-personalities__item:hover,
-.ai-draft-personalities__item:focus {
+.ai-draft-personalities__item:not(.ai-draft-personalities__item--active):hover,
+.ai-draft-personalities__item:not(.ai-draft-personalities__item--active):focus {
   outline: none;
   background: #f6f8fb;
   box-shadow: 0 0 0 1px rgba(31, 95, 139, 0.3), 0 4px 12px rgba(31, 47, 67, 0.12);
 }
 
-.ai-draft-personalities__item:active {
-  transform: scale(0.96);
-}
-
 .ai-draft-personalities__item--active {
+  outline: none;
   background: #eef6fb;
   box-shadow: 0 0 0 2px rgba(31, 95, 139, 0.34), 0 4px 12px rgba(31, 47, 67, 0.14);
+}
+
+.ai-draft-personalities__item--active:hover,
+.ai-draft-personalities__item--active:focus {
+  background: #eef6fb;
+  box-shadow: 0 0 0 2px rgba(31, 95, 139, 0.42), 0 4px 12px rgba(31, 47, 67, 0.14);
 }
 
 .ai-draft-personalities__item--disabled {
@@ -440,36 +469,35 @@
   padding-bottom: 4px;
 }
 
-.ai-draft-personalities__editor .ant-select-selection--multiple {
+.ai-draft-personalities__editor .ant-select-multiple .ant-select-selector {
   min-height: 34px;
   padding-bottom: 2px;
 }
 
-.ai-draft-personalities__editor .ant-select-selection--multiple .ant-select-selection__rendered {
+.ai-draft-personalities__editor .ant-select-multiple .ant-select-selection-overflow {
   min-height: 30px;
-  margin-right: 6px;
-  margin-bottom: -2px;
-  margin-left: 6px;
+  padding-right: 6px;
+  padding-left: 6px;
   line-height: 30px;
 }
 
-.ai-draft-personalities__editor .ant-select-selection__choice {
+.ai-draft-personalities__editor .ant-select-selection-item {
   max-width: 100%;
 }
 
-.ai-draft-personalities__editor .ant-select-selection--multiple .ant-select-selection__choice {
+.ai-draft-personalities__editor .ant-select-multiple .ant-select-selection-item {
   height: 24px;
   margin-right: 5px;
   margin-top: 4px;
   line-height: 22px;
 }
 
-.ai-draft-personalities__editor .ant-select-selection--multiple .ant-select-search--inline {
+.ai-draft-personalities__editor .ant-select-multiple .ant-select-selection-search {
   height: 28px;
   line-height: 28px;
 }
 
-.ai-draft-personalities__editor .ant-select-selection--multiple .ant-select-search__field {
+.ai-draft-personalities__editor .ant-select-multiple .ant-select-selection-search-input {
   height: 24px;
   margin-top: 3px;
 }

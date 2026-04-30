@@ -1,6 +1,7 @@
 import React, { useRef, MouseEvent, useEffect } from 'react';
 import { observer } from 'mobx-react';
-import { Button, Icon, Collapse, Popconfirm } from 'antd';
+import { Button, Collapse, Popconfirm } from 'antd';
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
 import { useUpdate } from 'ahooks';
 
@@ -49,9 +50,9 @@ function ConversationConditions({ node }: { node: ElementNodeType }) {
     }
   };
 
-  const onDeleteCondition = (event: MouseEvent, index: number) => {
+  const onDeleteCondition = (event: MouseEvent | undefined, index: number) => {
     nodeStore.removeNodeCondition(node, index);
-    event.stopPropagation();
+    event?.stopPropagation();
   };
 
   const renderPanel = (condition: OperationCallType, index: number) => {
@@ -70,17 +71,17 @@ function ConversationConditions({ node }: { node: ElementNodeType }) {
         <Popconfirm
           title="Are you sure you want to delete this condition?"
           placement="topLeft"
-          onConfirm={(event: MouseEvent) => onDeleteCondition(event, index)}
+          onConfirm={(event) => onDeleteCondition(event, index)}
           okText="Yes"
           cancelText="No"
         >
           <Button
             size="small"
-            type="danger"
+            danger
             className="conversation-conditions__panel-header-delete-button"
             onClick={(event: MouseEvent) => event.stopPropagation()}
           >
-            <Icon type="delete" />
+            <DeleteOutlined />
           </Button>
         </Popconfirm>
       </div>
@@ -100,7 +101,7 @@ function ConversationConditions({ node }: { node: ElementNodeType }) {
       <Collapse>{displayConditions.map((condition, index) => renderPanel(condition, index))}</Collapse>
       <div className="conversation-conditions__buttons">
         <Button className="button-secondary" size="small" onClick={onAddCondition}>
-          <Icon type="plus" />
+          <PlusOutlined />
         </Button>
       </div>
     </div>

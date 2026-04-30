@@ -1,5 +1,6 @@
 import React, { Fragment, useEffect, useRef, useState } from 'react';
-import { Alert, Icon, List, Spin } from 'antd';
+import { Alert, List, Spin } from 'antd';
+import { ArrowUpOutlined, FileTextOutlined, FolderAddOutlined, FolderOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
 import sortBy from 'lodash.sortby';
 
@@ -20,9 +21,13 @@ type Props = {
 };
 
 function getItemIcon(item: FileSystemItemType) {
-  if (item.isFile) return <Icon type="file-text" className="ai-context-path-picker__file-icon" />;
-  if (item.name === '..') return <Icon type="arrow-up" className="ai-context-path-picker__directory-icon" />;
-  return <Icon type={item.hasChildren ? 'folder-add' : 'folder'} className="ai-context-path-picker__directory-icon" />;
+  if (item.isFile) return <FileTextOutlined className="ai-context-path-picker__file-icon" />;
+  if (item.name === '..') return <ArrowUpOutlined className="ai-context-path-picker__directory-icon" />;
+  return item.hasChildren ? (
+    <FolderAddOutlined className="ai-context-path-picker__directory-icon" />
+  ) : (
+    <FolderOutlined className="ai-context-path-picker__directory-icon" />
+  );
 }
 
 function AiContextPathPicker({ globalModalId, initialPath, onSelectPath }: Props) {

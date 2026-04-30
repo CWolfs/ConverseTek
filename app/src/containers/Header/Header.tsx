@@ -15,8 +15,9 @@ import { updateConversation, exportConversation, exportAllConversations } from '
 
 import './Header.css';
 
-const MenuItem = Menu.Item;
-const { SubMenu } = Menu;
+type MenuItems = NonNullable<React.ComponentProps<typeof Menu>['items']>;
+
+const headerSubMenuPopupOffset: [number, number] = [0, 0];
 
 export function Header() {
   const dataStore = useStore<DataStore>('data');
@@ -25,82 +26,105 @@ export function Header() {
 
   const { workingDirectory } = dataStore;
   const hasActiveConversation = dataStore.activeConversationAsset !== null;
+  const fileMenuItems = [
+    {
+      key: 'open-folder',
+      label: 'Open Folder',
+      onClick: () => modalStore.setModelContent(FileSystemPicker, {}, 'global1'),
+    },
+    workingDirectory && {
+      key: 'new-conversation',
+      label: 'New Conversation',
+      onClick: () => dataStore.createNewConversation(),
+    },
+    hasActiveConversation && {
+      key: 'save-conversation',
+      label: 'Save Conversation',
+      onClick: () => {
+        const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+        if (!conversationAsset) return;
+
+        void updateConversation(conversationAsset.conversation.idRef.id, conversationAsset).then(() => {
+          void message.success('Save successful');
+        });
+        dataStore.updateActiveConversation(conversationAsset); // local update for speed
+      },
+    },
+    hasActiveConversation && {
+      key: 'save-conversation-as',
+      label: 'Save Conversation As...',
+      onClick: () => modalStore.setModelContent(SaveConversationAs, {}, 'global1'),
+    },
+    workingDirectory && {
+      key: 'import-conversation-json',
+      label: 'Import Conversation from JSON',
+      onClick: () => modalStore.setModelContent(FileSystemPicker, { fileMode: true }, 'global1'),
+    },
+    hasActiveConversation && {
+      key: 'export-conversation-json',
+      label: 'Export Conversation as JSON',
+      onClick: () => {
+        const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+        if (!conversationAsset) return;
+
+        void exportConversation(conversationAsset.conversation.idRef.id, conversationAsset).then(() => {
+          void message.success('Export successful');
+        });
+      },
+    },
+    workingDirectory && {
+      key: 'export-all-conversations-json',
+      label: 'Export All Conversations as JSON',
+      onClick: () => {
+        const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
+        const id = conversationAsset ? conversationAsset.conversation.idRef.id : '-1';
+
+        void exportAllConversations(id, conversationAsset).then(() => {
+          void message.success('Export successful');
+        });
+      },
+    },
+  ].filter(Boolean) as MenuItems;
+  const menuItems = [
+    {
+      children: fileMenuItems,
+      key: 'file',
+      label: 'File',
+      popupClassName: 'header__submenu-popup',
+      popupOffset: headerSubMenuPopupOffset,
+    },
+    workingDirectory &&
+      aiFeatureEnabled && {
+        children: [
+          {
+            key: 'draft-conversation',
+            label: 'Draft Conversation...',
+            onClick: () => modalStore.setModelContent(AiDraftModal, { mode: 'fullConversation' }, 'global1'),
+          },
+        ],
+        key: 'draft-assist',
+        label: 'Draft Assist',
+        popupClassName: 'header__submenu-popup',
+        popupOffset: headerSubMenuPopupOffset,
+      },
+    {
+      children: [
+        {
+          key: 'about',
+          label: 'About',
+          onClick: () => modalStore.setModelContent(About, {}, 'global1'),
+        },
+      ],
+      key: 'help',
+      label: 'Help',
+      popupClassName: 'header__submenu-popup',
+      popupOffset: headerSubMenuPopupOffset,
+    },
+  ].filter(Boolean) as MenuItems;
 
   return (
     <div className="header">
-      <Menu mode="horizontal">
-        <SubMenu title="File">
-          <MenuItem onClick={() => modalStore.setModelContent(FileSystemPicker, {}, 'global1')}>Open Folder</MenuItem>
-
-          {workingDirectory && <MenuItem onClick={() => dataStore.createNewConversation()}>New Conversation</MenuItem>}
-
-          {hasActiveConversation && (
-            <MenuItem
-              onClick={() => {
-                const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-                if (!conversationAsset) return;
-
-                void updateConversation(conversationAsset.conversation.idRef.id, conversationAsset).then(() => {
-                  void message.success('Save successful');
-                });
-                dataStore.updateActiveConversation(conversationAsset); // local update for speed
-              }}
-            >
-              Save Conversation
-            </MenuItem>
-          )}
-
-          {hasActiveConversation && (
-            <MenuItem onClick={() => modalStore.setModelContent(SaveConversationAs, {}, 'global1')}>Save Conversation As...</MenuItem>
-          )}
-
-          {workingDirectory && (
-            <MenuItem onClick={() => modalStore.setModelContent(FileSystemPicker, { fileMode: true }, 'global1')}>
-              Import Conversation from JSON
-            </MenuItem>
-          )}
-
-          {hasActiveConversation && (
-            <MenuItem
-              onClick={() => {
-                const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-                if (!conversationAsset) return;
-
-                void exportConversation(conversationAsset.conversation.idRef.id, conversationAsset).then(() => {
-                  void message.success('Export successful');
-                });
-              }}
-            >
-              Export Conversation as JSON
-            </MenuItem>
-          )}
-
-          {workingDirectory && (
-            <MenuItem
-              onClick={() => {
-                const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-                const id = conversationAsset ? conversationAsset.conversation.idRef.id : '-1';
-
-                void exportAllConversations(id, conversationAsset).then(() => {
-                  void message.success('Export successful');
-                });
-              }}
-            >
-              Export All Conversations as JSON
-            </MenuItem>
-          )}
-        </SubMenu>
-        {workingDirectory && aiFeatureEnabled && (
-          <SubMenu title="Draft Assist">
-            <MenuItem onClick={() => modalStore.setModelContent(AiDraftModal, { mode: 'fullConversation' }, 'global1')}>
-              Draft Conversation...
-            </MenuItem>
-          </SubMenu>
-        )}
-        <SubMenu title="Help">
-          <MenuItem onClick={() => modalStore.setModelContent(About, {}, 'global1')}>About</MenuItem>
-        </SubMenu>
-      </Menu>
+      <Menu mode="horizontal" items={menuItems} />
     </div>
   );
 }

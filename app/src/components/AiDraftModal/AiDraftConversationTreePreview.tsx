@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Icon } from 'antd';
+import { BranchesOutlined } from '@ant-design/icons';
 import { useSize } from 'ahooks';
 import { Tree, NodeRendererProps, RowRendererProps, CursorProps, TreeApi } from 'react-arborist';
 
@@ -166,7 +166,7 @@ export function AiDraftConversationTreePreview({ conversationAsset }: Props) {
     <div className="ai-draft-preview-tree">
       <div className="ai-draft-preview-tree__toolbar">
         <span>
-          <Icon type="branches" /> Conversation tree preview
+          <BranchesOutlined /> Conversation tree preview
         </span>
         <span>Read-only</span>
       </div>

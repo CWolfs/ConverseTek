@@ -1,7 +1,8 @@
 import React, { useRef, MouseEvent, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
-import { Button, Icon, Collapse, Popconfirm } from 'antd';
+import { Button, Collapse, Popconfirm } from 'antd';
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
 import { useUpdate } from 'ahooks';
 
@@ -50,9 +51,9 @@ function ConversationActions({ node }: { node: PromptNodeType | ElementNodeType 
     }
   };
 
-  const onDeleteAction = (event: MouseEvent, index: number) => {
+  const onDeleteAction = (event: MouseEvent | undefined, index: number) => {
     nodeStore.removeNodeAction(node, index);
-    event.stopPropagation();
+    event?.stopPropagation();
   };
 
   const renderPanel = (action: OperationCallType, index: number) => {
@@ -71,17 +72,17 @@ function ConversationActions({ node }: { node: PromptNodeType | ElementNodeType 
         <Popconfirm
           title="Are you sure you want to delete this action?"
           placement="topLeft"
-          onConfirm={(event: MouseEvent) => onDeleteAction(event, index)}
+          onConfirm={(event) => onDeleteAction(event, index)}
           okText="Yes"
           cancelText="No"
         >
           <Button
             size="small"
-            type="danger"
+            danger
             className="conversation-actions__panel-header-delete-button"
             onClick={(event: MouseEvent) => event.stopPropagation()}
           >
-            <Icon type="delete" />
+            <DeleteOutlined />
           </Button>
         </Popconfirm>
       </div>
@@ -102,7 +103,7 @@ function ConversationActions({ node }: { node: PromptNodeType | ElementNodeType 
       <Collapse>{displayActions.map((action, index) => renderPanel(action, index))}</Collapse>
       <div className="conversation-actions__buttons">
         <Button className="button-secondary" size="small" onClick={onAddAction}>
-          <Icon type="plus" />
+          <PlusOutlined />
         </Button>
       </div>
     </div>

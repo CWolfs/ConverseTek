@@ -1,7 +1,7 @@
 /* eslint-disable function-paren-newline */
 import React, { MouseEvent, ElementType } from 'react';
 import { observable, action, makeObservable } from 'mobx';
-import { ButtonType } from 'antd/lib/button';
+import { LegacyButtonType } from 'utils/antd-button-utils';
 
 import { getDevPreservedStore } from '../dev-preserved-store';
 
@@ -12,8 +12,6 @@ export type FSModalProps = {
   fileMode?: boolean;
 };
 
-type ModalButtonType = 'link' | 'primary' | 'default' | 'ghost' | 'dashed' | 'danger' | undefined;
-
 type ModalOptions = {
   props: FSModalProps;
 
@@ -21,13 +19,13 @@ type ModalOptions = {
   width: string;
 
   showOkButton: boolean;
-  okType: ModalButtonType | undefined;
+  okType: LegacyButtonType;
   okLabel: string;
   disableOk: boolean;
   onOk: OnOkType;
 
   showCancelButton: boolean;
-  cancelType: ModalButtonType | undefined;
+  cancelType: LegacyButtonType;
   cancelLabel: string;
   onCancel: OnCancelType;
 
@@ -170,7 +168,7 @@ class ModalStore {
     modalOptions.disableOk = flag;
   }
 
-  setOkType(type: ButtonType, globalModalId: string): void {
+  setOkType(type: LegacyButtonType, globalModalId: string): void {
     const modalOptions = this.options.get(globalModalId);
     if (modalOptions == null) return;
 
@@ -184,7 +182,7 @@ class ModalStore {
     modalOptions.okLabel = label;
   }
 
-  setCancelType(type: ButtonType, globalModalId: string): void {
+  setCancelType(type: LegacyButtonType, globalModalId: string): void {
     const modalOptions = this.options.get(globalModalId);
     if (modalOptions == null) return;
 

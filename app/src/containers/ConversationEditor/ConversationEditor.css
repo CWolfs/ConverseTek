@@ -78,7 +78,7 @@
         flex-direction: column;
         height: 100%;
 
-        &-bar {
+        &-nav {
           flex: 0 0 auto;
           margin: 0;
         }
@@ -104,14 +104,21 @@
 
       .ant-tabs-content {
         background-color: $backgroundPrimary;
-        flex: 1 1 auto;
-        height: auto;
+        height: 100%;
         min-height: 0;
+      }
+
+      .ant-tabs-content-holder {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow: hidden;
       }
 
       .ant-tabs-tabpane {
         background-color: $backgroundPrimary;
         height: 100%;
+        min-height: 0;
+        overflow: hidden;
       }
     }
 

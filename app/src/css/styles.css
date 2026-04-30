@@ -58,7 +58,7 @@ h3[type='secondary'] {
   color: $textColourSecondary;
 }
 
-.ant-select-selection__placeholder {
+.ant-select-selection-placeholder {
   color: #bfbfbf; /* Ant placeholder colour that isn't taking on <Autocomplete> placeholders */
   font-weight: 400;
 }

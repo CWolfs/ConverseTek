@@ -5,7 +5,8 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
-import { Icon, Tooltip } from 'antd';
+import { Tooltip } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { SelectValue } from 'antd/lib/select';
 
 import { useStore } from 'hooks/useStore';
@@ -59,7 +60,7 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
 
     const tooltipContent = tooltip ? (
       <Tooltip title={tooltip}>
-        <Icon type="exclamation-circle-o" />
+        <ExclamationCircleOutlined />
       </Tooltip>
     ) : undefined;
 
@@ -121,7 +122,7 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
 
       const tooltipContent = tooltip ? (
         <Tooltip title={tooltip}>
-          <Icon type="exclamation-circle-o" />
+          <ExclamationCircleOutlined />
         </Tooltip>
       ) : undefined;
 
