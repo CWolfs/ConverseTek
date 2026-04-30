@@ -12,6 +12,7 @@ import defer from 'lodash.defer';
 import 'react-sortable-tree/style.css';
 
 import { DataStore } from 'stores/dataStore/data-store';
+import { DefStore } from 'stores/defStore/def-store';
 import { NodeStore } from 'stores/nodeStore/node-store';
 import { ConversationAssetType, ElementNodeType, PromptNodeType } from 'types';
 
@@ -85,6 +86,7 @@ const zoomLevelIncrement = 0.05;
 
 function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationAsset: ConversationAssetType; rebuild: boolean; expandAll: boolean }) {
   const dataStore = useStore<DataStore>('data');
+  const defStore = useStore<DefStore>('def');
   const nodeStore = useStore<NodeStore>('node');
 
   const dialogEditorRef = useRef<HTMLDivElement>(null);
@@ -507,6 +509,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
               zoomLevel,
               speakerProjectionByNodeId,
               cameraProjectionByNodeId,
+              operationDefinitions: defStore.operations,
             })}
             nodeContentRenderer={(props: ConverseTekNodeRendererProps) => <ConverseTekNodeRenderer {...props} />}
             reactVirtualizedListProps={{

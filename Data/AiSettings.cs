@@ -6,6 +6,7 @@ namespace ConverseTek.Data {
     public string SelectedProvider { get; set; }
     public string CodexCommand { get; set; }
     public string CodexModel { get; set; }
+    public string CodexReasoningEffort { get; set; }
     public string CodexProfile { get; set; }
     public int TimeoutSeconds { get; set; }
     public Dictionary<string, AiModelCatalogResult> ModelCatalogs { get; set; }
@@ -17,6 +18,7 @@ namespace ConverseTek.Data {
         SelectedProvider = "codex",
         CodexCommand = "codex",
         CodexModel = "",
+        CodexReasoningEffort = "",
         CodexProfile = "",
         TimeoutSeconds = 300,
         ModelCatalogs = new Dictionary<string, AiModelCatalogResult>(),

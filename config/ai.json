@@ -3,6 +3,7 @@
   "selectedProvider": "codex",
   "codexCommand": "codex",
   "codexModel": "",
+  "codexReasoningEffort": "",
   "codexProfile": "",
   "timeoutSeconds": 300,
   "modelCatalogs": {},

@@ -27,6 +27,7 @@ export type AiSettingsType = {
   selectedProvider: AiProviderName;
   codexCommand: string;
   codexModel: string;
+  codexReasoningEffort: string;
   codexProfile: string;
   timeoutSeconds: number;
   modelCatalogs: Record<string, AiModelCatalogResultType>;
@@ -121,7 +122,13 @@ export type AiModelOptionType = {
   displayName: string;
   description: string;
   defaultReasoningLevel: string;
+  supportedReasoningLevels: AiReasoningLevelType[];
   priority: number;
+};
+
+export type AiReasoningLevelType = {
+  effort: string;
+  description: string;
 };
 
 export type AiModelCatalogResultType = {

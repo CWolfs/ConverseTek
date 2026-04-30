@@ -2,6 +2,11 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "CT: Fast Run",
+      "command": "${workspaceFolder}/bin/x64/Debug/net472/ConverseTek.exe",
+      "type": "shell"
+    },
+    {
       "label": "CT: Release",
       "command": "dotnet",
       "type": "process",
@@ -72,11 +77,6 @@
           "kind": "build",
           "isDefault": true
       }
-    },
-    {
-      "label": "CT: Fast Run",
-      "command": "${workspaceFolder}/bin/x64/Debug/net472/ConverseTek.exe",
-      "type": "shell"
     },
     {
       "label": "CT: Fast Dev",

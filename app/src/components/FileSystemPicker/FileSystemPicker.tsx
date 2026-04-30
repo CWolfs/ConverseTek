@@ -225,6 +225,7 @@ export function FileSystemPicker() {
     fontSize: 10,
     textAlign: 'center',
     fontWeight: 500,
+    lineHeight: 1.2,
   };
 
   setQuicklinkStatus();

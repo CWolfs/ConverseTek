@@ -182,6 +182,99 @@
     vertical-align: middle;
   }
 
+  &__logic-tooltip {
+    display: grid;
+    gap: 7px;
+    min-width: 260px;
+    max-width: 560px;
+
+    &-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 5px;
+      box-shadow: inset 0 -1px 0 rgba(31, 47, 67, 0.12);
+    }
+
+    &-heading strong {
+      color: #1f2f43;
+      font-size: 11px;
+      letter-spacing: 0;
+      text-transform: uppercase;
+    }
+
+    &-heading span {
+      min-width: 20px;
+      height: 18px;
+      border-radius: 9px;
+      background: #e8f7f4;
+      color: #0f766e;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 18px;
+      text-align: center;
+    }
+
+    &-operation {
+      display: grid;
+      gap: 7px;
+      max-width: 100%;
+      padding: 8px 9px;
+      border-radius: 3px;
+      background: #f6f8fb;
+      box-shadow: inset 0 0 0 1px rgba(31, 47, 67, 0.1);
+    }
+
+    &-operation-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    &-operation-name {
+      color: #1f2f43;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    &-operation-header code {
+      color: #6b7785;
+      font-family: Consolas, 'Courier New', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    &-sentence {
+      overflow-wrap: anywhere;
+      color: #243447;
+      font-size: 12px;
+      line-height: 1.45;
+      text-wrap: pretty;
+    }
+
+    &-fallback {
+      display: block;
+      overflow-wrap: anywhere;
+      color: #40556c;
+      font-family: Consolas, 'Courier New', monospace;
+      font-size: 11px;
+      line-height: 1.4;
+      white-space: normal;
+    }
+
+    &-operation p {
+      margin: 0;
+      color: #637083;
+      font-size: 11px;
+      line-height: 1.35;
+      text-wrap: pretty;
+    }
+  }
+
   &__link {
     display: flex;
     width: 100%;
@@ -331,6 +424,25 @@
 .rst__rowLabel {
   flex: 0 1 auto;
   padding-right: 20px;
+}
+
+.node-renderer__logic-popover .ant-popover-inner {
+  overflow: hidden;
+  border-radius: 4px;
+  box-shadow: 0 10px 26px rgba(15, 35, 60, 0.24);
+}
+
+.node-renderer__logic-popover .ant-popover-inner-content {
+  padding: 10px;
+  border: 1px solid rgba(31, 47, 67, 0.14);
+  border-radius: 4px;
+  background: #fff;
+  color: #262626;
+}
+
+.node-renderer__logic-popover .ant-popover-arrow {
+  background: #fff;
+  box-shadow: -1px -1px 0 rgba(31, 47, 67, 0.1);
 }
 .rst__rtl.rst__rowLabel {
   padding-left: 20px;

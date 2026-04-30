@@ -37,6 +37,7 @@ type ModalOptions = {
   centered: boolean;
   isVisible: boolean;
   closable: boolean;
+  maskClosable: boolean;
 };
 
 class ModalStore {
@@ -64,6 +65,7 @@ class ModalStore {
       setIsLoading: action,
       setLoadingLabel: action,
       setClosable: action,
+      setMaskClosable: action,
       showModal: action,
       closeModal: action,
       setProps: action,
@@ -99,6 +101,7 @@ class ModalStore {
       centered: false,
       isVisible: false,
       closable: true,
+      maskClosable: true,
 
       ...props,
     };
@@ -214,6 +217,13 @@ class ModalStore {
     if (modalOptions == null) return;
 
     modalOptions.closable = closable;
+  }
+
+  setMaskClosable(maskClosable: boolean, globalModalId: string): void {
+    const modalOptions = this.options.get(globalModalId);
+    if (modalOptions == null) return;
+
+    modalOptions.maskClosable = maskClosable;
   }
 
   showModal(flag: boolean, globalModalId: string): void {

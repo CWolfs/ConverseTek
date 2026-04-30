@@ -38,8 +38,10 @@ import {
   AiDraftRunResultType,
   AiDraftValidationResultType,
   AiModelCatalogResultType,
+  AiModelOptionType,
   AiSettingsType,
   AiWorkspaceSettingsType,
+  ConversationAssetType,
   ElementNodeType,
   PromptNodeType,
 } from 'types';
@@ -51,7 +53,19 @@ const { Option } = Select;
 const { TabPane } = Tabs;
 const AI_DEBUG_PREFIX = '[ConverseTek AI Modal]';
 
-const quickShotPrompts = [
+const fallbackReasoningEfforts = [
+  { effort: 'low', label: 'Low', description: 'Fast responses with lighter reasoning.' },
+  { effort: 'medium', label: 'Medium', description: 'Balanced speed and reasoning depth.' },
+  { effort: 'high', label: 'High', description: 'Better for branch planning and tangled context.' },
+  { effort: 'xhigh', label: 'Extra high', description: 'Slowest, deepest pass for difficult drafts.' },
+];
+
+type QuickShotPrompt = {
+  label: string;
+  prompt: string;
+};
+
+const rewriteQuickShotPrompts: QuickShotPrompt[] = [
   {
     label: 'Give me alternate versions',
     prompt: 'Give me alternate versions with clearly different flavours, not minor wording tweaks.',
@@ -66,6 +80,49 @@ const quickShotPrompts = [
   },
 ];
 
+const promptBranchQuickShotPrompts: QuickShotPrompt[] = [
+  {
+    label: 'Add practical response',
+    prompt:
+      'Add a new response choice from this prompt, then expand it into a sensible short branch. Make the first response a natural Commander line with intent or concern, not a terse command or abstract menu label. Most later choices should also be spoken Commander lines of roughly 5-14 words; only use very short labels for clear mechanical actions. Good style: "Can we push those sensors harder without cooking the ship?" Bad style: "Authorise deep sweep." Add action or condition intents when the branch clearly changes money, time, tags, contracts, or other game state.',
+  },
+  {
+    label: 'Add risky branch',
+    prompt:
+      'Add a new conversational Commander response that explores a more dangerous or costly option, then branch into grounded consequences and a clear next decision. Make the first response curious, sceptical, or decisive in-world rather than a terse command. Keep most follow-up choices as compact spoken lines, not button labels; vary length naturally and let only one or two choices be very short if the beat earns it. Avoid labels like Pick Risky Option or Authorise Scan unless the choice is intentionally mechanical. If the branch has a cost, delay, tag, or other game-state consequence, add suitable action or condition intents with advisory placeholder values.',
+  },
+  {
+    label: 'Add character-led branch',
+    prompt:
+      'Add a new conversational Commander response that invites the most relevant character to weigh in, then continue with their voice, priorities, and a useful follow-up choice. Make the first response sound like a player asking for judgement or a second opinion, not a menu label. Keep most follow-up choices as compact spoken lines rather than labels like Proceed, Do it, or Stand down. Add action or condition intents when the branch clearly changes money, time, tags, contracts, or other game state.',
+  },
+];
+
+const elementBranchQuickShotPrompts: QuickShotPrompt[] = [
+  {
+    label: 'Continue this branch',
+    prompt:
+      'Continue from the selected response with a sensible short follow-up branch that fits the current conversation context. Keep most new choices conversational, roughly 5-14 words, unless a bracketed mechanical action is genuinely appropriate. Add action or condition intents when the continuation clearly changes money, time, tags, contracts, or other game state.',
+  },
+  {
+    label: 'Escalate consequences',
+    prompt:
+      'Continue from the selected response by escalating the practical stakes, risks, or cost, then give the player clear conversational choices. Avoid making every choice a terse command; mix short punchy options with fuller spoken lines. If the branch has a cost, delay, tag, or other game-state consequence, add suitable action or condition intents with advisory placeholder values.',
+  },
+  {
+    label: 'Add character reaction',
+    prompt:
+      'Continue from the selected response with a focused reaction from the most relevant character, preserving their voice and moving the scene forward with natural response choices. Keep most choices as things the Commander could say, not admin labels. Add action or condition intents when the reaction clearly changes money, time, tags, contracts, or other game state.',
+  },
+];
+
+function getQuickShotPrompts(mode: AiDraftModeType, selectedNode: PromptNodeType | ElementNodeType | null): QuickShotPrompt[] {
+  if (mode === 'nodeSuggestion') return rewriteQuickShotPrompts;
+  if (mode === 'branchExpansion' && selectedNode?.type === 'node') return promptBranchQuickShotPrompts;
+  if (mode === 'branchExpansion') return elementBranchQuickShotPrompts;
+  return [];
+}
+
 type Props = {
   globalModalId: string;
   mode: AiDraftModeType;
@@ -77,6 +134,7 @@ const emptySettings: AiSettingsType = {
   selectedProvider: 'codex',
   codexCommand: 'codex',
   codexModel: '',
+  codexReasoningEffort: '',
   codexProfile: '',
   timeoutSeconds: 300,
   modelCatalogs: {},
@@ -102,6 +160,32 @@ function getModeTitle(mode: AiDraftModeType): string {
 function getAcceptLabel(mode: AiDraftModeType): string {
   if (mode === 'fullConversation') return 'Open In Main Editor';
   return 'Accept';
+}
+
+function getRewriteContextLabel(selectedNode: PromptNodeType | ElementNodeType | null): string {
+  if (selectedNode?.type === 'node') return 'Current prompt';
+  if (selectedNode?.type === 'root') return 'Current root response';
+  return 'Current response';
+}
+
+function splitDraftWarnings(warnings: string[]): { structuralWarnings: string[]; advisoryNotes: string[] } {
+  return warnings.reduce(
+    (result, warning) => {
+      if (warning.startsWith('AI warning:')) {
+        result.advisoryNotes.push(warning.replace(/^AI warning:\s*/, ''));
+      } else {
+        result.structuralWarnings.push(warning);
+      }
+
+      return result;
+    },
+    { structuralWarnings: [] as string[], advisoryNotes: [] as string[] },
+  );
+}
+
+function shouldShowSelectedNodeContext(mode: AiDraftModeType, selectedNode: PromptNodeType | ElementNodeType | null, draft: AiConversationDraftType | null): boolean {
+  if (selectedNode == null || draft != null) return false;
+  return mode === 'nodeSuggestion' || (mode === 'branchExpansion' && selectedNode.type === 'node');
 }
 
 function getDefaultCommandForProvider(providerName: string): string {
@@ -260,6 +344,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
     : null;
 
   const canGenerate = workingDirectory != null && (mode === 'fullConversation' || selectedNode != null);
+  const canGenerateFromBrief = canGenerate && brief.trim() !== '';
   const canAccept = draft != null && validation.errors.length === 0;
 
   const getCachedModelCatalog = (targetSettings: AiSettingsType, targetProviderName: string) => {
@@ -310,6 +395,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
     modalStore.setShowOkButton(false, globalModalId);
     modalStore.setShowCancelButton(true, globalModalId);
     modalStore.setCancelLabel('Close', globalModalId);
+    modalStore.setMaskClosable(false, globalModalId);
   }, []);
 
   const loadConfiguration = async (refreshModelsForSettingsTab = false) => {
@@ -359,8 +445,8 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
       return;
     }
 
-    setValidation(validateAiDraft(draft, defStore.operations, mode, selectedNode));
-  }, [draft, mode, selectedNode, defStore.operations]);
+    setValidation(validateAiDraft(draft, defStore.operations, mode, selectedNode, unsavedActiveConversationAsset));
+  }, [draft, mode, selectedNode, defStore.operations, unsavedActiveConversationAsset]);
 
   useEffect(() => {
     if (workspaceSettings == null) return;
@@ -455,13 +541,6 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
 
     updateCastPersonalities([...castPersonalities, ...missingDefaults]);
     setSelectedPersonalityId(missingDefaults[0].id);
-  };
-
-  const appendQuickShotPrompt = (prompt: string) => {
-    setBrief((previousBrief) => {
-      const trimmedBrief = previousBrief.trim();
-      return trimmedBrief ? `${trimmedBrief}\n\n${prompt}` : prompt;
-    });
   };
 
   const addContextPath = (path: string) => {
@@ -569,9 +648,16 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
     }, globalModalId);
   }, [activeTab, settings, workspaceSettings, isSavingConfiguration]);
 
-  const generateDraft = async () => {
+  const generateDraft = async (briefOverride?: string) => {
+    const draftBrief = briefOverride ?? brief;
+
     if (!canGenerate || workingDirectory == null) {
       void message.warning('Open a conversation folder and select a node when required before asking AI.');
+      return;
+    }
+
+    if (draftBrief.trim() === '') {
+      void message.warning('Write a brief before asking AI.');
       return;
     }
 
@@ -585,7 +671,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
       await saveConfiguration();
       const result = await createAiDraft({
         mode,
-        brief,
+        brief: draftBrief,
         workingDirectory,
         conversationJson: JSON.stringify(toJS(unsavedActiveConversationAsset), null, 2),
         selectedNodeJson: JSON.stringify(toJS(selectedNode), null, 2),
@@ -613,7 +699,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
     if (draft == null || workingDirectory == null) return;
 
     try {
-      const acceptedDraft = buildAcceptedDraft(draft, mode, workingDirectory, selectedNode, selectedSuggestionIndex);
+      const acceptedDraft = buildAcceptedDraft(draft, mode, workingDirectory, selectedNode, selectedSuggestionIndex, dataStore.unsavedActiveConversationAsset);
 
       if (acceptedDraft.kind === 'fullConversation') {
         const roundTripResult = await validateConversationRoundTrip(acceptedDraft.conversationAsset);
@@ -664,14 +750,22 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
 
   const contextPathsText = (workspaceSettings?.contextPaths || []).join('\n');
   const selectedNodeLabel = selectedNode ? `${selectedNode.type} ${getId(selectedNode)}` : 'None';
+  const showSelectedNodeContext = shouldShowSelectedNodeContext(mode, selectedNode, draft);
+  const selectedNodeOriginalText = showSelectedNodeContext ? getOriginalNodeText(selectedNode) : '';
+  const selectedNodeContextLabel = getRewriteContextLabel(selectedNode);
+  const quickShotPrompts = useMemo(() => getQuickShotPrompts(mode, selectedNode), [mode, selectedNode]);
   const listedModelSlugs = new Set((modelCatalog?.models || []).map((model) => model.slug));
   const shouldShowCustomModel = settings.codexModel !== '' && !listedModelSlugs.has(settings.codexModel);
+  const selectedModelOption = getSelectedModelOption(modelCatalog, settings.codexModel);
+  const reasoningEffortOptions = getReasoningEffortOptions(selectedModelOption, settings.codexReasoningEffort);
+  const selectedModelDefaultReasoningEffort = selectedModelOption?.defaultReasoningLevel || '';
 
   console.log(`${AI_DEBUG_PREFIX} render`, {
     activeTab,
     isVisible,
     providerName,
     codexModel: settings.codexModel,
+    codexReasoningEffort: settings.codexReasoningEffort,
     modelCatalogProvider: modelCatalog?.provider,
     modelCatalogFromCache: modelCatalog?.fromCache,
     listedModelSlugs: Array.from(listedModelSlugs),
@@ -708,6 +802,39 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
     }
   };
 
+  const draftActions = (
+    <div className="ai-draft-modal__actions">
+      <Button
+        className="ai-draft-modal__action-button ai-draft-modal__action-button--generate"
+        disabled={!canGenerateFromBrief || isLoading}
+        loading={isLoading}
+        onClick={() => {
+          void generateDraft();
+        }}
+      >
+        Generate Preview
+      </Button>
+      <Button
+        type={draft != null ? 'primary' : 'default'}
+        className="ai-draft-modal__action-button"
+        disabled={!canAccept || isLoading}
+        onClick={() => {
+          void acceptDraft();
+        }}
+      >
+        {getAcceptLabel(mode)}
+      </Button>
+      <Button
+        type={draft != null ? 'danger' : 'default'}
+        className="ai-draft-modal__action-button"
+        disabled={draft == null || isLoading}
+        onClick={() => setDraft(null)}
+      >
+        Reject
+      </Button>
+    </div>
+  );
+
   return (
     <div className={classnames('ai-draft-modal', draft && 'ai-draft-modal--has-draft')}>
       <Tabs activeKey={activeTab} onChange={changeTab}>
@@ -733,22 +860,37 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                 >
                   <TextArea
                     value={brief}
-                    onChange={(event: ChangeEvent<HTMLTextAreaElement>) => setBrief(event.target.value)}
+                    onChange={(event: ChangeEvent<HTMLTextAreaElement>) => {
+                      if (isLoading) return;
+                      setBrief(event.target.value);
+                    }}
+                    disabled={isLoading}
+                    readOnly={isLoading}
                     rows={draft ? 4 : 7}
                     placeholder="Describe the scene, tone, required beats, choices, tags, and anything the AI must avoid."
                   />
-                  <div className="ai-draft-modal__quick-shots">
-                    {quickShotPrompts.map((quickShotPrompt) => (
-                      <Button
-                        key={quickShotPrompt.label}
-                        size="small"
-                        disabled={isLoading}
-                        onClick={() => appendQuickShotPrompt(quickShotPrompt.prompt)}
-                      >
-                        {quickShotPrompt.label}
-                      </Button>
-                    ))}
-                  </div>
+                  {showSelectedNodeContext && (
+                    <div className="ai-draft-modal__rewrite-context">
+                      <span>{selectedNodeContextLabel}</span>
+                      <p>{selectedNodeOriginalText || 'Selected text is blank.'}</p>
+                    </div>
+                  )}
+                  {quickShotPrompts.length > 0 && (
+                    <div className="ai-draft-modal__quick-shots">
+                      {quickShotPrompts.map((quickShotPrompt) => (
+                        <Button
+                          key={quickShotPrompt.label}
+                          size="small"
+                          disabled={!canGenerate || isLoading}
+                          onClick={() => {
+                            void generateDraft(quickShotPrompt.prompt);
+                          }}
+                        >
+                          {quickShotPrompt.label}
+                        </Button>
+                      ))}
+                    </div>
+                  )}
                 </Form.Item>
               </Form>
             </Col>
@@ -803,29 +945,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
             </Col>
           </Row>
 
-          <div className="ai-draft-modal__actions">
-            <Button
-              type="primary"
-              disabled={!canGenerate || isLoading}
-              loading={isLoading}
-              onClick={() => {
-                void generateDraft();
-              }}
-            >
-              Generate Preview
-            </Button>
-            <Button
-              disabled={!canAccept || isLoading}
-              onClick={() => {
-                void acceptDraft();
-              }}
-            >
-              {getAcceptLabel(mode)}
-            </Button>
-            <Button disabled={draft == null || isLoading} onClick={() => setDraft(null)}>
-              Reject
-            </Button>
-          </div>
+          {draft == null && draftActions}
 
           {isLoading && (
             <div className="ai-draft-modal__loading">
@@ -841,10 +961,13 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
               mode={mode}
               workingDirectory={workingDirectory || ''}
               selectedNode={selectedNode}
+              existingConversationAsset={unsavedActiveConversationAsset}
               selectedSuggestionIndex={selectedSuggestionIndex}
               onSelectedSuggestionIndexChange={setSelectedSuggestionIndex}
             />
           )}
+
+          {draft != null && draftActions}
         </TabPane>
 
         <TabPane tab="Settings" key="settings">
@@ -939,6 +1062,44 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                     </div>
                   )}
                 </Form.Item>
+                {providerName === 'codex' && (
+                  <Form.Item
+                    label={
+                      <FieldLabel
+                        label="Reasoning effort"
+                        help="Overrides Codex's model/profile reasoning effort for ConverseTek draft runs only. Auto leaves the Codex CLI defaults alone."
+                      />
+                    }
+                  >
+                    <Select
+                      value={settings.codexReasoningEffort || ''}
+                      dropdownClassName="ai-draft-modal__reasoning-dropdown"
+                      optionLabelProp="label"
+                      onChange={(value: string) => updateSettings({ codexReasoningEffort: value })}
+                    >
+                      <Option value="" label="Auto">
+                        <div className="ai-draft-modal__select-option">
+                          <span>Auto</span>
+                          <small>
+                            Use the Codex profile/model default
+                            {selectedModelDefaultReasoningEffort ? ` (${titleCaseReasoningEffort(selectedModelDefaultReasoningEffort)})` : ''}.
+                          </small>
+                        </div>
+                      </Option>
+                      {reasoningEffortOptions.map((option) => (
+                        <Option key={option.effort} value={option.effort} label={option.label}>
+                          <div className="ai-draft-modal__select-option">
+                            <span>{option.label}</span>
+                            {option.description && <small>{option.description}</small>}
+                          </div>
+                        </Option>
+                      ))}
+                    </Select>
+                    <div className="ai-draft-modal__field-note">
+                      High or extra high is useful for branch expansion; medium is usually enough for simple rewrites.
+                    </div>
+                  </Form.Item>
+                )}
                 <Form.Item
                   label={
                     <FieldLabel
@@ -1180,6 +1341,7 @@ function DraftPreview({
   mode,
   workingDirectory,
   selectedNode,
+  existingConversationAsset,
   selectedSuggestionIndex,
   onSelectedSuggestionIndexChange,
 }: {
@@ -1188,18 +1350,20 @@ function DraftPreview({
   mode: AiDraftModeType;
   workingDirectory: string;
   selectedNode: PromptNodeType | ElementNodeType | null;
+  existingConversationAsset: ConversationAssetType | null;
   selectedSuggestionIndex: number;
   onSelectedSuggestionIndexChange: (index: number) => void;
 }) {
   const previewConversationAsset = useMemo(
-    () => (mode === 'fullConversation' ? null : buildPreviewConversationAssetFromDraft(draft, mode, workingDirectory, selectedNode)),
-    [draft, mode, workingDirectory, selectedNode],
+    () => (mode === 'fullConversation' ? null : buildPreviewConversationAssetFromDraft(draft, mode, workingDirectory, selectedNode, existingConversationAsset)),
+    [draft, mode, workingDirectory, selectedNode, existingConversationAsset],
   );
   const originalText = useMemo(() => (mode === 'nodeSuggestion' ? getOriginalNodeText(selectedNode) : ''), [mode, selectedNode]);
   const suggestedTexts = useMemo(
     () => (mode === 'nodeSuggestion' ? getSuggestedNodeTexts(draft, selectedNode).slice(0, 3) : []),
     [draft, mode, selectedNode],
   );
+  const { structuralWarnings, advisoryNotes } = useMemo(() => splitDraftWarnings(validation.warnings), [validation.warnings]);
 
   return (
     <div className="ai-draft-preview">
@@ -1211,8 +1375,16 @@ function DraftPreview({
       {validation.errors.length > 0 && (
         <Alert className="ai-draft-modal__alert" type="error" message="Draft errors" description={validation.errors.join('\n')} />
       )}
-      {validation.warnings.length > 0 && (
-        <Alert className="ai-draft-modal__alert" type="warning" message="Draft warnings" description={validation.warnings.join('\n')} />
+      {structuralWarnings.length > 0 && (
+        <Alert className="ai-draft-modal__alert" type="warning" message="Draft warnings" description={structuralWarnings.join('\n')} />
+      )}
+      {advisoryNotes.length > 0 && (
+        <div className="ai-draft-preview__notes" aria-label="Draft notes">
+          <span>Draft notes</span>
+          {advisoryNotes.map((note, index) => (
+            <p key={`${index}-${note}`}>{note}</p>
+          ))}
+        </div>
       )}
 
       {(draft.cast || []).length > 0 && (
@@ -1260,6 +1432,54 @@ function DraftPreview({
       ) : null}
     </div>
   );
+}
+
+function titleCaseReasoningEffort(effort: string): string {
+  if (effort === 'xhigh') return 'Extra high';
+  if (effort === '') return 'Auto';
+  return effort.charAt(0).toUpperCase() + effort.slice(1);
+}
+
+function getSelectedModelOption(modelCatalog: AiModelCatalogResultType | null, codexModel: string): AiModelOptionType | null {
+  if (!modelCatalog) return null;
+  if (!codexModel) return null;
+  return modelCatalog.models.find((model) => model.slug === codexModel) || null;
+}
+
+function getReasoningEffortOptions(selectedModel: AiModelOptionType | null, selectedEffort: string) {
+  const knownOptions = new Map(
+    fallbackReasoningEfforts.map((option) => [
+      option.effort,
+      {
+        ...option,
+        supported: true,
+      },
+    ]),
+  );
+
+  if (selectedModel?.supportedReasoningLevels.length) {
+    knownOptions.clear();
+    selectedModel.supportedReasoningLevels.forEach((level) => {
+      if (!level.effort) return;
+      knownOptions.set(level.effort, {
+        effort: level.effort,
+        label: titleCaseReasoningEffort(level.effort),
+        description: level.description,
+        supported: true,
+      });
+    });
+  }
+
+  if (selectedEffort && !knownOptions.has(selectedEffort)) {
+    knownOptions.set(selectedEffort, {
+      effort: selectedEffort,
+      label: `${titleCaseReasoningEffort(selectedEffort)} (custom)`,
+      description: 'Saved custom effort value.',
+      supported: true,
+    });
+  }
+
+  return Array.from(knownOptions.values());
 }
 
 export const ObservingAiDraftModal = observer(AiDraftModal);

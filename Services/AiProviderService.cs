@@ -236,6 +236,7 @@ namespace ConverseTek.Services {
             DisplayName = model.Value<string>("display_name") ?? model.Value<string>("slug") ?? "",
             Description = model.Value<string>("description") ?? "",
             DefaultReasoningLevel = model.Value<string>("default_reasoning_level") ?? "",
+            SupportedReasoningLevels = ReadSupportedReasoningLevels(model["supported_reasoning_levels"] as JArray),
             Priority = model.Value<int?>("priority") ?? 0
           });
         }
@@ -343,6 +344,9 @@ namespace ConverseTek.Services {
       if (!string.IsNullOrEmpty(settings.CodexProfile)) {
         command.Append(" --profile ").Append(QuoteForCmd(settings.CodexProfile));
       }
+      if (!string.IsNullOrEmpty(settings.CodexReasoningEffort)) {
+        command.Append(" -c ").Append(QuoteForCmd("model_reasoning_effort=" + settings.CodexReasoningEffort));
+      }
       command.Append(" --output-schema ").Append(QuoteForCmd(schemaPath));
       command.Append(" --output-last-message ").Append(QuoteForCmd(outputPath));
       command.Append(" -");
@@ -362,6 +366,20 @@ namespace ConverseTek.Services {
       Process process = new Process();
       process.StartInfo = startInfo;
       return process;
+    }
+
+    private List<AiReasoningLevel> ReadSupportedReasoningLevels(JArray levels) {
+      List<AiReasoningLevel> result = new List<AiReasoningLevel>();
+      if (levels == null) return result;
+
+      foreach (JToken level in levels) {
+        result.Add(new AiReasoningLevel {
+          Effort = level.Value<string>("effort") ?? "",
+          Description = level.Value<string>("description") ?? ""
+        });
+      }
+
+      return result;
     }
 
     private Process CreateCodexModelsProcess(AiSettings settings) {
@@ -403,10 +421,17 @@ namespace ConverseTek.Services {
       sb.AppendLine("- Use speaker.type none only when the line should inherit the current BattleTech conversation speaker. BattleTech does not have a separate narration speaker for SimGame conversation nodes.");
       sb.AppendLine("- Every root or choice must either set targetKey to an existing node key or set endsConversation to true.");
       sb.AppendLine("- For fullConversation, make the first root text an empty string and point it at the opening prompt node. Do not use Continue for that first root.");
-      sb.AppendLine("- For every other root or choice, use explicit short choices such as Understood, Ask Yang, or End conversation.");
+      sb.AppendLine("- For every other root or choice, use explicit short player-facing choices. Most choices should read like something the Commander could actually say, not an abstract design label: use Can we push the system harder? instead of Pick Risky Option. Use bracketed mechanical labels only when the choice is deliberately transactional or UI-like, for example [Buy for 1,000 C-bills].");
+      sb.AppendLine("- Do not make every response choice a two- or three-word command. Most branch choices should be compact spoken lines, usually about 5-14 words, with intent or attitude. Very short choices are fine sometimes for pace or clear mechanical actions, but they should not dominate a generated branch.");
       sb.AppendLine("- For nodeSuggestion, return exactly three different rewrite versions only. If the selected node is a prompt node, put the three versions in nodes[0].text, nodes[1].text, and nodes[2].text. If the selected node is a root or response, put the three versions in roots[0].text, roots[1].text, and roots[2].text. Leave the unused array empty. Make version 1 a faithful polish, version 2 a sharper or more dramatic flavour, and version 3 a shorter or more restrained flavour.");
+      sb.AppendLine("- For branchExpansion from a selected prompt node, treat this as inserting one new response choice under the selected prompt. Put that new response choice text in roots[0].text, set roots[0].targetKey to the first generated prompt node key, and put only the generated follow-up branch in nodes. The preview will show the selected prompt above the generated response.");
+      sb.AppendLine("- For that inserted branchExpansion response, write roots[0].text as an in-world Commander line with intent, concern, or attitude. Avoid terse administrative labels such as Authorise the scan, Spend the C-bills, Proceed, or Risky option unless the choice is deliberately a mechanical transaction. Prefer lines like Can we push those sensors harder without cooking the ship?");
+      sb.AppendLine("- For branchExpansion from a selected root or response, leave roots empty and attach nodes[0] directly to the selected element.");
+      sb.AppendLine("- For branchExpansion targetKey values, use generated node keys for generated targets. If a choice must return to an existing prompt from conversationJson, set targetKey to existing_node_INDEX using that prompt node's exact numeric index, for example existing_node_2. Do not invent symbolic existing aliases such as existing_battle_intel, and do not use warnings to explain unresolved targetKey values.");
       sb.AppendLine("- Write comment fields as short authoring notes that explain the beat, branch purpose, or condition context. Do not use draft keys such as darius_check as comments.");
-      sb.AppendLine("- For operation intents, only use operation names present in the supplied definitions JSON. If unsure, leave operations empty and describe the concern in warnings.");
+      sb.AppendLine("- For operation intents, only use operation names present in the supplied definitions JSON.");
+      sb.AppendLine("- If a draft branch clearly spends or grants C-bills, skips time, adds/removes a tag, checks a tag/stat, starts a contract, or otherwise changes game state, include suitable action or condition intents. Use reasonable advisory placeholder values when the exact balance number or tag key is not supplied, and put any tuning note in warnings instead of omitting the operation.");
+      sb.AppendLine("- Leave operation intents empty only when the branch has no mechanical consequence or no supplied operation definition fits the intended effect.");
       sb.AppendLine("- Use mode from the request exactly.");
       sb.AppendLine();
       AiWorkspaceSettings workspaceSettings = providerRequest.WorkspaceSettings;

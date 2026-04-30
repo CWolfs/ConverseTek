@@ -47,7 +47,13 @@ type AiModelOptionResponseType = {
   DisplayName?: string;
   Description?: string;
   DefaultReasoningLevel?: string;
+  SupportedReasoningLevels?: AiReasoningLevelResponseType[];
   Priority?: number;
+};
+
+type AiReasoningLevelResponseType = {
+  Effort?: string;
+  Description?: string;
 };
 
 type AiModelCatalogResponseType = {
@@ -82,6 +88,7 @@ type AiSettingsResponseType = {
   SelectedProvider?: string;
   CodexCommand?: string;
   CodexModel?: string;
+  CodexReasoningEffort?: string;
   CodexProfile?: string;
   TimeoutSeconds?: number;
   ModelCatalogs?: Record<string, AiModelCatalogResponseType>;
@@ -309,6 +316,10 @@ function normaliseAiModelOption(model: AiModelOptionResponseType): AiModelOption
     displayName: model.DisplayName ?? '',
     description: model.Description ?? '',
     defaultReasoningLevel: model.DefaultReasoningLevel ?? '',
+    supportedReasoningLevels: (model.SupportedReasoningLevels ?? []).map((level) => ({
+      effort: level.Effort ?? '',
+      description: level.Description ?? '',
+    })),
     priority: model.Priority ?? 0,
   };
 }
@@ -367,6 +378,7 @@ function normaliseAiSettings(source: AiSettingsResponseType): AiSettingsType {
     selectedProvider: source.SelectedProvider ?? 'codex',
     codexCommand: source.CodexCommand ?? 'codex',
     codexModel: source.CodexModel ?? '',
+    codexReasoningEffort: source.CodexReasoningEffort ?? '',
     codexProfile: source.CodexProfile ?? '',
     timeoutSeconds: source.TimeoutSeconds ?? 300,
     modelCatalogs,
@@ -378,9 +390,11 @@ function normaliseAiSettings(source: AiSettingsResponseType): AiSettingsType {
     rawSelectedProvider: source.SelectedProvider,
     rawEnabled: source.Enabled,
     rawCodexModel: source.CodexModel,
+    rawCodexReasoningEffort: source.CodexReasoningEffort,
     normalisedEnabled: settings.enabled,
     normalisedSelectedProvider: settings.selectedProvider,
     normalisedCodexModel: settings.codexModel,
+    normalisedCodexReasoningEffort: settings.codexReasoningEffort,
     modelCatalogKeys: Object.keys(settings.modelCatalogs),
     workspaceKeys: Object.keys(settings.workspaces),
     rawKeys: Object.keys(source),
@@ -520,6 +534,7 @@ export function saveAiSettings(settings: AiSettingsType): Promise<AiSettingsType
   console.log(`${AI_DEBUG_PREFIX} saveAiSettings request`, {
     selectedProvider: settings.selectedProvider,
     codexModel: settings.codexModel,
+    codexReasoningEffort: settings.codexReasoningEffort,
     modelCatalogKeys: Object.keys(settings.modelCatalogs || {}),
   });
 

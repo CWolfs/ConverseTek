@@ -3,12 +3,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
-import { Icon, Tooltip } from 'antd';
+import { Icon, Popover, Tooltip } from 'antd';
 import defer from 'lodash.defer';
 import tinycolor from 'tinycolor2';
 
 import type { OnNodeContextMenuProps } from '../DialogEditor';
-import type { PromptNodeType, ElementNodeType, ColourConfigType } from 'types';
+import type { PromptNodeType, ElementNodeType, ColourConfigType, OperationArgType, OperationCallType, OperationDefinitionType } from 'types';
 
 import { isDescendant } from 'utils/tree-data-utils';
 import { detectType } from 'utils/node-utils';
@@ -18,6 +18,7 @@ import type { CameraProjection } from 'utils/camera-projection-utils';
 
 import { DataStore } from 'stores/dataStore/data-store';
 
+import { ViewableLogic } from 'components/ViewableLogic';
 import { LinkIcon } from '../../Svg';
 
 import './ConverseTekNodeRenderer.css';
@@ -75,6 +76,8 @@ export type ConverseTekNodeRendererProps = {
   zoomLevel: number;
   speakerProjectionByNodeId?: Map<string, SpeakerProjection>;
   cameraProjectionByNodeId?: Map<string, CameraProjection>;
+  rowCommentTooltip?: string;
+  operationDefinitions?: OperationDefinitionType[];
 };
 
 function hasActionsAndConditions(node: PromptNodeType | ElementNodeType | null): { hasActions: boolean; hasConditions: boolean } {
@@ -168,6 +171,94 @@ function getActionsTooltip(isRoot: boolean, isNode: boolean, isResponse: boolean
   return 'Actions are configured on this item.';
 }
 
+function getOperationArgRawValue(arg: OperationArgType): string | number | boolean {
+  if (arg.callValue != null) return formatOperationCall(arg.callValue);
+
+  switch (arg.type) {
+    case 'bool':
+      return arg.boolValue;
+    case 'float':
+      return Number.isFinite(arg.floatValue) ? arg.floatValue : 0;
+    case 'int':
+      return Number.isFinite(arg.intValue) ? arg.intValue : 0;
+    case 'operation':
+      return arg.callValue != null ? formatOperationCall(arg.callValue) : 'operation';
+    case 'string':
+    default:
+      return arg.stringValue || '';
+  }
+}
+
+function formatOperationCall(operation: OperationCallType): string {
+  const args = (operation.args || []).map((arg) => formatPlainOperationValue(getOperationArgRawValue(arg))).join(', ');
+  return `${operation.functionName || 'operation'}(${args})`;
+}
+
+function formatPlainOperationValue(value: string | number | boolean): string {
+  if (typeof value === 'boolean') return value ? 'true' : 'false';
+  if (typeof value === 'number') return Number.isInteger(value) ? value.toLocaleString('en-GB') : String(value);
+  return value === '' ? '(blank)' : value;
+}
+
+function getOperationDefinition(
+  operation: OperationCallType,
+  operationDefinitions: OperationDefinitionType[] = [],
+): OperationDefinitionType | null {
+  return operationDefinitions.find((definition) => definition.key === operation.functionName) || null;
+}
+
+function getOperationDetailsTooltip(
+  heading: string,
+  operations: OperationCallType[] | null | undefined,
+  fallback: string,
+  operationDefinitions: OperationDefinitionType[] = [],
+): JSX.Element | string {
+  if (operations == null || operations.length <= 0) return fallback;
+
+  return (
+    <div className="node-renderer__logic-tooltip">
+      <div className="node-renderer__logic-tooltip-heading">
+        <strong>{heading}</strong>
+        <span>{operations.length}</span>
+      </div>
+      {operations.map((operation, index) => {
+        const definition = getOperationDefinition(operation, operationDefinitions);
+        return (
+          <div key={`${operation.functionName}-${index}`} className="node-renderer__logic-tooltip-operation">
+            <div className="node-renderer__logic-tooltip-operation-header">
+              <span className="node-renderer__logic-tooltip-operation-name">{definition?.label || operation.functionName || 'Operation'}</span>
+              <code>{operation.functionName || 'operation'}</code>
+            </div>
+            {definition != null ? (
+              <div className="node-renderer__logic-tooltip-sentence">
+                <ViewableLogic logic={operation} />
+              </div>
+            ) : (
+              <code className="node-renderer__logic-tooltip-fallback">{formatOperationCall(operation)}</code>
+            )}
+            {definition?.tooltip && <p>{definition.tooltip}</p>}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function getConditionsTooltip(node: PromptNodeType | ElementNodeType | null, operationDefinitions: OperationDefinitionType[]): JSX.Element | string {
+  if (node == null || node.type === 'node') return 'Conditions gate whether this item is available.';
+  return getOperationDetailsTooltip('Conditions', node.conditions?.ops, 'Conditions gate whether this response or root is available.', operationDefinitions);
+}
+
+function getActionsTooltipTitle(
+  node: PromptNodeType | ElementNodeType | null,
+  isRoot: boolean,
+  isNode: boolean,
+  isResponse: boolean,
+  operationDefinitions: OperationDefinitionType[],
+): JSX.Element | string {
+  return getOperationDetailsTooltip('Actions', node?.actions?.ops, getActionsTooltip(isRoot, isNode, isResponse), operationDefinitions);
+}
+
 /* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
 export const ConverseTekNodeRenderer = observer(
   ({
@@ -203,6 +294,8 @@ export const ConverseTekNodeRenderer = observer(
     zoomLevel,
     speakerProjectionByNodeId,
     cameraProjectionByNodeId,
+    rowCommentTooltip = '',
+    operationDefinitions = [],
     ...otherProps
   }: ConverseTekNodeRendererProps) => {
     const nodeRef = useRef<HTMLDivElement>(null);
@@ -258,6 +351,7 @@ export const ConverseTekNodeRenderer = observer(
       'node-renderer__root-handle': isRoot,
       'node-renderer__node-handle': isNode,
       'node-renderer__response-handle': isResponse,
+      'node-renderer__comment-handle': !!rowCommentTooltip,
     });
 
     const labelClasses = classnames('rst__rowLabel', rowDirectionClass, {
@@ -332,9 +426,20 @@ export const ConverseTekNodeRenderer = observer(
         );
       } else {
         // Show the handle used to initiate a drag-and-drop
-        handle = connectDragSource(<div className={moveHandleClasses}>{getMoveHandleIcon(isRoot, isNode, isResponse)}</div>, {
-          dropEffect: 'copy',
-        });
+        handle = connectDragSource(
+          <div className={moveHandleClasses} data-comment={rowCommentTooltip || undefined}>
+            {rowCommentTooltip && (
+              <>
+                <span className="node-renderer__comment-corner" />
+                <span className="node-renderer__comment-tooltip">{rowCommentTooltip}</span>
+              </>
+            )}
+            {getMoveHandleIcon(isRoot, isNode, isResponse)}
+          </div>,
+          {
+            dropEffect: 'copy',
+          },
+        );
       }
     }
 
@@ -447,11 +552,25 @@ export const ConverseTekNodeRenderer = observer(
             <div className="node-renderer__row-contents-logic">
               {isBaseCore && <Icon type="profile" style={coreStyle} />}
               {isIsolatedCore && <Icon type="branches" style={coreStyle} />}
-              {hasConditions && <Icon type="question-circle" theme="filled" style={logicStyle} />}
+              {hasConditions && (
+                <Popover
+                  overlayClassName="node-renderer__logic-popover"
+                  content={getConditionsTooltip(storedNode, operationDefinitions)}
+                  mouseEnterDelay={0.35}
+                  trigger="hover"
+                >
+                  <Icon type="question-circle" theme="filled" style={logicStyle} />
+                </Popover>
+              )}
               {hasActions && (
-                <Tooltip title={getActionsTooltip(isRoot, isNode, isResponse)} mouseEnterDelay={0.35}>
+                <Popover
+                  overlayClassName="node-renderer__logic-popover"
+                  content={getActionsTooltipTitle(storedNode, isRoot, isNode, isResponse, operationDefinitions)}
+                  mouseEnterDelay={0.35}
+                  trigger="hover"
+                >
                   <Icon type="right-circle" theme="filled" style={actionsIconStyle} />
-                </Tooltip>
+                </Popover>
               )}
               {!hasNodeTitle && <Icon type="enter" style={responseContinueStyle} />}
             </div>
