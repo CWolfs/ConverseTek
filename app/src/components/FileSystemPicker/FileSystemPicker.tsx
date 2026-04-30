@@ -45,6 +45,7 @@ export function FileSystemPicker() {
   const [files, setFiles] = useState<FileItemSystemType[]>([]);
   const [quickLinks, setQuickLinks] = useState<QuickLinkType[]>([]);
   const listItemRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+  const pendingScrollItemPath = useRef<string | null>(null);
 
   const { show } = useContextMenu({
     id: 'filesystempicker-context-menu',
@@ -164,7 +165,7 @@ export function FileSystemPicker() {
               fileSystemItem.active = true;
               setSelectedItem(fileSystemItem);
               modalStore.setDisableOk(false, globalModalId);
-              scrollToSelectedItem(fileSystemItem.path);
+              queueScrollToSelectedItem(fileSystemItem.path);
             }
           });
         },
@@ -172,9 +173,15 @@ export function FileSystemPicker() {
     }
   };
 
+  const queueScrollToSelectedItem = (key: string) => {
+    pendingScrollItemPath.current = key;
+    scrollToSelectedItem(key);
+  };
+
   const scrollToSelectedItem = (key: string) => {
     if (listItemRefs.current[key]) {
-      listItemRefs.current[key]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      listItemRefs.current[key]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      pendingScrollItemPath.current = null;
     }
   };
 
@@ -211,8 +218,11 @@ export function FileSystemPicker() {
   });
 
   useEffect(() => {
-    listItemRefs.current = {};
-  }, [directories, files]);
+    const pendingPath = pendingScrollItemPath.current;
+    if (pendingPath == null) return;
+
+    scrollToSelectedItem(pendingPath);
+  });
 
   const items = [...directories, ...files];
 

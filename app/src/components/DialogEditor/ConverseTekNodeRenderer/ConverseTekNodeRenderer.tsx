@@ -477,8 +477,6 @@ export const ConverseTekNodeRenderer = observer(
     const responseContinueStyle = {
       ...logicStyle,
       transform: 'rotate(270deg)',
-      fontSize: 22,
-      paddingRight: 4,
     };
 
     if ((!nodeTitle || (typeof nodeTitle === 'string' && nodeTitle.length <= 0)) && hasActions) {
@@ -583,7 +581,15 @@ export const ConverseTekNodeRenderer = observer(
                   <Icon type="right-circle" theme="filled" style={actionsIconStyle} />
                 </Popover>
               )}
-              {!hasNodeTitle && <Icon type="enter" style={responseContinueStyle} />}
+              {!hasNodeTitle && (
+                <Icon
+                  type="enter"
+                  className={classnames('node-renderer__continue-icon', {
+                    'node-renderer__continue-icon--before-badge': speakerBadge || cameraBadge,
+                  })}
+                  style={responseContinueStyle}
+                />
+              )}
             </div>
 
             <div className={labelClasses}>

@@ -8,9 +8,16 @@
   &__row-contents {
     cursor: pointer;
 
+    > section {
+      display: inline-flex;
+      align-items: center;
+    }
+
     &-logic {
-      display: inline-block;
-      vertical-align: sub;
+      display: inline-flex;
+      align-items: center;
+      vertical-align: middle;
+      line-height: 1;
     }
   }
 
@@ -125,6 +132,7 @@
     font-weight: 700;
     line-height: 16px;
     text-transform: uppercase;
+    transform: translateY(1px);
     white-space: nowrap;
 
     &--multiple {
@@ -149,6 +157,7 @@
     font-weight: 700;
     line-height: 16px;
     text-transform: uppercase;
+    transform: translateY(1px);
     white-space: nowrap;
     box-sizing: border-box;
 
@@ -180,6 +189,19 @@
     align-items: center;
     gap: 0;
     vertical-align: middle;
+  }
+
+  &__continue-icon {
+    width: 21px;
+    margin-left: 3px;
+    margin-right: 5px;
+    font-size: 19px;
+    line-height: 1;
+
+    &--before-badge {
+      margin-left: 0;
+      margin-right: 8px;
+    }
   }
 
   &__logic-tooltip {
@@ -450,7 +472,8 @@
   border-left: none;
   box-shadow: 0 2px 2px -2px;
   padding: 0 5px 0 10px;
-  border-radius: 2px;
+  border-radius: 0 2px 2px 0;
+  margin-left: -1px;
   min-width: 230px;
   flex: 1 0 auto;
   display: flex;
@@ -467,6 +490,8 @@
 
 .rst__rowContentsDragDisabled {
   border-left: solid #bbb 1px;
+  border-radius: 2px;
+  margin-left: 0;
 }
 
 .rst__rtl.rst__rowContentsDragDisabled {
@@ -476,7 +501,13 @@
 
 .rst__rowLabel {
   flex: 0 1 auto;
+  display: inline-flex;
+  align-items: center;
   padding-right: 20px;
+}
+
+.conversation-node-renderer__row-label.rst__rowLabel {
+  margin-bottom: 0;
 }
 
 .node-renderer__logic-popover .ant-popover-inner {
@@ -517,9 +548,10 @@
   no-repeat center;
   */
   border: solid #aaa 1px;
+  border-right-color: #bbb;
   box-shadow: 0 2px 2px -2px;
   cursor: move;
-  border-radius: 1px;
+  border-radius: 1px 0 0 1px;
   z-index: 1;
 }
 

@@ -41,6 +41,24 @@ describe('speaker projection utilities', () => {
     });
   });
 
+  it('shows known speaker ids as trimmed speaker names without changing the source id', () => {
+    const conversationAsset = createConversation('K:/Mods/Test/conversations');
+    const darius = createPromptNode(0);
+    darius.sourceInSceneRef = null;
+    darius.speakerOverrideId = '598cd3f26230355c18000069';
+
+    conversationAsset.conversation.nodes = [darius];
+    conversationAsset.conversation.roots = [makeRoot(0)];
+
+    const projections = buildPromptSpeakerProjectionMap(conversationAsset);
+
+    expect(projections.get(getId(darius))).toMatchObject({
+      label: 'Darius',
+      title: 'speakerName DariusDefault, speakerId 598cd3f26230355c18000069',
+      variant: 'default',
+    });
+  });
+
   it('projects a single inherited speaker through response branches', () => {
     const conversationAsset = createConversation('K:/Mods/Test/conversations');
     const yang = createPromptNode(0);
