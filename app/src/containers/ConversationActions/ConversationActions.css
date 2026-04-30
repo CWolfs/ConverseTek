@@ -1,12 +1,10 @@
 @import '../../css/constants.css';
 
 .conversation-actions {
-  display: flex;
-  flex-direction: column;
   height: 100%;
   min-height: 0;
   overflow-x: hidden;
-  overflow-y: hidden;
+  overflow-y: auto;
 
   &__panel-header {
     display: flex;
@@ -16,10 +14,28 @@
       display: inline-block;
     }
 
-    &-delete-button {
-      flex: 0 0 $largeSpace;
+    &-delete-button.ant-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 26px;
+      width: 26px;
+      min-width: 26px;
+      max-width: 26px;
+      height: 24px;
       margin-left: $mediumLargeSpace;
-      margin-right: $tinySpace;
+      margin-right: 0;
+      padding: 0;
+      line-height: 1;
+
+      .anticon {
+        font-size: 13px;
+        line-height: 1;
+      }
+
+      .anticon svg {
+        display: block;
+      }
     }
   }
 
@@ -46,10 +62,6 @@
   }
 
   .ant-collapse {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow-x: hidden;
-    overflow-y: auto;
     background-color: $backgroundTertiary;
     border-radius: 0 0 $tinySpace $tinySpace !important;
     border: 1px solid $borderTertiary !important;
@@ -73,6 +85,7 @@
 
     &-header {
       padding-top: $tinySpace !important;
+      padding-right: $tinySpace !important;
       padding-bottom: $tinySpace !important;
       color: $textColourPrimary !important;
 
