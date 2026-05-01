@@ -109,7 +109,7 @@ function AiContextPathPicker({ globalModalId, initialPath, onSelectPath }: Props
       <Alert
         className="ai-context-path-picker__alert"
         type="info"
-        message={`Choose a folder or one supported context file (${contextFileExtensions.join(', ')}).`}
+        title={`Choose a folder or one supported context file (${contextFileExtensions.join(', ')}).`}
       />
       {currentPath && <div className="ai-context-path-picker__path">{currentPath}</div>}
       <div className="ai-context-path-picker__list">

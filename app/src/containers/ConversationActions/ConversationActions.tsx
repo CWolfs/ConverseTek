@@ -15,7 +15,7 @@ import { PromptNodeType, ElementNodeType, OperationCallType } from 'types';
 
 import './ConversationActions.css';
 
-const { Panel } = Collapse;
+type CollapseItems = NonNullable<React.ComponentProps<typeof Collapse>['items']>;
 
 function ConversationActions({ node }: { node: PromptNodeType | ElementNodeType }) {
   const nodeStore = useStore<NodeStore>('node');
@@ -56,7 +56,7 @@ function ConversationActions({ node }: { node: PromptNodeType | ElementNodeType 
     event?.stopPropagation();
   };
 
-  const renderPanel = (action: OperationCallType, index: number) => {
+  const renderPanel = (action: OperationCallType, index: number): CollapseItems[number] => {
     const key = `${node.idRef.id}.${index}`;
 
     const classes = classnames('conversation-actions__panel', {
@@ -88,11 +88,12 @@ function ConversationActions({ node }: { node: PromptNodeType | ElementNodeType 
       </div>
     );
 
-    return (
-      <Panel key={`${key}`} className={classes} header={header}>
-        <EditableLogic key={action.functionName} logic={action} category="primary" scope="action" />
-      </Panel>
-    );
+    return {
+      children: <EditableLogic key={action.functionName} logic={action} category="primary" scope="action" />,
+      className: classes,
+      key,
+      label: header,
+    };
   };
 
   const displayActions = actions === null || !actions.ops ? [] : actions.ops;
@@ -100,7 +101,7 @@ function ConversationActions({ node }: { node: PromptNodeType | ElementNodeType 
 
   return (
     <div className="conversation-actions">
-      <Collapse>{displayActions.map((action, index) => renderPanel(action, index))}</Collapse>
+      <Collapse items={displayActions.map((action, index) => renderPanel(action, index))} />
       <div className="conversation-actions__buttons">
         <Button className="button-secondary" size="small" onClick={onAddAction}>
           <PlusOutlined />

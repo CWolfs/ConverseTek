@@ -855,7 +855,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
             <Alert
               className="ai-draft-modal__alert"
               type="warning"
-              message="This AI flow needs an open conversation folder and, for node or branch suggestions, a selected node."
+              title="This AI flow needs an open conversation folder and, for node or branch suggestions, a selected node."
             />
           )}
 
@@ -1001,7 +1001,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                   <Alert
                     className="ai-draft-modal__alert"
                     type="info"
-                    message={`${providerUi.displayName} settings can be prepared here, but only Codex runs drafts in this version.`}
+                    title={`${providerUi.displayName} settings can be prepared here, but only Codex runs drafts in this version.`}
                   />
                 )}
                 <Form.Item
@@ -1062,7 +1062,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                     <Alert
                       className="ai-draft-modal__inline-alert"
                       type="warning"
-                      message={modelCatalog.error || 'Could not load provider models.'}
+                      title={modelCatalog.error || 'Could not load provider models.'}
                     />
                   )}
                   {modelCatalog?.success && (
@@ -1083,7 +1083,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                   >
                     <Select
                       value={settings.codexReasoningEffort || ''}
-                      popupClassName="ai-draft-modal__reasoning-dropdown"
+                      classNames={{ popup: { root: 'ai-draft-modal__reasoning-dropdown' } }}
                       optionLabelProp="label"
                       onChange={(value: string) => updateSettings({ codexReasoningEffort: value })}
                     >
@@ -1398,10 +1398,10 @@ function DraftPreview({
       </div>
 
       {validation.errors.length > 0 && (
-        <Alert className="ai-draft-modal__alert" type="error" message="Draft errors" description={validation.errors.join('\n')} />
+        <Alert className="ai-draft-modal__alert" type="error" title="Draft errors" description={validation.errors.join('\n')} />
       )}
       {structuralWarnings.length > 0 && (
-        <Alert className="ai-draft-modal__alert" type="warning" message="Draft warnings" description={structuralWarnings.join('\n')} />
+        <Alert className="ai-draft-modal__alert" type="warning" title="Draft warnings" description={structuralWarnings.join('\n')} />
       )}
       {advisoryNotes.length > 0 && (
         <div className="ai-draft-preview__notes" aria-label="Draft notes">

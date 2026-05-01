@@ -2,13 +2,14 @@
 import React, { CSSProperties } from 'react';
 import { observer } from 'mobx-react';
 import { Input, AutoComplete } from 'antd';
-import { SelectValue } from 'antd/lib/select';
+
+type EditableInputValue = string | number;
 
 type Props = {
   value: string | null;
   options: ({ text: string; value: string | number } | string)[] | null;
-  onChange: (value: SelectValue) => void;
-  onBlur?: (value: SelectValue) => void;
+  onChange: (value: EditableInputValue) => void;
+  onBlur?: (value: EditableInputValue) => void;
   optionLabelProp?: string | null;
   valueLabel?: string | { text: string; value: string } | null;
 };

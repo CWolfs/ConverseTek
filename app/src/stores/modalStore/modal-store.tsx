@@ -1,12 +1,12 @@
 /* eslint-disable function-paren-newline */
-import React, { MouseEvent, ElementType } from 'react';
+import React, { ElementType, KeyboardEvent, MouseEvent } from 'react';
 import { observable, action, makeObservable } from 'mobx';
 import { LegacyButtonType } from 'utils/antd-button-utils';
 
 import { getDevPreservedStore } from '../dev-preserved-store';
 
 export type OnOkType = ((event: MouseEvent<HTMLElement>, value?: string) => void) | null;
-export type OnCancelType = ((event: MouseEvent<HTMLElement>) => void) | null;
+export type OnCancelType = ((event: KeyboardEvent<HTMLElement> | MouseEvent<HTMLElement>) => void) | null;
 
 export type FSModalProps = {
   fileMode?: boolean;

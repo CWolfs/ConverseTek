@@ -1,8 +1,10 @@
-import { ButtonType } from 'antd/lib/button';
+import type { ButtonProps } from 'antd';
 
-export type LegacyButtonType = ButtonType | 'danger' | undefined;
+type AntdButtonType = ButtonProps['type'];
 
-export function getAntdButtonType(type: LegacyButtonType): ButtonType | undefined {
+export type LegacyButtonType = AntdButtonType | 'danger' | undefined;
+
+export function getAntdButtonType(type: LegacyButtonType): AntdButtonType {
   return type === 'danger' ? 'default' : type;
 }
 

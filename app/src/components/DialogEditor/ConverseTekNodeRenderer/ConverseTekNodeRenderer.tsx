@@ -569,11 +569,10 @@ export const ConverseTekNodeRenderer = observer(
               {isIsolatedCore && <BranchesOutlined style={coreStyle} />}
               {hasConditions && (
                 <Popover
-                  overlayClassName="node-renderer__logic-popover"
+                  classNames={{ root: 'node-renderer__logic-popover' }}
                   content={getConditionsTooltip(storedNode, operationDefinitions)}
                   mouseEnterDelay={0.35}
-                  transitionName=""
-                  destroyTooltipOnHide
+                  destroyOnHidden
                   trigger="hover"
                 >
                   <QuestionCircleFilled style={logicStyle} />
@@ -581,11 +580,10 @@ export const ConverseTekNodeRenderer = observer(
               )}
               {hasActions && (
                 <Popover
-                  overlayClassName="node-renderer__logic-popover"
+                  classNames={{ root: 'node-renderer__logic-popover' }}
                   content={getActionsTooltipTitle(storedNode, isRoot, isNode, isResponse, operationDefinitions)}
                   mouseEnterDelay={0.35}
-                  transitionName=""
-                  destroyTooltipOnHide
+                  destroyOnHidden
                   trigger="hover"
                 >
                   <RightCircleFilled style={actionsIconStyle} />

@@ -1,10 +1,10 @@
 import React, { JSXElementConstructor, ReactElement } from 'react';
 import { observer } from 'mobx-react';
 import { Select } from 'antd';
-import { SelectValue } from 'antd/lib/select';
 
 const { Option } = Select;
 
+type EditableSelectValue = string | number;
 type SelectOptionElement = ReactElement<unknown, string | JSXElementConstructor<unknown>>;
 
 type Props = {
@@ -12,7 +12,7 @@ type Props = {
   options: string[] | { key: string }[];
   placeholder: string;
   style?: object;
-  onChange: (value: SelectValue, option: SelectOptionElement | SelectOptionElement[]) => void;
+  onChange: (value: EditableSelectValue, option: SelectOptionElement | SelectOptionElement[]) => void;
 };
 
 function EditableSelect({ value, options, placeholder, style = {}, onChange }: Props) {
@@ -20,7 +20,13 @@ function EditableSelect({ value, options, placeholder, style = {}, onChange }: P
   if (value) conditionalProps.defaultValue = value;
 
   return (
-    <Select {...conditionalProps} style={style || { width: 230 }} placeholder={placeholder} onChange={onChange} dropdownMatchSelectWidth={false}>
+    <Select
+      {...conditionalProps}
+      style={style || { width: 230 }}
+      placeholder={placeholder}
+      onChange={(nextValue, option) => onChange(nextValue as EditableSelectValue, option as SelectOptionElement | SelectOptionElement[])}
+      popupMatchSelectWidth={false}
+    >
       {options.map((option) => {
         if (typeof option === 'string') {
           return <Option key={option}>{option}</Option>;

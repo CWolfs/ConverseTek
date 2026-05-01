@@ -1,6 +1,5 @@
 import React, { CSSProperties, MouseEvent, ReactNode } from 'react';
 import { Button, Tooltip } from 'antd';
-import { TooltipPlacement } from 'antd/lib/tooltip';
 import { getAntdButtonType, isAntdButtonDanger, LegacyButtonType } from 'utils/antd-button-utils';
 
 import './IconButton.css';
@@ -18,7 +17,7 @@ type ButtonProps = {
 
 type TooltipProps = {
   title?: string;
-  placement?: TooltipPlacement;
+  placement?: React.ComponentProps<typeof Tooltip>['placement'];
 };
 
 export const IconButton = ({ type, icon, shape = 'circle', onClick, className, style = {}, title, placement = 'left' }: Props) => {

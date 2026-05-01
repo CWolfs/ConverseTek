@@ -2,8 +2,6 @@ import React, { useState, useEffect, ChangeEvent } from 'react';
 import PropTypes from 'prop-types';
 import { Card, Row, Col, Input, Select, Tooltip, Checkbox } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { SelectValue } from 'antd/lib/select';
-import { CheckboxChangeEvent } from 'antd/lib/checkbox';
 import { observer } from 'mobx-react';
 import capitalize from 'lodash.capitalize';
 
@@ -35,6 +33,8 @@ const colTwoLayout = {
 type Props = {
   node: PromptNodeType | ElementNodeType;
 };
+
+type CheckboxChangeEvent = Parameters<NonNullable<React.ComponentProps<typeof Checkbox>['onChange']>>[0];
 
 function ConversationGeneral({ node }: Props) {
   const nodeStore = useStore<NodeStore>('node');
@@ -74,10 +74,10 @@ function ConversationGeneral({ node }: Props) {
     nodeStore.setNodeId(node, createId(node.idRef, nodeId));
   };
 
-  const handleSpeakerChange = (value: SelectValue) => {
+  const handleSpeakerChange = (value: string) => {
     const { type } = node;
     if (type !== 'node') return;
-    if (value !== 'speakerId' && value !== 'castId') throw Error(`Invalid speaker change with value ${value as string}`);
+    if (value !== 'speakerId' && value !== 'castId') throw Error(`Invalid speaker change with value ${value}`);
 
     nodeStore.setPromptNodeSpeakerType(node, value);
     setSelectedSpeakerType(value);

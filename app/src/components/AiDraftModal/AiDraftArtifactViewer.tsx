@@ -52,7 +52,7 @@ export function AiDraftArtifactViewer({ globalModalId, title, path, content, tru
         <Alert
           className="ai-draft-artifact-viewer__alert"
           type="warning"
-          message="This diagnostics artifact is large, so ConverseTek is showing the first part only."
+          title="This diagnostics artifact is large, so ConverseTek is showing the first part only."
         />
       )}
       <pre>{displayedContent || '(empty)'}</pre>

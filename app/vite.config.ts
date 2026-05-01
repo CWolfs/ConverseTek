@@ -89,14 +89,6 @@ export default defineConfig({
       },
     },
   },
-  css: {
-    preprocessorOptions: {
-      less: {
-        javascriptEnabled: true,
-        math: 'always',
-      },
-    },
-  },
   build: {
     outDir: path.resolve(__dirname, '../dist'),
     emptyOutDir: true,
