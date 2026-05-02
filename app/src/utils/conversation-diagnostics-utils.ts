@@ -1,7 +1,7 @@
 import type { ConversationAssetType, ElementNodeType, InputType, OperationArgType, OperationCallType, OperationDefinitionType, PromptNodeType } from 'types';
 import { getId } from './conversation-utils';
 
-export type ConversationDiagnosticSeverity = 'error' | 'warning';
+export type ConversationDiagnosticSeverity = 'error' | 'warning' | 'info';
 export type ConversationDiagnosticCategory = 'content' | 'graph' | 'operation' | 'reference';
 
 export type ConversationDiagnostic = {
@@ -111,15 +111,23 @@ function scanConversationShape(
   nodes.forEach((node) => {
     const context = getPromptNodeContext(node);
 
-    if (node.text.trim() === '' && !isPromptNodeAutoFollowRouter(node)) {
+    if (node.text.trim() === '') {
       diagnostics.push(
-        createDiagnostic({
-          severity: 'warning',
-          category: 'content',
-          title: 'Prompt node has no text',
-          description: 'BattleTech can use empty prompt nodes as auto-follow routers, but this prompt does not look like a simple router. Check that the player will not be left on stale or missing dialogue text.',
-          context,
-        }),
+        isEmptyPromptLikelyInert(node)
+          ? createDiagnostic({
+              severity: 'warning',
+              category: 'content',
+              title: 'Prompt node has no content or responses',
+              description: 'This prompt has no speaker text, no response options, and no actions. Check that the player will not be left on stale or missing dialogue text.',
+              context,
+            })
+          : createDiagnostic({
+              severity: 'info',
+              category: 'content',
+              title: 'Prompt node has no text',
+              description: 'This prompt has no speaker text, but it has response choices or actions. This is valid for continuation routing, chained commander response runs, and other intentional silent prompt nodes.',
+              context,
+            }),
       );
     }
 
@@ -130,8 +138,8 @@ function scanConversationShape(
   });
 }
 
-function isPromptNodeAutoFollowRouter(node: PromptNodeType): boolean {
-  return node.branches.some((branch) => branch.responseText === '');
+function isEmptyPromptLikelyInert(node: PromptNodeType): boolean {
+  return node.branches.length <= 0 && (node.actions?.ops?.length ?? 0) <= 0;
 }
 
 function scanElementNodeTarget(
@@ -335,12 +343,16 @@ function scanOperationArg(
   }
 
   if (!isInputOptional(operation.functionName, input) && isEmptyRequiredArg(arg, input)) {
+    const severity = isInformationalEmptyArg(operation.functionName, input) ? 'info' : 'warning';
     diagnostics.push(
       createDiagnostic({
-        severity: 'warning',
+        severity,
         category: 'operation',
         title: 'Operation input is empty',
-        description: `${inputPath} is empty. This may fail or do nothing at runtime.`,
+        description:
+          severity === 'info'
+            ? `${inputPath} is empty. This is valid, but check that the missing value is intentional.`
+            : `${inputPath} is empty. This may fail or do nothing at runtime.`,
         context,
       }),
     );
@@ -470,6 +482,10 @@ function isInputOptional(functionName: string, input: InputType): boolean {
   if (inputText.includes('optional')) return true;
   if (functionName === sideloadConversationOperation && input.label.toLowerCase() === 'entry node id') return true;
   return false;
+}
+
+function isInformationalEmptyArg(functionName: string, input: InputType): boolean {
+  return functionName === 'Start Conversation Custom' && input.label.toLowerCase() === 'conversation sub header';
 }
 
 function buildLoadedConversationsById(conversationAssets: ConversationAssetType[]): Map<string, ConversationAssetType> {

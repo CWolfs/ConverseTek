@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { buildConversationDiagnostics } from 'utils/conversation-diagnostics-utils';
-import { createConversation, createPromptNode, createRootNode, getId } from 'utils/conversation-utils';
+import { createConversation, createPromptNode, createResponseNode, createRootNode, getId } from 'utils/conversation-utils';
 import type { ConversationAssetType, OperationArgType, OperationCallType, OperationDefinitionType } from 'types';
 
 function makeStringArg(value: string): OperationArgType {
@@ -97,6 +97,40 @@ describe('conversation diagnostics', () => {
     );
   });
 
+  it('allows empty prompt nodes that continue into response choices', () => {
+    const conversationAsset = makeBasicConversation();
+    const prompt = conversationAsset.conversation.nodes[0];
+    const commanderResponse = createResponseNode();
+    commanderResponse.responseText = 'Keep going.';
+    commanderResponse.nextNodeIndex = -1;
+    prompt.text = '';
+    prompt.branches = [commanderResponse];
+
+    const diagnostics = buildConversationDiagnostics({ conversationAsset, operationDefinitions: [] });
+    const promptDiagnostics = diagnostics.filter((diagnostic) => diagnostic.nodeId === getId(prompt));
+
+    expect(promptDiagnostics).toEqual(
+      expect.arrayContaining([expect.objectContaining({ severity: 'info', title: 'Prompt node has no text' })]),
+    );
+    expect(promptDiagnostics.some((diagnostic) => diagnostic.severity === 'warning' && diagnostic.title.startsWith('Prompt node'))).toBe(false);
+  });
+
+  it('reports empty prompt nodes that have no responses or actions', () => {
+    const conversationAsset = makeBasicConversation();
+    const prompt = conversationAsset.conversation.nodes[0];
+    prompt.text = '';
+    prompt.branches = [];
+    prompt.actions = null;
+
+    const diagnostics = buildConversationDiagnostics({ conversationAsset, operationDefinitions: [] });
+
+    expect(diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ severity: 'warning', title: 'Prompt node has no content or responses', nodeId: getId(prompt) }),
+      ]),
+    );
+  });
+
   it('does not treat operation definition values as strict validation rules', () => {
     const conversationAsset = makeBasicConversation();
     const prompt = conversationAsset.conversation.nodes[0];
@@ -141,6 +175,35 @@ describe('conversation diagnostics', () => {
 
     expect(diagnostics).not.toEqual(
       expect.arrayContaining([expect.objectContaining({ severity: 'warning', title: 'Operation input is outside the expected values', nodeId: getId(prompt) })]),
+    );
+  });
+
+  it('reports an empty conversation sub header as info instead of a warning', () => {
+    const conversationAsset = makeBasicConversation();
+    const prompt = conversationAsset.conversation.nodes[0];
+    const response = createResponseNode();
+    response.responseText = 'Open the custom conversation.';
+    response.actions = {
+      ops: [makeAction('Start Conversation Custom', [makeStringArg('conversation_target'), makeStringArg('Dead Claim'), makeStringArg('')])],
+    };
+    prompt.branches = [response];
+
+    const diagnostics = buildConversationDiagnostics({
+      conversationAsset,
+      operationDefinitions: [
+        makeDefinition('Start Conversation Custom', [
+          { label: 'Conversation Id', types: ['string'] },
+          { label: 'Conversation Header', types: ['string'] },
+          { label: 'Conversation Sub Header', types: ['string'] },
+        ]),
+      ],
+    });
+
+    expect(diagnostics).toEqual(
+      expect.arrayContaining([expect.objectContaining({ severity: 'info', title: 'Operation input is empty', nodeId: getId(response) })]),
+    );
+    expect(diagnostics).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ severity: 'warning', title: 'Operation input is empty', nodeId: getId(response) })]),
     );
   });
 

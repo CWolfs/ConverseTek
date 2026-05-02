@@ -29,6 +29,11 @@
   background: linear-gradient(90deg, #fff7f6 0%, #ffffff 68%);
 }
 
+.conversation-diagnostics__summary--info {
+  border-color: #cfe8ff;
+  background: linear-gradient(90deg, #f5fbff 0%, #ffffff 68%);
+}
+
 .conversation-diagnostics__summary--success {
   border-color: #d6f1df;
   background: linear-gradient(90deg, #f7fff9 0%, #ffffff 68%);
@@ -48,6 +53,10 @@
 
 .conversation-diagnostics__summary--error .conversation-diagnostics__summary-icon {
   background: #ff4d4f;
+}
+
+.conversation-diagnostics__summary--info .conversation-diagnostics__summary-icon {
+  background: #1890ff;
 }
 
 .conversation-diagnostics__summary--success .conversation-diagnostics__summary-icon {
@@ -130,6 +139,30 @@
 .conversation-diagnostics__toolbar-controls .ant-select-selector {
   min-height: 40px;
   border-radius: 4px;
+}
+
+.conversation-diagnostics__toolbar-controls .ant-input-affix-wrapper {
+  background: #ffffff;
+  border-color: #d6dde8;
+  color: #30343a;
+}
+
+.conversation-diagnostics__toolbar-controls .ant-input-affix-wrapper .ant-input {
+  background: transparent;
+  color: #30343a;
+}
+
+.conversation-diagnostics__toolbar-controls .ant-input-affix-wrapper .ant-input::placeholder {
+  color: #8a94a6;
+  font-style: normal;
+}
+
+.conversation-diagnostics__toolbar-controls .ant-input-prefix {
+  color: #596273;
+}
+
+.conversation-diagnostics__toolbar-controls .ant-input-clear-icon {
+  color: #697386;
 }
 
 .conversation-diagnostics__category-select.ant-select {
@@ -225,6 +258,10 @@
 
 .conversation-diagnostics__item--error .conversation-diagnostics__item-accent {
   background: #ff4d4f;
+}
+
+.conversation-diagnostics__item--info .conversation-diagnostics__item-accent {
+  background: #1890ff;
 }
 
 .conversation-diagnostics__item-body {

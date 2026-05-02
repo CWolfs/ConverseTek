@@ -1,7 +1,15 @@
 import { useEffect, useState } from 'react';
 import type { ComponentProps } from 'react';
 import { Button, Empty, Input, Select, Segmented, Tag } from 'antd';
-import { AimOutlined, CheckCircleOutlined, DownloadOutlined, ExclamationCircleOutlined, SearchOutlined, WarningOutlined } from '@ant-design/icons';
+import {
+  AimOutlined,
+  CheckCircleOutlined,
+  DownloadOutlined,
+  ExclamationCircleOutlined,
+  InfoCircleOutlined,
+  SearchOutlined,
+  WarningOutlined,
+} from '@ant-design/icons';
 import { observer } from 'mobx-react';
 
 import { useStore } from 'hooks/useStore';
@@ -24,7 +32,14 @@ type SegmentedOptions = NonNullable<ComponentProps<typeof Segmented>['options']>
 
 function getSeverityLabel(severity: ConversationDiagnosticSeverity): string {
   if (severity === 'error') return 'Error';
+  if (severity === 'info') return 'Info';
   return 'Warning';
+}
+
+function getSeverityTagColour(severity: ConversationDiagnosticSeverity): string {
+  if (severity === 'error') return 'error';
+  if (severity === 'info') return 'processing';
+  return 'warning';
 }
 
 function getCategoryLabel(category: ConversationDiagnostic['category']): string {
@@ -55,6 +70,7 @@ function ConversationDiagnosticsModal({ globalModalId }: Props) {
 
   const errorCount = diagnostics.filter((diagnostic) => diagnostic.severity === 'error').length;
   const warningCount = diagnostics.filter((diagnostic) => diagnostic.severity === 'warning').length;
+  const infoCount = diagnostics.filter((diagnostic) => diagnostic.severity === 'info').length;
   const normalisedSearchText = searchText.trim().toLowerCase();
   const filteredDiagnostics = diagnostics.filter((diagnostic) => {
     if (filter !== 'all' && diagnostic.severity !== filter) return false;
@@ -71,6 +87,7 @@ function ConversationDiagnosticsModal({ globalModalId }: Props) {
     { label: `All (${diagnostics.length})`, value: 'all' },
     { label: `Errors (${errorCount})`, value: 'error' },
     { label: `Warnings (${warningCount})`, value: 'warning' },
+    { label: `Info (${infoCount})`, value: 'info' },
   ];
 
   const jumpToNode = (diagnostic: ConversationDiagnostic) => {
@@ -87,7 +104,7 @@ function ConversationDiagnosticsModal({ globalModalId }: Props) {
       `Conversation Diagnostics - ${conversationName}`,
       '',
       `${diagnostics.length} diagnostic${diagnostics.length === 1 ? '' : 's'} found`,
-      `${errorCount} error${errorCount === 1 ? '' : 's'} and ${warningCount} warning${warningCount === 1 ? '' : 's'}`,
+      getSummaryCountsText(errorCount, warningCount, infoCount),
       '',
       ...diagnostics.flatMap((diagnostic, index) => [
         `${index + 1}. [${getSeverityLabel(diagnostic.severity)}] ${diagnostic.title}`,
@@ -119,9 +136,9 @@ function ConversationDiagnosticsModal({ globalModalId }: Props) {
 
   return (
     <div className="conversation-diagnostics">
-      <section className={`conversation-diagnostics__summary conversation-diagnostics__summary--${getSummaryTone(errorCount, warningCount)}`}>
+      <section className={`conversation-diagnostics__summary conversation-diagnostics__summary--${getSummaryTone(errorCount, warningCount, infoCount)}`}>
         <div className="conversation-diagnostics__summary-icon" aria-hidden="true">
-          {errorCount > 0 ? <ExclamationCircleOutlined /> : warningCount > 0 ? <WarningOutlined /> : <CheckCircleOutlined />}
+          {errorCount > 0 ? <ExclamationCircleOutlined /> : warningCount > 0 ? <WarningOutlined /> : infoCount > 0 ? <InfoCircleOutlined /> : <CheckCircleOutlined />}
         </div>
         <div className="conversation-diagnostics__summary-copy">
           <div className="conversation-diagnostics__summary-title">
@@ -131,7 +148,7 @@ function ConversationDiagnosticsModal({ globalModalId }: Props) {
           </div>
           <div className="conversation-diagnostics__summary-description">
             {diagnostics.length > 0
-              ? `${errorCount} error${errorCount === 1 ? '' : 's'} and ${warningCount} warning${warningCount === 1 ? '' : 's'} in the active conversation.`
+              ? `${getSummaryCountsText(errorCount, warningCount, infoCount)} in the active conversation.`
               : 'The active conversation passed the current content, graph, operation, and reference checks.'}
           </div>
         </div>
@@ -183,7 +200,7 @@ function ConversationDiagnosticsModal({ globalModalId }: Props) {
               <div className="conversation-diagnostics__item-body">
                 <div className="conversation-diagnostics__item-main">
                   <div className="conversation-diagnostics__item-tags">
-                    <Tag color={diagnostic.severity === 'error' ? 'error' : 'warning'}>{getSeverityLabel(diagnostic.severity)}</Tag>
+                    <Tag color={getSeverityTagColour(diagnostic.severity)}>{getSeverityLabel(diagnostic.severity)}</Tag>
                     <Tag>{getCategoryLabel(diagnostic.category)}</Tag>
                   </div>
                   <div className="conversation-diagnostics__item-title">{diagnostic.title}</div>
@@ -213,10 +230,18 @@ function ConversationDiagnosticsModal({ globalModalId }: Props) {
   );
 }
 
-function getSummaryTone(errorCount: number, warningCount: number): ConversationDiagnosticSeverity | 'success' {
+function getSummaryTone(errorCount: number, warningCount: number, infoCount: number): ConversationDiagnosticSeverity | 'success' {
   if (errorCount > 0) return 'error';
   if (warningCount > 0) return 'warning';
+  if (infoCount > 0) return 'info';
   return 'success';
+}
+
+function getSummaryCountsText(errorCount: number, warningCount: number, infoCount: number): string {
+  const errorText = `${errorCount} error${errorCount === 1 ? '' : 's'}`;
+  const warningText = `${warningCount} warning${warningCount === 1 ? '' : 's'}`;
+  const infoText = `${infoCount} info`;
+  return `${errorText}, ${warningText}, and ${infoText}`;
 }
 
 function MetaRow({ label, value }: { label: string; value: string }) {
