@@ -184,7 +184,11 @@ function ConversationGeneral({ node }: Props) {
             <div className="conversation-general__label">Only Once</div>
           </Col>
           <Col {...colTwoLayout}>
-            <Checkbox onChange={handleAvailbleOnceChange} checked={node.onlyOnce} />
+            <Checkbox
+              className="conversation-general__checkbox"
+              onChange={handleAvailbleOnceChange}
+              checked={node.onlyOnce}
+            />
           </Col>
         </Row>
       )}
@@ -195,7 +199,11 @@ function ConversationGeneral({ node }: Props) {
             <div className="conversation-general__label">Always Show</div>
           </Col>
           <Col {...colTwoLayout}>
-            <Checkbox onChange={handleHideIfUnavailableChange} checked={!node.hideIfUnavailable} />
+            <Checkbox
+              className="conversation-general__checkbox"
+              onChange={handleHideIfUnavailableChange}
+              checked={!node.hideIfUnavailable}
+            />
           </Col>
         </Row>
       )}

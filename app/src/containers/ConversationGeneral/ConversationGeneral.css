@@ -30,6 +30,13 @@
     min-height: 32px;
   }
 
+  &__checkbox.ant-checkbox-wrapper {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    vertical-align: top;
+  }
+
   &__speaker-group {
     display: flex;
     align-items: center;
