@@ -10,9 +10,7 @@
   max-width: min(760px, 55vw);
   min-height: 0;
   color: $textColourPrimary;
-  background:
-    radial-gradient(circle at top right, rgba(42, 176, 247, 0.12), transparent 28rem),
-    #1c2229;
+  background: $backgroundPrimary;
   box-shadow:
     inset 1px 0 0 rgba(255, 255, 255, 0.08),
     -10px 0 28px rgba(0, 0, 0, 0.25);
@@ -80,8 +78,8 @@
   align-items: center;
   justify-content: space-between;
   gap: $mediumSpace;
-  min-height: 58px;
-  padding: $mediumSpace $mediumLargeSpace $smallMediumSpace $mediumLargeSpace;
+  min-height: 48px;
+  padding: $smallMediumSpace $mediumSpace $smallSpace $mediumSpace;
 }
 
 .side-panel__title {
@@ -116,7 +114,7 @@
   flex: 1 1 auto;
   min-width: 0;
   min-height: 0;
-  padding: 0 $mediumLargeSpace $mediumLargeSpace $mediumLargeSpace;
+  padding: 0 $mediumSpace $mediumSpace $mediumSpace;
 }
 
 @keyframes side-panel-enter {
