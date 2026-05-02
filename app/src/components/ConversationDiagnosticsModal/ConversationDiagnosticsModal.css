@@ -317,7 +317,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(13rem, 22rem);
   gap: $mediumLargeSpace;
-  padding: 0 $mediumLargeSpace $mediumLargeSpace calc($mediumLargeSpace + 36px);
+  padding: $smallMediumSpace $mediumLargeSpace $mediumLargeSpace calc($mediumLargeSpace + 36px);
   box-shadow: inset 0 1px 0 rgba(26, 36, 52, 0.08);
 }
 
