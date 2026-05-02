@@ -38,6 +38,8 @@
   }
 
   .ant-tree .ant-tree-node-content-wrapper {
+    margin-left: -4px;
+    padding-inline: 2px 4px;
     transition-property: background-color, color;
   }
 
