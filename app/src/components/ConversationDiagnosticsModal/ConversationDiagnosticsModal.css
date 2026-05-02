@@ -633,9 +633,14 @@
 }
 
 .conversation-diagnostics--side-panel .conversation-diagnostics__toolbar-controls .ant-input-prefix,
-.conversation-diagnostics--side-panel .conversation-diagnostics__toolbar-controls .ant-input-clear-icon,
-.conversation-diagnostics__category-select--side-panel.ant-select .ant-select-arrow {
-  color: $highlightColourSecondary;
+.conversation-diagnostics--side-panel .conversation-diagnostics__toolbar-controls .ant-input-clear-icon {
+  color: $linkColourPrimary;
+}
+
+.conversation-diagnostics__category-select--side-panel.ant-select .ant-select-suffix,
+.conversation-diagnostics__category-select--side-panel.ant-select .ant-select-suffix .anticon,
+.conversation-diagnostics__category-select--side-panel.ant-select .ant-select-suffix svg {
+  color: $highlightColourSecondary !important;
 }
 
 .conversation-diagnostics--side-panel .conversation-diagnostics__item {

@@ -29,7 +29,7 @@
   &__toolbar {
     display: flex;
     justify-content: space-between;
-    margin: 0 $smallSpace $tinySpace $smallSpace;
+    margin: $tinySpace $smallSpace;
   }
 
   &__regenerate-ids-button {

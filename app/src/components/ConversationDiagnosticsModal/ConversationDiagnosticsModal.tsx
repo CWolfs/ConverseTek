@@ -184,33 +184,33 @@ function ConversationDiagnosticsContent({ globalModalId, variant = 'modal' }: Pr
         'conversation-diagnostics--side-panel': variant === 'side-panel',
       })}
     >
-      <section className={`conversation-diagnostics__summary conversation-diagnostics__summary--${getSummaryTone(errorCount, warningCount, infoCount)}`}>
-        <div className="conversation-diagnostics__summary-icon" aria-hidden="true">
-          {errorCount > 0 ? <ExclamationCircleOutlined /> : warningCount > 0 ? <WarningOutlined /> : infoCount > 0 ? <InfoCircleOutlined /> : <CheckCircleOutlined />}
-        </div>
-        <div className="conversation-diagnostics__summary-copy">
-          <div className="conversation-diagnostics__summary-title">
-            {diagnostics.length > 0
-              ? `${diagnostics.length} diagnostic${diagnostics.length === 1 ? '' : 's'} found`
-              : 'No diagnostics found'}
+      {variant !== 'side-panel' && (
+        <section className={`conversation-diagnostics__summary conversation-diagnostics__summary--${getSummaryTone(errorCount, warningCount, infoCount)}`}>
+          <div className="conversation-diagnostics__summary-icon" aria-hidden="true">
+            {errorCount > 0 ? <ExclamationCircleOutlined /> : warningCount > 0 ? <WarningOutlined /> : infoCount > 0 ? <InfoCircleOutlined /> : <CheckCircleOutlined />}
           </div>
-          <div className="conversation-diagnostics__summary-description">
-            {diagnostics.length > 0
-              ? `${getSummaryCountsText(errorCount, warningCount, infoCount)}.`
-              : 'The active conversation passed the current content, graph, operation, and reference checks.'}
+          <div className="conversation-diagnostics__summary-copy">
+            <div className="conversation-diagnostics__summary-title">
+              {diagnostics.length > 0
+                ? `${diagnostics.length} diagnostic${diagnostics.length === 1 ? '' : 's'} found`
+                : 'No diagnostics found'}
+            </div>
+            <div className="conversation-diagnostics__summary-description">
+              {diagnostics.length > 0
+                ? `${getSummaryCountsText(errorCount, warningCount, infoCount)}.`
+                : 'The active conversation passed the current content, graph, operation, and reference checks.'}
+            </div>
           </div>
-        </div>
-        <Button
-          className="conversation-diagnostics__export-button"
-          icon={<DownloadOutlined />}
-          aria-label={variant === 'side-panel' ? 'Export diagnostics report' : undefined}
-          title={variant === 'side-panel' ? 'Export diagnostics report' : undefined}
-          onClick={exportReport}
-          disabled={diagnostics.length <= 0}
-        >
-          {variant === 'side-panel' ? null : 'Export Report'}
-        </Button>
-      </section>
+          <Button
+            className="conversation-diagnostics__export-button"
+            icon={<DownloadOutlined />}
+            onClick={exportReport}
+            disabled={diagnostics.length <= 0}
+          >
+            Export Report
+          </Button>
+        </section>
+      )}
 
       {diagnostics.length > 0 && (
         <div className="conversation-diagnostics__toolbar">
