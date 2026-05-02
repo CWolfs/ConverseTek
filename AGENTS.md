@@ -28,6 +28,24 @@ Frontend calls go through `app/src/services/rest.ts`, which sends typed bridge m
 
 The desktop host uses WebView2/Edge Chromium. Modern CSS is available in the app runtime, so prefer clear, current CSS such as flex/grid gaps, `min()`/`max()`/`clamp()`, logical properties, and modern selectors where they make the UI simpler.
 
+Keep ConverseTek-specific layout, colour, spacing, and component polish in ordinary CSS/PostCSS files under `app/src/css/` and component-local CSS files. Do not migrate local app styling into CSS-in-JS, broad `theme.useToken()` rewrites, or large `ConfigProvider` component-token blocks.
+
+For AntD 6, use `ConfigProvider` `theme` for true app-wide design intent: enable `cssVar`, set stable global primitives such as `colorPrimary` and `borderRadius`, and use algorithms or motion settings only when they should affect the whole application. Treat AntD 6 as a CSS-variable system, not a reason to replace the app's CSS architecture.
+
+Use AntD component tokens only when the value should apply to every instance of that component across ConverseTek. Avoid using a global component token block to fix one local surface, for example styling the header menu through `theme.components.Menu`; that can unintentionally restyle unrelated dropdowns, trees, or menus.
+
+For local AntD compatibility styling, prefer scoped CSS variable overrides on app-owned wrappers, for example `.header .ant-menu-horizontal { --ant-menu-item-color: #fff; }`. Use AntD semantic hooks such as `classNames`, `styles`, and popup class hooks where available to attach those scopes to dropdowns, popovers, modals, and other portalled UI. Header menus, submenu popups, and other contextual surfaces should normally be restored with local CSS variables/classes rather than global theme component tokens.
+
+Avoid broad `.ant-*` selector overrides and `!important` unless a local, documented fallback is necessary. If an AntD selector must be targeted, keep it scoped to an app-owned wrapper and revisit it during AntD upgrades.
+
+Do not reintroduce AntD Less variable assumptions, `babel-plugin-import`, or `antd/dist/antd.css`. Import `antd/dist/reset.css` and keep normal CSS as the styling source of truth.
+
+Before larger AntD styling changes, check the official docs:
+
+- AntD theme customisation: `https://ant.design/docs/react/customize-theme/`
+- AntD style compatibility and override priority: `https://ant.design/docs/react/compatible-style/`
+- AntD 6 CSS variable direction: `https://ant.design/docs/blog/css-tricks/`
+
 ## Frontend Workflow
 
 The frontend uses Vite. Use `CT: Fast Dev` for the normal hot reload workflow; it starts or reuses the Vite server, then starts the WebView2 desktop shell with `CT_WEB_URL=http://127.0.0.1:5173/` so the backend bridge remains available. Keep `CT: UI Build` for static builds into `dist/` and the debug output folder.

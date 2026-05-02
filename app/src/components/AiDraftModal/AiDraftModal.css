@@ -35,6 +35,50 @@
   font-family: inherit;
 }
 
+.ai-draft-modal .ant-tabs {
+  --ant-tabs-ink-bar-color: #0084c1;
+  --ant-tabs-item-active-color: #0084c1;
+  --ant-tabs-item-color: #262626;
+  --ant-tabs-item-hover-color: #0084c1;
+  --ant-tabs-item-selected-color: #0084c1;
+}
+
+.ai-draft-modal .ant-tabs-content,
+.ai-draft-modal .ant-tabs-tabpane {
+  background: #fff;
+}
+
+.ai-draft-modal__columns {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+}
+
+.ai-draft-modal__columns > * {
+  min-width: 0;
+}
+
+.ai-draft-modal__columns--draft {
+  grid-template-columns: minmax(0, 14fr) minmax(0, 10fr);
+  gap: 16px;
+}
+
+.ai-draft-modal__columns--settings {
+  grid-template-columns: minmax(0, 10fr) minmax(0, 14fr);
+  gap: 16px;
+}
+
+.ai-draft-modal__columns--personalities {
+  grid-template-columns: minmax(0, 9fr) minmax(0, 15fr);
+  gap: 24px;
+}
+
+@media (max-width: 767px) {
+  .ai-draft-modal__columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .ai-draft-modal .ant-form-item-label label {
   color: #262626;
   font-weight: 600;

@@ -73,6 +73,11 @@
       }
 
       .ant-tabs {
+        --ant-tabs-ink-bar-color: $linkColourPrimary;
+        --ant-tabs-item-active-color: $linkColourPrimary;
+        --ant-tabs-item-color: white;
+        --ant-tabs-item-hover-color: $linkColourPrimary;
+        --ant-tabs-item-selected-color: $linkColourPrimary;
         color: white;
         display: flex;
         flex-direction: column;

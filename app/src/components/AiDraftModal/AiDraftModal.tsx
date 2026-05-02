@@ -2,7 +2,7 @@ import React, { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { toJS } from 'mobx';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react';
-import { Alert, Button, Checkbox, Col, Form, Input, message, Radio, Row, Select, Tabs, Tag, Tooltip } from 'antd';
+import { Alert, Button, Checkbox, Form, Input, message, Radio, Select, Tabs, Tag, Tooltip } from 'antd';
 import {
   CodeOutlined,
   CopyOutlined,
@@ -859,8 +859,8 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
             />
           )}
 
-          <Row gutter={16}>
-            <Col md={14}>
+          <div className="ai-draft-modal__columns ai-draft-modal__columns--draft">
+            <div>
               <Form layout="vertical">
                 <Form.Item
                   label={
@@ -905,8 +905,8 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                   )}
                 </Form.Item>
               </Form>
-            </Col>
-            <Col md={10}>
+            </div>
+            <div>
               <div className="ai-draft-modal__meta">
                 <div>
                   <span>Mode</span>
@@ -954,8 +954,8 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                   </div>
                 )}
               </div>
-            </Col>
-          </Row>
+            </div>
+          </div>
 
           {draft == null && draftActions}
 
@@ -981,8 +981,8 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
     {
       children: (
         <>
-          <Row gutter={16}>
-            <Col md={10}>
+          <div className="ai-draft-modal__columns ai-draft-modal__columns--settings">
+            <div>
               <Form layout="vertical">
                 <Form.Item
                   label={
@@ -1139,8 +1139,8 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                   />
                 </Form.Item>
               </Form>
-            </Col>
-            <Col md={14}>
+            </div>
+            <div>
               <Form layout="vertical">
                 <Form.Item
                   label={
@@ -1200,8 +1200,8 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                   />
                 </Form.Item>
               </Form>
-            </Col>
-          </Row>
+            </div>
+          </div>
         </>
       ),
       key: 'settings',
@@ -1210,8 +1210,8 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
     {
       children: (
         <>
-          <Row gutter={24} className="ai-draft-personalities">
-            <Col md={9}>
+          <div className="ai-draft-personalities ai-draft-modal__columns ai-draft-modal__columns--personalities">
+            <div>
               <div className="ai-draft-personalities__toolbar">
                 <div className="ai-draft-personalities__search">
                   <Input
@@ -1268,9 +1268,9 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                   Restore Missing Defaults
                 </Button>
               </div>
-            </Col>
+            </div>
 
-            <Col md={15}>
+            <div>
               {selectedPersonality == null ? (
                 <div className="ai-draft-personalities__editor-empty">Add a personality or restore the defaults to start.</div>
               ) : (
@@ -1344,8 +1344,8 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                   </Form.Item>
                 </Form>
               )}
-            </Col>
-          </Row>
+            </div>
+          </div>
         </>
       ),
       key: 'cast-personalities',
