@@ -52,7 +52,9 @@ The frontend uses Vite. Use `CT: Fast Dev` for the normal hot reload workflow; i
 
 ## Frontend Code Style
 
-Prefer named React imports for direct React helper access. For example, import and call `isValidElement` rather than using `React.isValidElement`, and import other React helpers the same way when practical. Keep the default `React` import only where JSX typing or APIs such as `React.ReactElement` make it the clearest option.
+Prefer named React imports for direct React helper access. For example, import and call `isValidElement` rather than using `React.isValidElement`, and import other React helpers the same way when practical.
+
+Do not add a default `React` import just for JSX. The app uses the modern JSX transform, so new TSX files should only import the specific React values or types they actually reference. Prefer named value imports and `type` imports, for example `import { useState } from 'react';` or `import type { ReactElement } from 'react';`.
 
 ## AI Drafting
 
