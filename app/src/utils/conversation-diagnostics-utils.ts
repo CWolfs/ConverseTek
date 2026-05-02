@@ -436,7 +436,7 @@ function createDiagnostic({
 function getPromptNodeContext(node: PromptNodeType): NodeContext {
   return {
     nodeId: getId(node),
-    nodeLabel: `Prompt #${node.index}`,
+    nodeLabel: `Prompt #${node.index + 1}`,
   };
 }
 

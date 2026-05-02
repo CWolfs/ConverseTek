@@ -115,6 +115,27 @@ describe('conversation diagnostics', () => {
     expect(promptDiagnostics.some((diagnostic) => diagnostic.severity === 'warning' && diagnostic.title.startsWith('Prompt node'))).toBe(false);
   });
 
+  it('shows prompt labels as one-based display numbers', () => {
+    const conversationAsset = makeBasicConversation();
+    const root = conversationAsset.conversation.roots[0];
+    const secondPrompt = createPromptNode(1);
+    const commanderResponse = createResponseNode();
+    commanderResponse.responseText = 'Keep going.';
+    commanderResponse.nextNodeIndex = -1;
+    secondPrompt.text = '';
+    secondPrompt.branches = [commanderResponse];
+    root.nextNodeIndex = 1;
+    conversationAsset.conversation.nodes.push(secondPrompt);
+
+    const diagnostics = buildConversationDiagnostics({ conversationAsset, operationDefinitions: [] });
+
+    expect(diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ severity: 'info', title: 'Prompt node has no text', nodeId: getId(secondPrompt), nodeLabel: 'Prompt #2' }),
+      ]),
+    );
+  });
+
   it('reports empty prompt nodes that have no responses or actions', () => {
     const conversationAsset = makeBasicConversation();
     const prompt = conversationAsset.conversation.nodes[0];
