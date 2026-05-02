@@ -1,12 +1,13 @@
 @import '../../css/constants.css';
 
 .side-panel {
+  position: relative;
   display: flex;
   flex: 0 0 var(--side-panel-width);
   flex-direction: column;
   width: var(--side-panel-width);
   min-width: 24rem;
-  max-width: min(34rem, 42vw);
+  max-width: min(760px, 55vw);
   min-height: 0;
   color: $textColourPrimary;
   background:
@@ -21,6 +22,46 @@
   transition-duration: 180ms;
   transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
   will-change: transform, opacity;
+}
+
+.side-panel__resize-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -4px;
+  z-index: 2;
+  width: 8px;
+  cursor: col-resize;
+  touch-action: none;
+}
+
+.side-panel__resize-handle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 4px;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  transition-property: background-color, box-shadow;
+  transition-duration: 120ms;
+  transition-timing-function: ease-out;
+}
+
+.side-panel__resize-handle:hover::before,
+.side-panel__resize-handle:focus-visible::before,
+.side-panel-resizing .side-panel__resize-handle::before {
+  background: rgba(42, 176, 247, 0.95);
+  box-shadow: 0 0 0 1px rgba(42, 176, 247, 0.24), 0 0 8px rgba(42, 176, 247, 0.44);
+}
+
+.side-panel__resize-handle:focus-visible {
+  outline: none;
+}
+
+.side-panel-resizing {
+  cursor: col-resize;
+  user-select: none;
 }
 
 .side-panel--open {
