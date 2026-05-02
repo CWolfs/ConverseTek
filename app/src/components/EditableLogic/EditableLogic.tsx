@@ -318,6 +318,9 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
   const argClasses = classnames('editable-logic__args', {
     'editable-logic__args--even': isEven,
   });
+  const editableLogicClasses = classnames('editable-logic', {
+    'editable-logic--even': isEven,
+  });
 
   // GUARD
   if (!logicDef) {
@@ -329,7 +332,7 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
   const argContent = renderInputsAndArgs(logicDef);
 
   return (
-    <div className="editable-logic">
+    <div className={editableLogicClasses}>
       <div className={operationClasses}>{content}</div>
       {logicDef.inputs.length > 0 && <div className={argClasses}>{argContent}</div>}
     </div>

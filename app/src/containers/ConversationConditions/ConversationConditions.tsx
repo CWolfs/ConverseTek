@@ -100,7 +100,15 @@ function ConversationConditions({ node }: { node: ElementNodeType }) {
 
   return (
     <div className="conversation-conditions">
-      <Collapse items={displayConditions.map((condition, index) => renderPanel(condition, index))} />
+      <Collapse
+        styles={{
+          body: {
+            backgroundColor: '#3d3d3e',
+            color: 'rgba(210, 210, 210, 0.85)',
+          },
+        }}
+        items={displayConditions.map((condition, index) => renderPanel(condition, index))}
+      />
       <div className="conversation-conditions__buttons">
         <Button className="button-secondary" type="primary" size="small" onClick={onAddCondition}>
           <PlusOutlined />

@@ -33,7 +33,8 @@ function EditableInput({ value = null, options = null, onChange, onBlur, optionL
     right: '10px',
     color: '#2e9bff',
     zIndex: '1',
-    top: '5px',
+    top: '50%',
+    transform: 'translateY(-50%)',
   } as CSSProperties;
 
   if (isAutocomplete) {

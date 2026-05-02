@@ -102,7 +102,15 @@ function ConversationActions({ node }: { node: PromptNodeType | ElementNodeType 
 
   return (
     <div className="conversation-actions">
-      <Collapse items={displayActions.map((action, index) => renderPanel(action, index))} />
+      <Collapse
+        styles={{
+          body: {
+            backgroundColor: '#3d3d3e',
+            color: 'rgba(210, 210, 210, 0.85)',
+          },
+        }}
+        items={displayActions.map((action, index) => renderPanel(action, index))}
+      />
       <div className="conversation-actions__buttons">
         <Button className="button-secondary" type="primary" size="small" onClick={onAddAction}>
           <PlusOutlined />
