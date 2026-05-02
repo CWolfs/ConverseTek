@@ -238,42 +238,6 @@
   color: $linkColourTertiary;
 }
 
-.conversation-diagnostics__category-dropdown--side-panel.ant-select-dropdown {
-  background: $backgroundTertiary !important;
-  color: $textColourPrimary !important;
-  box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.35),
-    0 0 0 1px rgba(255, 255, 255, 0.1);
-}
-
-.conversation-diagnostics__category-dropdown--side-panel.ant-select-dropdown .ant-select-item {
-  background: $backgroundTertiary !important;
-  color: $textColourPrimary !important;
-}
-
-.conversation-diagnostics__category-dropdown--side-panel.ant-select-dropdown .ant-select-item-option-content {
-  color: inherit !important;
-}
-
-.conversation-diagnostics__category-dropdown--side-panel.ant-select-dropdown .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
-  background: $highlightColourPrimary !important;
-  color: white !important;
-}
-
-.conversation-diagnostics__category-dropdown--side-panel.ant-select-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
-  border-left: 3px solid $linkColourPrimary;
-  background: rgba(42, 176, 247, 0.14) !important;
-  color: white !important;
-}
-
-.conversation-diagnostics__category-dropdown--side-panel.ant-select-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-disabled).ant-select-item-option-active {
-  background: $highlightColourPrimary !important;
-}
-
-.conversation-diagnostics__category-dropdown--side-panel.ant-select-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-disabled) .ant-select-item-option-state {
-  color: white !important;
-}
-
 .conversation-diagnostics__list {
   display: flex;
   flex-direction: column;
@@ -620,7 +584,6 @@
 
 .conversation-diagnostics--side-panel .conversation-diagnostics__toolbar-controls .ant-input-affix-wrapper,
 .conversation-diagnostics__category-select--side-panel.ant-select.ant-select-outlined:not(.ant-select-customize-input),
-.conversation-diagnostics__category-select--side-panel.ant-select:not(.ant-select-customize-input) .ant-select-selector,
 .conversation-diagnostics--side-panel .conversation-diagnostics__toolbar-controls .ant-btn {
   background: $backgroundTertiary;
   border-color: $borderTertiary;
@@ -628,6 +591,9 @@
 }
 
 .conversation-diagnostics--side-panel .conversation-diagnostics__toolbar-controls .ant-input-affix-wrapper .ant-input,
+.conversation-diagnostics__category-select--side-panel.ant-select .ant-select-content,
+.conversation-diagnostics__category-select--side-panel.ant-select .ant-select-content-has-value,
+.conversation-diagnostics__category-select--side-panel.ant-select .ant-select-input,
 .conversation-diagnostics__category-select--side-panel.ant-select .ant-select-selector,
 .conversation-diagnostics__category-select--side-panel.ant-select .ant-select-selection-wrap,
 .conversation-diagnostics__category-select--side-panel.ant-select .ant-select-selection-item,
@@ -637,6 +603,20 @@
 .conversation-diagnostics__category-select--side-panel.ant-select.ant-select-single .ant-select-selector .ant-select-selection-item,
 .conversation-diagnostics__category-select--side-panel.ant-select.ant-select-single .ant-select-selector .ant-select-selection-placeholder,
 .conversation-diagnostics__category-select--side-panel.ant-select:not(.ant-select-customize-input).ant-select-single .ant-select-selector .ant-select-selection-search-input {
+  color: $textColourPrimary !important;
+  -webkit-text-fill-color: $textColourPrimary !important;
+  opacity: 1 !important;
+}
+
+.conversation-diagnostics__category-select--side-panel.ant-select-open,
+.conversation-diagnostics__category-select--side-panel.ant-select-focused {
+  color: $textColourPrimary !important;
+}
+
+.conversation-diagnostics__category-select--side-panel.ant-select-open .ant-select-content,
+.conversation-diagnostics__category-select--side-panel.ant-select-focused .ant-select-content,
+.conversation-diagnostics__category-select--side-panel.ant-select-open .ant-select-content-has-value,
+.conversation-diagnostics__category-select--side-panel.ant-select-focused .ant-select-content-has-value {
   color: $textColourPrimary !important;
   -webkit-text-fill-color: $textColourPrimary !important;
   opacity: 1 !important;
@@ -655,7 +635,7 @@
 .conversation-diagnostics--side-panel .conversation-diagnostics__toolbar-controls .ant-input-prefix,
 .conversation-diagnostics--side-panel .conversation-diagnostics__toolbar-controls .ant-input-clear-icon,
 .conversation-diagnostics__category-select--side-panel.ant-select .ant-select-arrow {
-  color: $blue4;
+  color: $highlightColourSecondary;
 }
 
 .conversation-diagnostics--side-panel .conversation-diagnostics__item {

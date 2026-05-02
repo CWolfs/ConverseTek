@@ -234,10 +234,7 @@ function ConversationDiagnosticsContent({ globalModalId, variant = 'modal' }: Pr
               })}
               classNames={{
                 popup: {
-                  root:
-                    variant === 'side-panel'
-                      ? 'conversation-diagnostics__category-dropdown--side-panel'
-                      : 'conversation-diagnostics__category-dropdown',
+                  root: variant === 'side-panel' ? undefined : 'conversation-diagnostics__category-dropdown',
                 },
               }}
               value={categoryFilter}
