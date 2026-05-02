@@ -193,7 +193,7 @@ function ConversationDiagnosticsContent({ globalModalId, variant = 'modal' }: Pr
           </div>
           <div className="conversation-diagnostics__summary-description">
             {diagnostics.length > 0
-              ? `${getSummaryCountsText(errorCount, warningCount, infoCount)} in the active conversation.`
+              ? `${getSummaryCountsText(errorCount, warningCount, infoCount)}.`
               : 'The active conversation passed the current content, graph, operation, and reference checks.'}
           </div>
         </div>
