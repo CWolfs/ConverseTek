@@ -229,12 +229,15 @@ function ConversationDiagnosticsContent({ globalModalId, variant = 'modal' }: Pr
               onChange={(event) => setSearchText(event.target.value)}
             />
             <Select<CategoryFilterValue>
-              className="conversation-diagnostics__category-select"
+              className={classnames('conversation-diagnostics__category-select', {
+                'conversation-diagnostics__category-select--side-panel': variant === 'side-panel',
+              })}
               classNames={{
                 popup: {
-                  root: classnames('conversation-diagnostics__category-dropdown', {
-                    'conversation-diagnostics__category-dropdown--dark': variant === 'side-panel',
-                  }),
+                  root:
+                    variant === 'side-panel'
+                      ? 'conversation-diagnostics__category-dropdown--side-panel'
+                      : 'conversation-diagnostics__category-dropdown',
                 },
               }}
               value={categoryFilter}
