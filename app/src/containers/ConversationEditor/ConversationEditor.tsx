@@ -1,10 +1,8 @@
 import React, { ChangeEvent, useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react';
 import { message, Button, Row, Col, Form, Input, Tabs, Popconfirm } from 'antd';
 import { ArrowRightOutlined, MenuFoldOutlined, MenuUnfoldOutlined, RetweetOutlined, SaveOutlined } from '@ant-design/icons';
-import { Split } from '@geoffcox/react-splitter';
 
 import { updateConversation } from 'services/api';
 import { regenerateConversationId } from 'utils/conversation-utils';
@@ -12,6 +10,7 @@ import { detectType } from 'utils/node-utils';
 import { useStore } from 'hooks/useStore';
 import { DialogEditor } from 'components/DialogEditor';
 import { DialogTextArea } from 'components/DialogTextArea';
+import { Split } from 'components/Split';
 import { NodeStore } from 'stores/nodeStore/node-store';
 import { DataStore } from 'stores/dataStore/data-store';
 import { positiveActionButtonProps } from 'utils/antd-button-utils';
@@ -236,9 +235,5 @@ function ConversationEditor({ conversationAsset }: Props) {
     </div>
   );
 }
-
-ConversationEditor.propTypes = {
-  conversationAsset: PropTypes.object.isRequired,
-};
 
 export const ObservingConversationEditor = observer(ConversationEditor);

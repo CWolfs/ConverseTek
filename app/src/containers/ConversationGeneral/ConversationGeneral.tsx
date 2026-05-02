@@ -1,5 +1,4 @@
 import React, { useState, useEffect, ChangeEvent } from 'react';
-import PropTypes from 'prop-types';
 import { Card, Row, Col, Input, Select, Tooltip, Checkbox } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { observer } from 'mobx-react';
@@ -211,9 +210,5 @@ function ConversationGeneral({ node }: Props) {
     </Card>
   );
 }
-
-ConversationGeneral.propTypes = {
-  node: PropTypes.object.isRequired,
-};
 
 export const ObservingConversationGeneral = observer(ConversationGeneral);

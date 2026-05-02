@@ -133,8 +133,8 @@ export function AiDraftConversationTreePreview({ conversationAsset }: Props) {
               }
             : null
         }
-        connectDragPreview={(element: JSX.Element) => element}
-        connectDragSource={(element: JSX.Element) => element}
+        connectDragPreview={(element: React.ReactElement) => element}
+        connectDragSource={(element: React.ReactElement) => element}
         isDragging={false}
         canDrop={false}
         canDrag={false}

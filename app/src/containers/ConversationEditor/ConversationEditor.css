@@ -136,4 +136,8 @@
   .ant-form-item {
     margin-bottom: $tinySpace;
   }
+
+  .ant-form-item-label > label {
+    color: $textColourPrimary;
+  }
 }

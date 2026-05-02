@@ -3,13 +3,13 @@ import { Button } from 'antd';
 
 import './ToggleEditable.css';
 
-export function ToggleEditable({ children }: { children: JSX.Element[] }) {
+export function ToggleEditable({ children }: { children: React.ReactElement[] }) {
   const [editable] = useState(false);
 
   if (!children) return null;
 
-  const renderFirstChild = (): JSX.Element => children[0];
-  const renderSecondChild = (): JSX.Element => children[1];
+  const renderFirstChild = (): React.ReactElement => children[0];
+  const renderSecondChild = (): React.ReactElement => children[1];
 
   const content = editable ? renderSecondChild() : renderFirstChild();
 

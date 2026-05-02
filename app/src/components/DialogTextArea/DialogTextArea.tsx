@@ -1,5 +1,4 @@
 import React, { ChangeEvent } from 'react';
-import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
 import { Input } from 'antd';
 import { ElementNodeType, PromptNodeType } from 'types';
@@ -32,9 +31,5 @@ function DialogTextArea({ node }: { node: PromptNodeType | ElementNodeType }) {
     </div>
   );
 }
-
-DialogTextArea.propTypes = {
-  node: PropTypes.object.isRequired,
-};
 
 export const ObservingDialogTextArea = observer(DialogTextArea);

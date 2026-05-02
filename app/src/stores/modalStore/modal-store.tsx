@@ -15,7 +15,7 @@ export type FSModalProps = {
 type ModalOptions = {
   props: FSModalProps;
 
-  title: string | JSX.Element;
+  title: string | React.ReactElement;
   width: string;
 
   showOkButton: boolean;
@@ -39,7 +39,7 @@ type ModalOptions = {
 };
 
 class ModalStore {
-  modals = new Map<string, ElementType | JSX.Element>();
+  modals = new Map<string, ElementType | React.ReactElement>();
   options = new Map<string, ModalOptions>();
   private modalVersion = 0;
 
@@ -108,7 +108,7 @@ class ModalStore {
     if (show) this.showModal(true, globalModalId);
   }
 
-  getModal(globalModalId: string): JSX.Element | React.ElementType | undefined {
+  getModal(globalModalId: string): React.ReactElement | React.ElementType | undefined {
     return this.modals.get(globalModalId);
   }
 
@@ -116,7 +116,7 @@ class ModalStore {
     return this.options.get(globalModalId);
   }
 
-  setTitle(title: string | JSX.Element, globalModalId: string): void {
+  setTitle(title: string | React.ReactElement, globalModalId: string): void {
     const modalOptions = this.options.get(globalModalId);
     if (modalOptions == null) return;
 

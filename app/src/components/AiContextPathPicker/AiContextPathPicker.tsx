@@ -129,7 +129,9 @@ function AiContextPathPicker({ globalModalId, initialPath, onSelectPath }: Props
               return (
                 <ListItem key={item.path} className={itemClasses}>
                   <div
-                    ref={(el) => (listItemRefs.current[item.path] = el)}
+                    ref={(el) => {
+                      listItemRefs.current[item.path] = el;
+                    }}
                     className="ai-context-path-picker__item-content"
                     onClick={() => selectItem(item)}
                     onDoubleClick={() => item.isDirectory && openDirectory(item)}

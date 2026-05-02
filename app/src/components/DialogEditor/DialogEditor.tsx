@@ -515,7 +515,8 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
 
     const draggedNode = tree.dragNode?.data || null;
     const nodeParent = getNodePathNode(node.parent);
-    const dragSource = (element: JSX.Element) => React.cloneElement(element, { ref: dragHandle });
+    const dragSource = (element: React.ReactElement) =>
+      React.cloneElement(element as React.ReactElement<{ ref?: React.Ref<HTMLDivElement> }>, { ref: dragHandle });
     const toggleChildrenVisibility = ({ node: currentNode }: { node: RSTNode; path: RSTPath; treeIndex: number }) => {
       const arboristNode = tree.get(getConversationTreeNodeId(currentNode));
       if (arboristNode == null) return;
@@ -534,7 +535,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
         isContextMenuVisible={isContextMenuVisible}
         scaffoldBlockPxWidth={scaffoldBlockPxWidth}
         toggleChildrenVisibility={treeNode.children && treeNode.children.length > 0 ? toggleChildrenVisibility : null}
-        connectDragPreview={(element: JSX.Element) => element}
+        connectDragPreview={(element: React.ReactElement) => element}
         connectDragSource={dragSource}
         isDragging={draggedNode != null}
         canDrop={node.willReceiveDrop ? tree.canDrop() : true}

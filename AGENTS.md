@@ -50,6 +50,10 @@ Before larger AntD styling changes, check the official docs:
 
 The frontend uses Vite. Use `CT: Fast Dev` for the normal hot reload workflow; it starts or reuses the Vite server, then starts the WebView2 desktop shell with `CT_WEB_URL=http://127.0.0.1:5173/` so the backend bridge remains available. Keep `CT: UI Build` for static builds into `dist/` and the debug output folder.
 
+## Frontend Code Style
+
+Prefer named React imports for direct React helper access. For example, import and call `isValidElement` rather than using `React.isValidElement`, and import other React helpers the same way when practical. Keep the default `React` import only where JSX typing or APIs such as `React.ReactElement` make it the clearest option.
+
 ## AI Drafting
 
 AI-assisted conversation drafting is advisory only. Drafts must stay outside `dataStore.unsavedActiveConversationAsset` until the user accepts them.

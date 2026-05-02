@@ -1,6 +1,6 @@
 import { RefObject, useEffect } from 'react';
 
-export const useControlWheel = (targetRef: RefObject<HTMLElement>, onControlWheel: (increaseZoom: boolean) => void) => {
+export const useControlWheel = (targetRef: RefObject<HTMLElement | null>, onControlWheel: (increaseZoom: boolean) => void) => {
   useEffect(() => {
     if (!targetRef.current) return;
     const targetElement = targetRef.current;

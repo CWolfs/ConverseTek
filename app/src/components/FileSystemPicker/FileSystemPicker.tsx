@@ -268,7 +268,9 @@ export function FileSystemPicker() {
             return (
               <ListItem key={item.path} className={itemClasses}>
                 <div
-                  ref={(el) => (listItemRefs.current[item.path] = el)}
+                  ref={(el) => {
+                    listItemRefs.current[item.path] = el;
+                  }}
                   className="file-system-picker__directory-item-subcontainer"
                   onClick={() => onDirectoryClicked(item)}
                   onDoubleClick={() => item.isDirectory && onDirectoryDoubleClicked(item)}

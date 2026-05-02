@@ -1,5 +1,4 @@
 import React, { useRef, MouseEvent, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import { observer } from 'mobx-react';
 import { Button, Collapse, Popconfirm } from 'antd';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
@@ -119,9 +118,5 @@ function ConversationActions({ node }: { node: PromptNodeType | ElementNodeType 
     </div>
   );
 }
-
-ConversationActions.propTypes = {
-  node: PropTypes.object.isRequired,
-};
 
 export const ObservingConversationActions = observer(ConversationActions);

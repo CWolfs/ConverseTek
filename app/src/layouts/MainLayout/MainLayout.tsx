@@ -10,7 +10,7 @@ import { Footer } from '../../containers/Footer';
 
 import './Main.css';
 
-const MainLayout = (): JSX.Element => (
+const MainLayout = (): React.ReactElement => (
   <div className="main">
     <div className="main__content">
       <Header />
