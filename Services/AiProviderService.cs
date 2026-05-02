@@ -273,7 +273,7 @@ namespace ConverseTek.Services {
       File.WriteAllText(result.StderrPath, "", Encoding.UTF8);
 
       try {
-        Process process = CreateCodexProcess(providerRequest.Settings, result.OutputPath, commandPath);
+        Process process = CreateCodexProcess(providerRequest.Settings, result.PromptPath, result.OutputPath, commandPath);
         StringBuilder stdoutBuilder = new StringBuilder();
         StringBuilder stderrBuilder = new StringBuilder();
         process.OutputDataReceived += (sender, args) => {
@@ -286,8 +286,6 @@ namespace ConverseTek.Services {
         process.Start();
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
-        process.StandardInput.Write(prompt);
-        process.StandardInput.Close();
 
         bool exited = process.WaitForExit(providerRequest.Settings.TimeoutSeconds * 1000);
 
@@ -326,7 +324,7 @@ namespace ConverseTek.Services {
       }
     }
 
-    private Process CreateCodexProcess(AiSettings settings, string outputPath, string commandPath) {
+    private Process CreateCodexProcess(AiSettings settings, string promptPath, string outputPath, string commandPath) {
       string codexCommand = FindCodexCommand(settings);
       string schemaPath = Path.Combine(BASE_DIRECTORY, "config", "ai-draft-output.schema.json");
       if (!File.Exists(schemaPath)) {
@@ -350,6 +348,7 @@ namespace ConverseTek.Services {
       command.Append(" --output-schema ").Append(QuoteForCmd(schemaPath));
       command.Append(" --output-last-message ").Append(QuoteForCmd(outputPath));
       command.Append(" -");
+      command.Append(" < ").Append(QuoteForCmd(promptPath));
 
       File.WriteAllText(commandPath, command.ToString(), Encoding.UTF8);
 
@@ -358,7 +357,7 @@ namespace ConverseTek.Services {
       startInfo.Arguments = "/d /s /c \"" + command + "\"";
       startInfo.WorkingDirectory = BASE_DIRECTORY;
       startInfo.UseShellExecute = false;
-      startInfo.RedirectStandardInput = true;
+      startInfo.RedirectStandardInput = false;
       startInfo.RedirectStandardOutput = true;
       startInfo.RedirectStandardError = true;
       startInfo.CreateNoWindow = true;

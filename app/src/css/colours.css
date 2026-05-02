@@ -71,6 +71,7 @@ $textColourPrimary: rgba(210, 210, 210, 0.85);
 $textColourSecondary: $grey4;
 $textColourTertiary: $blue6;
 $textColourQuaternary: white;
+$textColourOnLight: #30343a;
 
 $linkColourPrimary: $c1blue6;
 $linkColourSecondary: white;

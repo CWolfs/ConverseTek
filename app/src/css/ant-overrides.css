@@ -349,16 +349,16 @@
   }
 }
 
-.ant-tooltip-inner {
-  background-color: gold;
-  color: black;
+.ant-tooltip .ant-tooltip-inner {
+  background-color: gold !important;
+  color: $textColourOnLight !important;
 }
 
-.ant-tooltip-arrow::before,
-.ant-tooltip-arrow-content,
-.ant-tooltip-arrow-content::before {
+.ant-tooltip .ant-tooltip-arrow::before,
+.ant-tooltip .ant-tooltip-arrow-content,
+.ant-tooltip .ant-tooltip-arrow-content::before {
   --antd-arrow-background-color: gold;
-  background: gold;
+  background: gold !important;
 }
 
 .ant-input::-webkit-input-placeholder {

@@ -522,7 +522,7 @@
   border: 1px solid rgba(31, 47, 67, 0.14);
   border-radius: 4px;
   background: #fff;
-  color: #262626;
+  color: $textColourOnLight;
 }
 
 .node-renderer__logic-popover .ant-popover-arrow {
