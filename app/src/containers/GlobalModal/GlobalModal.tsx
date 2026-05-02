@@ -78,7 +78,7 @@ function GlobalModal({ id }: { id: string }) {
       wrapClassName="global-modal"
       width={width}
       closable={closable}
-      maskClosable={maskClosable}
+      mask={{ closable: maskClosable }}
       centered={centered}
       transitionName=""
       maskTransitionName=""

@@ -45,8 +45,8 @@ class ModalStore {
 
   constructor() {
     makeObservable(this, {
-      modals: observable.deep,
-      options: observable,
+      modals: observable.shallow,
+      options: observable.shallow,
 
       setModelContent: action,
       setTitle: action,
@@ -104,7 +104,7 @@ class ModalStore {
       ...props,
     };
 
-    this.options.set(globalModalId, options);
+    this.options.set(globalModalId, observable.object(options, {}, { deep: false }));
     if (show) this.showModal(true, globalModalId);
   }
 
