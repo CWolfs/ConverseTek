@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { ComponentProps } from 'react';
-import { Alert, Button, Empty, Segmented, Tag } from 'antd';
-import { AimOutlined } from '@ant-design/icons';
+import { Button, Empty, Input, Select, Segmented, Tag } from 'antd';
+import { AimOutlined, CheckCircleOutlined, DownloadOutlined, ExclamationCircleOutlined, SearchOutlined, WarningOutlined } from '@ant-design/icons';
 import { observer } from 'mobx-react';
 
 import { useStore } from 'hooks/useStore';
@@ -9,7 +9,8 @@ import { DataStore } from 'stores/dataStore/data-store';
 import { DefStore } from 'stores/defStore/def-store';
 import { ModalStore } from 'stores/modalStore/modal-store';
 import { NodeStore } from 'stores/nodeStore/node-store';
-import { buildConversationDiagnostics, ConversationDiagnostic, ConversationDiagnosticSeverity } from 'utils/conversation-diagnostics-utils';
+import { buildConversationDiagnostics } from 'utils/conversation-diagnostics-utils';
+import type { ConversationDiagnostic, ConversationDiagnosticCategory, ConversationDiagnosticSeverity } from 'utils/conversation-diagnostics-utils';
 
 import './ConversationDiagnosticsModal.css';
 
@@ -18,6 +19,7 @@ type Props = {
 };
 
 type FilterValue = 'all' | ConversationDiagnosticSeverity;
+type CategoryFilterValue = 'all' | ConversationDiagnosticCategory;
 type SegmentedOptions = NonNullable<ComponentProps<typeof Segmented>['options']>;
 
 function getSeverityLabel(severity: ConversationDiagnosticSeverity): string {
@@ -38,6 +40,8 @@ function ConversationDiagnosticsModal({ globalModalId }: Props) {
   const modalStore = useStore<ModalStore>('modal');
   const nodeStore = useStore<NodeStore>('node');
   const [filter, setFilter] = useState<FilterValue>('all');
+  const [categoryFilter, setCategoryFilter] = useState<CategoryFilterValue>('all');
+  const [searchText, setSearchText] = useState('');
 
   const conversationAsset = dataStore.unsavedActiveConversationAsset;
   const diagnostics =
@@ -51,7 +55,17 @@ function ConversationDiagnosticsModal({ globalModalId }: Props) {
 
   const errorCount = diagnostics.filter((diagnostic) => diagnostic.severity === 'error').length;
   const warningCount = diagnostics.filter((diagnostic) => diagnostic.severity === 'warning').length;
-  const filteredDiagnostics = diagnostics.filter((diagnostic) => filter === 'all' || diagnostic.severity === filter);
+  const normalisedSearchText = searchText.trim().toLowerCase();
+  const filteredDiagnostics = diagnostics.filter((diagnostic) => {
+    if (filter !== 'all' && diagnostic.severity !== filter) return false;
+    if (categoryFilter !== 'all' && diagnostic.category !== categoryFilter) return false;
+    if (normalisedSearchText === '') return true;
+
+    return [diagnostic.title, diagnostic.nodeLabel, diagnostic.description, getCategoryLabel(diagnostic.category), getSeverityLabel(diagnostic.severity)]
+      .join(' ')
+      .toLowerCase()
+      .includes(normalisedSearchText);
+  });
 
   const filterOptions: SegmentedOptions = [
     { label: `All (${diagnostics.length})`, value: 'all' },
@@ -67,9 +81,37 @@ function ConversationDiagnosticsModal({ globalModalId }: Props) {
     window.setTimeout(() => nodeStore.scrollToActiveNode(true), 50);
   };
 
+  const exportReport = () => {
+    const conversationName = conversationAsset?.conversation.uiName || conversationAsset?.conversation.idRef.id || 'Active Conversation';
+    const report = [
+      `Conversation Diagnostics - ${conversationName}`,
+      '',
+      `${diagnostics.length} diagnostic${diagnostics.length === 1 ? '' : 's'} found`,
+      `${errorCount} error${errorCount === 1 ? '' : 's'} and ${warningCount} warning${warningCount === 1 ? '' : 's'}`,
+      '',
+      ...diagnostics.flatMap((diagnostic, index) => [
+        `${index + 1}. [${getSeverityLabel(diagnostic.severity)}] ${diagnostic.title}`,
+        `   Area: ${getCategoryLabel(diagnostic.category)}`,
+        `   Node: ${diagnostic.nodeLabel}`,
+        `   Detail: ${diagnostic.description}`,
+        '',
+      ]),
+    ].join('\n');
+
+    const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `conversetek-diagnostics-${Date.now()}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 0);
+  };
+
   useEffect(() => {
     modalStore.setTitle('Conversation Diagnostics', globalModalId);
-    modalStore.setWidth('78vw', globalModalId);
+    modalStore.setWidth('min(74rem, 86vw)', globalModalId);
     modalStore.setShowOkButton(false, globalModalId);
     modalStore.setShowCancelButton(true, globalModalId);
     modalStore.setCancelLabel('Close', globalModalId);
@@ -77,60 +119,109 @@ function ConversationDiagnosticsModal({ globalModalId }: Props) {
 
   return (
     <div className="conversation-diagnostics">
-      <div className="conversation-diagnostics__summary">
-        <Alert
-          type={errorCount > 0 ? 'error' : warningCount > 0 ? 'warning' : 'success'}
-          showIcon
-          message={
-            diagnostics.length > 0
+      <section className={`conversation-diagnostics__summary conversation-diagnostics__summary--${getSummaryTone(errorCount, warningCount)}`}>
+        <div className="conversation-diagnostics__summary-icon" aria-hidden="true">
+          {errorCount > 0 ? <ExclamationCircleOutlined /> : warningCount > 0 ? <WarningOutlined /> : <CheckCircleOutlined />}
+        </div>
+        <div className="conversation-diagnostics__summary-copy">
+          <div className="conversation-diagnostics__summary-title">
+            {diagnostics.length > 0
               ? `${diagnostics.length} diagnostic${diagnostics.length === 1 ? '' : 's'} found`
-              : 'No diagnostics found'
-          }
-          description={
-            diagnostics.length > 0
+              : 'No diagnostics found'}
+          </div>
+          <div className="conversation-diagnostics__summary-description">
+            {diagnostics.length > 0
               ? `${errorCount} error${errorCount === 1 ? '' : 's'} and ${warningCount} warning${warningCount === 1 ? '' : 's'} in the active conversation.`
-              : 'The active conversation passed the current content, graph, operation, and reference checks.'
-          }
-        />
-        {diagnostics.length > 0 && (
+              : 'The active conversation passed the current content, graph, operation, and reference checks.'}
+          </div>
+        </div>
+        <Button icon={<DownloadOutlined />} onClick={exportReport} disabled={diagnostics.length <= 0}>
+          Export Report
+        </Button>
+      </section>
+
+      {diagnostics.length > 0 && (
+        <div className="conversation-diagnostics__toolbar">
           <Segmented
             size="small"
             options={filterOptions}
             value={filter}
             onChange={(value) => setFilter(value as FilterValue)}
           />
-        )}
-      </div>
+          <div className="conversation-diagnostics__toolbar-controls">
+            <Input
+              allowClear
+              prefix={<SearchOutlined />}
+              placeholder="Search diagnostics..."
+              value={searchText}
+              onChange={(event) => setSearchText(event.target.value)}
+            />
+            <Select<CategoryFilterValue>
+              value={categoryFilter}
+              onChange={setCategoryFilter}
+              options={[
+                { label: 'All areas', value: 'all' },
+                { label: 'Content', value: 'content' },
+                { label: 'Graph', value: 'graph' },
+                { label: 'Operation', value: 'operation' },
+                { label: 'Reference', value: 'reference' },
+              ]}
+            />
+          </div>
+        </div>
+      )}
 
       {filteredDiagnostics.length <= 0 ? (
-        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No diagnostics in this filter" />
+        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={diagnostics.length <= 0 ? 'No diagnostics found' : 'No diagnostics in this filter'} />
       ) : (
         <div className="conversation-diagnostics__list">
           {filteredDiagnostics.map((diagnostic) => (
             <div key={diagnostic.id} className={`conversation-diagnostics__item conversation-diagnostics__item--${diagnostic.severity}`}>
-              <div className="conversation-diagnostics__item-main">
-                <div className="conversation-diagnostics__item-title">
-                  <Tag color={diagnostic.severity === 'error' ? 'error' : 'warning'}>{getSeverityLabel(diagnostic.severity)}</Tag>
-                  <Tag>{getCategoryLabel(diagnostic.category)}</Tag>
-                  <span>{diagnostic.title}</span>
+              <div className="conversation-diagnostics__item-accent" aria-hidden="true" />
+              <div className="conversation-diagnostics__item-body">
+                <div className="conversation-diagnostics__item-main">
+                  <div className="conversation-diagnostics__item-tags">
+                    <Tag color={diagnostic.severity === 'error' ? 'error' : 'warning'}>{getSeverityLabel(diagnostic.severity)}</Tag>
+                    <Tag>{getCategoryLabel(diagnostic.category)}</Tag>
+                  </div>
+                  <div className="conversation-diagnostics__item-title">{diagnostic.title}</div>
+                  <div className="conversation-diagnostics__item-node">{diagnostic.nodeLabel}</div>
+                  <div className="conversation-diagnostics__item-description">{diagnostic.description}</div>
                 </div>
-                <div className="conversation-diagnostics__item-node">{diagnostic.nodeLabel}</div>
-                <div className="conversation-diagnostics__item-description">{diagnostic.description}</div>
+                <aside className="conversation-diagnostics__item-details">
+                  <MetaRow label="Severity" value={getSeverityLabel(diagnostic.severity)} />
+                  <MetaRow label="Area" value={getCategoryLabel(diagnostic.category)} />
+                  <MetaRow label="Node" value={diagnostic.nodeLabel} />
+                  <Button
+                    className="conversation-diagnostics__jump-button"
+                    type="link"
+                    icon={<AimOutlined />}
+                    disabled={diagnostic.nodeId == null}
+                    onClick={() => jumpToNode(diagnostic)}
+                  >
+                    View in Conversation
+                  </Button>
+                </aside>
               </div>
-              <Button
-                className="conversation-diagnostics__jump-button"
-                size="small"
-                type="primary"
-                icon={<AimOutlined />}
-                disabled={diagnostic.nodeId == null}
-                onClick={() => jumpToNode(diagnostic)}
-              >
-                Select
-              </Button>
             </div>
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+function getSummaryTone(errorCount: number, warningCount: number): ConversationDiagnosticSeverity | 'success' {
+  if (errorCount > 0) return 'error';
+  if (warningCount > 0) return 'warning';
+  return 'success';
+}
+
+function MetaRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="conversation-diagnostics__meta-row">
+      <div className="conversation-diagnostics__meta-label">{label}</div>
+      <div className="conversation-diagnostics__meta-value">{value}</div>
     </div>
   );
 }
