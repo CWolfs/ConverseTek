@@ -1,0 +1,179 @@
+import { describe, expect, it } from 'vitest';
+
+import { buildConversationDiagnostics } from 'utils/conversation-diagnostics-utils';
+import { createConversation, createPromptNode, createRootNode, getId } from 'utils/conversation-utils';
+import type { ConversationAssetType, OperationArgType, OperationCallType, OperationDefinitionType } from 'types';
+
+function makeStringArg(value: string): OperationArgType {
+  return {
+    type: 'string',
+    intValue: 0,
+    boolValue: false,
+    floatValue: 0,
+    stringValue: value,
+    callValue: null,
+    variableRefValue: null,
+  };
+}
+
+function makeIntArg(value: number): OperationArgType {
+  return {
+    type: 'int',
+    intValue: value,
+    boolValue: false,
+    floatValue: 0,
+    stringValue: '',
+    callValue: null,
+    variableRefValue: null,
+  };
+}
+
+function makeAction(functionName: string, args: OperationArgType[] = []): OperationCallType {
+  return { functionName, args };
+}
+
+function makeDefinition(key: string, inputs: OperationDefinitionType['inputs'] = []): OperationDefinitionType {
+  return {
+    key,
+    label: key,
+    view: ['label', 'inputs'],
+    scope: 'action',
+    category: 'primary',
+    tooltip: '',
+    inputs,
+  };
+}
+
+function makeBasicConversation(): ConversationAssetType {
+  const conversationAsset = createConversation('K:/Mods/Test/conversations');
+  const root = createRootNode();
+  const prompt = createPromptNode(0);
+  root.nextNodeIndex = 0;
+  root.responseText = 'Start';
+  prompt.text = 'Hello.';
+
+  conversationAsset.conversation.roots = [root];
+  conversationAsset.conversation.nodes = [prompt];
+
+  return conversationAsset;
+}
+
+describe('conversation diagnostics', () => {
+  it('reports broken links and unreachable prompt nodes', () => {
+    const conversationAsset = makeBasicConversation();
+    const root = conversationAsset.conversation.roots[0];
+    const orphan = createPromptNode(4);
+    orphan.text = 'No route here.';
+    root.nextNodeIndex = 99;
+    conversationAsset.conversation.nodes.push(orphan);
+
+    const diagnostics = buildConversationDiagnostics({ conversationAsset, operationDefinitions: [] });
+
+    expect(diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ severity: 'error', title: 'Link target is missing', nodeId: getId(root) }),
+        expect.objectContaining({ severity: 'warning', title: 'Prompt node is not reachable from a root', nodeId: getId(orphan) }),
+      ]),
+    );
+  });
+
+  it('reports missing operation definitions and missing required inputs', () => {
+    const conversationAsset = makeBasicConversation();
+    const prompt = conversationAsset.conversation.nodes[0];
+    prompt.actions = {
+      ops: [makeAction('Unknown Action'), makeAction('Trigger Event', [makeStringArg('')])],
+    };
+
+    const diagnostics = buildConversationDiagnostics({
+      conversationAsset,
+      operationDefinitions: [makeDefinition('Trigger Event', [{ label: 'Event Def Id', types: ['string'] }])],
+    });
+
+    expect(diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ severity: 'error', title: 'Missing operation definition', nodeId: getId(prompt) }),
+        expect.objectContaining({ severity: 'warning', title: 'Operation input is empty', nodeId: getId(prompt) }),
+      ]),
+    );
+  });
+
+  it('uses the runtime prompt node position for link target checks', () => {
+    const conversationAsset = makeBasicConversation();
+    const root = conversationAsset.conversation.roots[0];
+    const target = createPromptNode(9);
+    target.text = 'Runtime position one.';
+    root.nextNodeIndex = 1;
+    conversationAsset.conversation.nodes.push(target);
+
+    const diagnostics = buildConversationDiagnostics({ conversationAsset, operationDefinitions: [] });
+
+    expect(diagnostics).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ severity: 'error', title: 'Link target is missing', nodeId: getId(root) }),
+      ]),
+    );
+    expect(diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ severity: 'warning', title: 'Prompt node index differs from its runtime position', nodeId: getId(target) }),
+      ]),
+    );
+  });
+
+  it('validates sideload conversation and entry node references against loaded conversations', () => {
+    const conversationAsset = makeBasicConversation();
+    const prompt = conversationAsset.conversation.nodes[0];
+    prompt.actions = {
+      ops: [makeAction('Sideload Conversation', [makeStringArg('conversation_missing'), makeStringArg('entry_missing'), makeIntArg(1)])],
+    };
+
+    const diagnostics = buildConversationDiagnostics({
+      conversationAsset,
+      operationDefinitions: [
+        makeDefinition('Sideload Conversation', [
+          { label: 'Conversation Id', types: ['string'] },
+          { label: 'Entry Node Id', types: ['string'] },
+          { label: 'Resume host after sideload finished', types: ['int'] },
+        ]),
+      ],
+      loadedConversationAssets: [],
+    });
+
+    expect(diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ severity: 'warning', title: 'Sideload conversation target is not loaded', nodeId: getId(prompt) }),
+      ]),
+    );
+  });
+
+  it('reports a missing sideload entry node when the conversation exists', () => {
+    const conversationAsset = makeBasicConversation();
+    const sideloadedConversation = createConversation('K:/Mods/Test/conversations');
+    sideloadedConversation.conversation.idRef.id = 'conversation_target';
+    const targetPrompt = createPromptNode(0);
+    targetPrompt.text = 'Loaded.';
+    sideloadedConversation.conversation.nodes = [targetPrompt];
+
+    const prompt = conversationAsset.conversation.nodes[0];
+    prompt.actions = {
+      ops: [makeAction('Sideload Conversation', [makeStringArg('conversation_target'), makeStringArg('entry_missing'), makeIntArg(1)])],
+    };
+
+    const diagnostics = buildConversationDiagnostics({
+      conversationAsset,
+      operationDefinitions: [
+        makeDefinition('Sideload Conversation', [
+          { label: 'Conversation Id', types: ['string'] },
+          { label: 'Entry Node Id', types: ['string'] },
+          { label: 'Resume host after sideload finished', types: ['int'] },
+        ]),
+      ],
+      loadedConversationAssets: [sideloadedConversation],
+    });
+
+    expect(diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ severity: 'warning', title: 'Sideload entry node is missing', nodeId: getId(prompt) }),
+      ]),
+    );
+  });
+});

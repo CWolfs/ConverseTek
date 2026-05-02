@@ -1,0 +1,86 @@
+@import '../../css/constants.css';
+
+.conversation-diagnostics {
+  display: flex;
+  flex-direction: column;
+  gap: $mediumSpace;
+  min-height: 24rem;
+  max-height: min(70vh, 48rem);
+}
+
+.conversation-diagnostics__summary {
+  display: flex;
+  flex-direction: column;
+  gap: $mediumSpace;
+}
+
+.conversation-diagnostics__summary .ant-alert {
+  border-radius: $tinySpace;
+}
+
+.conversation-diagnostics__list {
+  display: flex;
+  flex-direction: column;
+  gap: $smallSpace;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: $tinySpace;
+}
+
+.conversation-diagnostics__item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: $mediumSpace;
+  padding: $mediumSpace;
+  border: 1px solid $borderTertiary;
+  border-left-width: 4px;
+  border-radius: $tinySpace;
+  background: $backgroundSecondary;
+}
+
+.conversation-diagnostics__item--error {
+  border-left-color: #ff4d4f;
+}
+
+.conversation-diagnostics__item--warning {
+  border-left-color: #faad14;
+}
+
+.conversation-diagnostics__item-main {
+  min-width: 0;
+}
+
+.conversation-diagnostics__item-title {
+  display: flex;
+  align-items: center;
+  gap: $tinySpace;
+  min-width: 0;
+  color: $textColourPrimary;
+  font-weight: 600;
+}
+
+.conversation-diagnostics__item-title > span:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.conversation-diagnostics__item-node {
+  margin-top: $tinySpace;
+  color: $textColourSecondary;
+  font-size: $fontSizeSmall;
+}
+
+.conversation-diagnostics__item-description {
+  margin-top: $smallSpace;
+  color: $textColourPrimary;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.conversation-diagnostics__jump-button.ant-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 6rem;
+}

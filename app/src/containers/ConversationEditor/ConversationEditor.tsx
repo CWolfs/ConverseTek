@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import type { ChangeEvent, ComponentProps } from 'react';
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react';
-import { message, Button, Row, Col, Form, Input, Tabs, Popconfirm } from 'antd';
-import { ArrowRightOutlined, MenuFoldOutlined, MenuUnfoldOutlined, RetweetOutlined, SaveOutlined } from '@ant-design/icons';
+import { message, Button, Row, Col, Form, Input, Tabs, Popconfirm, Tooltip } from 'antd';
+import { ArrowRightOutlined, MenuFoldOutlined, MenuUnfoldOutlined, RetweetOutlined, SaveOutlined, WarningOutlined } from '@ant-design/icons';
 
 import { updateConversation } from 'services/api';
 import { regenerateConversationId } from 'utils/conversation-utils';
@@ -11,9 +11,11 @@ import { detectType } from 'utils/node-utils';
 import { useStore } from 'hooks/useStore';
 import { DialogEditor } from 'components/DialogEditor';
 import { DialogTextArea } from 'components/DialogTextArea';
+import { ConversationDiagnosticsModal } from 'components/ConversationDiagnosticsModal';
 import { Split } from 'components/Split';
 import { NodeStore } from 'stores/nodeStore/node-store';
 import { DataStore } from 'stores/dataStore/data-store';
+import { ModalStore } from 'stores/modalStore/modal-store';
 import { positiveActionButtonProps } from 'utils/antd-button-utils';
 import { ElementNodeType, ConversationAssetType } from 'types';
 
@@ -58,6 +60,7 @@ const inactiveNodeSplitSizes = {
 function ConversationEditor({ conversationAsset }: Props) {
   const nodeStore = useStore<NodeStore>('node');
   const dataStore = useStore<DataStore>('data');
+  const modalStore = useStore<ModalStore>('modal');
   const [isAllExpanded, setIsAllExpanded] = useState<boolean>(true);
 
   const { unsavedActiveConversationAsset } = dataStore;
@@ -192,6 +195,15 @@ function ConversationEditor({ conversationAsset }: Props) {
             }}
             icon={<ArrowRightOutlined />}
           />
+          <Tooltip title="Run conversation diagnostics">
+            <Button
+              className="conversation-editor__diagnostics-button button-secondary"
+              type="primary"
+              size="small"
+              icon={<WarningOutlined />}
+              onClick={() => modalStore.setModelContent(ConversationDiagnosticsModal, {}, 'global1')}
+            />
+          </Tooltip>
         </div>
 
         <div className="conversation-editor__buttons">
