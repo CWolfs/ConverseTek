@@ -1,4 +1,4 @@
-import React, { MouseEvent } from 'react';
+import type { MouseEvent } from 'react';
 import { Menu, Item, ItemParams, useContextMenu } from 'react-contexify';
 
 import { DirectoryItemType } from 'types/FileSystemItemType';

@@ -1,4 +1,5 @@
-import React, { useRef, MouseEvent, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
+import type { ComponentProps, MouseEvent } from 'react';
 import { observer } from 'mobx-react';
 import { Button, Collapse, Popconfirm } from 'antd';
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
@@ -14,7 +15,7 @@ import { PromptNodeType, ElementNodeType, OperationCallType } from 'types';
 
 import './ConversationActions.css';
 
-type CollapseItems = NonNullable<React.ComponentProps<typeof Collapse>['items']>;
+type CollapseItems = NonNullable<ComponentProps<typeof Collapse>['items']>;
 
 function ConversationActions({ node }: { node: PromptNodeType | ElementNodeType }) {
   const nodeStore = useStore<NodeStore>('node');

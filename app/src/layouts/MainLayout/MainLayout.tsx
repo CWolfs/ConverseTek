@@ -1,4 +1,4 @@
-import React from 'react';
+import type { ReactElement } from 'react';
 import { observer } from 'mobx-react';
 import { Routes, Route } from 'react-router-dom';
 
@@ -10,7 +10,7 @@ import { Footer } from '../../containers/Footer';
 
 import './Main.css';
 
-const MainLayout = (): React.ReactElement => (
+const MainLayout = (): ReactElement => (
   <div className="main">
     <div className="main__content">
       <Header />

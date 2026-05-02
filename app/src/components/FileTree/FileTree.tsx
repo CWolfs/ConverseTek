@@ -1,5 +1,5 @@
 /* eslint-disable function-paren-newline */
-import React, { CSSProperties } from 'react';
+import type { ComponentProps, CSSProperties, Key } from 'react';
 import { Tree, type TreeDataNode } from 'antd';
 import { FileOutlined, FolderOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
@@ -11,8 +11,8 @@ import { observer } from 'mobx-react';
 
 import './FileTree.css';
 
-type TreeSelectInfo = Parameters<NonNullable<React.ComponentProps<typeof Tree>['onSelect']>>[1];
-type TreeRightClickInfo = Parameters<NonNullable<React.ComponentProps<typeof Tree>['onRightClick']>>[0];
+type TreeSelectInfo = Parameters<NonNullable<ComponentProps<typeof Tree>['onSelect']>>[1];
+type TreeRightClickInfo = Parameters<NonNullable<ComponentProps<typeof Tree>['onRightClick']>>[0];
 type TreeData = TreeDataNode[];
 
 type Props = {
@@ -85,7 +85,7 @@ const FileTree = ({ title, data = null, onSelected = () => {}, selectedKeys = []
     show({ event, props: { id: eventKey, title: item?.label || String(eventKey), selected: selectedKeys.includes(eventKey) } });
   };
 
-  const onSelectTree = (nextSelectedKeys: React.Key[], event: TreeSelectInfo) => {
+  const onSelectTree = (nextSelectedKeys: Key[], event: TreeSelectInfo) => {
     const selectedTreeKeys = nextSelectedKeys.map(String);
     if (selectedTreeKeys.includes(rootTreeKey)) return;
 

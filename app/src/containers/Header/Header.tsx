@@ -1,4 +1,4 @@
-import React from 'react';
+import type { ComponentProps } from 'react';
 import { message, Menu } from 'antd';
 import { observer } from 'mobx-react';
 
@@ -15,7 +15,7 @@ import { updateConversation, exportConversation, exportAllConversations } from '
 
 import './Header.css';
 
-type MenuItems = NonNullable<React.ComponentProps<typeof Menu>['items']>;
+type MenuItems = NonNullable<ComponentProps<typeof Menu>['items']>;
 
 const headerSubMenuPopupOffset: [number, number] = [0, 0];
 

@@ -1,7 +1,7 @@
 /* eslint-disable function-paren-newline */
-import React, { ElementType, KeyboardEvent, MouseEvent } from 'react';
+import type { ElementType, KeyboardEvent, MouseEvent, ReactElement } from 'react';
 import { observable, action, makeObservable } from 'mobx';
-import { LegacyButtonType } from 'utils/antd-button-utils';
+import { AppButtonIntent } from 'utils/antd-button-utils';
 
 import { getDevPreservedStore } from '../dev-preserved-store';
 
@@ -15,17 +15,17 @@ export type FSModalProps = {
 type ModalOptions = {
   props: FSModalProps;
 
-  title: string | React.ReactElement;
+  title: string | ReactElement;
   width: string;
 
   showOkButton: boolean;
-  okType: LegacyButtonType;
+  okType: AppButtonIntent;
   okLabel: string;
   disableOk: boolean;
   onOk: OnOkType;
 
   showCancelButton: boolean;
-  cancelType: LegacyButtonType;
+  cancelType: AppButtonIntent;
   cancelLabel: string;
   onCancel: OnCancelType;
 
@@ -39,7 +39,7 @@ type ModalOptions = {
 };
 
 class ModalStore {
-  modals = new Map<string, ElementType | React.ReactElement>();
+  modals = new Map<string, ElementType | ReactElement>();
   options = new Map<string, ModalOptions>();
   private modalVersion = 0;
 
@@ -108,7 +108,7 @@ class ModalStore {
     if (show) this.showModal(true, globalModalId);
   }
 
-  getModal(globalModalId: string): React.ReactElement | React.ElementType | undefined {
+  getModal(globalModalId: string): ReactElement | ElementType | undefined {
     return this.modals.get(globalModalId);
   }
 
@@ -116,7 +116,7 @@ class ModalStore {
     return this.options.get(globalModalId);
   }
 
-  setTitle(title: string | React.ReactElement, globalModalId: string): void {
+  setTitle(title: string | ReactElement, globalModalId: string): void {
     const modalOptions = this.options.get(globalModalId);
     if (modalOptions == null) return;
 
@@ -168,7 +168,7 @@ class ModalStore {
     modalOptions.disableOk = flag;
   }
 
-  setOkType(type: LegacyButtonType, globalModalId: string): void {
+  setOkType(type: AppButtonIntent, globalModalId: string): void {
     const modalOptions = this.options.get(globalModalId);
     if (modalOptions == null) return;
 
@@ -182,7 +182,7 @@ class ModalStore {
     modalOptions.okLabel = label;
   }
 
-  setCancelType(type: LegacyButtonType, globalModalId: string): void {
+  setCancelType(type: AppButtonIntent, globalModalId: string): void {
     const modalOptions = this.options.get(globalModalId);
     if (modalOptions == null) return;
 

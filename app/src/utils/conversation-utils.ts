@@ -1,4 +1,3 @@
-/* eslint-disable import/extensions */
 import { v4 as uuidv4 } from 'uuid';
 import md5 from 'md5';
 import findIndex from 'lodash.findindex';

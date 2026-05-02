@@ -1,10 +1,11 @@
 /* eslint-disable react/jsx-one-expression-per-line */
-import React, { useEffect, MouseEvent } from 'react';
+import { useEffect } from 'react';
+import type { MouseEvent } from 'react';
 import { ExclamationCircleTwoTone } from '@ant-design/icons';
 
 import { useStore } from 'hooks/useStore';
 import { ModalStore, OnCancelType, OnOkType } from 'stores/modalStore/modal-store';
-import { LegacyButtonType } from 'utils/antd-button-utils';
+import { AppButtonIntent } from 'utils/antd-button-utils';
 
 import './ModalConfirmation.css';
 
@@ -16,9 +17,9 @@ type Props = {
   body: string | string[];
   width: string;
   buttons: {
-    positiveType?: LegacyButtonType;
+    positiveType?: AppButtonIntent;
     positiveLabel: string;
-    negativeType?: LegacyButtonType;
+    negativeType?: AppButtonIntent;
     negativeLabel?: string;
     onNegative: OnCancelType;
     onPositive: OnOkType;
@@ -58,7 +59,7 @@ export function ModalConfirmation({ globalModalId, type, title, header, body, wi
     }
 
     if (buttons?.negativeLabel) {
-      if (buttons.negativeType != null) modalStore.setOkType(buttons.negativeType, globalModalId);
+      if (buttons.negativeType != null) modalStore.setCancelType(buttons.negativeType, globalModalId);
       modalStore.setOnCancel(buttons.onNegative, globalModalId);
       modalStore.setCancelLabel(buttons.negativeLabel, globalModalId);
       modalStore.setShowCancelButton(true, globalModalId);

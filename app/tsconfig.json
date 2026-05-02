@@ -10,7 +10,7 @@
        "strict": true,
        "noImplicitAny": true,
        "skipLibCheck": true,
-       "allowJs": true,
+       "allowJs": false,
        "isolatedModules": true,
        "noEmit": true,
        "jsx": "react-jsx",

@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable jsx-a11y/no-static-element-interactions */
-import React, { useState, useEffect, useRef, useMemo, MouseEvent } from 'react';
+import { cloneElement, useState, useEffect, useRef, useMemo } from 'react';
+import type { CSSProperties, MouseEvent, ReactElement, Ref } from 'react';
 import { observer } from 'mobx-react';
 import { Tree, NodeApi, NodeRendererProps, RowRendererProps, CursorProps, DragPreviewProps, TreeApi } from 'react-arborist';
 import { useContextMenu } from 'react-contexify';
@@ -95,7 +96,7 @@ const rootScaffoldOffsetPx = scaffoldBlockPxWidth;
 const dragPreviewHandleAnchorX = 17;
 const dragPreviewHandleAnchorY = 12;
 
-function getNodeLayoutStyle(style: React.CSSProperties): React.CSSProperties {
+function getNodeLayoutStyle(style: CSSProperties): CSSProperties {
   const paddingLeft = typeof style.paddingLeft === 'number' ? style.paddingLeft : parseFloat(String(style.paddingLeft || 0));
 
   return {
@@ -400,7 +401,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
         nodeStore.setNodeExpansion(node.id, expandAll);
       },
       expanded: expandAll,
-    }) as RSTNode[];
+    });
 
     replaceTreeData(updatedTreeData);
   }, [expandAll]);
@@ -515,8 +516,8 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
 
     const draggedNode = tree.dragNode?.data || null;
     const nodeParent = getNodePathNode(node.parent);
-    const dragSource = (element: React.ReactElement) =>
-      React.cloneElement(element as React.ReactElement<{ ref?: React.Ref<HTMLDivElement> }>, { ref: dragHandle });
+    const dragSource = (element: ReactElement) =>
+      cloneElement(element as ReactElement<{ ref?: Ref<HTMLDivElement> }>, { ref: dragHandle });
     const toggleChildrenVisibility = ({ node: currentNode }: { node: RSTNode; path: RSTPath; treeIndex: number }) => {
       const arboristNode = tree.get(getConversationTreeNodeId(currentNode));
       if (arboristNode == null) return;
@@ -535,7 +536,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
         isContextMenuVisible={isContextMenuVisible}
         scaffoldBlockPxWidth={scaffoldBlockPxWidth}
         toggleChildrenVisibility={treeNode.children && treeNode.children.length > 0 ? toggleChildrenVisibility : null}
-        connectDragPreview={(element: React.ReactElement) => element}
+        connectDragPreview={(element: ReactElement) => element}
         connectDragSource={dragSource}
         isDragging={draggedNode != null}
         canDrop={node.willReceiveDrop ? tree.canDrop() : true}

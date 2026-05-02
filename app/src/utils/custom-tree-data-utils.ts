@@ -121,7 +121,7 @@ function setExpandedInTree(treeData: RSTNode[], nodeId: string, onNode: (node: R
     treeData,
     searchQuery: undefined,
     searchFocusOffset: undefined,
-    getNodeKey: ({ node }: { node: RSTNode }) => node.id,
+    getNodeKey: ({ node }: { node: RSTNode }) => node.id || '',
     searchMethod: ({ node }: { node: RSTNode }) => node.id === nodeId,
     expandFocusMatchPaths: false,
   }) as TreeSearchResult;
@@ -138,9 +138,9 @@ function setExpandedInTree(treeData: RSTNode[], nodeId: string, onNode: (node: R
     treeData,
     path,
     newNode: treeNode,
-    getNodeKey: ({ node }: { node: RSTNode }) => node.id,
+    getNodeKey: ({ node }: { node: RSTNode }) => node.id || '',
     ignoreCollapsed: false,
-  }) as RSTNode[];
+  });
 }
 
 export function expandFromCoreToNode(treeData: RSTNode[], node: PromptNodeType | ElementNodeType | null, onNode: (node: RSTNode) => void): RSTNode[] {

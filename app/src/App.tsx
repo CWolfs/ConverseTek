@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Routes, Route, BrowserRouter as Router } from 'react-router-dom';
 import { Provider, observer } from 'mobx-react';
 import { App as AntdApp, ConfigProvider } from 'antd';

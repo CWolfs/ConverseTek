@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { isValidElement, useState } from 'react';
 import { Modal, Button } from 'antd';
 import { observer } from 'mobx-react';
 
@@ -83,7 +83,7 @@ function GlobalModal({ id }: { id: string }) {
       transitionName=""
       maskTransitionName=""
     >
-      {React.isValidElement(content) ? content : null}
+      {isValidElement(content) ? content : null}
     </Modal>
   );
 }

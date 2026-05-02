@@ -1,4 +1,5 @@
-import React, { useState, useEffect, ChangeEvent } from 'react';
+import { useState, useEffect } from 'react';
+import type { ChangeEvent, ComponentProps } from 'react';
 import { Card, Row, Col, Input, Select, Tooltip, Checkbox } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { observer } from 'mobx-react';
@@ -33,7 +34,7 @@ type Props = {
   node: PromptNodeType | ElementNodeType;
 };
 
-type CheckboxChangeEvent = Parameters<NonNullable<React.ComponentProps<typeof Checkbox>['onChange']>>[0];
+type CheckboxChangeEvent = Parameters<NonNullable<ComponentProps<typeof Checkbox>['onChange']>>[0];
 
 function ConversationGeneral({ node }: Props) {
   const nodeStore = useStore<NodeStore>('node');

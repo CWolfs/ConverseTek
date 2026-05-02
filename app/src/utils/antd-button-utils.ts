@@ -4,15 +4,15 @@ type AntdButtonType = ButtonProps['type'];
 type AntdButtonColor = ButtonProps['color'];
 type AntdButtonVariant = ButtonProps['variant'];
 
-export type LegacyButtonType = AntdButtonType | 'danger' | 'positive' | undefined;
+export type AppButtonIntent = AntdButtonType | 'danger' | 'positive' | undefined;
 
-export function getAntdButtonType(type: LegacyButtonType): AntdButtonType {
+export function getAntdButtonType(type: AppButtonIntent): AntdButtonType {
   if (type === 'danger') return 'primary';
   if (type === 'positive') return undefined;
   return type;
 }
 
-export function isAntdButtonDanger(type: LegacyButtonType): boolean {
+export function isAntdButtonDanger(type: AppButtonIntent): boolean {
   return type === 'danger';
 }
 
@@ -26,10 +26,10 @@ export const positiveActionButtonProps = {
   variant: 'solid',
 } satisfies Pick<ButtonProps, 'color' | 'variant'>;
 
-export function getAntdButtonColor(type: LegacyButtonType): AntdButtonColor {
+export function getAntdButtonColor(type: AppButtonIntent): AntdButtonColor {
   return type === 'positive' ? positiveActionButtonProps.color : undefined;
 }
 
-export function getAntdButtonVariant(type: LegacyButtonType): AntdButtonVariant {
+export function getAntdButtonVariant(type: AppButtonIntent): AntdButtonVariant {
   return type === 'positive' ? positiveActionButtonProps.variant : undefined;
 }

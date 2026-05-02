@@ -1,4 +1,5 @@
-import React, { Children, CSSProperties, isValidElement, PointerEvent, ReactNode, useRef, useState } from 'react';
+import { Children, isValidElement, useRef, useState } from 'react';
+import type { CSSProperties, PointerEvent, ReactNode } from 'react';
 import classnames from 'classnames';
 
 import './Split.css';

@@ -1,4 +1,5 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import type { ChangeEvent, ComponentProps } from 'react';
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react';
 import { message, Button, Row, Col, Form, Input, Tabs, Popconfirm } from 'antd';
@@ -23,7 +24,7 @@ import { ConversationActions } from '../ConversationActions';
 import './ConversationEditor.css';
 
 const FormItem = Form.Item;
-type TabsItems = NonNullable<React.ComponentProps<typeof Tabs>['items']>;
+type TabsItems = NonNullable<ComponentProps<typeof Tabs>['items']>;
 
 type Props = {
   conversationAsset: ConversationAssetType;

@@ -1,5 +1,5 @@
 /* eslint-disable operator-linebreak */
-import React, { useState, useEffect, Fragment, useRef } from 'react';
+import { useState, useEffect, Fragment, useRef } from 'react';
 import { List } from 'antd';
 import { BookTwoTone, DesktopOutlined, FileTextOutlined, FolderAddOutlined, FolderOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
@@ -35,11 +35,10 @@ export function FileSystemPicker() {
   const globalModalId = 'global1';
 
   const modalOptions = modalStore.getOptions(globalModalId);
-  if (modalOptions == null) return null;
-  const modalProps: FSModalProps = modalOptions.props;
+  const modalProps: FSModalProps | null = modalOptions?.props ?? null;
 
   const [loading, setLoading] = useState(false);
-  const [fileMode, setFileMode] = useState<boolean>(modalProps.fileMode || false);
+  const [fileMode, setFileMode] = useState<boolean>(modalProps?.fileMode || false);
   const [selectedItem, setSelectedItem] = useState<FileSystemItemType | null>(null);
   const [contextSelectedItem, setContextSelectedItem] = useState<DirectoryItemType | null>(null);
   const [directories, setDirectories] = useState<DirectoryItemType[]>([]);
@@ -231,6 +230,8 @@ export function FileSystemPicker() {
   const favouriteQuickLinkButtonClassName = 'file-system-picker__quick-link-button file-system-picker__quick-link-button--favourite';
 
   setQuicklinkStatus();
+
+  if (modalOptions == null || modalProps == null) return null;
 
   return (
     <div className="file-system-picker">
