@@ -102,7 +102,7 @@ function ConversationConditions({ node }: { node: ElementNodeType }) {
     <div className="conversation-conditions">
       <Collapse items={displayConditions.map((condition, index) => renderPanel(condition, index))} />
       <div className="conversation-conditions__buttons">
-        <Button className="button-secondary" size="small" onClick={onAddCondition}>
+        <Button className="button-secondary" type="primary" size="small" onClick={onAddCondition}>
           <PlusOutlined />
         </Button>
       </div>

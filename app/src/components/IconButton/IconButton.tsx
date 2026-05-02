@@ -1,7 +1,6 @@
 import React, { CSSProperties, MouseEvent, ReactNode } from 'react';
 import { Button, Tooltip } from 'antd';
-import classnames from 'classnames';
-import { getAntdButtonClassName, getAntdButtonType, isAntdButtonDanger, LegacyButtonType } from 'utils/antd-button-utils';
+import { getAntdButtonColor, getAntdButtonType, getAntdButtonVariant, isAntdButtonDanger, LegacyButtonType } from 'utils/antd-button-utils';
 
 import './IconButton.css';
 
@@ -24,8 +23,10 @@ type TooltipProps = {
 export const IconButton = ({ type, icon, shape = 'circle', onClick, className, style = {}, title, placement = 'left' }: Props) => {
   let component = (
     <Button
-      className={classnames(className, getAntdButtonClassName(type))}
+      className={className}
       type={getAntdButtonType(type)}
+      color={getAntdButtonColor(type)}
+      variant={getAntdButtonVariant(type)}
       danger={isAntdButtonDanger(type)}
       shape={shape === 'circle-outline' ? 'circle' : shape}
       icon={icon}

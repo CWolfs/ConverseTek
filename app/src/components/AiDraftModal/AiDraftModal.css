@@ -311,19 +311,6 @@
   min-height: 32px;
 }
 
-.ai-draft-modal__actions .ant-btn.ai-draft-modal__action-button--generate:not([disabled]) {
-  border-color: $green6;
-  background-color: $green6;
-  color: #fff;
-}
-
-.ai-draft-modal__actions .ant-btn.ai-draft-modal__action-button--generate:not([disabled]):hover,
-.ai-draft-modal__actions .ant-btn.ai-draft-modal__action-button--generate:not([disabled]):focus {
-  border-color: $green3;
-  background-color: $green3;
-  color: #fff;
-}
-
 .ai-draft-personalities {
   padding-top: 16px;
 }

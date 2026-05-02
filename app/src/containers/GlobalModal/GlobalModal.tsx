@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 
 import { useStore } from 'hooks/useStore';
 import { ModalStore } from 'stores/modalStore/modal-store';
-import { getAntdButtonClassName, getAntdButtonType, isAntdButtonDanger } from 'utils/antd-button-utils';
+import { getAntdButtonColor, getAntdButtonType, getAntdButtonVariant, isAntdButtonDanger } from 'utils/antd-button-utils';
 
 import './GlobalModal.css';
 
@@ -42,8 +42,9 @@ function GlobalModal({ id }: { id: string }) {
     showCancelButton ? (
       <Button
         key="cancel"
-        className={getAntdButtonClassName(cancelType)}
         type={getAntdButtonType(cancelType)}
+        color={getAntdButtonColor(cancelType)}
+        variant={getAntdButtonVariant(cancelType)}
         danger={isAntdButtonDanger(cancelType)}
         onClick={onCancel || undefined}
       >
@@ -54,8 +55,9 @@ function GlobalModal({ id }: { id: string }) {
     showOkButton ? (
       <Button
         key="submit"
-        className={getAntdButtonClassName(okType)}
         type={getAntdButtonType(okType)}
+        color={getAntdButtonColor(okType)}
+        variant={getAntdButtonVariant(okType)}
         danger={isAntdButtonDanger(okType)}
         onClick={onOk || undefined}
         loading={isLoading}

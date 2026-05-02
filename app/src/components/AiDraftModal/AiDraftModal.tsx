@@ -24,6 +24,7 @@ import { NodeStore } from 'stores/nodeStore/node-store';
 import { AiContextPathPicker } from 'components/AiContextPathPicker';
 import { AiDraftConversationTreePreview } from './AiDraftConversationTreePreview';
 import { AiDraftArtifactViewer } from './AiDraftArtifactViewer';
+import { positiveActionButtonProps } from '../../theme/conversetek-theme';
 import {
   createAiDraft,
   getAiDraftArtifact,
@@ -817,6 +818,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
     <div className="ai-draft-modal__actions">
       <Button
         className="ai-draft-modal__action-button ai-draft-modal__action-button--generate"
+        {...positiveActionButtonProps}
         disabled={!canGenerateFromBrief || isLoading}
         loading={isLoading}
         onClick={() => {
@@ -826,8 +828,8 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
         {isLoading ? 'Generating Draft...' : 'Generate Preview'}
       </Button>
       <Button
-        type={draft != null ? 'primary' : 'default'}
-        className={classnames('ai-draft-modal__action-button', draft != null && 'button-positive')}
+        {...(draft != null ? positiveActionButtonProps : {})}
+        className="ai-draft-modal__action-button"
         disabled={!canAccept || isLoading}
         onClick={() => {
           void acceptDraft();

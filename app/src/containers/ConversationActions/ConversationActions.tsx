@@ -104,7 +104,7 @@ function ConversationActions({ node }: { node: PromptNodeType | ElementNodeType 
     <div className="conversation-actions">
       <Collapse items={displayActions.map((action, index) => renderPanel(action, index))} />
       <div className="conversation-actions__buttons">
-        <Button className="button-secondary" size="small" onClick={onAddAction}>
+        <Button className="button-secondary" type="primary" size="small" onClick={onAddAction}>
           <PlusOutlined />
         </Button>
       </div>
