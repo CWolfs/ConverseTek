@@ -157,6 +157,8 @@ function ConversationDiagnosticsModal({ globalModalId }: Props) {
               onChange={(event) => setSearchText(event.target.value)}
             />
             <Select<CategoryFilterValue>
+              className="conversation-diagnostics__category-select"
+              classNames={{ popup: { root: 'conversation-diagnostics__category-dropdown' } }}
               value={categoryFilter}
               onChange={setCategoryFilter}
               options={[
