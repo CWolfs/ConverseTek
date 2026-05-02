@@ -1,3 +1,5 @@
+@import '../../css/constants.css';
+
 .ai-draft-modal {
   display: flex;
   flex-direction: column;
@@ -36,11 +38,11 @@
 }
 
 .ai-draft-modal .ant-tabs {
-  --ant-tabs-ink-bar-color: #0084c1;
-  --ant-tabs-item-active-color: #0084c1;
+  --ant-tabs-ink-bar-color: $linkColourPrimary;
+  --ant-tabs-item-active-color: $linkColourPrimary;
   --ant-tabs-item-color: #262626;
-  --ant-tabs-item-hover-color: #0084c1;
-  --ant-tabs-item-selected-color: #0084c1;
+  --ant-tabs-item-hover-color: $linkColourPrimary;
+  --ant-tabs-item-selected-color: $linkColourPrimary;
 }
 
 .ai-draft-modal .ant-tabs-content,
@@ -310,15 +312,15 @@
 }
 
 .ai-draft-modal__actions .ant-btn.ai-draft-modal__action-button--generate:not([disabled]) {
-  border-color: #1677c2;
-  background-color: #1677c2;
+  border-color: $green6;
+  background-color: $green6;
   color: #fff;
 }
 
 .ai-draft-modal__actions .ant-btn.ai-draft-modal__action-button--generate:not([disabled]):hover,
 .ai-draft-modal__actions .ant-btn.ai-draft-modal__action-button--generate:not([disabled]):focus {
-  border-color: #0f5f9d;
-  background-color: #0f5f9d;
+  border-color: $green3;
+  background-color: $green3;
   color: #fff;
 }
 

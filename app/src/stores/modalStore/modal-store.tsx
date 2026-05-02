@@ -83,7 +83,7 @@ class ModalStore {
       width: '70vw',
 
       showOkButton: true,
-      okType: 'primary',
+      okType: 'positive',
       okLabel: 'Ok',
       disableOk: true,
       onOk: null,

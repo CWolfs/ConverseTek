@@ -77,6 +77,7 @@ function ConversationConditions({ node }: { node: ElementNodeType }) {
         >
           <Button
             size="small"
+            type="primary"
             danger
             className="conversation-conditions__panel-header-delete-button"
             onClick={(event: MouseEvent) => event.stopPropagation()}

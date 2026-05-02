@@ -78,6 +78,7 @@ function ConversationActions({ node }: { node: PromptNodeType | ElementNodeType 
         >
           <Button
             size="small"
+            type="primary"
             danger
             className="conversation-actions__panel-header-delete-button"
             onClick={(event: MouseEvent) => event.stopPropagation()}

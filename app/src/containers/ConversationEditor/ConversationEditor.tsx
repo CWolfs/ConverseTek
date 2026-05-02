@@ -197,7 +197,7 @@ function ConversationEditor({ conversationAsset }: Props) {
           >
             <Button className="conversation-editor__regenerate-ids-button button-secondary" type="primary" size="small" icon={<RetweetOutlined />} />
           </Popconfirm>
-          <Button className="conversation-editor__save-button" type="primary" size="small" icon={<SaveOutlined />} onClick={onSaveButtonClicked} />
+          <Button className="conversation-editor__save-button button-positive" type="primary" size="small" icon={<SaveOutlined />} onClick={onSaveButtonClicked} />
         </div>
       </div>
 

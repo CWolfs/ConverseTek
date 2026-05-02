@@ -827,7 +827,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
       </Button>
       <Button
         type={draft != null ? 'primary' : 'default'}
-        className="ai-draft-modal__action-button"
+        className={classnames('ai-draft-modal__action-button', draft != null && 'button-positive')}
         disabled={!canAccept || isLoading}
         onClick={() => {
           void acceptDraft();
@@ -836,7 +836,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
         {getAcceptLabel(mode)}
       </Button>
       <Button
-        type="default"
+        type={draft != null ? 'primary' : 'default'}
         danger={draft != null}
         className="ai-draft-modal__action-button"
         disabled={draft == null || isLoading}
@@ -1261,7 +1261,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                 <Button icon={<CopyOutlined />} disabled={selectedPersonality == null} onClick={duplicateSelectedPersonality}>
                   Duplicate
                 </Button>
-                <Button icon={<DeleteOutlined />} disabled={selectedPersonality == null} onClick={deleteSelectedPersonality}>
+                <Button type="primary" danger icon={<DeleteOutlined />} disabled={selectedPersonality == null} onClick={deleteSelectedPersonality}>
                   Delete
                 </Button>
                 <Button icon={<ReloadOutlined />} onClick={restoreMissingDefaultPersonalities}>

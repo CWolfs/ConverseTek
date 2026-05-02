@@ -2,28 +2,39 @@
 
 .ant-btn-primary {
   color: #fff;
-  background-color: $green6;
-  border-color: $green6;
+  background-color: $backgroundSecondary;
+  border-color: $backgroundSecondary;
 
   &:active {
     color: #fff;
-    background-color: $green6;
-    border-color: $green6;
+    background-color: $blue9;
+    border-color: $blue9;
   }
 
   &:focus,
   &:hover {
     color: #fff;
-    background-color: $green6;
-    border-color: $green6;
+    background-color: $blue7;
+    border-color: $blue7;
   }
 
   &.ant-btn-clicked:after {
-    border: 0 solid $green6;
+    border: 0 solid $backgroundSecondary;
+  }
+
+  &.ant-btn[disabled],
+  &.ant-btn-disabled,
+  &.ant-btn[disabled]:hover,
+  &.ant-btn-disabled:hover {
+    color: rgba(0, 0, 0, 0.25);
+    background-color: #f5f5f5;
+    border-color: #d9d9d9;
+    box-shadow: none;
   }
 }
 
-.button-primary-pale {
+.button-positive.ant-btn,
+.button-positive.ant-btn-primary {
   color: #fff;
   background-color: $green6;
   border-color: $green6;
@@ -43,6 +54,39 @@
 
   &.ant-btn-clicked:after {
     border: 0 solid $green6;
+  }
+
+  &.ant-btn[disabled],
+  &.ant-btn-disabled,
+  &.ant-btn[disabled]:hover,
+  &.ant-btn-disabled:hover {
+    color: rgba(0, 0, 0, 0.25);
+    background-color: #f5f5f5;
+    border-color: #d9d9d9;
+    box-shadow: none;
+  }
+}
+
+.button-primary-pale {
+  color: #fff;
+  background-color: $backgroundSecondaryPale;
+  border-color: $backgroundSecondaryPale;
+
+  &:active {
+    color: #fff;
+    background-color: $backgroundSecondary;
+    border-color: $backgroundSecondary;
+  }
+
+  &:focus,
+  &:hover {
+    color: #fff;
+    background-color: $backgroundSecondary;
+    border-color: $backgroundSecondary;
+  }
+
+  &.ant-btn-clicked:after {
+    border: 0 solid $backgroundSecondaryPale;
   }
 }
 
@@ -123,6 +167,7 @@
   color: white;
   background-color: #f5222d;
   border-color: #f5222d;
+  box-shadow: 0 2px 0 rgba(245, 34, 45, 0.1);
 
   &:active {
     color: white;
@@ -139,6 +184,16 @@
 
   &.ant-btn-clicked:after {
     border: 0 solid #f5222d;
+  }
+
+  &.ant-btn[disabled],
+  &.ant-btn-disabled,
+  &.ant-btn[disabled]:hover,
+  &.ant-btn-disabled:hover {
+    color: rgba(0, 0, 0, 0.25);
+    background-color: #f5f5f5;
+    border-color: #d9d9d9;
+    box-shadow: none;
   }
 }
 

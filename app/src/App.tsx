@@ -20,15 +20,7 @@ const converseTekTheme: ThemeConfig = {
   },
   token: {
     borderRadius: 2,
-    colorPrimary: '#0084c1',
-  },
-  components: {
-    Button: {
-      colorPrimary: '#52c41a',
-      colorPrimaryActive: '#52c41a',
-      colorPrimaryHover: '#52c41a',
-      primaryShadow: '0 2px 0 rgba(82, 196, 26, 0.1)',
-    },
+    colorPrimary: '#0050b3',
   },
 };
 
