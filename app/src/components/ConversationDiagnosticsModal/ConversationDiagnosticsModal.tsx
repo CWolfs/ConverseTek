@@ -4,9 +4,11 @@ import { Button, Empty, Input, Select, Segmented, Tag } from 'antd';
 import {
   AimOutlined,
   CheckCircleOutlined,
+  CompressOutlined,
   DownOutlined,
   DownloadOutlined,
   ExclamationCircleOutlined,
+  ExpandAltOutlined,
   InfoCircleOutlined,
   RightOutlined,
   SearchOutlined,
@@ -96,6 +98,7 @@ function ConversationDiagnosticsContent({ globalModalId, variant = 'modal' }: Pr
   ];
   const allFilteredDiagnosticsExpanded =
     filteredDiagnostics.length > 0 && filteredDiagnostics.every((diagnostic) => expandedDiagnosticIds.has(diagnostic.id));
+  const toggleVisibleDiagnosticsLabel = allFilteredDiagnosticsExpanded ? 'Collapse visible diagnostics' : 'Expand visible diagnostics';
 
   const toggleDiagnostic = (diagnosticId: string) => {
     setExpandedDiagnosticIds((currentIds) => {
@@ -237,7 +240,15 @@ function ConversationDiagnosticsContent({ globalModalId, variant = 'modal' }: Pr
                 { label: 'Reference', value: 'reference' },
               ]}
             />
-            <Button onClick={toggleFilteredDiagnostics}>{allFilteredDiagnosticsExpanded ? 'Collapse Visible' : 'Expand Visible'}</Button>
+            <Button
+              className="conversation-diagnostics__expand-toggle"
+              icon={allFilteredDiagnosticsExpanded ? <CompressOutlined /> : <ExpandAltOutlined />}
+              aria-label={variant === 'side-panel' ? toggleVisibleDiagnosticsLabel : undefined}
+              title={variant === 'side-panel' ? toggleVisibleDiagnosticsLabel : undefined}
+              onClick={toggleFilteredDiagnostics}
+            >
+              {variant === 'side-panel' ? null : allFilteredDiagnosticsExpanded ? 'Collapse Visible' : 'Expand Visible'}
+            </Button>
           </div>
         </div>
       )}
