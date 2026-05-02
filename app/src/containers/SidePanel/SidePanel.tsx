@@ -1,4 +1,4 @@
-import { isValidElement } from 'react';
+import { isValidElement, useEffect, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { Button } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
@@ -12,11 +12,25 @@ import './SidePanel.css';
 function SidePanel() {
   const sidePanelStore = useStore<SidePanelStore>('sidePanel');
   const { panel, options } = sidePanelStore;
+  const [shouldRender, setShouldRender] = useState(options.isVisible);
 
-  if (!options.isVisible || panel == null) return null;
+  useEffect(() => {
+    if (options.isVisible) {
+      setShouldRender(true);
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(() => setShouldRender(false), 180);
+    return () => window.clearTimeout(timeoutId);
+  }, [options.isVisible]);
+
+  if (!shouldRender || panel == null) return null;
 
   return (
-    <aside className="side-panel" style={{ '--side-panel-width': options.width } as CSSProperties}>
+    <aside
+      className={`side-panel ${options.isVisible ? 'side-panel--open' : 'side-panel--closing'}`}
+      style={{ '--side-panel-width': options.width } as CSSProperties}
+    >
       <header className="side-panel__header">
         <div className="side-panel__title">{options.title}</div>
         <Button aria-label="Close side panel" className="side-panel__close" type="text" icon={<CloseOutlined />} onClick={sidePanelStore.closePanel} />

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import type { ChangeEvent, ComponentProps } from 'react';
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react';
-import { message, Button, Row, Col, Form, Input, Tabs, Popconfirm, Tooltip } from 'antd';
+import { message, Button, Row, Col, Form, Input, Tabs, Popconfirm } from 'antd';
 import { ArrowRightOutlined, MenuFoldOutlined, MenuUnfoldOutlined, RetweetOutlined, SaveOutlined, WarningOutlined } from '@ant-design/icons';
 
 import { updateConversation } from 'services/api';
@@ -213,15 +213,13 @@ function ConversationEditor({ conversationAsset }: Props) {
             }}
             icon={<ArrowRightOutlined />}
           />
-          <Tooltip title="Run conversation diagnostics">
-            <Button
-              className="conversation-editor__diagnostics-button button-secondary"
-              type="primary"
-              size="small"
-              icon={<WarningOutlined />}
-              onClick={onDiagnosticsButtonClicked}
-            />
-          </Tooltip>
+          <Button
+            className="conversation-editor__diagnostics-button button-secondary"
+            type="primary"
+            size="small"
+            icon={<WarningOutlined />}
+            onClick={onDiagnosticsButtonClicked}
+          />
         </div>
 
         <div className="conversation-editor__buttons">
