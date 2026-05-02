@@ -71,6 +71,7 @@ function ConversationEditor({ conversationAsset }: Props) {
 
   const { unsavedActiveConversationAsset } = dataStore;
   const { activeNode, rebuild } = nodeStore;
+  const activeConversationId = conversationAsset.conversation.idRef.id;
 
   const createNewUnsavedConversation = () => {
     const unsavedConversationAsset = { ...toJS(conversationAsset) };
@@ -137,6 +138,13 @@ function ConversationEditor({ conversationAsset }: Props) {
   useEffect(() => {
     createNewUnsavedConversation();
   }, [conversationAsset]);
+
+  useEffect(() => {
+    if (!sidePanelStore.isPanelVisible(diagnosticsSidePanelId)) return;
+    if ((windowSize.width ?? 0) < 1280) return;
+
+    sidePanelStore.setPanelContent(ConversationDiagnosticsPanel, {}, 'Conversation Diagnostics', true, diagnosticsSidePanelId);
+  }, [activeConversationId, sidePanelStore, windowSize.width]);
 
   useEffect(() => {
     if (windowSize.width != null && windowSize.width < 1280) sidePanelStore.closePanel();

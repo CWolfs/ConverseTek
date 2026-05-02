@@ -31,6 +31,7 @@ type OperationContext = NodeContext & {
 };
 
 const sideloadConversationOperation = 'Sideload Conversation';
+const setBattleTechViewscreenImageOperation = 'Set BattleTech Viewscreen Image';
 
 export function buildConversationDiagnostics(options: ConversationDiagnosticsOptions): ConversationDiagnostic[] {
   const { conversationAsset, operationDefinitions, loadedConversationAssets = [] } = options;
@@ -111,23 +112,15 @@ function scanConversationShape(
   nodes.forEach((node) => {
     const context = getPromptNodeContext(node);
 
-    if (node.text.trim() === '') {
+    if (node.text.trim() === '' && isEmptyPromptLikelyInert(node)) {
       diagnostics.push(
-        isEmptyPromptLikelyInert(node)
-          ? createDiagnostic({
-              severity: 'warning',
-              category: 'content',
-              title: 'Prompt node has no content or responses',
-              description: 'This prompt has no speaker text, no response options, and no actions. Check that the player will not be left on stale or missing dialogue text.',
-              context,
-            })
-          : createDiagnostic({
-              severity: 'info',
-              category: 'content',
-              title: 'Prompt node has no text',
-              description: 'This prompt has no speaker text, but it has response choices or actions. This is valid for continuation routing, chained commander response runs, and other intentional silent prompt nodes.',
-              context,
-            }),
+        createDiagnostic({
+          severity: 'warning',
+          category: 'content',
+          title: 'Prompt node has no content or responses',
+          description: 'This prompt has no speaker text, no response options, and no actions. Check that the player will not be left on stale or missing dialogue text.',
+          context,
+        }),
       );
     }
 
@@ -349,10 +342,7 @@ function scanOperationArg(
         severity,
         category: 'operation',
         title: 'Operation input is empty',
-        description:
-          severity === 'info'
-            ? `${inputPath} is empty. This is valid, but check that the missing value is intentional.`
-            : `${inputPath} is empty. This may fail or do nothing at runtime.`,
+        description: getEmptyRequiredArgDescription(operation.functionName, inputPath, severity),
         context,
       }),
     );
@@ -485,7 +475,18 @@ function isInputOptional(functionName: string, input: InputType): boolean {
 }
 
 function isInformationalEmptyArg(functionName: string, input: InputType): boolean {
-  return functionName === 'Start Conversation Custom' && input.label.toLowerCase() === 'conversation sub header';
+  if (functionName === 'Start Conversation Custom' && input.label.toLowerCase() === 'conversation sub header') return true;
+  if (functionName === setBattleTechViewscreenImageOperation && input.label.toLowerCase() === 'key') return true;
+  return false;
+}
+
+function getEmptyRequiredArgDescription(functionName: string, inputPath: string, severity: ConversationDiagnosticSeverity): string {
+  if (functionName === setBattleTechViewscreenImageOperation) {
+    return `${inputPath} is empty. BattleTech treats this as clearing the conversation viewscreen, so check that the reset is intentional.`;
+  }
+
+  if (severity === 'info') return `${inputPath} is empty. This is valid, but check that the missing value is intentional.`;
+  return `${inputPath} is empty. This may fail or do nothing at runtime.`;
 }
 
 function buildLoadedConversationsById(conversationAssets: ConversationAssetType[]): Map<string, ConversationAssetType> {

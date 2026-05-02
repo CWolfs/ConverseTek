@@ -97,7 +97,7 @@ describe('conversation diagnostics', () => {
     );
   });
 
-  it('allows empty prompt nodes that continue into response choices', () => {
+  it('ignores empty prompt nodes that continue into response choices', () => {
     const conversationAsset = makeBasicConversation();
     const prompt = conversationAsset.conversation.nodes[0];
     const commanderResponse = createResponseNode();
@@ -109,21 +109,16 @@ describe('conversation diagnostics', () => {
     const diagnostics = buildConversationDiagnostics({ conversationAsset, operationDefinitions: [] });
     const promptDiagnostics = diagnostics.filter((diagnostic) => diagnostic.nodeId === getId(prompt));
 
-    expect(promptDiagnostics).toEqual(
-      expect.arrayContaining([expect.objectContaining({ severity: 'info', title: 'Prompt node has no text' })]),
-    );
-    expect(promptDiagnostics.some((diagnostic) => diagnostic.severity === 'warning' && diagnostic.title.startsWith('Prompt node'))).toBe(false);
+    expect(promptDiagnostics.some((diagnostic) => diagnostic.title.startsWith('Prompt node'))).toBe(false);
   });
 
   it('shows prompt labels as one-based display numbers', () => {
     const conversationAsset = makeBasicConversation();
     const root = conversationAsset.conversation.roots[0];
     const secondPrompt = createPromptNode(1);
-    const commanderResponse = createResponseNode();
-    commanderResponse.responseText = 'Keep going.';
-    commanderResponse.nextNodeIndex = -1;
     secondPrompt.text = '';
-    secondPrompt.branches = [commanderResponse];
+    secondPrompt.branches = [];
+    secondPrompt.actions = null;
     root.nextNodeIndex = 1;
     conversationAsset.conversation.nodes.push(secondPrompt);
 
@@ -131,7 +126,7 @@ describe('conversation diagnostics', () => {
 
     expect(diagnostics).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ severity: 'info', title: 'Prompt node has no text', nodeId: getId(secondPrompt), nodeLabel: 'Prompt #2' }),
+        expect.objectContaining({ severity: 'warning', title: 'Prompt node has no content or responses', nodeId: getId(secondPrompt), nodeLabel: 'Prompt #2' }),
       ]),
     );
   });
@@ -225,6 +220,33 @@ describe('conversation diagnostics', () => {
     );
     expect(diagnostics).not.toEqual(
       expect.arrayContaining([expect.objectContaining({ severity: 'warning', title: 'Operation input is empty', nodeId: getId(response) })]),
+    );
+  });
+
+  it('reports an empty BattleTech viewscreen image key as info instead of a warning', () => {
+    const conversationAsset = makeBasicConversation();
+    const prompt = conversationAsset.conversation.nodes[0];
+    prompt.actions = {
+      ops: [makeAction('Set BattleTech Viewscreen Image', [makeStringArg('')])],
+    };
+
+    const diagnostics = buildConversationDiagnostics({
+      conversationAsset,
+      operationDefinitions: [makeDefinition('Set BattleTech Viewscreen Image', [{ label: 'Key', types: ['string'] }])],
+    });
+
+    expect(diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          severity: 'info',
+          title: 'Operation input is empty',
+          description: expect.stringContaining('clearing the conversation viewscreen'),
+          nodeId: getId(prompt),
+        }),
+      ]),
+    );
+    expect(diagnostics).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ severity: 'warning', title: 'Operation input is empty', nodeId: getId(prompt) })]),
     );
   });
 
