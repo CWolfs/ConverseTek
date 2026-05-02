@@ -538,6 +538,7 @@
 
 .conversation-diagnostics--side-panel .conversation-diagnostics__toolbar .ant-segmented {
   width: 100%;
+  background: transparent;
   box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.16);
 }
 
@@ -545,18 +546,33 @@
   flex: 1 1 0;
   min-width: 0;
   color: $textColourSecondary;
+  background: transparent;
+}
+
+.conversation-diagnostics--side-panel .conversation-diagnostics__toolbar .ant-segmented-item-label {
+  color: inherit;
 }
 
 .conversation-diagnostics--side-panel .conversation-diagnostics__toolbar .ant-segmented-item:hover,
 .conversation-diagnostics--side-panel .conversation-diagnostics__toolbar .ant-segmented-item:focus-visible {
   color: white;
-  background: rgba(24, 144, 255, 0.1);
+  background: rgba(24, 144, 255, 0.12);
+}
+
+.conversation-diagnostics--side-panel .conversation-diagnostics__toolbar .ant-segmented-item:hover .ant-segmented-item-label,
+.conversation-diagnostics--side-panel .conversation-diagnostics__toolbar .ant-segmented-item:focus-visible .ant-segmented-item-label {
+  color: white;
 }
 
 .conversation-diagnostics--side-panel .conversation-diagnostics__toolbar .ant-segmented-item-selected {
   color: white;
-  background: transparent;
+  background: rgba(24, 144, 255, 0.18);
+  background-color: rgba(24, 144, 255, 0.18);
   box-shadow: inset 0 -2px 0 $linkColourPrimary;
+}
+
+.conversation-diagnostics--side-panel .conversation-diagnostics__toolbar .ant-segmented-item-selected .ant-segmented-item-label {
+  color: white;
 }
 
 .conversation-diagnostics--side-panel .conversation-diagnostics__toolbar .ant-segmented-thumb {
