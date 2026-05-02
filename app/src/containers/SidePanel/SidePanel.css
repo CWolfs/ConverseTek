@@ -102,8 +102,8 @@
 
 .side-panel__close.ant-btn:hover,
 .side-panel__close.ant-btn:focus {
-  color: white;
-  background: rgba(255, 255, 255, 0.08);
+  color: white !important;
+  background: rgba(24, 144, 255, 0.16) !important;
 }
 
 .side-panel__close.ant-btn:active {

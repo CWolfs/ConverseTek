@@ -585,7 +585,7 @@
 }
 
 .conversation-diagnostics--side-panel .conversation-diagnostics__toolbar-controls {
-  grid-template-columns: minmax(0, 1fr) 40px;
+  grid-template-columns: minmax(0, 1fr) 32px;
   align-items: center;
 }
 
@@ -598,7 +598,11 @@
 }
 
 .conversation-diagnostics--side-panel .conversation-diagnostics__expand-toggle.ant-btn {
-  width: 40px;
+  justify-self: end;
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  min-height: 32px;
   padding: 0;
 }
 
