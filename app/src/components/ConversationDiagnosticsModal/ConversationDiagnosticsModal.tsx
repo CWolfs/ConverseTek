@@ -4,9 +4,11 @@ import { Button, Empty, Input, Select, Segmented, Tag } from 'antd';
 import {
   AimOutlined,
   CheckCircleOutlined,
+  DownOutlined,
   DownloadOutlined,
   ExclamationCircleOutlined,
   InfoCircleOutlined,
+  RightOutlined,
   SearchOutlined,
   WarningOutlined,
 } from '@ant-design/icons';
@@ -57,6 +59,7 @@ function ConversationDiagnosticsModal({ globalModalId }: Props) {
   const [filter, setFilter] = useState<FilterValue>('all');
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilterValue>('all');
   const [searchText, setSearchText] = useState('');
+  const [expandedDiagnosticIds, setExpandedDiagnosticIds] = useState<Set<string>>(() => new Set());
 
   const conversationAsset = dataStore.unsavedActiveConversationAsset;
   const diagnostics =
@@ -89,6 +92,32 @@ function ConversationDiagnosticsModal({ globalModalId }: Props) {
     { label: `Warnings (${warningCount})`, value: 'warning' },
     { label: `Info (${infoCount})`, value: 'info' },
   ];
+  const allFilteredDiagnosticsExpanded =
+    filteredDiagnostics.length > 0 && filteredDiagnostics.every((diagnostic) => expandedDiagnosticIds.has(diagnostic.id));
+
+  const toggleDiagnostic = (diagnosticId: string) => {
+    setExpandedDiagnosticIds((currentIds) => {
+      const nextIds = new Set(currentIds);
+      if (nextIds.has(diagnosticId)) {
+        nextIds.delete(diagnosticId);
+      } else {
+        nextIds.add(diagnosticId);
+      }
+      return nextIds;
+    });
+  };
+
+  const toggleFilteredDiagnostics = () => {
+    setExpandedDiagnosticIds((currentIds) => {
+      const nextIds = new Set(currentIds);
+      if (allFilteredDiagnosticsExpanded) {
+        filteredDiagnostics.forEach((diagnostic) => nextIds.delete(diagnostic.id));
+      } else {
+        filteredDiagnostics.forEach((diagnostic) => nextIds.add(diagnostic.id));
+      }
+      return nextIds;
+    });
+  };
 
   const jumpToNode = (diagnostic: ConversationDiagnostic) => {
     if (diagnostic.nodeId == null) return;
@@ -133,6 +162,14 @@ function ConversationDiagnosticsModal({ globalModalId }: Props) {
     modalStore.setShowCancelButton(true, globalModalId);
     modalStore.setCancelLabel('Close', globalModalId);
   }, []);
+
+  useEffect(() => {
+    const diagnosticIds = new Set(diagnostics.map((diagnostic) => diagnostic.id));
+    setExpandedDiagnosticIds((currentIds) => {
+      const nextIds = new Set([...currentIds].filter((diagnosticId) => diagnosticIds.has(diagnosticId)));
+      return nextIds.size === currentIds.size ? currentIds : nextIds;
+    });
+  }, [diagnostics.map((diagnostic) => diagnostic.id).join('|')]);
 
   return (
     <div className="conversation-diagnostics">
@@ -186,6 +223,7 @@ function ConversationDiagnosticsModal({ globalModalId }: Props) {
                 { label: 'Reference', value: 'reference' },
               ]}
             />
+            <Button onClick={toggleFilteredDiagnostics}>{allFilteredDiagnosticsExpanded ? 'Collapse Visible' : 'Expand Visible'}</Button>
           </div>
         </div>
       )}
@@ -194,36 +232,56 @@ function ConversationDiagnosticsModal({ globalModalId }: Props) {
         <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={diagnostics.length <= 0 ? 'No diagnostics found' : 'No diagnostics in this filter'} />
       ) : (
         <div className="conversation-diagnostics__list">
-          {filteredDiagnostics.map((diagnostic) => (
-            <div key={diagnostic.id} className={`conversation-diagnostics__item conversation-diagnostics__item--${diagnostic.severity}`}>
-              <div className="conversation-diagnostics__item-accent" aria-hidden="true" />
-              <div className="conversation-diagnostics__item-body">
-                <div className="conversation-diagnostics__item-main">
-                  <div className="conversation-diagnostics__item-tags">
-                    <Tag color={getSeverityTagColour(diagnostic.severity)}>{getSeverityLabel(diagnostic.severity)}</Tag>
-                    <Tag>{getCategoryLabel(diagnostic.category)}</Tag>
-                  </div>
-                  <div className="conversation-diagnostics__item-title">{diagnostic.title}</div>
-                  <div className="conversation-diagnostics__item-node">{diagnostic.nodeLabel}</div>
-                  <div className="conversation-diagnostics__item-description">{diagnostic.description}</div>
-                </div>
-                <aside className="conversation-diagnostics__item-details">
-                  <MetaRow label="Severity" value={getSeverityLabel(diagnostic.severity)} />
-                  <MetaRow label="Area" value={getCategoryLabel(diagnostic.category)} />
-                  <MetaRow label="Node" value={diagnostic.nodeLabel} />
-                  <Button
-                    className="conversation-diagnostics__jump-button"
-                    type="link"
-                    icon={<AimOutlined />}
-                    disabled={diagnostic.nodeId == null}
-                    onClick={() => jumpToNode(diagnostic)}
+          {filteredDiagnostics.map((diagnostic) => {
+            const isExpanded = expandedDiagnosticIds.has(diagnostic.id);
+
+            return (
+              <div key={diagnostic.id} className={`conversation-diagnostics__item conversation-diagnostics__item--${diagnostic.severity}`}>
+                <div className="conversation-diagnostics__item-accent" aria-hidden="true" />
+                <div className="conversation-diagnostics__item-panel">
+                  <button
+                    type="button"
+                    className="conversation-diagnostics__item-summary"
+                    aria-expanded={isExpanded}
+                    onClick={() => toggleDiagnostic(diagnostic.id)}
                   >
-                    View in Conversation
-                  </Button>
-                </aside>
+                    <span className="conversation-diagnostics__item-toggle" aria-hidden="true">
+                      {isExpanded ? <DownOutlined /> : <RightOutlined />}
+                    </span>
+                    <span className="conversation-diagnostics__item-summary-copy">
+                      <span className="conversation-diagnostics__item-title">{diagnostic.title}</span>
+                      <span className="conversation-diagnostics__item-node">{diagnostic.nodeLabel}</span>
+                    </span>
+                    <span className="conversation-diagnostics__item-tags">
+                      <Tag color={getSeverityTagColour(diagnostic.severity)}>{getSeverityLabel(diagnostic.severity)}</Tag>
+                      <Tag>{getCategoryLabel(diagnostic.category)}</Tag>
+                    </span>
+                  </button>
+                  {isExpanded && (
+                    <div className="conversation-diagnostics__item-body">
+                      <div className="conversation-diagnostics__item-main">
+                        <div className="conversation-diagnostics__item-description">{diagnostic.description}</div>
+                      </div>
+                      <aside className="conversation-diagnostics__item-details">
+                        <MetaRow label="Severity" value={getSeverityLabel(diagnostic.severity)} />
+                        <MetaRow label="Area" value={getCategoryLabel(diagnostic.category)} />
+                        <MetaRow label="Node" value={diagnostic.nodeLabel} />
+                        <Button
+                          className="conversation-diagnostics__jump-button"
+                          type="link"
+                          icon={<AimOutlined />}
+                          disabled={diagnostic.nodeId == null}
+                          onClick={() => jumpToNode(diagnostic)}
+                        >
+                          View in Conversation
+                        </Button>
+                      </aside>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
