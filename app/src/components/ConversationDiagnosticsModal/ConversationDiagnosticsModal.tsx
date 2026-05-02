@@ -143,7 +143,7 @@ function ConversationDiagnosticsContent({ globalModalId, variant = 'modal' }: Pr
       ...diagnostics.flatMap((diagnostic, index) => [
         `${index + 1}. [${getSeverityLabel(diagnostic.severity)}] ${diagnostic.title}`,
         `   Area: ${getCategoryLabel(diagnostic.category)}`,
-        `   Node: ${diagnostic.nodeLabel}`,
+        `   ${getDiagnosticSubjectLabel(diagnostic)}: ${diagnostic.nodeLabel}`,
         `   Detail: ${diagnostic.description}`,
         '',
       ]),
@@ -297,7 +297,7 @@ function ConversationDiagnosticsContent({ globalModalId, variant = 'modal' }: Pr
                       <aside className="conversation-diagnostics__item-details">
                         <MetaRow label="Severity" value={getSeverityLabel(diagnostic.severity)} />
                         <MetaRow label="Area" value={getCategoryLabel(diagnostic.category)} />
-                        <MetaRow label="Node" value={diagnostic.nodeLabel} />
+                        <MetaRow label={getDiagnosticSubjectLabel(diagnostic)} value={diagnostic.nodeLabel} />
                         <Button
                           className="conversation-diagnostics__jump-button"
                           type="link"
@@ -332,6 +332,10 @@ function getSummaryCountsText(errorCount: number, warningCount: number, infoCoun
   const warningText = `${warningCount} warning${warningCount === 1 ? '' : 's'}`;
   const infoText = `${infoCount} info`;
   return `${errorText}, ${warningText}, and ${infoText}`;
+}
+
+function getDiagnosticSubjectLabel(diagnostic: ConversationDiagnostic): string {
+  return diagnostic.nodeId == null ? 'Conversation' : 'Node';
 }
 
 function MetaRow({ label, value }: { label: string; value: string }) {

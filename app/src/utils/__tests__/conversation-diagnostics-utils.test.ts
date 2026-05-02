@@ -147,6 +147,74 @@ describe('conversation diagnostics', () => {
     );
   });
 
+  it('reports duplicate node ids in the active conversation', () => {
+    const conversationAsset = makeBasicConversation();
+    const prompt = conversationAsset.conversation.nodes[0];
+    const response = createResponseNode();
+    response.idRef.id = prompt.idRef.id;
+    response.responseText = 'Duplicate id response.';
+    prompt.branches = [response];
+
+    const diagnostics = buildConversationDiagnostics({ conversationAsset, operationDefinitions: [] });
+
+    expect(diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          severity: 'warning',
+          title: 'Duplicate node id',
+          description: expect.stringContaining('sideload entry points'),
+          nodeId: getId(response),
+        }),
+      ]),
+    );
+  });
+
+  it('reports when the active conversation id is duplicated by another loaded conversation', () => {
+    const conversationAsset = makeBasicConversation();
+    conversationAsset.conversation.idRef.id = 'conversation_target';
+    const duplicateConversationAsset = createConversation('K:/Mods/Test/other-conversations');
+    duplicateConversationAsset.conversation.uiName = 'Duplicate Conversation';
+    duplicateConversationAsset.conversation.idRef.id = 'other-prefix:conversation_target';
+
+    const diagnostics = buildConversationDiagnostics({
+      conversationAsset,
+      operationDefinitions: [],
+      loadedConversationAssets: [duplicateConversationAsset],
+    });
+
+    expect(diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          severity: 'warning',
+          title: 'Duplicate conversation id',
+          description: expect.stringContaining("Duplicate Conversation', uses matching id 'other-prefix:conversation_target'"),
+          nodeId: null,
+        }),
+      ]),
+    );
+  });
+
+  it('does not report the saved copy of the active conversation as a duplicate conversation id', () => {
+    const conversationAsset = makeBasicConversation();
+    conversationAsset.conversation.idRef.id = 'conversation_target';
+    const savedActiveConversationAsset = structuredClone(conversationAsset);
+
+    const diagnostics = buildConversationDiagnostics({
+      conversationAsset,
+      operationDefinitions: [],
+      loadedConversationAssets: [savedActiveConversationAsset],
+    });
+
+    expect(diagnostics).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          severity: 'warning',
+          title: 'Duplicate conversation id',
+        }),
+      ]),
+    );
+  });
+
   it('does not treat operation definition values as strict validation rules', () => {
     const conversationAsset = makeBasicConversation();
     const prompt = conversationAsset.conversation.nodes[0];

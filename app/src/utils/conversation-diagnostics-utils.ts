@@ -40,6 +40,7 @@ export function buildConversationDiagnostics(options: ConversationDiagnosticsOpt
   const promptNodesByRuntimeIndex = buildPromptNodeRuntimeIndexMap(conversationAsset.conversation.nodes, diagnostics);
   const loadedConversationsById = buildLoadedConversationsById([conversationAsset, ...loadedConversationAssets]);
 
+  scanActiveConversationIdDuplicates(conversationAsset, loadedConversationAssets, diagnostics);
   scanConversationShape(conversationAsset, diagnostics, promptNodesByRuntimeIndex);
   scanReachability(conversationAsset, diagnostics, promptNodesByRuntimeIndex);
   scanOperations(conversationAsset, diagnostics, operationDefinitionsByName, loadedConversationsById);
@@ -92,6 +93,8 @@ function scanConversationShape(
 ): void {
   const { roots, nodes } = conversationAsset.conversation;
 
+  scanDuplicateNodeIds(conversationAsset, diagnostics);
+
   if (roots.length <= 0) {
     diagnostics.push(
       createDiagnostic({
@@ -127,6 +130,44 @@ function scanConversationShape(
     node.branches.forEach((response, index) => {
       const responseContext = getElementNodeContext(response, `Response ${index + 1} from ${context.nodeLabel}`);
       scanElementNodeTarget(response, responseContext, diagnostics, promptNodesByIndex, false);
+    });
+  });
+}
+
+function scanDuplicateNodeIds(conversationAsset: ConversationAssetType, diagnostics: ConversationDiagnostic[]): void {
+  const nodeContextsById = new Map<string, NodeContext>();
+
+  const scanNodeId = (node: ElementNodeType | PromptNodeType, context: NodeContext): void => {
+    const nodeId = getId(node);
+    if (nodeId === '' || nodeId === '-1') return;
+
+    const existingContext = nodeContextsById.get(nodeId);
+    if (existingContext != null) {
+      diagnostics.push(
+        createDiagnostic({
+          severity: 'warning',
+          category: 'reference',
+          title: 'Duplicate node id',
+          description: `${context.nodeLabel} shares node id '${nodeId}' with ${existingContext.nodeLabel}. Node-id based references, including sideload entry points, may resolve unpredictably.`,
+          context,
+        }),
+      );
+      return;
+    }
+
+    nodeContextsById.set(nodeId, context);
+  };
+
+  conversationAsset.conversation.roots.forEach((root, index) => {
+    scanNodeId(root, getElementNodeContext(root, `Root ${index + 1}`));
+  });
+
+  conversationAsset.conversation.nodes.forEach((node) => {
+    const promptContext = getPromptNodeContext(node);
+    scanNodeId(node, promptContext);
+
+    node.branches.forEach((response, index) => {
+      scanNodeId(response, getElementNodeContext(response, `Response ${index + 1} from ${promptContext.nodeLabel}`));
     });
   });
 }
@@ -499,6 +540,36 @@ function buildLoadedConversationsById(conversationAssets: ConversationAssetType[
   });
 
   return conversationsById;
+}
+
+function scanActiveConversationIdDuplicates(
+  conversationAsset: ConversationAssetType,
+  loadedConversationAssets: ConversationAssetType[],
+  diagnostics: ConversationDiagnostic[],
+): void {
+  const rawId = conversationAsset.conversation.idRef.id;
+  const comparableId = getComparableId(rawId);
+  const duplicateConversation = loadedConversationAssets.find((loadedConversationAsset) => {
+    if (loadedConversationAsset === conversationAsset) return false;
+    if (loadedConversationAsset.filepath === conversationAsset.filepath) return false;
+
+    const loadedRawId = loadedConversationAsset.conversation.idRef.id;
+    return loadedRawId === rawId || getComparableId(loadedRawId) === comparableId;
+  });
+
+  if (duplicateConversation == null) return;
+
+  const duplicateRawId = duplicateConversation.conversation.idRef.id;
+  const duplicateName = duplicateConversation.conversation.uiName || duplicateRawId;
+  diagnostics.push(
+    createDiagnostic({
+      severity: 'warning',
+      category: 'reference',
+      title: 'Duplicate conversation id',
+      description: `Another loaded conversation, '${duplicateName}', uses matching id '${duplicateRawId}'. The active conversation id is '${rawId}', so conversation-id based references may resolve to the wrong conversation until the duplicate id is fixed.`,
+      context: getConversationContext(conversationAsset),
+    }),
+  );
 }
 
 function getComparableId(id: string): string {
