@@ -6,10 +6,12 @@ import './Split.css';
 
 type Props = {
   children: ReactNode;
+  className?: string;
   horizontal?: boolean;
   initialPrimarySize?: string;
   minPrimarySize?: string;
   minSecondarySize?: string;
+  orientation?: 'vertical' | 'horizontal';
 };
 
 function parseSize(size: string | undefined, fallback: number): number {
@@ -25,12 +27,22 @@ function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
 }
 
-export function Split({ children, horizontal = false, initialPrimarySize = '50%', minPrimarySize = '0%', minSecondarySize = '0%' }: Props) {
+export function Split({
+  children,
+  className,
+  horizontal = false,
+  initialPrimarySize = '50%',
+  minPrimarySize = '0%',
+  minSecondarySize = '0%',
+  orientation,
+}: Props) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [primarySize, setPrimarySize] = useState(parseSize(initialPrimarySize, 50));
   const panes = Children.toArray(children).filter(isValidElement);
   const [primaryPane, secondaryPane] = panes;
   const canResize = panes.length > 1;
+  const resolvedOrientation = orientation || (horizontal ? 'horizontal' : 'vertical');
+  const isHorizontal = resolvedOrientation === 'horizontal';
   const minPrimary = parseSize(minPrimarySize, 0);
   const minSecondary = parseSize(minSecondarySize, 0);
   const maxPrimary = 100 - minSecondary;
@@ -46,8 +58,8 @@ export function Split({ children, horizontal = false, initialPrimarySize = '50%'
       if (containerRef.current == null) return;
 
       const bounds = containerRef.current.getBoundingClientRect();
-      const position = horizontal ? moveEvent.clientY - bounds.top : moveEvent.clientX - bounds.left;
-      const availableSize = horizontal ? bounds.height : bounds.width;
+      const position = isHorizontal ? moveEvent.clientY - bounds.top : moveEvent.clientX - bounds.left;
+      const availableSize = isHorizontal ? bounds.height : bounds.width;
       if (availableSize <= 0) return;
 
       setPrimarySize(clamp((position / availableSize) * 100, minPrimary, maxPrimary));
@@ -66,7 +78,10 @@ export function Split({ children, horizontal = false, initialPrimarySize = '50%'
   const primaryStyle = { '--split-primary-size': `${clampedPrimarySize}%` } as CSSProperties;
 
   return (
-    <div ref={containerRef} className={classnames('split', { 'split--horizontal': horizontal })}>
+    <div
+      ref={containerRef}
+      className={classnames('split', className, `split--${resolvedOrientation}`)}
+    >
       <div className="split__pane split__pane--primary" style={primaryStyle}>
         {primaryPane}
       </div>

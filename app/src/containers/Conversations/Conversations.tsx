@@ -6,6 +6,7 @@ import type { DefStore } from 'stores/defStore/def-store';
 
 import { getConversations, getDefinitions } from 'services/api';
 import { useStore } from 'hooks/useStore';
+import { Split } from 'components/Split';
 
 import { ConversationTree } from '../ConversationTree';
 import { ConversationEditor } from '../ConversationEditor';
@@ -32,10 +33,18 @@ const Conversations = () => {
 
   return (
     <div className="conversations">
-      <div className="conversations__tree">
-        <ConversationTree />
-      </div>
-      <div className="conversations__main">{mainView}</div>
+      <Split
+        className="conversations__split"
+        orientation="vertical"
+        initialPrimarySize="18%"
+        minPrimarySize="12%"
+        minSecondarySize="45%"
+      >
+        <div className="conversations__tree">
+          <ConversationTree />
+        </div>
+        <div className="conversations__main">{mainView}</div>
+      </Split>
     </div>
   );
 };

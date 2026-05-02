@@ -2,16 +2,31 @@
 
 .conversations {
   height: 100%;
-  display: flex;
+  min-width: 0;
+  min-height: 0;
 
   &__tree {
     height: 100%;
+    min-width: 0;
     padding: $smallMediumSpace 0 $smallMediumSpace $smallMediumSpace;
     background-color: $backgroundTertiary;
-    border-right: 1px solid $borderTertiary;
   }
 
   &__main {
-    flex-grow: 1;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  &__split {
+    height: 100%;
+  }
+
+  @media screen and (min-width: 1px) and (max-width: 1180px) {
+    &__split > .split__pane--primary,
+    &__split > .split__handle {
+      display: none;
+    }
   }
 }
