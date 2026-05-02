@@ -3,6 +3,7 @@
 .conversation-general.ant-card {
   background-color: $backgroundPrimary;
   box-sizing: border-box;
+  container-type: inline-size;
   height: 100%;
 
   &.ant-card-bordered {
@@ -22,6 +23,7 @@
     color: $textColourQuaternary;
     line-height: 32px;
     text-align: right;
+    white-space: nowrap;
   }
 
   &__value {
@@ -54,6 +56,8 @@
     justify-content: flex-end;
     align-items: center;
     height: 32px;
+    min-width: 0;
+    white-space: nowrap;
 
     .anticon {
       flex: 0 0 auto;
@@ -70,5 +74,47 @@
     .ant-select-selector .ant-select-selection-item {
       color: $textColourPrimary;
     }
+  }
+}
+
+.conversation-general .ant-card-body > .ant-row {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+.conversation-general .ant-card-body > .ant-row > .ant-col {
+  min-width: 0;
+  padding-left: $smallSpace !important;
+  padding-right: $smallSpace !important;
+}
+
+@container (max-width: 28rem) {
+  .conversation-general .ant-card-body > .ant-row > .ant-col {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+  }
+
+  .conversation-general__label {
+    line-height: $lineHeightNormal;
+    min-height: 24px;
+    text-align: left;
+  }
+
+  .conversation-general__speaker-group-label {
+    justify-content: flex-start;
+    height: auto;
+    min-height: 24px;
+  }
+
+  .conversation-general__speaker-group {
+    flex-wrap: wrap;
+  }
+
+  .conversation-general__speaker-select {
+    flex: 0 0 115px;
+  }
+
+  .conversation-general__speaker-group .ant-input {
+    flex: 1 1 12rem;
   }
 }
