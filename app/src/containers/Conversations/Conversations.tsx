@@ -14,6 +14,7 @@ import type { SplitHandleDoubleClickContext } from 'components/Split';
 
 import { ConversationTree } from '../ConversationTree';
 import { ConversationEditor } from '../ConversationEditor';
+import { SidePanel } from '../SidePanel';
 import { SplashScreen } from '../SplashScreen';
 
 import './Conversations.css';
@@ -122,7 +123,10 @@ const Conversations = () => {
             )}
           </div>
         </div>
-        <div className="conversations__main">{mainView}</div>
+        <div className="conversations__workspace">
+          <div className="conversations__main">{mainView}</div>
+          <SidePanel />
+        </div>
       </Split>
     </div>
   );

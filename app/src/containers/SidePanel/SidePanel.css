@@ -1,0 +1,63 @@
+@import '../../css/constants.css';
+
+.side-panel {
+  display: flex;
+  flex: 0 0 var(--side-panel-width);
+  flex-direction: column;
+  width: var(--side-panel-width);
+  min-width: 24rem;
+  max-width: min(34rem, 42vw);
+  min-height: 0;
+  color: $textColourPrimary;
+  background:
+    radial-gradient(circle at top right, rgba(42, 176, 247, 0.12), transparent 28rem),
+    #1c2229;
+  box-shadow:
+    inset 1px 0 0 rgba(255, 255, 255, 0.08),
+    -10px 0 28px rgba(0, 0, 0, 0.25);
+}
+
+.side-panel__header {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: $mediumSpace;
+  min-height: 58px;
+  padding: $mediumSpace $mediumLargeSpace $smallMediumSpace $mediumLargeSpace;
+}
+
+.side-panel__title {
+  min-width: 0;
+  overflow: hidden;
+  color: white;
+  font-size: $fontSizeLarge;
+  font-weight: $fontWeightSemibold;
+  line-height: $lineHeightLarge;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.side-panel__close.ant-btn {
+  flex: 0 0 auto;
+  min-width: 40px;
+  min-height: 40px;
+  color: #b6c1d0;
+}
+
+.side-panel__close.ant-btn:hover,
+.side-panel__close.ant-btn:focus {
+  color: white;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.side-panel__close.ant-btn:active {
+  transform: scale(0.96);
+}
+
+.side-panel__content {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  padding: 0 $mediumLargeSpace $mediumLargeSpace $mediumLargeSpace;
+}

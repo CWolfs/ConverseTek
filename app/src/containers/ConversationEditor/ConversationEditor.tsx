@@ -9,13 +9,15 @@ import { updateConversation } from 'services/api';
 import { regenerateConversationId } from 'utils/conversation-utils';
 import { detectType } from 'utils/node-utils';
 import { useStore } from 'hooks/useStore';
+import { useWindowSize } from 'hooks/useWindowSize';
 import { DialogEditor } from 'components/DialogEditor';
 import { DialogTextArea } from 'components/DialogTextArea';
-import { ConversationDiagnosticsModal } from 'components/ConversationDiagnosticsModal';
+import { ConversationDiagnosticsModal, ConversationDiagnosticsPanel } from 'components/ConversationDiagnosticsModal';
 import { Split } from 'components/Split';
 import { NodeStore } from 'stores/nodeStore/node-store';
 import { DataStore } from 'stores/dataStore/data-store';
 import { ModalStore } from 'stores/modalStore/modal-store';
+import { SidePanelStore } from 'stores/sidePanelStore/side-panel-store';
 import { positiveActionButtonProps } from 'utils/antd-button-utils';
 import { ElementNodeType, ConversationAssetType } from 'types';
 
@@ -61,7 +63,9 @@ function ConversationEditor({ conversationAsset }: Props) {
   const nodeStore = useStore<NodeStore>('node');
   const dataStore = useStore<DataStore>('data');
   const modalStore = useStore<ModalStore>('modal');
+  const sidePanelStore = useStore<SidePanelStore>('sidePanel');
   const [isAllExpanded, setIsAllExpanded] = useState<boolean>(true);
+  const windowSize = useWindowSize();
 
   const { unsavedActiveConversationAsset } = dataStore;
   const { activeNode, rebuild } = nodeStore;
@@ -106,6 +110,16 @@ function ConversationEditor({ conversationAsset }: Props) {
     dataStore.setUnsavedConversationUIName(event.target.value.trim());
   };
 
+  const onDiagnosticsButtonClicked = () => {
+    if ((windowSize.width ?? 0) >= 1280) {
+      sidePanelStore.setPanelContent(ConversationDiagnosticsPanel, {}, 'Conversation Diagnostics');
+      return;
+    }
+
+    sidePanelStore.closePanel();
+    modalStore.setModelContent(ConversationDiagnosticsModal, {}, 'global1');
+  };
+
   // onMount
   useEffect(() => {
     const unsavedConversationAsset = { ...toJS(conversationAsset) };
@@ -116,6 +130,10 @@ function ConversationEditor({ conversationAsset }: Props) {
   useEffect(() => {
     createNewUnsavedConversation();
   }, [conversationAsset]);
+
+  useEffect(() => {
+    if (windowSize.width != null && windowSize.width < 1280) sidePanelStore.closePanel();
+  }, [sidePanelStore, windowSize.width]);
 
   if (unsavedActiveConversationAsset == null) return null;
 
@@ -201,7 +219,7 @@ function ConversationEditor({ conversationAsset }: Props) {
               type="primary"
               size="small"
               icon={<WarningOutlined />}
-              onClick={() => modalStore.setModelContent(ConversationDiagnosticsModal, {}, 'global1')}
+              onClick={onDiagnosticsButtonClicked}
             />
           </Tooltip>
         </div>

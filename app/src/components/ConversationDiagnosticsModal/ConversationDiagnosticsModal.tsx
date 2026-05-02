@@ -12,6 +12,7 @@ import {
   SearchOutlined,
   WarningOutlined,
 } from '@ant-design/icons';
+import classnames from 'classnames';
 import { observer } from 'mobx-react';
 
 import { useStore } from 'hooks/useStore';
@@ -25,7 +26,8 @@ import type { ConversationDiagnostic, ConversationDiagnosticCategory, Conversati
 import './ConversationDiagnosticsModal.css';
 
 type Props = {
-  globalModalId: string;
+  globalModalId?: string;
+  variant?: 'modal' | 'side-panel';
 };
 
 type FilterValue = 'all' | ConversationDiagnosticSeverity;
@@ -51,7 +53,7 @@ function getCategoryLabel(category: ConversationDiagnostic['category']): string 
   return 'Content';
 }
 
-function ConversationDiagnosticsModal({ globalModalId }: Props) {
+function ConversationDiagnosticsContent({ globalModalId, variant = 'modal' }: Props) {
   const dataStore = useStore<DataStore>('data');
   const defStore = useStore<DefStore>('def');
   const modalStore = useStore<ModalStore>('modal');
@@ -123,7 +125,7 @@ function ConversationDiagnosticsModal({ globalModalId }: Props) {
     if (diagnostic.nodeId == null) return;
 
     nodeStore.setActiveNode(diagnostic.nodeId);
-    modalStore.closeModal(globalModalId);
+    if (globalModalId != null) modalStore.closeModal(globalModalId);
     window.setTimeout(() => nodeStore.scrollToActiveNode(true), 50);
   };
 
@@ -156,6 +158,8 @@ function ConversationDiagnosticsModal({ globalModalId }: Props) {
   };
 
   useEffect(() => {
+    if (globalModalId == null) return;
+
     modalStore.setTitle('Conversation Diagnostics', globalModalId);
     modalStore.setWidth('min(74rem, 86vw)', globalModalId);
     modalStore.setShowOkButton(false, globalModalId);
@@ -172,7 +176,11 @@ function ConversationDiagnosticsModal({ globalModalId }: Props) {
   }, [diagnostics.map((diagnostic) => diagnostic.id).join('|')]);
 
   return (
-    <div className="conversation-diagnostics">
+    <div
+      className={classnames('conversation-diagnostics', {
+        'conversation-diagnostics--side-panel': variant === 'side-panel',
+      })}
+    >
       <section className={`conversation-diagnostics__summary conversation-diagnostics__summary--${getSummaryTone(errorCount, warningCount, infoCount)}`}>
         <div className="conversation-diagnostics__summary-icon" aria-hidden="true">
           {errorCount > 0 ? <ExclamationCircleOutlined /> : warningCount > 0 ? <WarningOutlined /> : infoCount > 0 ? <InfoCircleOutlined /> : <CheckCircleOutlined />}
@@ -212,7 +220,13 @@ function ConversationDiagnosticsModal({ globalModalId }: Props) {
             />
             <Select<CategoryFilterValue>
               className="conversation-diagnostics__category-select"
-              classNames={{ popup: { root: 'conversation-diagnostics__category-dropdown' } }}
+              classNames={{
+                popup: {
+                  root: classnames('conversation-diagnostics__category-dropdown', {
+                    'conversation-diagnostics__category-dropdown--dark': variant === 'side-panel',
+                  }),
+                },
+              }}
               value={categoryFilter}
               onChange={setCategoryFilter}
               options={[
@@ -311,4 +325,10 @@ function MetaRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-export const ObservingConversationDiagnosticsModal = observer(ConversationDiagnosticsModal);
+export const ObservingConversationDiagnosticsModal = observer(ConversationDiagnosticsContent);
+
+function ConversationDiagnosticsPanel() {
+  return <ConversationDiagnosticsContent variant="side-panel" />;
+}
+
+export const ObservingConversationDiagnosticsPanel = observer(ConversationDiagnosticsPanel);
