@@ -519,7 +519,10 @@
 .conversation-diagnostics--side-panel .conversation-diagnostics__summary .ant-btn {
   grid-column: auto;
   justify-self: end;
+  width: 34px;
+  min-width: 34px;
   min-height: 34px;
+  padding: 0;
   color: $textColourPrimary;
   background: $backgroundPrimary;
   border-color: $borderTertiary;

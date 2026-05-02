@@ -200,8 +200,15 @@ function ConversationDiagnosticsContent({ globalModalId, variant = 'modal' }: Pr
               : 'The active conversation passed the current content, graph, operation, and reference checks.'}
           </div>
         </div>
-        <Button icon={<DownloadOutlined />} onClick={exportReport} disabled={diagnostics.length <= 0}>
-          Export Report
+        <Button
+          className="conversation-diagnostics__export-button"
+          icon={<DownloadOutlined />}
+          aria-label={variant === 'side-panel' ? 'Export diagnostics report' : undefined}
+          title={variant === 'side-panel' ? 'Export diagnostics report' : undefined}
+          onClick={exportReport}
+          disabled={diagnostics.length <= 0}
+        >
+          {variant === 'side-panel' ? null : 'Export Report'}
         </Button>
       </section>
 
