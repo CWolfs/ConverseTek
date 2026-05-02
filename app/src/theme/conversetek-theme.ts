@@ -1,15 +1,12 @@
-import type { ButtonProps, ThemeConfig } from 'antd';
+import type { ThemeConfig } from 'antd';
 
 export const converseTekColourRoles = {
   appPrimary: '#0050b3',
+  focusAccent: '#0084c1',
+  inputSurface: '#2f2f2f',
   positiveAction: '#52c41a',
   success: '#52c41a',
 } as const;
-
-const antdButtonColourByPurpose = {
-  // AntD's Button API uses preset colour names; ConverseTek code imports the purpose-based props below.
-  positiveAction: 'green',
-} satisfies Record<'positiveAction', NonNullable<ButtonProps['color']>>;
 
 export const converseTekTheme: ThemeConfig = {
   cssVar: {
@@ -19,11 +16,16 @@ export const converseTekTheme: ThemeConfig = {
     borderRadius: 2,
     colorPrimary: converseTekColourRoles.appPrimary,
     colorSuccess: converseTekColourRoles.success,
+    // AntD preset token name; ConverseTek's purpose role is positiveAction.
     green: converseTekColourRoles.positiveAction,
   },
+  components: {
+    Input: {
+      activeBg: converseTekColourRoles.inputSurface,
+      activeBorderColor: converseTekColourRoles.focusAccent,
+      activeShadow: '0 0 0 2px rgba(0, 132, 193, 0.18)',
+      hoverBg: converseTekColourRoles.inputSurface,
+      hoverBorderColor: converseTekColourRoles.focusAccent,
+    },
+  },
 };
-
-export const positiveActionButtonProps = {
-  color: antdButtonColourByPurpose.positiveAction,
-  variant: 'solid',
-} satisfies Pick<ButtonProps, 'color' | 'variant'>;

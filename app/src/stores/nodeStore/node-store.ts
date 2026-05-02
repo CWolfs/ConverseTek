@@ -667,6 +667,8 @@ class NodeStore {
   }
 
   setNodeId(node: PromptNodeType | ElementNodeType, id: string) {
+    if (node.idRef.id === id) return;
+
     node.idRef.id = id;
     nodeStore.setRebuild(true);
 

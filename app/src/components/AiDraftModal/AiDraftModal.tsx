@@ -24,7 +24,7 @@ import { NodeStore } from 'stores/nodeStore/node-store';
 import { AiContextPathPicker } from 'components/AiContextPathPicker';
 import { AiDraftConversationTreePreview } from './AiDraftConversationTreePreview';
 import { AiDraftArtifactViewer } from './AiDraftArtifactViewer';
-import { positiveActionButtonProps } from '../../theme/conversetek-theme';
+import { positiveActionButtonProps } from 'utils/antd-button-utils';
 import {
   createAiDraft,
   getAiDraftArtifact,

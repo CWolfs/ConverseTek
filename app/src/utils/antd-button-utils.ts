@@ -1,5 +1,4 @@
 import type { ButtonProps } from 'antd';
-import { positiveActionButtonProps } from '../theme/conversetek-theme';
 
 type AntdButtonType = ButtonProps['type'];
 type AntdButtonColor = ButtonProps['color'];
@@ -16,6 +15,16 @@ export function getAntdButtonType(type: LegacyButtonType): AntdButtonType {
 export function isAntdButtonDanger(type: LegacyButtonType): boolean {
   return type === 'danger';
 }
+
+const antdButtonColourByPurpose = {
+  // AntD's Button API uses preset colour names; ConverseTek code should use the purpose-based props below.
+  positiveAction: 'green',
+} satisfies Record<'positiveAction', NonNullable<ButtonProps['color']>>;
+
+export const positiveActionButtonProps = {
+  color: antdButtonColourByPurpose.positiveAction,
+  variant: 'solid',
+} satisfies Pick<ButtonProps, 'color' | 'variant'>;
 
 export function getAntdButtonColor(type: LegacyButtonType): AntdButtonColor {
   return type === 'positive' ? positiveActionButtonProps.color : undefined;

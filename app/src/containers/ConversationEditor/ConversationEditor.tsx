@@ -14,7 +14,7 @@ import { DialogEditor } from 'components/DialogEditor';
 import { DialogTextArea } from 'components/DialogTextArea';
 import { NodeStore } from 'stores/nodeStore/node-store';
 import { DataStore } from 'stores/dataStore/data-store';
-import { positiveActionButtonProps } from '../../theme/conversetek-theme';
+import { positiveActionButtonProps } from 'utils/antd-button-utils';
 import { ElementNodeType, ConversationAssetType } from 'types';
 
 import { ConversationGeneral } from '../ConversationGeneral';

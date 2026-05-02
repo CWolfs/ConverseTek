@@ -71,6 +71,7 @@ function ConversationGeneral({ node }: Props) {
   };
 
   const handleIdBlur = () => {
+    if (nodeId === getId(node)) return;
     nodeStore.setNodeId(node, createId(node.idRef, nodeId));
   };
 
