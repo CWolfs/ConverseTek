@@ -381,6 +381,10 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
     setIsContextMenuVisible(false);
   }, [rebuild]);
 
+  useEffect(() => {
+    resize();
+  }, [dialogEditorSize?.width, dialogEditorSize?.height, zoomLevel]);
+
   // On window size change
   useEffect(() => {
     setTimeout(() => {
