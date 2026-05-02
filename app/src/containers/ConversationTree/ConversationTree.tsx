@@ -12,6 +12,10 @@ import { updateConversation } from 'services/api';
 
 import './ConversationTree.css';
 
+type Props = {
+  showTitle?: boolean;
+};
+
 function remapConversationData(conversationAssets: Map<string, ConversationAssetType>) {
   return sortBy(
     Array.from(conversationAssets.values()).map((asset) => ({
@@ -22,7 +26,7 @@ function remapConversationData(conversationAssets: Map<string, ConversationAsset
   );
 }
 
-function ConversationTree() {
+function ConversationTree({ showTitle = true }: Props) {
   const dataStore = useStore<DataStore>('data');
   const modalStore = useStore<ModalStore>('modal');
 
@@ -70,7 +74,7 @@ function ConversationTree() {
     <div className="conversation-tree">
       <ConversationTreeContextMenu id="conversation-context-menu" />
       <FileTree
-        title="Conversations"
+        title={showTitle ? 'Conversations' : ''}
         data={data}
         onSelected={onNodeSelected}
         selectedKeys={selectedKeys || []}

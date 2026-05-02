@@ -8,8 +8,59 @@
   &__tree {
     height: 100%;
     min-width: 0;
-    padding: $smallMediumSpace 0 $smallMediumSpace $smallMediumSpace;
     background-color: $backgroundTertiary;
+  }
+
+  &__tree-dock {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    padding: $smallMediumSpace 0 $smallMediumSpace $smallMediumSpace;
+  }
+
+  &__tree-dock--collapsed {
+    align-items: center;
+    padding: $smallMediumSpace 0;
+  }
+
+  &__tree-dock-header {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: $smallSpace;
+    min-height: 32px;
+    margin-bottom: $tinySpace;
+    padding-right: $smallMediumSpace;
+  }
+
+  &__tree-dock--collapsed &__tree-dock-header {
+    justify-content: center;
+    padding-right: 0;
+  }
+
+  &__tree-dock-title {
+    min-width: 0;
+    overflow: hidden;
+    color: $textColourSecondary;
+    font-weight: bold;
+    line-height: 24px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__tree-dock-content {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+  }
+
+  &__dock-toggle.ant-btn {
+    flex: 0 0 auto;
+    width: 32px;
+    height: 32px;
   }
 
   &__main {
@@ -23,10 +74,7 @@
     height: 100%;
   }
 
-  @media screen and (min-width: 1px) and (max-width: 1180px) {
-    &__split > .split__pane--primary,
-    &__split > .split__handle {
-      display: none;
-    }
+  &__split.split--primary-collapsed > .split__pane--primary {
+    box-shadow: inset -1px 0 0 $borderTertiary;
   }
 }
