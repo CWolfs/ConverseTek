@@ -59,6 +59,8 @@ const inactiveNodeSplitSizes = {
   minSecondarySize: '0%',
 };
 
+const diagnosticsSidePanelId = 'conversation-diagnostics';
+
 function ConversationEditor({ conversationAsset }: Props) {
   const nodeStore = useStore<NodeStore>('node');
   const dataStore = useStore<DataStore>('data');
@@ -112,7 +114,12 @@ function ConversationEditor({ conversationAsset }: Props) {
 
   const onDiagnosticsButtonClicked = () => {
     if ((windowSize.width ?? 0) >= 1280) {
-      sidePanelStore.setPanelContent(ConversationDiagnosticsPanel, {}, 'Conversation Diagnostics');
+      if (sidePanelStore.isPanelVisible(diagnosticsSidePanelId)) {
+        sidePanelStore.closePanel();
+        return;
+      }
+
+      sidePanelStore.setPanelContent(ConversationDiagnosticsPanel, {}, 'Conversation Diagnostics', true, diagnosticsSidePanelId);
       return;
     }
 
