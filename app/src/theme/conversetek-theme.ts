@@ -27,5 +27,11 @@ export const converseTekTheme: ThemeConfig = {
       hoverBg: converseTekColourRoles.inputSurface,
       hoverBorderColor: converseTekColourRoles.focusAccent,
     },
+    Select: {
+      activeBorderColor: converseTekColourRoles.focusAccent,
+      activeOutlineColor: 'rgba(0, 132, 193, 0.18)',
+      hoverBorderColor: converseTekColourRoles.focusAccent,
+      selectorBg: converseTekColourRoles.inputSurface,
+    },
   },
 };

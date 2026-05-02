@@ -36,4 +36,21 @@
   .ant-tree {
     padding-right: $smallMediumSpace;
   }
+
+  .ant-tree .ant-tree-node-content-wrapper {
+    transition-property: background-color, color;
+  }
+
+  .ant-tree .ant-tree-node-content-wrapper:hover,
+  .ant-tree .ant-tree-node-content-wrapper.ant-tree-node-selected {
+    background-color: $highlightColourPrimary !important;
+    color: $textColourQuaternary !important;
+  }
+
+  .ant-tree .ant-tree-node-content-wrapper:hover .ant-tree-title,
+  .ant-tree .ant-tree-node-content-wrapper.ant-tree-node-selected .ant-tree-title,
+  .ant-tree .ant-tree-treenode:hover .ant-tree-node-content-wrapper .ant-tree-title,
+  .ant-tree .ant-tree-treenode-selected .ant-tree-node-content-wrapper .ant-tree-title {
+    color: $textColourQuaternary !important;
+  }
 }

@@ -24,6 +24,12 @@
     text-align: right;
   }
 
+  &__value {
+    display: flex;
+    align-items: center;
+    min-height: 32px;
+  }
+
   &__speaker-group {
     display: flex;
     align-items: center;
@@ -53,5 +59,9 @@
   &__speaker-select {
     flex: 0 0 115px;
     width: 115px;
+
+    .ant-select-selector .ant-select-selection-item {
+      color: $textColourPrimary;
+    }
   }
 }

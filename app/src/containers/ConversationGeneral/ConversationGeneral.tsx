@@ -128,7 +128,7 @@ function ConversationGeneral({ node }: Props) {
           <div className="conversation-general__label">Type</div>
         </Col>
         <Col {...colTwoLayout}>
-          <div>{capitalize(type)}</div>
+          <div className="conversation-general__value">{capitalize(type)}</div>
         </Col>
       </Row>
       <Row gutter={16}>
