@@ -1,3 +1,5 @@
+@import '../../css/constants.css';
+
 .ai-draft-modal {
   display: flex;
   flex-direction: column;
@@ -35,14 +37,66 @@
   font-family: inherit;
 }
 
+.ai-draft-modal .ant-tabs {
+  --ant-tabs-ink-bar-color: $linkColourPrimary;
+  --ant-tabs-item-active-color: $linkColourPrimary;
+  --ant-tabs-item-color: $textColourOnLight;
+  --ant-tabs-item-hover-color: $linkColourPrimary;
+  --ant-tabs-item-selected-color: $linkColourPrimary;
+}
+
+.ai-draft-modal .ant-tabs-content,
+.ai-draft-modal .ant-tabs-tabpane {
+  background: #fff;
+}
+
+.ai-draft-modal__columns {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+}
+
+.ai-draft-modal__columns > * {
+  min-width: 0;
+}
+
+.ai-draft-modal__columns--draft {
+  grid-template-columns: minmax(0, 14fr) minmax(0, 10fr);
+  gap: 16px;
+}
+
+.ai-draft-modal__columns--settings {
+  grid-template-columns: minmax(0, 10fr) minmax(0, 14fr);
+  gap: 16px;
+}
+
+.ai-draft-modal__columns--personalities {
+  grid-template-columns: minmax(0, 9fr) minmax(0, 15fr);
+  gap: 24px;
+}
+
+@media (max-width: 767px) {
+  .ai-draft-modal__columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 .ai-draft-modal .ant-form-item-label label {
-  color: #262626;
+  color: $textColourOnLight;
   font-weight: 600;
 }
 
 .ai-draft-modal .ant-input,
 .ai-draft-modal .ant-select:not(.ant-select-customize-input) .ant-select-selector {
   border-color: #5f6b7a;
+}
+
+.ai-draft-modal .ant-input:disabled,
+.ai-draft-modal .ant-input-disabled {
+  border-color: #d9d9d9 !important;
+  background-color: #fafafa !important;
+  box-shadow: none;
+  color: #8c8c8c;
 }
 
 .ai-draft-modal .ant-input::-webkit-input-placeholder {
@@ -110,7 +164,7 @@
 }
 
 .ai-draft-modal__select-option span {
-  color: #262626;
+  color: $textColourOnLight;
   font-weight: 600;
 }
 
@@ -159,6 +213,13 @@
   min-height: 32px;
 }
 
+.ai-draft-modal__field-actions .ant-btn:not(.ant-btn-primary):not(.ant-btn-dangerous):not(:disabled):not(.ant-btn-disabled),
+.ai-draft-modal__quick-shots .ant-btn:not(.ant-btn-primary):not(.ant-btn-dangerous):not(:disabled):not(.ant-btn-disabled),
+.ai-draft-modal__artifact-actions .ant-btn:not(.ant-btn-primary):not(.ant-btn-dangerous):not(:disabled):not(.ant-btn-disabled),
+.ai-draft-modal__actions .ant-btn:not(.ant-btn-primary):not(.ant-btn-dangerous):not(:disabled):not(.ant-btn-disabled) {
+  color: $textColourOnLight;
+}
+
 .ai-draft-modal__quick-shots {
   display: flex;
   flex-wrap: wrap;
@@ -175,7 +236,7 @@
   padding: 10px 12px;
   border-radius: 4px;
   background: #fff;
-  color: #262626;
+  color: $textColourOnLight;
   box-shadow: inset 0 0 0 1px rgba(31, 47, 67, 0.12), 0 2px 8px rgba(31, 47, 67, 0.06);
 }
 
@@ -232,7 +293,7 @@
   padding: 4px 6px;
   border: 1px solid #e8e8e8;
   background: #fff;
-  color: #262626;
+  color: $textColourOnLight;
   font-size: 12px;
 }
 
@@ -263,19 +324,6 @@
 
 .ai-draft-modal__actions .ant-btn {
   min-height: 32px;
-}
-
-.ai-draft-modal__actions .ant-btn.ai-draft-modal__action-button--generate:not([disabled]) {
-  border-color: #1677c2;
-  background-color: #1677c2;
-  color: #fff;
-}
-
-.ai-draft-modal__actions .ant-btn.ai-draft-modal__action-button--generate:not([disabled]):hover,
-.ai-draft-modal__actions .ant-btn.ai-draft-modal__action-button--generate:not([disabled]):focus {
-  border-color: #0f5f9d;
-  background-color: #0f5f9d;
-  color: #fff;
 }
 
 .ai-draft-personalities {
@@ -344,7 +392,7 @@
   border-radius: 4px;
   background: #fff;
   box-shadow: 0 0 0 1px rgba(31, 47, 67, 0.12), 0 2px 8px rgba(31, 47, 67, 0.08);
-  color: #262626;
+  color: $textColourOnLight;
   cursor: pointer;
   text-align: left;
   transition-property: background, box-shadow, opacity, transform;
@@ -504,7 +552,7 @@
 }
 
 .ai-draft-preview__summary h3 {
-  color: #262626;
+  color: $textColourOnLight;
   margin: 0 0 6px;
 }
 
@@ -557,7 +605,7 @@
 
 .ai-draft-preview__suggestion h4 {
   margin: 0;
-  color: #262626;
+  color: $textColourOnLight;
 }
 
 .ai-draft-preview__versions {
@@ -575,7 +623,7 @@
   padding: 11px 12px;
   border-radius: 4px;
   background: #fff;
-  color: #262626;
+  color: $textColourOnLight;
   box-shadow: inset 0 0 0 1px rgba(31, 47, 67, 0.12), 0 2px 8px rgba(31, 47, 67, 0.08);
 }
 
@@ -614,7 +662,7 @@
   min-height: 24px;
   margin-bottom: 6px;
   margin-right: 0;
-  color: #262626;
+  color: $textColourOnLight;
   font-weight: 600;
 }
 

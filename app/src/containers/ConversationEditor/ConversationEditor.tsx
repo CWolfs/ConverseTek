@@ -14,6 +14,7 @@ import { DialogEditor } from 'components/DialogEditor';
 import { DialogTextArea } from 'components/DialogTextArea';
 import { NodeStore } from 'stores/nodeStore/node-store';
 import { DataStore } from 'stores/dataStore/data-store';
+import { positiveActionButtonProps } from 'utils/antd-button-utils';
 import { ElementNodeType, ConversationAssetType } from 'types';
 
 import { ConversationGeneral } from '../ConversationGeneral';
@@ -154,7 +155,12 @@ function ConversationEditor({ conversationAsset }: Props) {
                   okText="Yes"
                   cancelText="No"
                 >
-                  <Button className="conversation-editor__regenerate-conversation-id-button button-secondary" size="small" icon={<RetweetOutlined />} />
+                  <Button
+                    className="conversation-editor__regenerate-conversation-id-button button-secondary"
+                    type="primary"
+                    size="small"
+                    icon={<RetweetOutlined />}
+                  />
                 </Popconfirm>
               </div>
             </FormItem>
@@ -171,6 +177,7 @@ function ConversationEditor({ conversationAsset }: Props) {
         <div className="conversation-editor__tool-buttons">
           <Button
             className="conversation-editor__expand-nodes button-secondary"
+            type="primary"
             size="small"
             icon={isAllExpanded ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
             onClick={() => setIsAllExpanded(!isAllExpanded)}
@@ -197,7 +204,7 @@ function ConversationEditor({ conversationAsset }: Props) {
           >
             <Button className="conversation-editor__regenerate-ids-button button-secondary" type="primary" size="small" icon={<RetweetOutlined />} />
           </Popconfirm>
-          <Button className="conversation-editor__save-button" type="primary" size="small" icon={<SaveOutlined />} onClick={onSaveButtonClicked} />
+          <Button className="conversation-editor__save-button" {...positiveActionButtonProps} size="small" icon={<SaveOutlined />} onClick={onSaveButtonClicked} />
         </div>
       </div>
 

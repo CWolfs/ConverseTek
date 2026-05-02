@@ -21,13 +21,6 @@
         "legacy": true
       }
     ],
-    [
-      "import",
-      {
-        "libraryName": "antd",
-        "style": true
-      }
-    ],
     "@babel/plugin-syntax-dynamic-import",
     "@babel/plugin-syntax-import-meta",
     ["@babel/plugin-proposal-class-properties", { "loose": false }],

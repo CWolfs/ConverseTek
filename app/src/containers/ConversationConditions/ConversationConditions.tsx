@@ -14,7 +14,7 @@ import { ElementNodeType, OperationCallType } from 'types';
 
 import './ConversationConditions.css';
 
-const { Panel } = Collapse;
+type CollapseItems = NonNullable<React.ComponentProps<typeof Collapse>['items']>;
 
 function ConversationConditions({ node }: { node: ElementNodeType }) {
   const nodeStore = useStore<NodeStore>('node');
@@ -55,7 +55,7 @@ function ConversationConditions({ node }: { node: ElementNodeType }) {
     event?.stopPropagation();
   };
 
-  const renderPanel = (condition: OperationCallType, index: number) => {
+  const renderPanel = (condition: OperationCallType, index: number): CollapseItems[number] => {
     const key = `${node.idRef.id}.${index}`;
 
     const classes = classnames('conversation-conditions__panel', {
@@ -77,6 +77,7 @@ function ConversationConditions({ node }: { node: ElementNodeType }) {
         >
           <Button
             size="small"
+            type="primary"
             danger
             className="conversation-conditions__panel-header-delete-button"
             onClick={(event: MouseEvent) => event.stopPropagation()}
@@ -87,20 +88,29 @@ function ConversationConditions({ node }: { node: ElementNodeType }) {
       </div>
     );
 
-    return (
-      <Panel key={`${key}`} className={classes} header={header}>
-        <EditableLogic key={condition.functionName} logic={condition} category="primary" scope="condition" />
-      </Panel>
-    );
+    return {
+      children: <EditableLogic key={condition.functionName} logic={condition} category="primary" scope="condition" />,
+      className: classes,
+      key,
+      label: header,
+    };
   };
   const displayConditions = conditions === null || !conditions.ops ? [] : conditions.ops;
   dataSize.current = displayConditions.length;
 
   return (
     <div className="conversation-conditions">
-      <Collapse>{displayConditions.map((condition, index) => renderPanel(condition, index))}</Collapse>
+      <Collapse
+        styles={{
+          body: {
+            backgroundColor: '#3d3d3e',
+            color: 'rgba(210, 210, 210, 0.85)',
+          },
+        }}
+        items={displayConditions.map((condition, index) => renderPanel(condition, index))}
+      />
       <div className="conversation-conditions__buttons">
-        <Button className="button-secondary" size="small" onClick={onAddCondition}>
+        <Button className="button-secondary" type="primary" size="small" onClick={onAddCondition}>
           <PlusOutlined />
         </Button>
       </div>

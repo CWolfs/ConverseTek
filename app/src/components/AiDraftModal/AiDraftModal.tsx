@@ -2,7 +2,7 @@ import React, { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { toJS } from 'mobx';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react';
-import { Alert, Button, Checkbox, Col, Form, Input, message, Radio, Row, Select, Tabs, Tag, Tooltip } from 'antd';
+import { Alert, Button, Checkbox, Form, Input, message, Radio, Select, Tabs, Tag, Tooltip } from 'antd';
 import {
   CodeOutlined,
   CopyOutlined,
@@ -24,6 +24,7 @@ import { NodeStore } from 'stores/nodeStore/node-store';
 import { AiContextPathPicker } from 'components/AiContextPathPicker';
 import { AiDraftConversationTreePreview } from './AiDraftConversationTreePreview';
 import { AiDraftArtifactViewer } from './AiDraftArtifactViewer';
+import { positiveActionButtonProps } from 'utils/antd-button-utils';
 import {
   createAiDraft,
   getAiDraftArtifact,
@@ -817,6 +818,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
     <div className="ai-draft-modal__actions">
       <Button
         className="ai-draft-modal__action-button ai-draft-modal__action-button--generate"
+        {...positiveActionButtonProps}
         disabled={!canGenerateFromBrief || isLoading}
         loading={isLoading}
         onClick={() => {
@@ -826,7 +828,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
         {isLoading ? 'Generating Draft...' : 'Generate Preview'}
       </Button>
       <Button
-        type={draft != null ? 'primary' : 'default'}
+        {...(draft != null ? positiveActionButtonProps : {})}
         className="ai-draft-modal__action-button"
         disabled={!canAccept || isLoading}
         onClick={() => {
@@ -836,7 +838,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
         {getAcceptLabel(mode)}
       </Button>
       <Button
-        type="default"
+        type={draft != null ? 'primary' : 'default'}
         danger={draft != null}
         className="ai-draft-modal__action-button"
         disabled={draft == null || isLoading}
@@ -855,12 +857,12 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
             <Alert
               className="ai-draft-modal__alert"
               type="warning"
-              message="This AI flow needs an open conversation folder and, for node or branch suggestions, a selected node."
+              title="This AI flow needs an open conversation folder and, for node or branch suggestions, a selected node."
             />
           )}
 
-          <Row gutter={16}>
-            <Col md={14}>
+          <div className="ai-draft-modal__columns ai-draft-modal__columns--draft">
+            <div>
               <Form layout="vertical">
                 <Form.Item
                   label={
@@ -905,8 +907,8 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                   )}
                 </Form.Item>
               </Form>
-            </Col>
-            <Col md={10}>
+            </div>
+            <div>
               <div className="ai-draft-modal__meta">
                 <div>
                   <span>Mode</span>
@@ -954,8 +956,8 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                   </div>
                 )}
               </div>
-            </Col>
-          </Row>
+            </div>
+          </div>
 
           {draft == null && draftActions}
 
@@ -981,8 +983,8 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
     {
       children: (
         <>
-          <Row gutter={16}>
-            <Col md={10}>
+          <div className="ai-draft-modal__columns ai-draft-modal__columns--settings">
+            <div>
               <Form layout="vertical">
                 <Form.Item
                   label={
@@ -1001,7 +1003,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                   <Alert
                     className="ai-draft-modal__alert"
                     type="info"
-                    message={`${providerUi.displayName} settings can be prepared here, but only Codex runs drafts in this version.`}
+                    title={`${providerUi.displayName} settings can be prepared here, but only Codex runs drafts in this version.`}
                   />
                 )}
                 <Form.Item
@@ -1062,7 +1064,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                     <Alert
                       className="ai-draft-modal__inline-alert"
                       type="warning"
-                      message={modelCatalog.error || 'Could not load provider models.'}
+                      title={modelCatalog.error || 'Could not load provider models.'}
                     />
                   )}
                   {modelCatalog?.success && (
@@ -1083,7 +1085,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                   >
                     <Select
                       value={settings.codexReasoningEffort || ''}
-                      popupClassName="ai-draft-modal__reasoning-dropdown"
+                      classNames={{ popup: { root: 'ai-draft-modal__reasoning-dropdown' } }}
                       optionLabelProp="label"
                       onChange={(value: string) => updateSettings({ codexReasoningEffort: value })}
                     >
@@ -1139,8 +1141,8 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                   />
                 </Form.Item>
               </Form>
-            </Col>
-            <Col md={14}>
+            </div>
+            <div>
               <Form layout="vertical">
                 <Form.Item
                   label={
@@ -1200,8 +1202,8 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                   />
                 </Form.Item>
               </Form>
-            </Col>
-          </Row>
+            </div>
+          </div>
         </>
       ),
       key: 'settings',
@@ -1210,8 +1212,8 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
     {
       children: (
         <>
-          <Row gutter={24} className="ai-draft-personalities">
-            <Col md={9}>
+          <div className="ai-draft-personalities ai-draft-modal__columns ai-draft-modal__columns--personalities">
+            <div>
               <div className="ai-draft-personalities__toolbar">
                 <div className="ai-draft-personalities__search">
                   <Input
@@ -1261,16 +1263,16 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                 <Button icon={<CopyOutlined />} disabled={selectedPersonality == null} onClick={duplicateSelectedPersonality}>
                   Duplicate
                 </Button>
-                <Button icon={<DeleteOutlined />} disabled={selectedPersonality == null} onClick={deleteSelectedPersonality}>
+                <Button type="primary" danger icon={<DeleteOutlined />} disabled={selectedPersonality == null} onClick={deleteSelectedPersonality}>
                   Delete
                 </Button>
                 <Button icon={<ReloadOutlined />} onClick={restoreMissingDefaultPersonalities}>
                   Restore Missing Defaults
                 </Button>
               </div>
-            </Col>
+            </div>
 
-            <Col md={15}>
+            <div>
               {selectedPersonality == null ? (
                 <div className="ai-draft-personalities__editor-empty">Add a personality or restore the defaults to start.</div>
               ) : (
@@ -1344,8 +1346,8 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                   </Form.Item>
                 </Form>
               )}
-            </Col>
-          </Row>
+            </div>
+          </div>
         </>
       ),
       key: 'cast-personalities',
@@ -1398,10 +1400,10 @@ function DraftPreview({
       </div>
 
       {validation.errors.length > 0 && (
-        <Alert className="ai-draft-modal__alert" type="error" message="Draft errors" description={validation.errors.join('\n')} />
+        <Alert className="ai-draft-modal__alert" type="error" title="Draft errors" description={validation.errors.join('\n')} />
       )}
       {structuralWarnings.length > 0 && (
-        <Alert className="ai-draft-modal__alert" type="warning" message="Draft warnings" description={structuralWarnings.join('\n')} />
+        <Alert className="ai-draft-modal__alert" type="warning" title="Draft warnings" description={structuralWarnings.join('\n')} />
       )}
       {advisoryNotes.length > 0 && (
         <div className="ai-draft-preview__notes" aria-label="Draft notes">

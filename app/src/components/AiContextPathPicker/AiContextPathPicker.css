@@ -1,3 +1,5 @@
+@import '../../css/constants.css';
+
 .ai-context-path-picker {
   display: flex;
   flex-direction: column;
@@ -12,7 +14,7 @@
   margin-bottom: 8px;
   padding: 6px 8px;
   background: #fafafa;
-  color: #262626;
+  color: $textColourOnLight;
   font-size: 12px;
   overflow-wrap: anywhere;
 }

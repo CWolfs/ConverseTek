@@ -1,8 +1,7 @@
 /* eslint-disable function-paren-newline */
 import React, { CSSProperties } from 'react';
-import { Tree } from 'antd';
+import { Tree, type TreeDataNode } from 'antd';
 import { FileOutlined, FolderOutlined } from '@ant-design/icons';
-import { DataNode } from 'antd/lib/tree';
 import classnames from 'classnames';
 import { useContextMenu } from 'react-contexify';
 import { useStore } from 'hooks/useStore';
@@ -14,7 +13,7 @@ import './FileTree.css';
 
 type TreeSelectInfo = Parameters<NonNullable<React.ComponentProps<typeof Tree>['onSelect']>>[1];
 type TreeRightClickInfo = Parameters<NonNullable<React.ComponentProps<typeof Tree>['onRightClick']>>[0];
-type TreeData = DataNode[];
+type TreeData = TreeDataNode[];
 
 type Props = {
   title: string;

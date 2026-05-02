@@ -7,7 +7,6 @@ import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Tooltip } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { SelectValue } from 'antd/lib/select';
 
 import { useStore } from 'hooks/useStore';
 import { DefStore } from 'stores/defStore/def-store';
@@ -33,6 +32,8 @@ type ValueProps = {
   optionLabelProp: string | null;
   options: ({ text: string; value: string | number } | string)[] | null;
 };
+
+type EditableSelectValue = string | number;
 
 function getValueProps(values: InputValueType[] | undefined): ValueProps {
   const valueProps: ValueProps = {
@@ -71,7 +72,7 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
           options={parentInput.types}
           placeholder="Select a type"
           style={{ width: 120 }}
-          onChange={(value: SelectValue) => {
+          onChange={(value: EditableSelectValue) => {
             if (typeof value === 'string' && InputTypeTypes.includes(value as InputTypeType)) {
               if (parentLogic) defStore.setArgType(parentLogic, parentArg, value as InputTypeType);
             }
@@ -84,7 +85,7 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
         value={functionName}
         options={operations}
         placeholder="Select an operation"
-        onChange={(value: SelectValue) => {
+        onChange={(value: EditableSelectValue) => {
           if (typeof value === 'string') defStore.setOperation(logic, value);
         }}
       />
@@ -135,7 +136,7 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
           options={input.types}
           placeholder="Select a type"
           style={{ width: 120 }}
-          onChange={(value: SelectValue) => {
+          onChange={(value: EditableSelectValue) => {
             if (typeof value === 'string' && InputTypeTypes.includes(value as InputTypeType)) {
               defStore.setArgType(logic, arg, value as InputTypeType);
             }
@@ -226,7 +227,7 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
                           }
                         }
                       } else {
-                        defStore.setArgValue(logic, arg, value as number);
+                        defStore.setArgValue(logic, arg, value);
                       }
                     }}
                     onBlur={(value) => {
@@ -275,7 +276,7 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
                           }
                         }
                       } else {
-                        defStore.setArgValue(logic, arg, value as number);
+                        defStore.setArgValue(logic, arg, value);
                       }
                     }}
                     onBlur={(value) => {
@@ -317,6 +318,9 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
   const argClasses = classnames('editable-logic__args', {
     'editable-logic__args--even': isEven,
   });
+  const editableLogicClasses = classnames('editable-logic', {
+    'editable-logic--even': isEven,
+  });
 
   // GUARD
   if (!logicDef) {
@@ -328,7 +332,7 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
   const argContent = renderInputsAndArgs(logicDef);
 
   return (
-    <div className="editable-logic">
+    <div className={editableLogicClasses}>
       <div className={operationClasses}>{content}</div>
       {logicDef.inputs.length > 0 && <div className={argClasses}>{argContent}</div>}
     </div>

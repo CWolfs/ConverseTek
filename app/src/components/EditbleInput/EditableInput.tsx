@@ -2,13 +2,14 @@
 import React, { CSSProperties } from 'react';
 import { observer } from 'mobx-react';
 import { Input, AutoComplete } from 'antd';
-import { SelectValue } from 'antd/lib/select';
+
+type EditableInputValue = string | number;
 
 type Props = {
   value: string | null;
   options: ({ text: string; value: string | number } | string)[] | null;
-  onChange: (value: SelectValue) => void;
-  onBlur?: (value: SelectValue) => void;
+  onChange: (value: EditableInputValue) => void;
+  onBlur?: (value: EditableInputValue) => void;
   optionLabelProp?: string | null;
   valueLabel?: string | { text: string; value: string } | null;
 };
@@ -32,7 +33,8 @@ function EditableInput({ value = null, options = null, onChange, onBlur, optionL
     right: '10px',
     color: '#2e9bff',
     zIndex: '1',
-    top: '5px',
+    top: '50%',
+    transform: 'translateY(-50%)',
   } as CSSProperties;
 
   if (isAutocomplete) {

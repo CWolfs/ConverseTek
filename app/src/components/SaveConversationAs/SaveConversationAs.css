@@ -7,6 +7,6 @@
 
   .ant-input {
     background-color: transparent;
-    color: #262626;
+    color: $textColourOnLight;
   }
 }
