@@ -97,6 +97,53 @@ describe('conversation diagnostics', () => {
     );
   });
 
+  it('does not treat operation definition values as strict validation rules', () => {
+    const conversationAsset = makeBasicConversation();
+    const prompt = conversationAsset.conversation.nodes[0];
+    prompt.actions = {
+      ops: [
+        makeAction('Start Conversation Custom', [
+          makeStringArg('9cc71978b9c677fd26a37d5e'),
+          makeStringArg('Dead Claim'),
+          makeStringArg('Hunt that prospect'),
+          makeIntArg(0),
+          makeIntArg(1000),
+        ]),
+      ],
+    };
+
+    const diagnostics = buildConversationDiagnostics({
+      conversationAsset,
+      operationDefinitions: [
+        makeDefinition('Start Conversation Custom', [
+          { label: 'Conversation Id', types: ['string'] },
+          { label: 'Conversation Header', types: ['string'] },
+          { label: 'Conversation Sub Header', types: ['string'] },
+          {
+            label: 'Force Non-FP Conference Room',
+            types: ['int'],
+            values: [
+              { text: 'False', value: 0 },
+              { text: 'True', value: 1 },
+            ],
+          },
+          {
+            label: 'Dropship Exit Room',
+            types: ['int'],
+            values: [
+              { text: 'DC Leopard Corridor', value: 110 },
+              { text: 'DC Mech Bay', value: 200 },
+            ],
+          },
+        ]),
+      ],
+    });
+
+    expect(diagnostics).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ severity: 'warning', title: 'Operation input is outside the expected values', nodeId: getId(prompt) })]),
+    );
+  });
+
   it('uses the runtime prompt node position for link target checks', () => {
     const conversationAsset = makeBasicConversation();
     const root = conversationAsset.conversation.roots[0];

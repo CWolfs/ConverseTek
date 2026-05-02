@@ -346,21 +346,6 @@ function scanOperationArg(
     );
   }
 
-  if (input.values != null && input.values.length > 0) {
-    const value = getArgPrimitiveValue(arg);
-    if (value != null && !input.values.some((inputValue) => inputValue.value === value)) {
-      diagnostics.push(
-        createDiagnostic({
-          severity: 'warning',
-          category: 'operation',
-          title: 'Operation input is outside the expected values',
-          description: `${inputPath} uses '${String(value)}', but the definition only lists specific values for this input.`,
-          context,
-        }),
-      );
-    }
-  }
-
   if (arg.callValue != null) {
     scanOperation(
       arg.callValue,
@@ -464,16 +449,6 @@ function getEffectiveArgType(arg: OperationArgType): 'operation' | 'string' | 'f
   if (arg.floatValue !== 0) return 'float';
   if (arg.boolValue) return 'bool';
   if (arg.intValue !== 0) return 'int';
-  return null;
-}
-
-function getArgPrimitiveValue(arg: OperationArgType): string | number | boolean | null {
-  const argType = getEffectiveArgType(arg);
-
-  if (argType === 'string') return arg.stringValue;
-  if (argType === 'float') return arg.floatValue;
-  if (argType === 'int') return arg.intValue;
-  if (argType === 'bool') return arg.boolValue;
   return null;
 }
 
