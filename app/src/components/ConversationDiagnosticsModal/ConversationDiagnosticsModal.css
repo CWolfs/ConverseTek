@@ -239,30 +239,31 @@
 }
 
 .conversation-diagnostics__category-dropdown--dark.ant-select-dropdown {
-  background: #202831;
+  background: $backgroundTertiary;
   color: $textColourPrimary;
   box-shadow:
     0 8px 24px rgba(0, 0, 0, 0.35),
-    0 0 0 1px rgba(255, 255, 255, 0.12);
+    0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 .conversation-diagnostics__category-dropdown--dark.ant-select-dropdown .ant-select-item {
-  background: #202831;
+  background: $backgroundTertiary;
   color: $textColourPrimary;
 }
 
 .conversation-diagnostics__category-dropdown--dark.ant-select-dropdown .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
-  background: rgba(24, 144, 255, 0.16);
+  background: $highlightColourPrimary;
   color: white;
 }
 
 .conversation-diagnostics__category-dropdown--dark.ant-select-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
-  background: rgba(24, 144, 255, 0.22);
+  border-left: 3px solid $linkColourPrimary;
+  background: rgba(42, 176, 247, 0.14);
   color: white;
 }
 
 .conversation-diagnostics__category-dropdown--dark.ant-select-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-disabled) .ant-select-item-option-state {
-  color: $blue4;
+  color: white;
 }
 
 .conversation-diagnostics__list {
@@ -619,7 +620,12 @@
 .conversation-diagnostics--side-panel .conversation-diagnostics__category-select.ant-select.ant-select-single .ant-select-selector .ant-select-selection-item,
 .conversation-diagnostics--side-panel .conversation-diagnostics__category-select.ant-select.ant-select-single .ant-select-selector .ant-select-selection-placeholder,
 .conversation-diagnostics--side-panel .conversation-diagnostics__category-select.ant-select:not(.ant-select-customize-input).ant-select-single .ant-select-selector .ant-select-selection-search-input {
-  color: $textColourPrimary;
+  color: $textColourPrimary !important;
+}
+
+.conversation-diagnostics--side-panel .conversation-diagnostics__category-select.ant-select-open .ant-select-selector .ant-select-selection-item,
+.conversation-diagnostics--side-panel .conversation-diagnostics__category-select.ant-select-focused .ant-select-selector .ant-select-selection-item {
+  color: $textColourPrimary !important;
 }
 
 .conversation-diagnostics--side-panel .conversation-diagnostics__toolbar-controls .ant-input-affix-wrapper .ant-input::placeholder {
