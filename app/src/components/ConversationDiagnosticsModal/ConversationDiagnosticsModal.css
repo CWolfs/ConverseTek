@@ -229,6 +229,7 @@
 .conversation-diagnostics__list {
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
   gap: $smallMediumSpace;
   min-height: 0;
   overflow-y: auto;
@@ -237,6 +238,7 @@
 
 .conversation-diagnostics__item {
   display: grid;
+  flex: 0 0 auto;
   grid-template-columns: 4px minmax(0, 1fr);
   overflow: hidden;
   border-radius: 6px;
