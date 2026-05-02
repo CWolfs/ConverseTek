@@ -37,11 +37,14 @@
   }
 
   &__tool-buttons {
+    display: flex;
+    align-items: center;
+    gap: $smallSpace;
     margin-bottom: $smallSpace;
   }
 
   &__expand-nodes {
-    margin-right: $smallSpace;
+    flex: 0 0 auto;
   }
 
   &__details {
