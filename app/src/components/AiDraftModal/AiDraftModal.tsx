@@ -1,4 +1,5 @@
-import React, { ChangeEvent, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import type { ChangeEvent, ComponentProps } from 'react';
 import { toJS } from 'mobx';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react';
@@ -62,7 +63,7 @@ import './AiDraftModal.css';
 
 const { TextArea } = Input;
 const { Option } = Select;
-type TabsItems = NonNullable<React.ComponentProps<typeof Tabs>['items']>;
+type TabsItems = NonNullable<ComponentProps<typeof Tabs>['items']>;
 const AI_DEBUG_PREFIX = '[ConverseTek AI Modal]';
 
 const fallbackReasoningEfforts = [

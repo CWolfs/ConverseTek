@@ -1,4 +1,5 @@
-import React, { useState, useEffect, ChangeEvent } from 'react';
+import { useState, useEffect } from 'react';
+import type { ChangeEvent } from 'react';
 import { observer } from 'mobx-react';
 import { message, Input } from 'antd';
 
@@ -15,12 +16,12 @@ function SaveConversationAs() {
   const globalModalId = 'global1';
 
   const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-  if (!conversationAsset) return null;
-
-  const [suggestedFileName] = useState(`${conversationAsset.conversation.idRef.id}.convo.bytes`);
+  const suggestedFileName = conversationAsset == null ? '' : `${conversationAsset.conversation.idRef.id}.convo.bytes`;
   const [modifiedFileName, setModifiedFileName] = useState<string | null>(null);
 
   const onOk = () => {
+    if (conversationAsset == null) return;
+
     const { filename: previousFileName, filepath: previousFilePath } = conversationAsset;
 
     conversationAsset.filename = (modifiedFileName || suggestedFileName).replace('.bytes', '');
@@ -51,6 +52,8 @@ function SaveConversationAs() {
   useEffect(() => {
     setupModal();
   });
+
+  if (conversationAsset == null) return null;
 
   return (
     <div className="save-conversation-as">

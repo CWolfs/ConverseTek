@@ -1,4 +1,3 @@
-import React from 'react';
 import { Menu, Item, ItemParams, Separator, useContextMenu } from 'react-contexify';
 import { observer } from 'mobx-react';
 

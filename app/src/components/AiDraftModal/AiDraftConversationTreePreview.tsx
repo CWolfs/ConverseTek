@@ -1,4 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import type { CSSProperties, MutableRefObject, ReactElement } from 'react';
 import { BranchesOutlined } from '@ant-design/icons';
 import { useSize } from 'ahooks';
 import { Tree, NodeRendererProps, RowRendererProps, CursorProps, TreeApi } from 'react-arborist';
@@ -24,7 +25,7 @@ import 'components/DialogEditor/DialogEditor.css';
 const scaffoldBlockPxWidth = 44;
 const rootScaffoldOffsetPx = scaffoldBlockPxWidth;
 
-function getPreviewNodeLayoutStyle(style: React.CSSProperties): React.CSSProperties {
+function getPreviewNodeLayoutStyle(style: CSSProperties): CSSProperties {
   const paddingLeft = typeof style.paddingLeft === 'number' ? style.paddingLeft : parseFloat(String(style.paddingLeft || 0));
 
   return {
@@ -133,8 +134,8 @@ export function AiDraftConversationTreePreview({ conversationAsset }: Props) {
               }
             : null
         }
-        connectDragPreview={(element: React.ReactElement) => element}
-        connectDragSource={(element: React.ReactElement) => element}
+        connectDragPreview={(element: ReactElement) => element}
+        connectDragSource={(element: ReactElement) => element}
         isDragging={false}
         canDrop={false}
         canDrag={false}
@@ -204,7 +205,7 @@ function createPreviewNodeStore(
   conversationAsset: ConversationAssetType,
   expansionByNodeId: Map<string, boolean>,
   setActiveNodeId: (nodeId: string | null) => void,
-  maxHorizontalNodePositionRef: React.MutableRefObject<number>,
+  maxHorizontalNodePositionRef: MutableRefObject<number>,
 ): PreviewNodeStore {
   const nodeById = new Map<string, PromptNodeType | ElementNodeType>();
   const promptNodeByIndex = new Map<number, PromptNodeType>();

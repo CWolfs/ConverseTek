@@ -2,7 +2,6 @@
 /* eslint-disable react/jsx-one-expression-per-line */
 /* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable operator-linebreak */
-import React from 'react';
 import { observer } from 'mobx-react';
 import classnames from 'classnames';
 import { Tooltip } from 'antd';

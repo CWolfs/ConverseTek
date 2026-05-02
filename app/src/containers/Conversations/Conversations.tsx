@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { observer } from 'mobx-react';
 
 import type { DataStore } from 'stores/dataStore/data-store';

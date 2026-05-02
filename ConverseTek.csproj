@@ -26,7 +26,6 @@
 
   <ItemGroup>
     <Compile Remove="app\node_modules\**" />
-    <Compile Remove="Handlers\**" />
     <Content Remove="app\**" />
     <EmbeddedResource Remove="app\node_modules\**" />
     <None Remove="app\node_modules\**" />

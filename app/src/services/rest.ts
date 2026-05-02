@@ -25,11 +25,6 @@ type PendingRequest = {
 const pendingRequests = new Map<string, PendingRequest>();
 let messageListenerAttached = false;
 
-export function infoTemp() {
-  console.log('External - info');
-  return { objective: 'External - ConverseTek Main Objectives', platform: 'External - Platforms', version: 'External - Version' };
-}
-
 export function get<T = unknown>(url: string, parameters: object | null = null): Promise<T> {
   return sendBridgeRequest<T>({
     id: createRequestId(),
@@ -98,7 +93,6 @@ function createRequestId() {
 }
 
 export default {
-  infoTemp,
   get,
   post,
 };

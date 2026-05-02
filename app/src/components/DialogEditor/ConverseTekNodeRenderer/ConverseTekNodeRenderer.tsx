@@ -1,6 +1,7 @@
 /* eslint-disable function-paren-newline */
 /* eslint-disable indent */
-import React, { CSSProperties, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { CSSProperties, ReactElement } from 'react';
 import classnames from 'classnames';
 import { observer } from 'mobx-react';
 import { Popover, Tooltip } from 'antd';
@@ -63,20 +64,20 @@ export type ConverseTekNodeRendererProps = {
   isContextMenuVisible: boolean;
   scaffoldBlockPxWidth: number;
   toggleChildrenVisibility: (({ node, path, treeIndex }: NodeStateProps) => void) | null;
-  connectDragPreview: (element: React.ReactElement) => React.ReactElement;
-  connectDragSource: (element: React.ReactElement, effect: { dropEffect: string }) => React.ReactElement;
+  connectDragPreview: (element: ReactElement) => ReactElement;
+  connectDragSource: (element: ReactElement, effect: { dropEffect: string }) => ReactElement;
   isDragging: boolean;
   canDrop: boolean;
   canDrag: boolean;
   node: RSTNode;
-  title: ((nodeState: NodeStateProps) => string | React.ReactElement) | string | React.ReactElement | null;
-  subtitle: ((nodeState: NodeStateProps) => string | React.ReactElement) | string | React.ReactElement | null;
+  title: ((nodeState: NodeStateProps) => string | ReactElement) | string | ReactElement | null;
+  subtitle: ((nodeState: NodeStateProps) => string | ReactElement) | string | ReactElement | null;
   draggedNode: RSTNode | null;
   path: RSTPath;
   treeIndex: number;
   isSearchMatch: boolean;
   isSearchFocus: boolean;
-  buttons: React.ReactElement[];
+  buttons: ReactElement[];
   className: string;
   style: CSSProperties;
   didDrop: boolean;
@@ -166,7 +167,7 @@ function getPromptSpeakerBadge(
   };
 }
 
-function getMoveHandleIcon(isRoot: boolean, isNode: boolean, isResponse: boolean): React.ReactElement | null {
+function getMoveHandleIcon(isRoot: boolean, isNode: boolean, isResponse: boolean): ReactElement | null {
   const handleIconStyle = { color: 'white', fontSize: '20px' };
 
   if (isRoot) return <AntDesignOutlined style={handleIconStyle} />;
@@ -224,7 +225,7 @@ function getOperationDetailsTooltip(
   operations: OperationCallType[] | null | undefined,
   fallback: string,
   operationDefinitions: OperationDefinitionType[] = [],
-): React.ReactElement | string {
+): ReactElement | string {
   if (operations == null || operations.length <= 0) return fallback;
 
   return (
@@ -256,7 +257,7 @@ function getOperationDetailsTooltip(
   );
 }
 
-function getConditionsTooltip(node: PromptNodeType | ElementNodeType | null, operationDefinitions: OperationDefinitionType[]): React.ReactElement | string {
+function getConditionsTooltip(node: PromptNodeType | ElementNodeType | null, operationDefinitions: OperationDefinitionType[]): ReactElement | string {
   if (node == null || node.type === 'node') return 'Conditions gate whether this item is available.';
   return getOperationDetailsTooltip('Conditions', node.conditions?.ops, 'Conditions gate whether this response or root is available.', operationDefinitions);
 }
@@ -267,7 +268,7 @@ function getActionsTooltipTitle(
   isNode: boolean,
   isResponse: boolean,
   operationDefinitions: OperationDefinitionType[],
-): React.ReactElement | string {
+): ReactElement | string {
   return getOperationDetailsTooltip('Actions', node?.actions?.ops, getActionsTooltip(isRoot, isNode, isResponse), operationDefinitions);
 }
 
@@ -341,7 +342,7 @@ export const ConverseTekNodeRenderer = observer(
     const contextMenuId = node.id || Math.random().toString();
     const { parentId } = node;
 
-    let nodeTitle: ((nodeState: NodeStateProps) => string | React.ReactElement) | React.ReactElement | string = '';
+    let nodeTitle: ((nodeState: NodeStateProps) => string | ReactElement) | ReactElement | string = '';
     if (storedNode === null || storedNode === undefined) {
       nodeTitle = title || node.title;
     } else {

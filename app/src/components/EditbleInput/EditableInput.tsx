@@ -1,5 +1,5 @@
 /* eslint-disable no-else-return */
-import React, { CSSProperties } from 'react';
+import type { CSSProperties } from 'react';
 import { observer } from 'mobx-react';
 import { Input, AutoComplete } from 'antd';
 

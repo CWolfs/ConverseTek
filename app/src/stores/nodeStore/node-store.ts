@@ -4,7 +4,6 @@ import defer from 'lodash.defer';
 import remove from 'lodash.remove';
 import sortBy from 'lodash.sortby';
 import last from 'lodash.last';
-import structuredClone from '@ungap/structured-clone';
 
 import {
   getId,
@@ -379,7 +378,7 @@ class NodeStore {
       nodeIdMap: new Map<number, number>(),
     };
 
-    const node = structuredClone<PromptNodeType | ElementNodeType | null>(toJS(this.getNode(nodeId)));
+    const node = structuredClone(toJS(this.getNode(nodeId)));
     if (node === null) return;
 
     tempClipboard.originalNodeId = nodeId;
@@ -463,7 +462,7 @@ class NodeStore {
   ): void {
     if (tempClipboard == null) throw Error('Clipboard is null or undefined. Cannot copy nodes with no clipboard');
 
-    const promptNode = structuredClone<PromptNodeType | null>(toJS(this.getPromptNodeByIndex(nodeIndex)));
+    const promptNode = structuredClone(toJS(this.getPromptNodeByIndex(nodeIndex)));
     if (!promptNode) return;
 
     const { index } = promptNode;

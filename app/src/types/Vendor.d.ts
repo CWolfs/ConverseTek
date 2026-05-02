@@ -1,10 +1,5 @@
 declare module '*.css';
 
-declare module '@ungap/structured-clone' {
-  const structuredClone: <T>(input: T) => T;
-  export = structuredClone;
-}
-
 type RSTNodeOnMoveContainer = {
   treeData: object[];
   node: RSTNode;
@@ -30,8 +25,8 @@ type RSTNodeCanDragContainer = {
   path: RSTPath;
   treeIndex: number;
   lowerSiblingCounts: number[];
-  isSearchMatch: bool;
-  isSearchFocus: bool;
+  isSearchMatch: boolean;
+  isSearchFocus: boolean;
 };
 
 type RSTNode = {

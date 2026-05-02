@@ -1,4 +1,3 @@
-import React from 'react';
 import { Menu, Item, ItemParams } from 'react-contexify';
 
 import { useStore } from 'hooks/useStore';

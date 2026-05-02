@@ -346,16 +346,31 @@
 }
 
 .ai-draft-personalities__search .ant-input-affix-wrapper {
+  background-color: $backgroundTertiary;
+  border-color: $borderTertiary;
+  color: $textColourPrimary;
   padding-left: 12px;
+}
+
+.ai-draft-personalities__search .ant-input-affix-wrapper:hover,
+.ai-draft-personalities__search .ant-input-affix-wrapper-focused {
+  background-color: $backgroundTertiary;
+  border-color: $borderTertiary;
 }
 
 .ai-draft-personalities__search .ant-input-affix-wrapper .ant-input-prefix {
   margin-right: 12px;
-  color: #40556c;
+  color: $textColourPrimary;
 }
 
 .ai-draft-personalities__search .ant-input-affix-wrapper > input.ant-input {
+  background-color: transparent;
+  color: $textColourPrimary;
   padding-left: 10px !important;
+}
+
+.ai-draft-personalities__search .ant-input-affix-wrapper > input.ant-input::placeholder {
+  color: #ffffff2e;
 }
 
 .ai-draft-personalities__toolbar .ant-btn,

@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from 'react';
+import type { ChangeEvent } from 'react';
 import { observer } from 'mobx-react';
 import { Input } from 'antd';
 import { ElementNodeType, PromptNodeType } from 'types';

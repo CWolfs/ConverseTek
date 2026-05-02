@@ -1,4 +1,4 @@
-import React, { JSXElementConstructor, ReactElement } from 'react';
+import type { JSXElementConstructor, ReactElement } from 'react';
 import { observer } from 'mobx-react';
 import { Select } from 'antd';
 
