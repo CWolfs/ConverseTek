@@ -206,11 +206,87 @@
 
 .ai-draft-modal__field-actions {
   display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   margin-top: 8px;
 }
 
 .ai-draft-modal__field-actions .ant-btn {
   min-height: 32px;
+}
+
+.ai-draft-modal__context-paths {
+  display: grid;
+  gap: 8px;
+  min-height: 92px;
+  max-height: min(220px, 30vh);
+  overflow-y: auto;
+  padding: 2px 4px 4px 2px;
+}
+
+.ai-draft-modal__context-paths-empty {
+  display: flex;
+  align-items: center;
+  min-height: 58px;
+  padding: 10px 12px;
+  border-radius: 4px;
+  background: #fafafa;
+  color: #66788a;
+  box-shadow: inset 0 0 0 1px rgba(31, 47, 67, 0.1);
+  font-size: 13px;
+  text-wrap: pretty;
+}
+
+.ai-draft-modal__context-path-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 40px;
+  align-items: center;
+  min-height: 40px;
+  border-radius: 4px;
+  background: #fff;
+  color: $textColourOnLight;
+  box-shadow: 0 0 0 1px rgba(31, 47, 67, 0.12), 0 2px 8px rgba(31, 47, 67, 0.06);
+  transition-property: background, box-shadow;
+  transition-duration: 140ms;
+  transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+.ai-draft-modal__context-path-item:hover,
+.ai-draft-modal__context-path-item:focus-within {
+  background: #f6f8fb;
+  box-shadow: 0 0 0 1px rgba(31, 95, 139, 0.3), 0 4px 12px rgba(31, 47, 67, 0.1);
+}
+
+.ai-draft-modal__context-path-text {
+  min-width: 0;
+  padding: 10px 0 10px 12px;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.ai-draft-modal__context-path-remove.ant-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  min-height: 40px;
+  color: #66788a;
+  transition-property: background, color, transform;
+  transition-duration: 140ms;
+  transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+.ai-draft-modal__context-path-remove.ant-btn:hover,
+.ai-draft-modal__context-path-remove.ant-btn:focus {
+  background: rgba(188, 44, 44, 0.08);
+  color: #bc2c2c;
+}
+
+.ai-draft-modal__context-path-remove.ant-btn:active {
+  transform: scale(0.96);
 }
 
 .ai-draft-modal__field-actions .ant-btn:not(.ant-btn-primary):not(.ant-btn-dangerous):not(:disabled):not(.ant-btn-disabled),

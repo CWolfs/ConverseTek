@@ -28,6 +28,8 @@ Frontend calls go through `app/src/services/rest.ts`, which sends typed bridge m
 
 The desktop host uses WebView2/Edge Chromium. Modern CSS is available in the app runtime, so prefer clear, current CSS such as flex/grid gaps, `min()`/`max()`/`clamp()`, logical properties, and modern selectors where they make the UI simpler.
 
+Repo-local skills live under `.agents/skills/`. For ConverseTek visual styling, AntD appearance, text colour, layout, hover/focus, modal, menu, button, or WebView2-rendered UI issues, use the `conversetek-live-ui-inspection` skill before guessing at CSS selectors.
+
 Keep ConverseTek-specific layout, colour, spacing, and component polish in ordinary CSS/PostCSS files under `app/src/css/` and component-local CSS files. Do not migrate local app styling into CSS-in-JS, broad `theme.useToken()` rewrites, or large `ConfigProvider` component-token blocks.
 
 For AntD 6, use `ConfigProvider` `theme` for true app-wide design intent: enable `cssVar`, set stable global primitives such as `colorPrimary` and `borderRadius`, and use algorithms or motion settings only when they should affect the whole application. Treat AntD 6 as a CSS-variable system, not a reason to replace the app's CSS architecture.

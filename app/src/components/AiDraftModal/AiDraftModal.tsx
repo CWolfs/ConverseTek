@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { ChangeEvent, ComponentProps } from 'react';
+import type { ChangeEvent, ComponentProps, CSSProperties } from 'react';
 import { toJS } from 'mobx';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react';
-import { Alert, Button, Checkbox, Form, Input, message, Radio, Select, Tabs, Tag, Tooltip } from 'antd';
+import { Alert, App as AntdApp, Button, Checkbox, Form, Input, Radio, Select, Tabs, Tag, Tooltip } from 'antd';
 import {
   CodeOutlined,
+  CloseOutlined,
   CopyOutlined,
   DeleteOutlined,
   FileTextOutlined,
@@ -65,6 +66,7 @@ const { TextArea } = Input;
 const { Option } = Select;
 type TabsItems = NonNullable<ComponentProps<typeof Tabs>['items']>;
 const AI_DEBUG_PREFIX = '[ConverseTek AI Modal]';
+const positiveActionButtonStyle: CSSProperties = { color: '#fff' };
 
 const fallbackReasoningEfforts = [
   { effort: 'low', label: 'Low', description: 'Fast responses with lighter reasoning.' },
@@ -165,7 +167,7 @@ type ProviderUi = {
 };
 
 function getModeTitle(mode: AiDraftModeType): string {
-  if (mode === 'fullConversation') return 'AI Draft Conversation';
+  if (mode === 'fullConversation') return 'Draft Assist';
   if (mode === 'branchExpansion') return 'AI Expand Branch';
   return 'AI Suggest Node Text';
 }
@@ -318,6 +320,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
   const defStore = useStore<DefStore>('def');
   const modalStore = useStore<ModalStore>('modal');
   const nodeStore = useStore<NodeStore>('node');
+  const { message: messageApi } = AntdApp.useApp();
 
   const [settings, setSettings] = useState<AiSettingsType>(emptySettings);
   const [workspaceSettings, setWorkspaceSettings] = useState<AiWorkspaceSettingsType | null>(null);
@@ -442,7 +445,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
       }
     } catch (error) {
       console.log(`${AI_DEBUG_PREFIX} loadConfiguration error`, error);
-      void message.error(error instanceof Error ? error.message : 'Could not load AI settings.');
+      void messageApi.error(error instanceof Error ? error.message : 'Could not load AI settings.');
     }
   };
 
@@ -548,7 +551,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
     );
 
     if (missingDefaults.length === 0) {
-      void message.info('All default cast personalities are already present.');
+      void messageApi.info('All default cast personalities are already present.');
       return;
     }
 
@@ -560,6 +563,11 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
     const existingPaths = workspaceSettings?.contextPaths || [];
     if (existingPaths.includes(path)) return;
     updateWorkspaceSettings({ contextPaths: [...existingPaths, path] });
+  };
+
+  const removeContextPath = (path: string) => {
+    const existingPaths = workspaceSettings?.contextPaths || [];
+    updateWorkspaceSettings({ contextPaths: existingPaths.filter((existingPath) => existingPath !== path) });
   };
 
   const openContextPathPicker = () => {
@@ -575,14 +583,14 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
 
   const openDraftArtifact = async (title: string, path: string) => {
     if (!path) {
-      void message.warning('No AI diagnostics file is available yet.');
+      void messageApi.warning('No AI diagnostics file is available yet.');
       return;
     }
 
     try {
       const artifact = await getAiDraftArtifact(path);
       if (!artifact.success) {
-        void message.error(artifact.error || 'Could not read AI diagnostics file.');
+        void messageApi.error(artifact.error || 'Could not read AI diagnostics file.');
         return;
       }
 
@@ -597,7 +605,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
         'global2',
       );
     } catch (error) {
-      void message.error(error instanceof Error ? error.message : 'Could not read AI diagnostics file.');
+      void messageApi.error(error instanceof Error ? error.message : 'Could not read AI diagnostics file.');
     }
   };
 
@@ -632,11 +640,11 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
       setModelCatalog(getCachedModelCatalog(savedSettings, savedProviderName));
 
       if (showSuccessMessage) {
-        void message.success('AI settings saved');
+        void messageApi.success('AI settings saved');
       }
     } catch (error) {
       console.log(`${AI_DEBUG_PREFIX} saveConfiguration error`, error);
-      void message.error(error instanceof Error ? error.message : 'Could not save AI settings.');
+      void messageApi.error(error instanceof Error ? error.message : 'Could not save AI settings.');
       throw error;
     } finally {
       console.log(`${AI_DEBUG_PREFIX} saveConfiguration finally`, {
@@ -665,12 +673,12 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
     const draftBrief = briefOverride ?? brief;
 
     if (!canGenerate || workingDirectory == null) {
-      void message.warning('Open a conversation folder and select a node when required before asking AI.');
+      void messageApi.warning('Open a conversation folder and select a node when required before asking AI.');
       return;
     }
 
     if (draftBrief.trim() === '') {
-      void message.warning('Write a brief before asking AI.');
+      void messageApi.warning('Write a brief before asking AI.');
       return;
     }
 
@@ -695,14 +703,14 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
       setDraftRunResult(result);
 
       if (!result.success) {
-        void message.error(result.error || 'AI draft generation failed.');
+        void messageApi.error(result.error || 'AI draft generation failed.');
         return;
       }
 
       setDraft(parseAiDraft(result.draftJson));
-      void message.success('AI draft generated');
+      void messageApi.success('AI draft generated');
     } catch (error) {
-      void message.error(error instanceof Error ? error.message : 'AI draft generation failed.');
+      void messageApi.error(error instanceof Error ? error.message : 'AI draft generation failed.');
     } finally {
       setIsLoading(false);
     }
@@ -717,7 +725,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
       if (acceptedDraft.kind === 'fullConversation') {
         const roundTripResult = await validateConversationRoundTrip(acceptedDraft.conversationAsset);
         if (!roundTripResult.success) {
-          void message.error(`Generated conversation failed serialisation validation: ${roundTripResult.error}`);
+          void messageApi.error(`Generated conversation failed serialisation validation: ${roundTripResult.error}`);
           return;
         }
 
@@ -754,14 +762,14 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
         });
       }
 
-      void message.success(mode === 'fullConversation' ? 'AI conversation draft is ready to save' : 'AI suggestion accepted');
+      void messageApi.success(mode === 'fullConversation' ? 'AI conversation draft is ready to save' : 'AI suggestion accepted');
       modalStore.closeModal(globalModalId);
     } catch (error) {
-      void message.error(error instanceof Error ? error.message : 'Could not accept AI draft.');
+      void messageApi.error(error instanceof Error ? error.message : 'Could not accept AI draft.');
     }
   };
 
-  const contextPathsText = (workspaceSettings?.contextPaths || []).join('\n');
+  const contextPaths = workspaceSettings?.contextPaths || [];
   const selectedNodeLabel = selectedNode ? `${selectedNode.type} ${getId(selectedNode)}` : 'None';
   const showSelectedNodeContext = shouldShowSelectedNodeContext(mode, selectedNode, draft);
   const selectedNodeOriginalText = showSelectedNodeContext ? getOriginalNodeText(selectedNode) : '';
@@ -817,36 +825,43 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
 
   const draftActions = (
     <div className="ai-draft-modal__actions">
-      <Button
-        className="ai-draft-modal__action-button ai-draft-modal__action-button--generate"
-        {...positiveActionButtonProps}
-        disabled={!canGenerateFromBrief || isLoading}
-        loading={isLoading}
-        onClick={() => {
-          void generateDraft();
-        }}
-      >
-        {isLoading ? 'Generating Draft...' : 'Generate Preview'}
-      </Button>
-      <Button
-        {...(draft != null ? positiveActionButtonProps : {})}
-        className="ai-draft-modal__action-button"
-        disabled={!canAccept || isLoading}
-        onClick={() => {
-          void acceptDraft();
-        }}
-      >
-        {getAcceptLabel(mode)}
-      </Button>
-      <Button
-        type={draft != null ? 'primary' : 'default'}
-        danger={draft != null}
-        className="ai-draft-modal__action-button"
-        disabled={draft == null || isLoading}
-        onClick={() => setDraft(null)}
-      >
-        Reject
-      </Button>
+      {draft == null ? (
+        <Button
+          className="ai-draft-modal__action-button ai-draft-modal__action-button--positive ai-draft-modal__action-button--generate"
+          {...positiveActionButtonProps}
+          disabled={!canGenerateFromBrief || isLoading}
+          loading={isLoading}
+          style={canGenerateFromBrief && !isLoading ? positiveActionButtonStyle : undefined}
+          onClick={() => {
+            void generateDraft();
+          }}
+        >
+          {isLoading ? 'Generating Draft...' : 'Generate Preview'}
+        </Button>
+      ) : (
+        <>
+          <Button
+            {...positiveActionButtonProps}
+            className="ai-draft-modal__action-button ai-draft-modal__action-button--positive"
+            disabled={!canAccept || isLoading}
+            style={canAccept && !isLoading ? positiveActionButtonStyle : undefined}
+            onClick={() => {
+              void acceptDraft();
+            }}
+          >
+            {getAcceptLabel(mode)}
+          </Button>
+          <Button
+            type="primary"
+            danger
+            className="ai-draft-modal__action-button"
+            disabled={isLoading}
+            onClick={() => setDraft(null)}
+          >
+            Reject
+          </Button>
+        </>
+      )}
     </div>
   );
 
@@ -1149,23 +1164,30 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                   label={
                     <FieldLabel
                       label="Context files and folders"
-                      help="One file or folder path per line. ConverseTek includes supported text files as read-only context. Examples: a DeadClaim outline markdown file; a folder containing existing conversation exports."
+                      help="ConverseTek includes supported text files as read-only context. Examples: a DeadClaim outline markdown file; a folder containing existing conversation exports."
                     />
                   }
                 >
-                  <TextArea
-                    value={contextPathsText}
-                    rows={7}
-                    placeholder="One path per line"
-                    onChange={(event) =>
-                      updateWorkspaceSettings({
-                        contextPaths: event.target.value
-                          .split('\n')
-                          .map((line) => line.trim())
-                          .filter(Boolean),
-                      })
-                    }
-                  />
+                  <div className="ai-draft-modal__context-paths" role="list">
+                    {contextPaths.length === 0 ? (
+                      <div className="ai-draft-modal__context-paths-empty">No context paths added yet.</div>
+                    ) : (
+                      contextPaths.map((path) => (
+                        <div key={path} className="ai-draft-modal__context-path-item" role="listitem">
+                          <span className="ai-draft-modal__context-path-text">{path}</span>
+                          <Tooltip title="Remove context path">
+                            <Button
+                              aria-label={`Remove context path ${path}`}
+                              className="ai-draft-modal__context-path-remove"
+                              icon={<CloseOutlined />}
+                              type="text"
+                              onClick={() => removeContextPath(path)}
+                            />
+                          </Tooltip>
+                        </div>
+                      ))
+                    )}
+                  </div>
                   <div className="ai-draft-modal__field-actions">
                     <Button icon={<FolderOpenOutlined />} onClick={openContextPathPicker}>
                       Browse...
