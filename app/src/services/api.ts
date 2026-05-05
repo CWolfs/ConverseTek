@@ -2,6 +2,7 @@ import { runInAction } from 'mobx';
 
 import {
   AiCastPersonalityType,
+  AiBriefHistoryEntryType,
   AiDraftArtifactResultType,
   AiDraftRequestType,
   AiDraftRunResultType,
@@ -70,7 +71,15 @@ type AiWorkspaceSettingsResponseType = {
   ContextPaths?: string[];
   HouseStyleNotes?: string;
   DefaultCampaignBrief?: string;
+  BriefHistoryByScope?: Record<string, AiBriefHistoryEntryResponseType[]>;
   CastPersonalities?: AiCastPersonalityResponseType[];
+};
+
+type AiBriefHistoryEntryResponseType = {
+  Brief?: string;
+  Mode?: string;
+  CreatedAt?: string;
+  ConversationLabel?: string;
 };
 
 type AiCastPersonalityResponseType = {
@@ -260,6 +269,7 @@ export function updateConversation(id: string, conversationAsset: ConversationAs
       const typedConversations = conversations.map((conversation) => mapToType<ConversationAssetType>(conversation, fullConversationAssetMapping));
       dataStore.setConversations(typedConversations);
       dataStore.setConversationDirty(false);
+      nodeStore.setRebuild(true);
       return typedConversations;
     },
   );
@@ -349,12 +359,44 @@ function normaliseAiCastPersonality(source: AiCastPersonalityResponseType): AiCa
   };
 }
 
+function normaliseAiBriefHistoryEntry(source: AiBriefHistoryEntryResponseType): AiBriefHistoryEntryType {
+  return {
+    brief: (source.Brief ?? '').trim(),
+    mode: source.Mode ?? 'fullConversation',
+    createdAt: source.CreatedAt ?? '',
+    conversationLabel: source.ConversationLabel ?? '',
+  } as AiBriefHistoryEntryType;
+}
+
+function normaliseAiBriefHistoryEntries(entries: AiBriefHistoryEntryResponseType[]): AiBriefHistoryEntryType[] {
+  const seenBriefs = new Set<string>();
+  const normalisedEntries: AiBriefHistoryEntryType[] = [];
+
+  for (const entry of entries) {
+    const normalisedEntry = normaliseAiBriefHistoryEntry(entry);
+    if (normalisedEntry.brief === '' || seenBriefs.has(normalisedEntry.brief)) continue;
+    seenBriefs.add(normalisedEntry.brief);
+    normalisedEntries.push(normalisedEntry);
+    if (normalisedEntries.length >= 10) break;
+  }
+
+  return normalisedEntries;
+}
+
 function normaliseAiWorkspaceSettings(source: AiWorkspaceSettingsResponseType): AiWorkspaceSettingsType {
+  const rawBriefHistory = source.BriefHistoryByScope ?? {};
+  const briefHistoryByScope: Record<string, AiBriefHistoryEntryType[]> = {};
+
+  for (const [scopeKey, entries] of Object.entries(rawBriefHistory)) {
+    briefHistoryByScope[scopeKey] = normaliseAiBriefHistoryEntries(entries ?? []);
+  }
+
   return {
     workingDirectory: source.WorkingDirectory ?? '',
     contextPaths: source.ContextPaths ?? [],
     houseStyleNotes: source.HouseStyleNotes ?? '',
     defaultCampaignBrief: source.DefaultCampaignBrief ?? '',
+    briefHistoryByScope,
     castPersonalities: (source.CastPersonalities ?? []).map(normaliseAiCastPersonality),
   };
 }

@@ -112,7 +112,16 @@
 .ai-draft-modal__field-label {
   display: inline-flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   max-width: 100%;
+  min-width: 100%;
+}
+
+.ai-draft-modal__field-label-main {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
 }
 
 .ai-draft-modal__help-icon {
@@ -126,6 +135,86 @@
 .ai-draft-modal__help-icon:hover,
 .ai-draft-modal__help-icon:focus {
   color: #1f5f8b;
+}
+
+.ai-draft-modal__brief-history-trigger.ant-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  min-height: 28px;
+  color: #59728a;
+  transition-property: background, color, transform;
+  transition-duration: 140ms;
+  transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+.ai-draft-modal__brief-history-trigger.ant-btn:not(:disabled):not(.ant-btn-disabled):hover,
+.ai-draft-modal__brief-history-trigger.ant-btn:not(:disabled):not(.ant-btn-disabled):focus {
+  background: rgba(31, 95, 139, 0.08);
+  color: #1f5f8b;
+}
+
+.ai-draft-modal__brief-history-trigger.ant-btn:not(:disabled):not(.ant-btn-disabled):active {
+  transform: scale(0.96);
+}
+
+.ai-draft-modal__brief-history-popover .ant-popover-inner {
+  padding: 6px;
+}
+
+.ai-draft-modal__brief-history {
+  display: grid;
+  width: min(420px, calc(100vw - 72px));
+  max-height: min(360px, 52vh);
+  overflow-y: auto;
+  gap: 4px;
+}
+
+.ai-draft-modal__brief-history-item {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  min-height: 48px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 4px;
+  background: #fff;
+  color: $textColourOnLight;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  transition-property: background, box-shadow, transform;
+  transition-duration: 140ms;
+  transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+.ai-draft-modal__brief-history-item:hover,
+.ai-draft-modal__brief-history-item:focus {
+  outline: none;
+  background: #f6f8fb;
+  box-shadow: inset 0 0 0 1px rgba(31, 95, 139, 0.28);
+}
+
+.ai-draft-modal__brief-history-item:active {
+  transform: scale(0.96);
+}
+
+.ai-draft-modal__brief-history-item span {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-height: 1.35;
+  text-wrap: pretty;
+}
+
+.ai-draft-modal__brief-history-item small {
+  color: #66788a;
+  font-size: 12px;
+  line-height: 1.25;
 }
 
 .ai-draft-modal__model-row {

@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { ChangeEvent, ComponentProps, CSSProperties } from 'react';
+import type { ChangeEvent, ComponentProps, CSSProperties, ReactNode } from 'react';
 import { toJS } from 'mobx';
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react';
-import { Alert, App as AntdApp, Button, Checkbox, Form, Input, Radio, Select, Tabs, Tag, Tooltip } from 'antd';
+import { Alert, App as AntdApp, Button, Checkbox, Form, Input, Popover, Radio, Select, Tabs, Tag, Tooltip } from 'antd';
 import {
   CodeOutlined,
   CloseOutlined,
@@ -11,6 +11,7 @@ import {
   DeleteOutlined,
   FileTextOutlined,
   FolderOpenOutlined,
+  HistoryOutlined,
   PlusOutlined,
   QuestionCircleOutlined,
   ReloadOutlined,
@@ -46,6 +47,7 @@ import {
   validateAiDraft,
 } from 'utils/ai-draft-utils';
 import {
+  AiBriefHistoryEntryType,
   AiCastPersonalityType,
   AiConversationDraftType,
   AiDraftModeType,
@@ -67,6 +69,7 @@ const { Option } = Select;
 type TabsItems = NonNullable<ComponentProps<typeof Tabs>['items']>;
 const AI_DEBUG_PREFIX = '[ConverseTek AI Modal]';
 const positiveActionButtonStyle: CSSProperties = { color: '#fff' };
+const MAX_BRIEF_HISTORY_ENTRIES = 10;
 
 const fallbackReasoningEfforts = [
   { effort: 'low', label: 'Low', description: 'Fast responses with lighter reasoning.' },
@@ -229,13 +232,16 @@ function getProviderUi(providerName: string): ProviderUi {
   };
 }
 
-function FieldLabel({ label, help }: { label: string; help: string }) {
+function FieldLabel({ label, help, action }: { label: string; help: string; action?: ReactNode }) {
   return (
     <span className="ai-draft-modal__field-label">
-      <span>{label}</span>
-      <Tooltip title={help}>
-        <QuestionCircleOutlined className="ai-draft-modal__help-icon" />
-      </Tooltip>
+      <span className="ai-draft-modal__field-label-main">
+        <span>{label}</span>
+        <Tooltip title={help}>
+          <QuestionCircleOutlined className="ai-draft-modal__help-icon" />
+        </Tooltip>
+      </span>
+      {action}
     </span>
   );
 }
@@ -250,8 +256,70 @@ function createWorkspaceSettings(workingDirectory: string, defaultPersonalities:
     contextPaths: [],
     houseStyleNotes: '',
     defaultCampaignBrief: '',
+    briefHistoryByScope: {},
     castPersonalities: cloneDefaultCastPersonalities(defaultPersonalities),
   };
+}
+
+function getConversationHistoryIdentity(conversationAsset: ConversationAssetType | null): string {
+  if (conversationAsset == null) return '__no_conversation__';
+  const fileIdentity = conversationAsset.filepath || conversationAsset.filename;
+  if (fileIdentity.trim() !== '') return normaliseWorkspaceKey(fileIdentity);
+  return conversationAsset.conversation.idRef.id || '__no_conversation__';
+}
+
+function getConversationHistoryLabel(conversationAsset: ConversationAssetType | null): string {
+  if (conversationAsset == null) return 'Workspace';
+  return conversationAsset.conversation.uiName || conversationAsset.conversation.idRef.id || conversationAsset.filename || 'Conversation';
+}
+
+function getBriefHistoryScopeKey(mode: AiDraftModeType, conversationAsset: ConversationAssetType | null): string {
+  if (mode === 'fullConversation') return 'workspace:fullConversation';
+  return `conversation:${mode}:${getConversationHistoryIdentity(conversationAsset)}`;
+}
+
+function addBriefHistoryEntry(
+  workspaceSettings: AiWorkspaceSettingsType | null,
+  mode: AiDraftModeType,
+  conversationAsset: ConversationAssetType | null,
+  brief: string,
+): AiWorkspaceSettingsType | null {
+  if (workspaceSettings == null) return null;
+
+  const trimmedBrief = brief.trim();
+  if (trimmedBrief === '') return workspaceSettings;
+
+  const scopeKey = getBriefHistoryScopeKey(mode, conversationAsset);
+  const nextEntry: AiBriefHistoryEntryType = {
+    brief: trimmedBrief,
+    mode,
+    createdAt: new Date().toISOString(),
+    conversationLabel: getConversationHistoryLabel(mode === 'fullConversation' ? null : conversationAsset),
+  };
+  const previousEntries = workspaceSettings.briefHistoryByScope[scopeKey] || [];
+  const nextEntries = [nextEntry, ...previousEntries.filter((entry) => entry.brief !== trimmedBrief)].slice(0, MAX_BRIEF_HISTORY_ENTRIES);
+
+  return {
+    ...workspaceSettings,
+    briefHistoryByScope: {
+      ...workspaceSettings.briefHistoryByScope,
+      [scopeKey]: nextEntries,
+    },
+  };
+}
+
+function formatBriefHistoryDate(value: string): string {
+  if (value.trim() === '') return '';
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+
+  return date.toLocaleString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 }
 
 function cloneDefaultCastPersonalities(defaultPersonalities: AiCastPersonalityType[]): AiCastPersonalityType[] {
@@ -325,6 +393,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
   const [settings, setSettings] = useState<AiSettingsType>(emptySettings);
   const [workspaceSettings, setWorkspaceSettings] = useState<AiWorkspaceSettingsType | null>(null);
   const [brief, setBrief] = useState('');
+  const [isBriefHistoryOpen, setIsBriefHistoryOpen] = useState(false);
   const [draft, setDraft] = useState<AiConversationDraftType | null>(null);
   const [validation, setValidation] = useState<AiDraftValidationResultType>({ errors: [], warnings: [] });
   const [modelCatalog, setModelCatalog] = useState<AiModelCatalogResultType | null>(null);
@@ -609,12 +678,14 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
     }
   };
 
-  const saveConfiguration = async (showSuccessMessage = false) => {
+  const saveConfiguration = async (showSuccessMessage = false, workspaceSettingsOverride?: AiWorkspaceSettingsType | null) => {
+    const settingsToSave = workspaceSettingsOverride === undefined ? workspaceSettings : workspaceSettingsOverride;
+
     console.log(`${AI_DEBUG_PREFIX} saveConfiguration start`, {
       showSuccessMessage,
       selectedProvider: settings.selectedProvider,
       codexModel: settings.codexModel,
-      hasWorkspaceSettings: workspaceSettings != null,
+      hasWorkspaceSettings: settingsToSave != null,
     });
 
     setIsSavingConfiguration(true);
@@ -627,8 +698,8 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
         savedCodexModel: savedSettings.codexModel,
       });
 
-      if (workspaceSettings != null) {
-        savedSettings = await saveAiWorkspaceSettings(workspaceSettings);
+      if (settingsToSave != null) {
+        savedSettings = await saveAiWorkspaceSettings(settingsToSave);
         console.log(`${AI_DEBUG_PREFIX} saveConfiguration after saveAiWorkspaceSettings`, {
           savedSelectedProvider: savedSettings.selectedProvider,
           savedCodexModel: savedSettings.codexModel,
@@ -689,7 +760,12 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
     setDraftRunResult(null);
 
     try {
-      await saveConfiguration();
+      const nextWorkspaceSettings = addBriefHistoryEntry(workspaceSettings, mode, unsavedActiveConversationAsset, draftBrief);
+      if (nextWorkspaceSettings != null) {
+        setWorkspaceSettings(nextWorkspaceSettings);
+      }
+
+      await saveConfiguration(false, nextWorkspaceSettings);
       const result = await createAiDraft({
         mode,
         brief: draftBrief,
@@ -775,6 +851,8 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
   const selectedNodeOriginalText = showSelectedNodeContext ? getOriginalNodeText(selectedNode) : '';
   const selectedNodeContextLabel = getRewriteContextLabel(selectedNode);
   const quickShotPrompts = useMemo(() => getQuickShotPrompts(mode, selectedNode), [mode, selectedNode]);
+  const briefHistoryScopeKey = getBriefHistoryScopeKey(mode, unsavedActiveConversationAsset);
+  const briefHistoryEntries = workspaceSettings?.briefHistoryByScope[briefHistoryScopeKey] || [];
   const listedModelSlugs = new Set((modelCatalog?.models || []).map((model) => model.slug));
   const shouldShowCustomModel = settings.codexModel !== '' && !listedModelSlugs.has(settings.codexModel);
   const selectedModelOption = getSelectedModelOption(modelCatalog, settings.codexModel);
@@ -822,6 +900,35 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
       void loadModelCatalog(settings, true);
     }
   };
+
+  const briefHistoryContent = (
+    <div className="ai-draft-modal__brief-history" role="menu" aria-label="Brief history">
+      {briefHistoryEntries.map((entry) => {
+        const entryDate = formatBriefHistoryDate(entry.createdAt);
+
+        return (
+          <button
+            key={`${entry.createdAt}-${entry.brief}`}
+            className="ai-draft-modal__brief-history-item"
+            type="button"
+            role="menuitem"
+            disabled={isLoading}
+            onClick={() => {
+              setBrief(entry.brief);
+              setIsBriefHistoryOpen(false);
+            }}
+          >
+            <span>{entry.brief}</span>
+            {(entry.conversationLabel || entryDate) && (
+              <small>
+                {[entry.conversationLabel, entryDate].filter(Boolean).join(' - ')}
+              </small>
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
 
   const draftActions = (
     <div className="ai-draft-modal__actions">
@@ -885,6 +992,25 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                     <FieldLabel
                       label="Brief"
                       help="Describe what the AI should draft: story beats, tone, speakers, choices, required operations, and anything to avoid."
+                      action={
+                        <Popover
+                          content={briefHistoryContent}
+                          open={isBriefHistoryOpen && briefHistoryEntries.length > 0}
+                          trigger="click"
+                          placement="bottomLeft"
+                          overlayClassName="ai-draft-modal__brief-history-popover"
+                          onOpenChange={(open) => setIsBriefHistoryOpen(open)}
+                        >
+                          <Button
+                            aria-label="Show brief history"
+                            className="ai-draft-modal__brief-history-trigger"
+                            disabled={isLoading || briefHistoryEntries.length === 0}
+                            icon={<HistoryOutlined />}
+                            size="small"
+                            type="text"
+                          />
+                        </Popover>
+                      }
                     />
                   }
                 >

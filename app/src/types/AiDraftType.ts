@@ -9,7 +9,15 @@ export type AiWorkspaceSettingsType = {
   contextPaths: string[];
   houseStyleNotes: string;
   defaultCampaignBrief: string;
+  briefHistoryByScope: Record<string, AiBriefHistoryEntryType[]>;
   castPersonalities: AiCastPersonalityType[];
+};
+
+export type AiBriefHistoryEntryType = {
+  brief: string;
+  mode: AiDraftModeType;
+  createdAt: string;
+  conversationLabel: string;
 };
 
 export type AiCastPersonalityType = {

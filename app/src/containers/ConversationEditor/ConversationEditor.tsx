@@ -88,7 +88,6 @@ function ConversationEditor({ conversationAsset }: Props) {
       void message.success('Save successful');
     });
     dataStore.updateActiveConversation(unsavedActiveConversationAsset); // local update for speed
-    createNewUnsavedConversation();
   };
 
   const onRegenerateNodeIdsButtonClicked = () => {

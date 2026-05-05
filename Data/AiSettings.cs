@@ -32,6 +32,7 @@ namespace ConverseTek.Data {
     public List<string> ContextPaths { get; set; }
     public string HouseStyleNotes { get; set; }
     public string DefaultCampaignBrief { get; set; }
+    public Dictionary<string, List<AiBriefHistoryEntry>> BriefHistoryByScope { get; set; }
     public List<AiCastPersonality> CastPersonalities { get; set; }
 
     public static AiWorkspaceSettings CreateDefault(string workingDirectory) {
@@ -40,9 +41,17 @@ namespace ConverseTek.Data {
         ContextPaths = new List<string>(),
         HouseStyleNotes = "",
         DefaultCampaignBrief = "",
+        BriefHistoryByScope = new Dictionary<string, List<AiBriefHistoryEntry>>(),
         CastPersonalities = null
       };
     }
+  }
+
+  public class AiBriefHistoryEntry {
+    public string Brief { get; set; }
+    public string Mode { get; set; }
+    public string CreatedAt { get; set; }
+    public string ConversationLabel { get; set; }
   }
 
   public class AiCastPersonality {

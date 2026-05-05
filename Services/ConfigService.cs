@@ -213,11 +213,28 @@ namespace ConverseTek.Services {
       if (workspaceSettings.ContextPaths == null) workspaceSettings.ContextPaths = new List<string>();
       if (workspaceSettings.HouseStyleNotes == null) workspaceSettings.HouseStyleNotes = "";
       if (workspaceSettings.DefaultCampaignBrief == null) workspaceSettings.DefaultCampaignBrief = "";
+      if (workspaceSettings.BriefHistoryByScope == null) workspaceSettings.BriefHistoryByScope = new Dictionary<string, List<AiBriefHistoryEntry>>();
+      foreach (string key in new List<string>(workspaceSettings.BriefHistoryByScope.Keys)) {
+        List<AiBriefHistoryEntry> entries = workspaceSettings.BriefHistoryByScope[key] ?? new List<AiBriefHistoryEntry>();
+        for (int i = 0; i < entries.Count; i++) {
+          entries[i] = NormaliseAiBriefHistoryEntry(entries[i]);
+        }
+        workspaceSettings.BriefHistoryByScope[key] = entries;
+      }
       if (workspaceSettings.CastPersonalities == null) workspaceSettings.CastPersonalities = GetAiCastPersonalityDefaults();
       for (int i = 0; i < workspaceSettings.CastPersonalities.Count; i++) {
         workspaceSettings.CastPersonalities[i] = NormaliseAiCastPersonality(workspaceSettings.CastPersonalities[i]);
       }
       return workspaceSettings;
+    }
+
+    private AiBriefHistoryEntry NormaliseAiBriefHistoryEntry(AiBriefHistoryEntry entry) {
+      if (entry == null) entry = new AiBriefHistoryEntry();
+      if (entry.Brief == null) entry.Brief = "";
+      if (entry.Mode == null) entry.Mode = "";
+      if (entry.CreatedAt == null) entry.CreatedAt = "";
+      if (entry.ConversationLabel == null) entry.ConversationLabel = "";
+      return entry;
     }
 
     private AiCastPersonality NormaliseAiCastPersonality(AiCastPersonality personality) {
