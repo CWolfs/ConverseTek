@@ -11,6 +11,11 @@ export type InputValueType = {
   value: string | number;
 };
 
+export type AiOperationExampleType = {
+  description?: string;
+  call?: unknown;
+};
+
 export type InputType = {
   label: string;
   types: InputTypeType[];
@@ -18,6 +23,9 @@ export type InputType = {
   viewLabel?: string;
   values?: InputValueType[];
   defaultValue?: DefaultInputValueType; // Maybe lock this down to string and parse int / float when required
+  preferredType?: InputTypeType;
+  aiHint?: string;
+  aiExamples?: AiOperationExampleType[];
 };
 
 export type OperationDefinitionType = {
@@ -28,4 +36,6 @@ export type OperationDefinitionType = {
   category: 'primary' | 'secondary';
   tooltip: string;
   inputs: InputType[];
+  aiHint?: string;
+  aiExamples?: AiOperationExampleType[];
 };

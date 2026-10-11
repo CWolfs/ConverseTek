@@ -5,6 +5,7 @@
   "scope": "action",
   "category": "primary",
   "tooltip": "WARNING: This vanilla method is bugged. It truncates it to an 'int' so floats DON'T WORK",
+  "aiHint": "Adds or updates a float SimGame stat, but this vanilla method truncates floats to ints. Prefer integer or string stats for durable state unless a float is explicitly required.",
   "inputs": [
     {
       "label": "Type",
@@ -19,7 +20,9 @@
     {
       "label": "Stat Key",
       "types": ["string"],
-      "viewlabel": "'{value}'"
+      "viewlabel": "'{value}'",
+      "preferredType": "string",
+      "aiHint": "Use a stable stat key for the durable state being recorded."
     },
     {
       "label": "Stat Value",

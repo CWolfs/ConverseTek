@@ -3,14 +3,17 @@
   "label": "Get Preset Value (int)",
   "view": ["result"],
   "category": "secondary",
+  "aiHint": "Returns an int from a named preset. Use as a nested operation when a primary operation input expects an enum-like value such as HasOrHasNot.",
   "inputs": [
     {
       "label": "Key",
-      "types": ["string"]
+      "types": ["string"],
+      "aiHint": "Preset key, for example HasOrHasNot, DoesOrDoesNot, SimGameScope, or SimGameFadeValues."
     },
     {
       "label": "Value",
-      "types": ["int"]
+      "types": ["int"],
+      "aiHint": "The numeric preset value to return. For HasOrHasNot, 1 means has and 0 means doesn't have."
     }
   ]
 }

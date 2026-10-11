@@ -46,6 +46,8 @@ For architecture detail, read the docs under [`docs/architecture/`](./docs/archi
 - Backend AI providers go through `Services/AiProviderService.cs`; Codex CLI is the first provider, but provider names should stay generic for future CLIs.
 - Frontend draft conversion lives in `app/src/utils/ai-draft-utils.ts` and should return fresh conversation assets or explicit patch objects.
 - Full drafts use "Turn Into Real Conversation"; node/branch suggestions use "Accept" / "Reject".
+- AI draft operation intents may use nested operation args with `type: "operation"` and a nested `{ functionName, args }` value. Operation definitions may include advisory `aiHint`, `aiExamples`, and input-level `preferredType` metadata for draft generation.
+- AI draft prompts should understand tags and stats as durable state that may cross between conversations, custom contracts, and mission runtime logic in mod setups that support it. Suggest tag/stat setters only when context indicates that integration exists and the setter represents meaningful route, clue, consequence, setup, or later-branch state.
 
 ## Important quirks
 

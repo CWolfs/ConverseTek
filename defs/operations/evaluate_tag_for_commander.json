@@ -4,15 +4,41 @@
   "view": ["label", "inputs"],
   "scope": "condition",
   "category": "primary",
+  "aiHint": "Checks whether the commander has or does not have a tag. For generated drafts, prefer the Conditional input as a nested Get Preset Value (int) call using the HasOrHasNot preset.",
+  "aiExamples": [
+    {
+      "description": "Commander has tag",
+      "call": {
+        "functionName": "Evaluate Tag for Commander",
+        "args": [
+          {
+            "type": "operation",
+            "value": {
+              "functionName": "Get Preset Value (int)",
+              "args": [
+                { "type": "string", "value": "HasOrHasNot" },
+                { "type": "int", "value": 1 }
+              ]
+            }
+          },
+          { "type": "string", "value": "commander_example_tag" }
+        ]
+      }
+    }
+  ],
   "inputs": [
     {
       "label": "Conditional",
-      "types": ["operation", "int"]
+      "types": ["operation", "int"],
+      "preferredType": "operation",
+      "aiHint": "Use Get Preset Value (int) with preset key HasOrHasNot. Value 1 means has; value 0 means doesn't have."
     },
     {
       "label": "Tag Key",
       "types": ["operation", "string"],
-      "scope": "commander"
+      "scope": "commander",
+      "preferredType": "string",
+      "aiHint": "Use the literal commander tag key as a string unless it must come from another operation."
     }
   ]
 }

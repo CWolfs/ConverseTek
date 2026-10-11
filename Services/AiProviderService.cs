@@ -429,7 +429,11 @@ namespace ConverseTek.Services {
       sb.AppendLine("- For branchExpansion targetKey values, use generated node keys for generated targets. If a choice must return to an existing prompt from conversationJson, set targetKey to existing_node_INDEX using that prompt node's exact numeric index, for example existing_node_2. Do not invent symbolic existing aliases such as existing_battle_intel, and do not use warnings to explain unresolved targetKey values.");
       sb.AppendLine("- Write comment fields as short authoring notes that explain the beat, branch purpose, or condition context. Do not use draft keys such as darius_check as comments.");
       sb.AppendLine("- For operation intents, only use operation names present in the supplied definitions JSON.");
+      sb.AppendLine("- Operation args may use type operation. In that case value must be a nested operation call object with functionName and args.");
+      sb.AppendLine("- When an operation input has preferredType, treat it as the normal choice for fixed known values. Use another allowed type when the value is dynamic, computed, or read from a tag, stat, preset, or value getter.");
       sb.AppendLine("- If a draft branch clearly spends or grants C-bills, skips time, adds/removes a tag, checks a tag/stat, starts a contract, or otherwise changes game state, include suitable action or condition intents. Use reasonable advisory placeholder values when the exact balance number or tag key is not supplied, and put any tuning note in warnings instead of omitting the operation.");
+      sb.AppendLine("- Some mod setups can use conversation tags and stats as durable state across custom contracts or mission runtime logic. When the brief, workspace notes, or context suggests that support exists, consider setting tags or stats when a conversation choice should influence a later contract or mission, and consider checking tags or stats when earlier mission or contract events should influence the conversation.");
+      sb.AppendLine("- Do not assume every mod has mission/runtime tag-stat integration, and do not invent tag/stat side effects for every branch. Use them when they capture a meaningful durable choice, flag, route, consequence, clue, or mission setup that later logic could consume.");
       sb.AppendLine("- Leave operation intents empty only when the branch has no mechanical consequence or no supplied operation definition fits the intended effect.");
       sb.AppendLine("- Use mode from the request exactly.");
       sb.AppendLine();
@@ -458,6 +462,10 @@ namespace ConverseTek.Services {
       }
       sb.AppendLine();
 
+      sb.AppendLine("Operation usage guide:");
+      sb.AppendLine(BuildOperationUsageGuide(providerRequest.Request == null ? null : providerRequest.Request.DefinitionsJson));
+      sb.AppendLine();
+
       sb.AppendLine("Context files:");
       if (providerRequest.ContextFiles == null || providerRequest.ContextFiles.Count == 0) {
         sb.AppendLine("(none)");
@@ -476,6 +484,127 @@ namespace ConverseTek.Services {
       sb.AppendLine(requestJson);
       sb.AppendLine("```");
       return sb.ToString();
+    }
+
+    private string BuildOperationUsageGuide(string definitionsJson) {
+      if (string.IsNullOrWhiteSpace(definitionsJson)) return "(none)";
+
+      try {
+        JObject definitions = JObject.Parse(definitionsJson);
+        JArray operations = definitions["operations"] as JArray ?? definitions["Operations"] as JArray;
+        if (operations == null || operations.Count == 0) return "(none)";
+
+        StringBuilder guide = new StringBuilder();
+        guide.AppendLine("Use this guide for operation intent args. Primitive args use their type directly; operation args use nested calls.");
+
+        foreach (JObject operation in operations) {
+          if (!ShouldIncludeOperationInGuide(operation)) continue;
+
+          string key = GetJsonString(operation, "key", "Key");
+          if (string.IsNullOrEmpty(key)) continue;
+
+          string scope = GetJsonString(operation, "scope", "Scope");
+          string aiHint = GetJsonString(operation, "aiHint", "AiHint");
+          guide.Append("- ").Append(key);
+          if (!string.IsNullOrEmpty(scope)) guide.Append(" [").Append(scope).Append("]");
+          if (!string.IsNullOrEmpty(aiHint)) guide.Append(": ").Append(aiHint);
+          guide.AppendLine();
+
+          JArray inputs = operation["inputs"] as JArray ?? operation["Inputs"] as JArray;
+          if (inputs != null) {
+            for (int index = 0; index < inputs.Count; index++) {
+              JObject input = inputs[index] as JObject;
+              if (input == null) continue;
+              guide.Append("  arg ").Append(index + 1).Append(" ");
+              guide.Append(GetJsonString(input, "label", "Label"));
+
+              JArray types = input["types"] as JArray ?? input["Types"] as JArray;
+              if (types != null) guide.Append(" types=").Append(FormatStringArray(types));
+
+              string preferredType = GetJsonString(input, "preferredType", "PreferredType");
+              if (!string.IsNullOrEmpty(preferredType)) guide.Append(" preferredType=").Append(preferredType);
+
+              JArray values = input["values"] as JArray ?? input["Values"] as JArray;
+              if (values != null && values.Count > 0) guide.Append(" values=").Append(FormatInputValues(values));
+
+              string inputHint = GetJsonString(input, "aiHint", "AiHint");
+              if (!string.IsNullOrEmpty(inputHint)) guide.Append(" hint=").Append(inputHint);
+              guide.AppendLine();
+            }
+          }
+
+          AppendExamples(guide, operation["aiExamples"] as JArray ?? operation["AiExamples"] as JArray);
+        }
+
+        string result = guide.ToString().Trim();
+        return result == "" ? "(none)" : result;
+      } catch (Exception error) {
+        return "(could not parse operation usage guide: " + error.Message + ")";
+      }
+    }
+
+    private bool ShouldIncludeOperationInGuide(JObject operation) {
+      if (!string.IsNullOrEmpty(GetJsonString(operation, "aiHint", "AiHint"))) return true;
+      if ((operation["aiExamples"] as JArray ?? operation["AiExamples"] as JArray) != null) return true;
+
+      JArray inputs = operation["inputs"] as JArray ?? operation["Inputs"] as JArray;
+      if (inputs == null) return false;
+
+      foreach (JToken inputToken in inputs) {
+        JObject input = inputToken as JObject;
+        if (input == null) continue;
+        if (!string.IsNullOrEmpty(GetJsonString(input, "aiHint", "AiHint"))) return true;
+        if (!string.IsNullOrEmpty(GetJsonString(input, "preferredType", "PreferredType"))) return true;
+        JArray types = input["types"] as JArray ?? input["Types"] as JArray;
+        if (types != null && ContainsString(types, "operation")) return true;
+      }
+
+      return false;
+    }
+
+    private string GetJsonString(JObject source, string camelName, string pascalName) {
+      JToken value = source[camelName] ?? source[pascalName];
+      return value == null ? "" : value.ToString().Trim();
+    }
+
+    private bool ContainsString(JArray values, string expectedValue) {
+      foreach (JToken value in values) {
+        if (string.Equals(value.ToString(), expectedValue, StringComparison.OrdinalIgnoreCase)) return true;
+      }
+
+      return false;
+    }
+
+    private string FormatStringArray(JArray values) {
+      List<string> result = new List<string>();
+      foreach (JToken value in values) {
+        string text = value.ToString().Trim();
+        if (text != "") result.Add(text);
+      }
+
+      return string.Join("/", result.ToArray());
+    }
+
+    private string FormatInputValues(JArray values) {
+      List<string> result = new List<string>();
+      foreach (JObject value in values) {
+        string text = GetJsonString(value, "text", "Text");
+        string rawValue = GetJsonString(value, "value", "Value");
+        if (text != "" || rawValue != "") result.Add(text + "=" + rawValue);
+      }
+
+      return string.Join(", ", result.ToArray());
+    }
+
+    private void AppendExamples(StringBuilder guide, JArray examples) {
+      if (examples == null || examples.Count == 0) return;
+
+      int count = Math.Min(examples.Count, 2);
+      for (int index = 0; index < count; index++) {
+        string example = examples[index].ToString(Formatting.None);
+        if (example.Length > 600) example = example.Substring(0, 600) + "...";
+        guide.Append("  example: ").AppendLine(example);
+      }
     }
 
     private string FormatKnownCastIds(AiWorkspaceSettings workspaceSettings) {

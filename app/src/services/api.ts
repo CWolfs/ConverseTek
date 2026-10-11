@@ -162,6 +162,9 @@ type OperationInputResponseType = {
   ViewLabel?: string;
   Values?: OperationInputValueResponseType[];
   DefaultValue?: string | number | null;
+  PreferredType?: InputTypeType;
+  AiHint?: string;
+  AiExamples?: OperationDefinitionType['aiExamples'];
 };
 
 type OperationDefinitionResponseType = {
@@ -172,6 +175,8 @@ type OperationDefinitionResponseType = {
   Category?: OperationDefinitionType['category'];
   Tooltip?: string;
   Inputs?: OperationInputResponseType[];
+  AiHint?: string;
+  AiExamples?: OperationDefinitionType['aiExamples'];
 };
 
 type PresetDefinitionResponseType = {
@@ -518,6 +523,9 @@ function normaliseOperationInput(input: OperationInputResponseType): InputType {
     viewLabel: input.ViewLabel,
     values: input.Values?.map(normaliseInputValue),
     defaultValue: input.DefaultValue ?? null,
+    preferredType: input.PreferredType,
+    aiHint: input.AiHint,
+    aiExamples: input.AiExamples,
   };
 }
 
@@ -530,6 +538,8 @@ function normaliseOperationDefinition(definition: OperationDefinitionResponseTyp
     category: definition.Category ?? 'primary',
     tooltip: definition.Tooltip ?? '',
     inputs: (definition.Inputs ?? []).map(normaliseOperationInput),
+    aiHint: definition.AiHint,
+    aiExamples: definition.AiExamples,
   };
 }
 

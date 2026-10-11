@@ -4,10 +4,13 @@
   "view": ["inputs"],
   "scope": "action",
   "category": "primary",
+  "aiHint": "Adds or removes a tag from a SimGame tag scope. Use this when a conversation choice should record a durable route, clue, consequence, or setup flag. In mod setups that support runtime tag/stat reads, conversation tags may influence later contracts or missions and mission-set tags may influence later conversations.",
   "inputs": [
     {
       "label": "Action",
       "types": ["operation", "int"],
+      "preferredType": "int",
+      "aiHint": "Use 1 to add a tag and 0 to remove a tag.",
       "values": [
         { "viewlabel": "Add a tag to", "text": "Add", "value": 1 },
         { "viewlabel": "Remove a tag from", "text": "Remove", "value": 0 }
@@ -16,6 +19,8 @@
     {
       "label": "Type",
       "types": ["operation", "int"],
+      "preferredType": "int",
+      "aiHint": "Use 1 for company, 2 for commander, 3 for current system, and 4 for flashpoint.",
       "values": [
         { "viewlabel": "the company scope", "text": "Company", "value": 1 },
         { "viewlabel": "the commander scope", "text": "Commander", "value": 2 },
@@ -26,7 +31,9 @@
     {
       "label": "Tag Key",
       "types": ["string"],
-      "viewlabel": "with the name '{value}'"
+      "viewlabel": "with the name '{value}'",
+      "preferredType": "string",
+      "aiHint": "Use a stable literal tag key for the state being recorded, for example company_contract_route_a or commander_accepted_risk."
     }
   ]
 }

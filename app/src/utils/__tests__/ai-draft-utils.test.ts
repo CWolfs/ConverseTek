@@ -24,6 +24,30 @@ const operations: OperationDefinitionType[] = [
     tooltip: '',
     inputs: [{ label: 'Flag', types: ['string'] }],
   },
+  {
+    key: 'Evaluate Tag for Company',
+    label: 'If the Company',
+    view: ['label', 'inputs'],
+    scope: 'condition',
+    category: 'primary',
+    tooltip: '',
+    inputs: [
+      { label: 'Conditional', types: ['operation', 'int'], preferredType: 'operation' },
+      { label: 'Tag Key', types: ['operation', 'string'], preferredType: 'string' },
+    ],
+  },
+  {
+    key: 'Get Preset Value (int)',
+    label: 'Get Preset Value (int)',
+    view: ['result'],
+    scope: 'action',
+    category: 'secondary',
+    tooltip: '',
+    inputs: [
+      { label: 'Key', types: ['string'] },
+      { label: 'Value', types: ['int'] },
+    ],
+  },
 ];
 
 function makeDraft(overrides: Partial<AiConversationDraftType> = {}): AiConversationDraftType {
@@ -144,6 +168,174 @@ describe('AI draft utilities', () => {
     expect(conversationAsset.conversation.nodes[0].branches[0].comment).toBe('Continue to the practical follow-up.');
     expect(conversationAsset.conversation.nodes[1].branches[0].nextNodeIndex).toBe(-1);
     expect(conversationAsset.conversation.nodes[0].actions?.ops?.[0].functionName).toBe('SetFlag');
+  });
+
+  it('converts nested operation args into operation call values', async () => {
+    const { buildConversationAssetFromDraft, validateAiDraft } = await import('utils/ai-draft-utils');
+    const draft = makeDraft({
+      roots: [
+        {
+          ...makeDraft().roots[0],
+          conditions: [
+            {
+              functionName: 'Evaluate Tag for Company',
+              args: [
+                {
+                  type: 'operation',
+                  value: {
+                    functionName: 'Get Preset Value (int)',
+                    args: [
+                      { type: 'string', value: 'HasOrHasNot' },
+                      { type: 'int', value: 1 },
+                    ],
+                  },
+                },
+                { type: 'string', value: 'company_dead_claim_seen' },
+              ],
+              note: 'Only show the branch when the company has the tag.',
+            },
+          ],
+        },
+      ],
+    });
+
+    const validation = validateAiDraft(draft, operations, 'fullConversation');
+    const conversationAsset = buildConversationAssetFromDraft(draft, 'K:/Mods/DeadClaim/conversations');
+    const conditionalArg = conversationAsset.conversation.roots[0].conditions?.ops?.[0].args[0];
+
+    expect(validation.errors).toEqual([]);
+    expect(conditionalArg?.type).toBe('operation');
+    expect(conditionalArg?.callValue?.functionName).toBe('Get Preset Value (int)');
+    expect(conditionalArg?.callValue?.args[0].stringValue).toBe('HasOrHasNot');
+    expect(conditionalArg?.callValue?.args[1].intValue).toBe(1);
+  });
+
+  it('flags unknown nested operation calls during validation', async () => {
+    const { validateAiDraft } = await import('utils/ai-draft-utils');
+    const draft = makeDraft({
+      roots: [
+        {
+          ...makeDraft().roots[0],
+          conditions: [
+            {
+              functionName: 'Evaluate Tag for Company',
+              args: [
+                {
+                  type: 'operation',
+                  value: {
+                    functionName: 'Missing Nested Operation',
+                    args: [],
+                  },
+                },
+                { type: 'string', value: 'company_dead_claim_seen' },
+              ],
+              note: '',
+            },
+          ],
+        },
+      ],
+    });
+
+    const validation = validateAiDraft(draft, operations, 'fullConversation');
+
+    expect(validation.errors).toContain(
+      "root 1 conditions operation 1 'Evaluate Tag for Company' arg 1 nested operation 1 references unknown operation 'Missing Nested Operation'.",
+    );
+  });
+
+  it('flags nested operation calls with the wrong arg count', async () => {
+    const { validateAiDraft } = await import('utils/ai-draft-utils');
+    const draft = makeDraft({
+      roots: [
+        {
+          ...makeDraft().roots[0],
+          conditions: [
+            {
+              functionName: 'Evaluate Tag for Company',
+              args: [
+                {
+                  type: 'operation',
+                  value: {
+                    functionName: 'Get Preset Value (int)',
+                    args: [{ type: 'string', value: 'HasOrHasNot' }],
+                  },
+                },
+                { type: 'string', value: 'company_dead_claim_seen' },
+              ],
+              note: '',
+            },
+          ],
+        },
+      ],
+    });
+
+    const validation = validateAiDraft(draft, operations, 'fullConversation');
+
+    expect(validation.errors).toContain(
+      "root 1 conditions operation 1 'Evaluate Tag for Company' arg 1 nested operation 1 'Get Preset Value (int)' has 1 args, expected 2.",
+    );
+  });
+
+  it('flags operation args where the definition only allows primitive values', async () => {
+    const { validateAiDraft } = await import('utils/ai-draft-utils');
+    const draft = makeDraft({
+      nodes: [
+        {
+          ...makeDraft().nodes[0],
+          actions: [
+            {
+              functionName: 'SetFlag',
+              args: [
+                {
+                  type: 'operation',
+                  value: {
+                    functionName: 'Get Preset Value (int)',
+                    args: [
+                      { type: 'string', value: 'HasOrHasNot' },
+                      { type: 'int', value: 1 },
+                    ],
+                  },
+                },
+              ],
+              note: '',
+            },
+          ],
+        },
+        makeDraft().nodes[1],
+      ],
+    });
+
+    const validation = validateAiDraft(draft, operations, 'fullConversation');
+
+    expect(validation.errors).toContain("node 'intro' actions operation 1 'SetFlag' arg 1 uses type 'operation', but the definition allows string.");
+  });
+
+  it('allows primitive fallback args when the definition permits them', async () => {
+    const { validateAiDraft } = await import('utils/ai-draft-utils');
+    const draft = makeDraft({
+      roots: [
+        {
+          ...makeDraft().roots[0],
+          conditions: [
+            {
+              functionName: 'Evaluate Tag for Company',
+              args: [
+                { type: 'int', value: 1 },
+                { type: 'string', value: 'company_dead_claim_seen' },
+              ],
+              note: 'Valid, though the operation-shaped preset is preferred.',
+            },
+          ],
+        },
+      ],
+    });
+
+    const validation = validateAiDraft(draft, operations, 'fullConversation');
+
+    expect(validation.errors).toEqual([]);
+    expect(validation.warnings).toContain(
+      "root 1 conditions operation 1 'Evaluate Tag for Company' arg 1 uses type 'int', but 'operation' is preferred for generated drafts.",
+    );
   });
 
   it('converts repeated full-draft targets into auxiliary links after the first structural parent', async () => {

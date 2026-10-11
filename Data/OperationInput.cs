@@ -7,6 +7,9 @@ namespace ConverseTek.Data {
     public string Scope { get; set; }
     public OperationInputValue[] Values { get; set; }
     public object DefaultValue { get; set; }
+    public string PreferredType { get; set; }
+    public string AiHint { get; set; }
+    public object[] AiExamples { get; set; }
 
     public OperationInput(string label, string viewLabel, string tooltip, string[] types, string scope, OperationInputValue[] values, object defaultValue) {
       this.Label = label;

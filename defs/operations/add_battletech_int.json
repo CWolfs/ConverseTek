@@ -4,6 +4,7 @@
   "view": ["inputs"],
   "scope": "action",
   "category": "primary",
+  "aiHint": "Adds or updates an integer SimGame stat. Use this when a conversation choice should record numeric state that later conversations may read, or that contracts/missions may read in mod setups that support runtime stat access.",
   "inputs": [
     {
       "label": "Type",
@@ -18,7 +19,9 @@
     {
       "label": "Stat Key",
       "types": ["string"],
-      "viewlabel": "'{value}'"
+      "viewlabel": "'{value}'",
+      "preferredType": "string",
+      "aiHint": "Use a stable stat key for the durable state being recorded."
     },
     {
       "label": "Stat Value",

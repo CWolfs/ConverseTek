@@ -68,6 +68,8 @@ AI-assisted conversation drafting is advisory only. Drafts must stay outside `da
 - Backend provider work goes through `Services/AiProviderService.cs`; keep provider names generic so Codex, Claude Code, and future CLIs can share the interface.
 - Frontend draft conversion lives in `app/src/utils/ai-draft-utils.ts`; keep these functions pure and return fresh conversation assets or explicit patch objects.
 - Accepting a full draft must use "Turn Into Real Conversation"; node or branch suggestions must remain "Accept" / "Reject" until accepted.
+- AI draft operation intents may include nested operation args with `type: "operation"` and a nested `{ functionName, args }` value. Operation definition JSON may include optional `aiHint`, `aiExamples`, and input-level `preferredType` fields to guide generation; these are advisory editor metadata and must not affect BattleTech serialisation.
+- AI draft prompts should understand tags and stats as durable state that may cross between conversations, custom contracts, and mission runtime logic in mod setups that support it. Suggest tag/stat setters only when context indicates that integration exists and the setter represents meaningful route, clue, consequence, setup, or later-branch state.
 
 ## Verification
 

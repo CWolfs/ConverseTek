@@ -9,6 +9,8 @@ namespace ConverseTek.Data {
     public string Category { get; set; }
     public string Scope { get; set; }
     public List<OperationInput> Inputs { get; set; }
+    public string AiHint { get; set; }
+    public List<object> AiExamples { get; set; }
 
     public OperationDefinition(string type, string key, string tooltip, string label, string category, string scope) : base(type) {
       this.Key = key;

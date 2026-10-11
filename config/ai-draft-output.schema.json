@@ -104,13 +104,46 @@
             "properties": {
               "type": {
                 "type": "string",
-                "enum": ["string", "int", "float", "bool"]
+                "enum": ["string", "int", "float", "bool", "operation"]
               },
-              "value": { "type": ["string", "number", "boolean", "null"] }
+              "value": {
+                "anyOf": [
+                  { "type": ["string", "number", "boolean", "null"] },
+                  { "$ref": "#/definitions/nestedOperationCall" }
+                ]
+              }
             }
           }
         },
         "note": { "type": "string" }
+      }
+    },
+    "nestedOperationCall": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["functionName", "args"],
+      "properties": {
+        "functionName": { "type": "string" },
+        "args": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["type", "value"],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["string", "int", "float", "bool", "operation"]
+              },
+              "value": {
+                "anyOf": [
+                  { "type": ["string", "number", "boolean", "null"] },
+                  { "$ref": "#/definitions/nestedOperationCall" }
+                ]
+              }
+            }
+          }
+        }
       }
     }
   }

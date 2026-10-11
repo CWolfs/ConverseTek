@@ -4,6 +4,7 @@
   "view": ["inputs"],
   "scope": "action",
   "category": "primary",
+  "aiHint": "Sets a string SimGame stat. Use this when a conversation choice should store a durable id, route, clue, system, faction, or setup value that later conversations may read, or that contracts/missions may read in mod setups that support runtime stat access.",
   "inputs": [
     {
       "label": "Type",
@@ -34,12 +35,16 @@
     {
       "label": "Stat Key",
       "types": ["string"],
-      "viewlabel": "'{value}'"
+      "viewlabel": "'{value}'",
+      "preferredType": "string",
+      "aiHint": "Use a stable stat key for the durable state being recorded."
     },
     {
       "label": "Stat Value",
       "types": ["operation", "string"],
-      "viewlabel": "with the value '{value}'"
+      "viewlabel": "with the value '{value}'",
+      "preferredType": "string",
+      "aiHint": "Use a literal string for fixed values, or an operation when copying a dynamic value such as a system id, contract id, tag-derived value, or another stat."
     }
   ]
 }

@@ -148,8 +148,12 @@ Important fields:
 - `nodes[]` -> prompt nodes with stable draft `key` values plus readable `comment` authoring notes. For prompt-node text suggestions, `nodes[0].text` carries the replacement text.
 - `choices[]` -> player responses that point to a target draft key or deliberately end the conversation. Their `comment` fields describe the branch purpose or condition context.
 - For root/response text suggestions, `roots[0].text` carries the replacement text and is not treated as a graph edge.
-- `actions[]` / `conditions[]` -> operation intents using existing definition `key` names and typed argument values.
+- `actions[]` / `conditions[]` -> operation intents using existing definition `key` names and typed argument values. Args may also use `type: "operation"` with a nested `{ functionName, args }` value, which converts to `OperationArgType.callValue` when the draft is accepted.
 - Prompt node speaker priority follows BattleTech's real fields: `sourceInSceneRef.id` is the cast id and takes priority. If `sourceInSceneRef` is set, BattleTech uses that cast definition. If the prompt should use `speakerOverrideId`, ConverseTek must clear `sourceInSceneRef`. Prompt nodes without `sourceInSceneRef` or `speakerOverrideId` inherit the current SimGame conversation speaker at runtime. ConverseTek labels these as `Inherits`; BattleTech does not provide a distinct narration speaker for SimGame conversation nodes.
+
+Operation definitions can include optional AI metadata for draft generation: `aiHint`, `aiExamples`, and input-level `preferredType`. These fields are editor guidance only; they do not change the BattleTech operation schema or serialised conversation data.
+
+In some modded workflows, tags and stats can act as durable state shared between conversations, custom contracts, and mission runtime logic. AI draft guidance should mention tag/stat setters when context indicates that integration exists and a branch needs to record a route, clue, consequence, setup value, or later-branch state, and should mention tag/stat checks when previous contract or mission events can affect the conversation.
 
 Draft keys are temporary. ConverseTek generates real BattleTech ids and prompt indexes during acceptance. This keeps AI output advisory and prevents preview rendering from mutating the active observable conversation graph.
 

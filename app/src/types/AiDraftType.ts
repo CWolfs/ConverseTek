@@ -45,14 +45,17 @@ export type AiSettingsType = {
 
 export type AiDraftModeType = 'fullConversation' | 'nodeSuggestion' | 'branchExpansion';
 
-export type AiDraftArgType = {
-  type: 'string' | 'int' | 'float' | 'bool';
-  value: string | number | boolean | null;
-};
-
-export type AiDraftOperationIntentType = {
+export type AiDraftOperationCallType = {
   functionName: string;
   args: AiDraftArgType[];
+};
+
+export type AiDraftArgType = {
+  type: 'string' | 'int' | 'float' | 'bool' | 'operation';
+  value: string | number | boolean | AiDraftOperationCallType | null;
+};
+
+export type AiDraftOperationIntentType = AiDraftOperationCallType & {
   note: string;
 };
 

@@ -2,10 +2,12 @@ import { v4 as uuidv4 } from 'uuid';
 
 import {
   AiAcceptedDraftType,
+  AiDraftArgType,
   AiBranchExpansionPatchType,
   AiConversationDraftType,
   AiDraftChoiceType,
   AiDraftModeType,
+  AiDraftOperationCallType,
   AiDraftOperationIntentType,
   AiDraftValidationResultType,
   ConversationAssetType,
@@ -160,7 +162,7 @@ export function validateAiDraft(
     }
 
     validateSpeaker(node.key, node.speaker, warnings);
-    validateOperations(`node '${node.key}' actions`, node.actions, operations, errors);
+    validateOperations(`node '${node.key}' actions`, node.actions, operations, errors, warnings);
     node.choices?.forEach((choice, index) =>
       validateChoice(`node '${node.key}' choice ${index + 1}`, choice, nodeKeys, operations, errors, warnings, false, externalTargetKeys),
     );
@@ -173,8 +175,8 @@ export function validateAiDraft(
   } else if (mode === 'branchExpansion' && activeNode?.type === 'node') {
     const promptChoice = getBranchExpansionPromptChoice(structuralDraft);
     if (promptChoice != null) {
-      validateOperations('branch expansion response conditions', promptChoice.conditions, operations, errors);
-      validateOperations('branch expansion response actions', promptChoice.actions, operations, errors);
+      validateOperations('branch expansion response conditions', promptChoice.conditions, operations, errors, warnings);
+      validateOperations('branch expansion response actions', promptChoice.actions, operations, errors, warnings);
     }
   }
   structuralDraft.warnings?.forEach((warning) => {
@@ -223,29 +225,71 @@ function validateChoice(
     warnings.push(`${label} ends the conversation and also has targetKey '${choice.targetKey}'. The ending will win.`);
   }
 
-  validateOperations(`${label} conditions`, choice.conditions, operations, errors);
-  validateOperations(`${label} actions`, choice.actions, operations, errors);
+  validateOperations(`${label} conditions`, choice.conditions, operations, errors, warnings);
+  validateOperations(`${label} actions`, choice.actions, operations, errors, warnings);
 }
 
 function validateOperations(
   label: string,
-  intents: AiDraftOperationIntentType[] | null | undefined,
+  intents: AiDraftOperationCallType[] | null | undefined,
   operations: OperationDefinitionType[],
   errors: string[],
+  warnings: string[],
 ): void {
   if (!intents) return;
 
-  intents.forEach((intent) => {
+  intents.forEach((intent, intentIndex) => {
+    const operationLabel = `${label} operation ${intentIndex + 1}`;
     const definition = operations.find((operation) => operation.key === intent.functionName);
     if (!definition) {
-      errors.push(`${label} references unknown operation '${intent.functionName}'.`);
+      errors.push(`${operationLabel} references unknown operation '${intent.functionName}'.`);
       return;
     }
 
     if (intent.args.length !== definition.inputs.length) {
-      errors.push(`${label} operation '${intent.functionName}' has ${intent.args.length} args, expected ${definition.inputs.length}.`);
+      errors.push(`${operationLabel} '${intent.functionName}' has ${intent.args.length} args, expected ${definition.inputs.length}.`);
     }
+
+    intent.args.forEach((arg, argIndex) => {
+      validateOperationArg(`${operationLabel} '${intent.functionName}' arg ${argIndex + 1}`, arg, definition.inputs[argIndex], operations, errors, warnings);
+    });
   });
+}
+
+function validateOperationArg(
+  label: string,
+  arg: AiDraftArgType,
+  input: OperationDefinitionType['inputs'][number] | undefined,
+  operations: OperationDefinitionType[],
+  errors: string[],
+  warnings: string[],
+): void {
+  if (input == null) return;
+
+  if (!input.types.includes(arg.type)) {
+    errors.push(`${label} uses type '${arg.type}', but the definition allows ${input.types.join(', ')}.`);
+    return;
+  }
+
+  if (input.preferredType && input.preferredType !== arg.type) {
+    warnings.push(`${label} uses type '${arg.type}', but '${input.preferredType}' is preferred for generated drafts.`);
+  }
+
+  if (arg.type !== 'operation') return;
+
+  if (!isAiDraftOperationCall(arg.value)) {
+    errors.push(`${label} is an operation argument but does not contain a nested operation call.`);
+    return;
+  }
+
+  validateOperations(`${label} nested`, [arg.value], operations, errors, warnings);
+}
+
+function isAiDraftOperationCall(value: AiDraftArgType['value']): value is AiDraftOperationCallType {
+  if (value == null || typeof value !== 'object') return false;
+
+  const maybeCall = value as Partial<AiDraftOperationCallType>;
+  return typeof maybeCall.functionName === 'string' && Array.isArray(maybeCall.args);
 }
 
 export function buildAcceptedDraft(
@@ -740,21 +784,21 @@ function normaliseResponseFallback(value: string | null | undefined): string {
   return firstSentence.length > 48 ? `${firstSentence.slice(0, 45).trim()}...` : firstSentence;
 }
 
-function buildOperationCall(intent: AiDraftOperationIntentType): OperationCallType {
+function buildOperationCall(intent: AiDraftOperationIntentType | AiDraftOperationCallType): OperationCallType {
   return {
     functionName: intent.functionName,
     args: intent.args.map(buildOperationArg),
   };
 }
 
-function buildOperationArg(arg: { type: string; value: string | number | boolean | null }): OperationArgType {
+function buildOperationArg(arg: AiDraftArgType): OperationArgType {
   return {
     type: arg.type === 'bool' ? 'bool' : (arg.type as OperationArgType['type']),
     intValue: arg.type === 'int' ? Number(arg.value ?? 0) : 0,
     boolValue: arg.type === 'bool' ? Boolean(arg.value) : false,
     floatValue: arg.type === 'float' ? Number(arg.value ?? 0) : 0,
     stringValue: arg.type === 'string' ? String(arg.value ?? '') : '',
-    callValue: null,
+    callValue: arg.type === 'operation' && isAiDraftOperationCall(arg.value) ? buildOperationCall(arg.value) : null,
     variableRefValue: null,
   };
 }
