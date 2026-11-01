@@ -1,0 +1,21 @@
+<Project>
+  <!-- ConverseTek code-quality rules for every C# project in the repo (rules themselves are in .editorconfig) -->
+  <PropertyGroup>
+    <ConverseTekRepoRoot>$(MSBuildThisFileDirectory)</ConverseTekRepoRoot>
+    <!-- File-scoped namespaces need C# 10+; syntax only, so fine on net472 -->
+    <LangVersion>latest</LangVersion>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <!-- net472 projects don't get the .NET analysers by default; CA1502 (complexity) needs them -->
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="$(ConverseTekRepoRoot)CodeMetricsConfig.txt" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(MSBuildProjectName)' != 'ConverseTek.Analyzers'">
+    <ProjectReference Include="$(ConverseTekRepoRoot)Analyzers/ConverseTek.Analyzers.csproj"
+                      OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="all" />
+  </ItemGroup>
+</Project>

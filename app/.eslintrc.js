@@ -1,3 +1,12 @@
+// Files already over the 800-line limit. Split these, then remove them from the list.
+const GRANDFATHERED_LONG_FILES = [
+  'src/components/AiDraftModal/AiDraftModal.tsx',
+  'src/stores/nodeStore/node-store.ts',
+  'src/utils/tree-data-utils.ts',
+  'src/utils/ai-draft-utils.ts',
+  'src/utils/__tests__/ai-draft-utils.test.ts',
+];
+
 module.exports = {
   root: true,
   globals: {
@@ -20,6 +29,8 @@ module.exports = {
         'plugin:react-hooks/recommended',
         'plugin:@typescript-eslint/recommended',
         'plugin:@typescript-eslint/recommended-requiring-type-checking',
+        // Last, so formatting is left to Prettier (npm run format:check)
+        'prettier',
       ],
       parser: '@typescript-eslint/parser',
       parserOptions: {
@@ -40,6 +51,18 @@ module.exports = {
         'react/jsx-one-expression-per-line': 0,
         'react-hooks/exhaustive-deps': 0,
         '@typescript-eslint/no-empty-function': ['error', { allow: ['arrowFunctions'] }],
+
+        // House rules shared with the C# side (.editorconfig)
+        curly: ['error', 'all'],
+        complexity: ['error', 20],
+        'max-lines': ['error', { max: 800, skipBlankLines: false, skipComments: false }],
+        'file-length-warning': 'warn',
+      },
+    },
+    {
+      files: GRANDFATHERED_LONG_FILES,
+      rules: {
+        'max-lines': ['warn', { max: 800, skipBlankLines: false, skipComments: false }],
       },
     },
   ],

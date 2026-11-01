@@ -1,0 +1,78 @@
+root = true
+
+# ConverseTek code style. C# rules are enforced at build time (EnforceCodeStyleInBuild in Directory.Build.props);
+# TypeScript is enforced by ESLint and Prettier in app/ (npm run lint, npm run format:check).
+
+[*]
+charset = utf-8
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.cs]
+# Braces on the same line (K&R / "Egyptian")
+csharp_new_line_before_open_brace = none
+csharp_new_line_before_else = false
+csharp_new_line_before_catch = false
+csharp_new_line_before_finally = false
+csharp_new_line_before_members_in_object_initializers = true
+csharp_new_line_before_members_in_anonymous_types = true
+
+csharp_indent_case_contents = true
+csharp_indent_switch_labels = true
+csharp_prefer_braces = true:error
+csharp_style_namespace_declarations = file_scoped:error
+csharp_using_directive_placement = outside_namespace:error
+dotnet_sort_system_directives_first = true
+
+# Formatting, braces, file-scoped namespaces and using placement fail the build
+dotnet_diagnostic.IDE0055.severity = error
+dotnet_diagnostic.IDE0011.severity = error
+dotnet_diagnostic.IDE0161.severity = error
+dotnet_diagnostic.IDE0065.severity = error
+
+# Field names: plain camelCase, no _ or s_ prefix; this. only where a name is shadowed
+dotnet_style_qualification_for_field = false
+dotnet_style_qualification_for_property = false
+dotnet_style_qualification_for_method = false
+dotnet_style_qualification_for_event = false
+dotnet_diagnostic.IDE0003.severity = error
+dotnet_diagnostic.IDE1006.severity = error
+
+dotnet_naming_symbols.constants.applicable_kinds = field
+dotnet_naming_symbols.constants.applicable_accessibilities = *
+dotnet_naming_symbols.constants.required_modifiers = const
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+dotnet_naming_rule.constants_are_pascal_case.symbols = constants
+dotnet_naming_rule.constants_are_pascal_case.style = pascal_case
+dotnet_naming_rule.constants_are_pascal_case.severity = error
+
+dotnet_naming_symbols.static_readonly_fields.applicable_kinds = field
+dotnet_naming_symbols.static_readonly_fields.applicable_accessibilities = *
+dotnet_naming_symbols.static_readonly_fields.required_modifiers = static, readonly
+dotnet_naming_rule.static_readonly_fields_are_pascal_case.symbols = static_readonly_fields
+dotnet_naming_rule.static_readonly_fields_are_pascal_case.style = pascal_case
+dotnet_naming_rule.static_readonly_fields_are_pascal_case.severity = error
+
+dotnet_naming_symbols.hidden_fields.applicable_kinds = field
+dotnet_naming_symbols.hidden_fields.applicable_accessibilities = private, protected, private_protected
+dotnet_naming_style.camel_case.capitalization = camel_case
+dotnet_naming_rule.hidden_fields_are_camel_case.symbols = hidden_fields
+dotnet_naming_rule.hidden_fields_are_camel_case.style = camel_case
+dotnet_naming_rule.hidden_fields_are_camel_case.severity = error
+
+# Complexity: cyclomatic complexity max 20 (threshold in CodeMetricsConfig.txt)
+dotnet_diagnostic.CA1502.severity = error
+
+# File length (ConverseTek.Analyzers): warn above 700 lines, error above 800
+dotnet_diagnostic.CTK0001.severity = warning
+dotnet_diagnostic.CTK0002.severity = error
+
+# Grandfathered: already over 800 lines. Split these, then delete the section.
+[Services/AiProviderService.cs]
+dotnet_diagnostic.CTK0002.severity = warning

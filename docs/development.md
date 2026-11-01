@@ -94,12 +94,18 @@ Run these from `app/` unless using `npm --prefix app ...` from the repo root.
 npm run ts-check
 npm run lint
 npm run lint:fix
+npm run format
+npm run format:check
 npm run test
 npm run build
 npm start
 ```
 
 `npm start` only starts the Vite server. For real app testing, prefer `CT: Fast Dev` so WebView2 and the backend bridge are available.
+
+## Code Style
+
+C# style rules are in the root `.editorconfig` and are enforced when building - a formatting, brace, naming, complexity or file-length violation fails the build. Fix formatting with `dotnet format <project> --severity error`. TypeScript uses ESLint (`npm run lint`) and Prettier (`npm run format`). The shared rules are summarised in `AGENTS.md` under "Code Style and Linting".
 
 ## DevTools
 

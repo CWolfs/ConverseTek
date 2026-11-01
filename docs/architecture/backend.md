@@ -138,6 +138,10 @@ The conversation and definition types moved to `Core/Data/` and keep the `Conver
 
 `ConverseTek.Cli.csproj` builds `ctek.exe` (`export`, `import`, `check`, `refs`) on top of `Core/`. It is built separately from the app and is not part of `BuildServer`. Usage is documented in [docs/cli.md](../cli.md).
 
+## Code Quality - `Directory.Build.props`, `.editorconfig`, `Analyzers/`
+
+`Directory.Build.props` applies to every C# project in the repo. It turns on `EnforceCodeStyleInBuild` and the .NET analysers (CA1502 complexity, threshold in `CodeMetricsConfig.txt`), sets `LangVersion` to `latest` for file-scoped namespaces, and adds `Analyzers/ConverseTek.Analyzers.csproj` as an analyser to every project except itself. That project (netstandard2.0, Roslyn) holds `FileLengthAnalyzer`: CTK0001 warns above 700 lines and CTK0002 fails above 800. The rules themselves are in the root `.editorconfig`; see `AGENTS.md` "Code Style and Linting".
+
 ## External Assemblies - `libs/`
 
 Referenced from `ConverseTek.csproj`:

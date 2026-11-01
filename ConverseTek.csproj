@@ -31,11 +31,11 @@
     <None Remove="app\node_modules\**" />
   </ItemGroup>
 
-  <!-- Core and Cli are their own projects; keep their sources out of the app's default globs -->
+  <!-- Core, Cli and Analyzers are their own projects; keep their sources out of the app's default globs -->
   <ItemGroup>
-    <Compile Remove="Core\**;Cli\**" />
-    <EmbeddedResource Remove="Core\**;Cli\**" />
-    <None Remove="Core\**;Cli\**" />
+    <Compile Remove="Core\**;Cli\**;Analyzers\**" />
+    <EmbeddedResource Remove="Core\**;Cli\**;Analyzers\**" />
+    <None Remove="Core\**;Cli\**;Analyzers\**" />
   </ItemGroup>
 
   <ItemGroup>

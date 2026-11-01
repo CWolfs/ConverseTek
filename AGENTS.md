@@ -64,6 +64,20 @@ Prefer named React imports for direct React helper access. For example, import a
 
 Do not add a default `React` import just for JSX. The app uses the modern JSX transform, so new TSX files should only import the specific React values or types they actually reference. Prefer named value imports and `type` imports, for example `import { useState } from 'react';` or `import type { ReactElement } from 'react';`.
 
+## Code Style and Linting
+
+The rules live in the root `.editorconfig` (C#) and `app/.eslintrc.js` + `app/prettier.config.js` (TypeScript). Both sides share the same house rules:
+
+- **Formatting**: 2-space indents, braces on the same line, CRLF, UTF-8, final newline. C# formatting violations (IDE0055) fail the build; TypeScript is formatted by Prettier (`npm run format`, checked by `npm run format:check`).
+- **Braces always**: every `if`/`else`/loop body is braced (C# `csharp_prefer_braces`/IDE0011, ESLint `curly: all`).
+- **C# layout**: file-scoped namespaces with `using`s outside them, System usings first. Constants and `static readonly` fields are PascalCase; private/protected fields are plain camelCase with no `_` prefix; no `this.` unless a name is shadowed.
+- **Complexity**: cyclomatic complexity at most 20 (C# CA1502 via `CodeMetricsConfig.txt`, ESLint `complexity`).
+- **File length**: warning above 700 lines, error above 800 (C# `ConverseTek.Analyzers` CTK0001/CTK0002, ESLint `file-length-warning` from `app/eslint-rules/` plus core `max-lines`).
+
+Files and functions that already broke the length or complexity limits are grandfathered: per-file sections in `.editorconfig`, the `GRANDFATHERED_LONG_FILES` list in `app/.eslintrc.js`, and `// eslint-disable-next-line complexity -- grandfathered, split later` comments. Do not add new entries - split the code instead - and remove an entry when its file or function is split.
+
+C# rules are enforced at build time (`EnforceCodeStyleInBuild` in `Directory.Build.props`). To fix C# formatting automatically, run `dotnet format <project> --severity error`. Do not use `--severity info`: it applies unrelated optional refactors such as collection expressions and making methods static.
+
 ## AI Drafting
 
 AI-assisted conversation drafting is advisory only. Drafts must stay outside `dataStore.unsavedActiveConversationAsset` until the user accepts them.
@@ -79,4 +93,4 @@ AI-assisted conversation drafting is advisory only. Drafts must stay outside `da
 
 ## Verification
 
-Always run the relevant lint and test commands before handing work back. For frontend changes, run `npm run ts-check` from `app/`, the configured lint command if present, and the relevant Vitest suite. For backend changes, run `dotnet build ConverseTek.csproj /t:BuildServer` from the repo root when game DLLs are available. For `Core/` or `Cli/` changes, also run `dotnet build Cli/ConverseTek.Cli.csproj` and exercise `ctek check` and an `export`/`import` round trip on a real conversations folder - a JSON export imported back should be byte-identical to the original `.bytes`. If a lint or test command is missing, blocked, or not relevant to the touched area, say that explicitly in the final response.
+Always run the relevant lint and test commands before handing work back. For frontend changes, run `npm run ts-check`, `npm run lint` and `npm run format:check` from `app/`, and the relevant Vitest suite. For backend changes, run `dotnet build ConverseTek.csproj /t:BuildServer` from the repo root when game DLLs are available. For `Core/` or `Cli/` changes, also run `dotnet build Cli/ConverseTek.Cli.csproj` and exercise `ctek check` and an `export`/`import` round trip on a real conversations folder - a JSON export imported back should be byte-identical to the original `.bytes`. If a lint or test command is missing, blocked, or not relevant to the touched area, say that explicitly in the final response.
