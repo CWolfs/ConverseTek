@@ -2,7 +2,7 @@
 
 The backend is C# on **.NET Framework 4.7.2**, hosted by a WinForms **WebView2 / Edge Chromium** desktop shell. It reads and writes BattleTech's binary `.bytes` conversation files, exposes the local file system to the UI, serves JSON definition packs, and provides the local route bridge used by the React app.
 
-Repo root contains the `.csproj`, `Program.cs`, and the source folders described below.
+Repo root contains the `.csproj`, `Program.cs`, and the source folders described below. Conversation file handling, definition loading and diagnostics live in the shared `Core/` library (see [Shared Core](#shared-core---core)), which the desktop app and the `ctek` command line tool (`Cli/`, see [docs/cli.md](../cli.md)) both reference.
 
 ## Entry Point - `Program.cs`
 
@@ -73,8 +73,8 @@ All services use a singleton `getInstance()` pattern.
 
 ### `ConversationService`
 
-- Reads/writes BattleTech conversation files.
-- `LoadConversations()` scans `WorkingDirectory` for `*.bytes`, deserialises each via `protobuf-net`'s `RuntimeTypeModel`, and wraps it in `ConversationAsset`. Files matching `.cvsl.bytes` are loaded as speaker lists instead.
+- Reads/writes BattleTech conversation files through `Core/Conversations/ConversationFiles`, adding the app's logging and file-extension handling.
+- `LoadConversations()` scans `WorkingDirectory` for `*.bytes`, deserialises each, and wraps it in `ConversationAsset`. Files matching `.cvsl.bytes` are loaded as speaker lists instead.
 - `SaveConversation(asset, FileFormat)` writes either binary (`.bytes`) or JSON (`.json`) depending on the enum.
 - `ImportConversation(path)` parses an external JSON file into a `Conversation` object.
 - `DeleteConversation(path)` removes the file.
@@ -83,7 +83,7 @@ All services use a singleton `getInstance()` pattern.
 
 ### `DefinitionService`
 
-- `LoadDefinitions()` reads every JSON file under `defs/operations/`, `defs/presets/`, and `defs/tags/`.
+- `LoadDefinitions()` loads `defs/` next to the executable through `Core/Definitions/DefinitionSet`, which reads every JSON file under `defs/operations/`, `defs/presets/`, and `defs/tags/`.
 - Deserialises definitions into `OperationDefinition`, `PresetDefinition`, and `TagDefinition`.
 - Returns one combined dictionary, served by `DefinitionController.GetDefinitions()`.
 
@@ -113,18 +113,30 @@ All services use a singleton `getInstance()` pattern.
 
 ## Data Types - `Data/`
 
-DTOs and enums consumed by controllers/services:
+App-only DTOs consumed by controllers/services:
 
-- `ConversationAsset` - `{ FileName, FilePath, Conversation }` where `Conversation` comes from `isogame`.
-- `SpeakerListAsset` - `{ FileName, FilePath, ConversationSpeakerList }`.
-- `FileFormat` - enum `JSON | BINARY`.
-- `Definition` -> `OperationDefinition`, `PresetDefinition`, `TagDefinition`.
-- `OperationInput`, `OperationInputValue` - sub-types for operation argument schema.
 - `FsDirectory`, `FsFile`, `FsView` - filesystem listing structs.
+- `AiDraft*`, `AiSettings` - AI drafting request, result and settings types.
 
-## JSON Helpers - `Json/`
+The conversation and definition types moved to `Core/Data/` and keep the `ConverseTek.Data` namespace.
 
-- `PresetDefinitionJsonConverter` - Newtonsoft converter that handles the case where a preset value is a scalar instead of an object.
+## Shared Core - `Core/`
+
+`ConverseTek.Core.csproj` is a .NET Framework 4.7.2 class library with no UI or singleton state. Methods throw on failure and leave logging to the caller. The app's `ConverseTek.csproj` excludes `Core\**` and `Cli\**` from its own compile globs and takes a project reference instead.
+
+- `Data/` - `ConversationAsset`, `SpeakerListAsset`, `FileFormat`, `Definition` -> `OperationDefinition` / `PresetDefinition` / `TagDefinition`, `OperationInput`, `OperationInputValue`.
+- `Json/PresetDefinitionJsonConverter` - Newtonsoft converter that handles the case where a preset value is a scalar instead of an object.
+- `Conversations/ConversationFiles` - load/save `.bytes` (protobuf via `RuntimeTypeModel`) and JSON, speaker lists, folder loading and `RoundTrip()` (serialise then read back).
+- `Conversations/ConversationIds` - the `conversationId:id` comparison rules, matching the frontend's `getId`.
+- `Conversations/OperationArgs` - works out which `TsVariant` field an arg uses, matching the editor's def-store typing and BattleTech's raw reading.
+- `Conversations/OperationFormatter`, `ConversationScriptWriter` - the readable script view used by `ctek export`.
+- `Definitions/DefinitionSet` - loads a defs folder and looks up operations and presets.
+- `Diagnostics/ConversationDiagnostics` - C# port of `app/src/utils/conversation-diagnostics-utils.ts`. **Keep the two in step**: a check added or changed in one must be mirrored in the other. The deliberate differences are listed at the top of the C# file and in [docs/cli.md](../cli.md).
+- `References/ConversationReferences` - tag, stat and conversation id usage across a set of conversations, driven by operation input labels.
+
+## Command Line Tool - `Cli/`
+
+`ConverseTek.Cli.csproj` builds `ctek.exe` (`export`, `import`, `check`, `refs`) on top of `Core/`. It is built separately from the app and is not part of `BuildServer`. Usage is documented in [docs/cli.md](../cli.md).
 
 ## External Assemblies - `libs/`
 
@@ -132,7 +144,7 @@ Referenced from `ConverseTek.csproj`:
 
 - `ShadowrunDTO.dll` - defines `isogame.Conversation`, `isogame.ConversationSpeakerList`, and the rest of BattleTech's serialisable game types.
 - `ShadowrunSerializer.dll` - protobuf-related serialisation infrastructure.
-- `protobuf-net.dll` - used directly by `ConversationService` for binary read/write via `RuntimeTypeModel`.
+- `protobuf-net.dll` - used by `Core/Conversations/ConversationFiles` for binary read/write via `RuntimeTypeModel`.
 - `Newtonsoft.Json.dll` - JSON serialisation everywhere.
 
 The two Shadowrun DLLs are **not in the repo**; users copy them from their own BattleTech install (`BATTLETECH/BattleTech_Data/Managed/`) into `libs/` before building. The `/dependency-status` endpoint surfaces a missing-DLL warning to the UI on startup.

@@ -10,6 +10,8 @@ Use UK English in prose, docs, comments, commit messages, PR text, and issue tex
 
 ConverseTek is a React + TypeScript + MobX frontend in `app/`, hosted by a C#/.NET Framework 4.7.2 WebView2 desktop shell at the repository root. The backend reads and writes BattleTech protobuf `.bytes` conversation files through the game DLLs in `libs/`.
 
+Conversation file I/O, definition loading, diagnostics and reference scanning live in the shared `Core/` class library (`ConverseTek.Core.csproj`), referenced by both the desktop app and the `ctek` command line tool in `Cli/` (see `docs/cli.md`). Keep `Core/` free of UI, singletons and logging - its methods throw and callers decide what to do. The app's csproj excludes `Core\**` and `Cli\**` from its compile globs, so new files there belong to those projects only.
+
 Read `docs/architecture/overview.md` before larger changes, then the specific architecture document for the area being touched.
 
 ## BattleTech Conversation Format
@@ -19,6 +21,10 @@ Do not add new properties to conversation assets, prompt nodes, response nodes, 
 Transient editor-only state is fine, but keep it outside the serialised conversation graph or strip/recompute it before persistence, for example in a UI store, config file, or separate metadata structure keyed by stable ids. AI draft/intermediate types may have their own fields, but conversion into a real conversation must only populate real BattleTech fields.
 
 For prompt speakers, follow the FAQ behaviour: `sourceInSceneRef.id` is the cast id and takes priority in BattleTech. If a prompt should use `speakerOverrideId` instead, `sourceInSceneRef` must be cleared. If both are absent, the node inherits the current conversation speaker.
+
+## Conversation Diagnostics
+
+Diagnostics exist twice: `app/src/utils/conversation-diagnostics-utils.ts` for the editor panel and `Core/Diagnostics/ConversationDiagnostics.cs` for `ctek check` and `ctek import`. When a check is added, removed or reworded in one, make the same change in the other. The few deliberate differences (the CLI reads files exactly as stored) are listed at the top of the C# file and in `docs/cli.md`.
 
 ## Desktop Bridge Routing
 
@@ -73,4 +79,4 @@ AI-assisted conversation drafting is advisory only. Drafts must stay outside `da
 
 ## Verification
 
-Always run the relevant lint and test commands before handing work back. For frontend changes, run `npm run ts-check` from `app/`, the configured lint command if present, and the relevant Vitest suite. For backend changes, run `dotnet build ConverseTek.csproj /t:BuildServer` from the repo root when game DLLs are available. If a lint or test command is missing, blocked, or not relevant to the touched area, say that explicitly in the final response.
+Always run the relevant lint and test commands before handing work back. For frontend changes, run `npm run ts-check` from `app/`, the configured lint command if present, and the relevant Vitest suite. For backend changes, run `dotnet build ConverseTek.csproj /t:BuildServer` from the repo root when game DLLs are available. For `Core/` or `Cli/` changes, also run `dotnet build Cli/ConverseTek.Cli.csproj` and exercise `ctek check` and an `export`/`import` round trip on a real conversations folder - a JSON export imported back should be byte-identical to the original `.bytes`. If a lint or test command is missing, blocked, or not relevant to the touched area, say that explicitly in the final response.

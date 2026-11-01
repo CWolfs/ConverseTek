@@ -31,6 +31,17 @@
     <None Remove="app\node_modules\**" />
   </ItemGroup>
 
+  <!-- Core and Cli are their own projects; keep their sources out of the app's default globs -->
+  <ItemGroup>
+    <Compile Remove="Core\**;Cli\**" />
+    <EmbeddedResource Remove="Core\**;Cli\**" />
+    <None Remove="Core\**;Cli\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="Core\ConverseTek.Core.csproj" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3912.50" />
   </ItemGroup>

@@ -3,12 +3,7 @@ namespace ConverseTek.Services {
   using System.IO;
   using System.Collections.Generic;
 
-  using Newtonsoft.Json;
-
-  using isogame;
-  using ProtoBuf;
-  using ProtoBuf.Meta;
-
+  using ConverseTek.Conversations;
   using ConverseTek.Data;
   using ConverseTek.Infrastructure;
 
@@ -48,35 +43,21 @@ namespace ConverseTek.Services {
     }
 
     public ConversationAsset LoadConversation(string filePath) {
-      ConversationAsset conversationAsset = null;
-      RuntimeTypeModel runtimeTypeModel = TypeModel.Create();
-
       try {
-        using (FileStream fileStream = new FileStream(filePath, FileMode.Open)) {
-          Conversation conversation = runtimeTypeModel.Deserialize(fileStream, null, typeof(Conversation)) as Conversation;
-          conversationAsset = new ConversationAsset(filePath, conversation);
-        }
+        return new ConversationAsset(filePath, ConversationFiles.LoadBinary(filePath));
       } catch (Exception error) {
         Log.Error(error.ToString());
         return null;
       }
-
-      return conversationAsset;
     }
 
     public ConversationAsset ImportConversation(string filePath) {
-      ConversationAsset conversationAsset = null;
-
       try {
-        string json = File.ReadAllText(filePath);
-        Conversation conversation = JsonConvert.DeserializeObject<Conversation>(json);
-        conversationAsset = new ConversationAsset(filePath, conversation);
+        return new ConversationAsset(filePath, ConversationFiles.LoadJson(filePath));
       } catch (Exception error) {
         Log.Error(error.ToString());
         return null;
       }
-
-      return conversationAsset;
     }
 
     public bool DeleteConversation(string filePath) {
@@ -105,36 +86,24 @@ namespace ConverseTek.Services {
     }
 
     private void SaveJsonConversation(ConversationAsset conversationAsset, string path) {
-      File.WriteAllText(Path.ChangeExtension(path, ".json"), JsonConvert.SerializeObject(conversationAsset.Conversation, Formatting.Indented));
+      ConversationFiles.SaveJson(conversationAsset.Conversation, Path.ChangeExtension(path, ".json"));
     }
 
     private void SaveBinaryConversation(ConversationAsset conversationAsset, string path) {
-      RuntimeTypeModel runtimeTypeModel = TypeModel.Create();
-
       try {
-        using (FileStream fileStream = new FileStream(Path.ChangeExtension(path, ".bytes"), FileMode.Create)) {
-          runtimeTypeModel.Serialize(fileStream, conversationAsset.Conversation);
-        }
+        ConversationFiles.SaveBinary(conversationAsset.Conversation, Path.ChangeExtension(path, ".bytes"));
       } catch (Exception error) {
         Log.Error(error.ToString());
       }
     }
 
     public SpeakerListAsset LoadSpeakersList(string filePath) {
-      SpeakerListAsset speakerListAsset = null;
-      RuntimeTypeModel runtimeTypeModel = TypeModel.Create();
-
       try {
-        using (FileStream fileStream = new FileStream(filePath, FileMode.Open)) {
-          ConversationSpeakerList speakerList = runtimeTypeModel.Deserialize(fileStream, null, typeof(ConversationSpeakerList)) as ConversationSpeakerList;
-          speakerListAsset = new SpeakerListAsset(filePath, speakerList);
-        }
+        return new SpeakerListAsset(filePath, ConversationFiles.LoadSpeakerList(filePath));
       } catch (Exception error) {
         Log.Error(error.ToString());
         return null;
       }
-
-      return speakerListAsset;
     }
 
     public void SaveSpeakersList(SpeakerListAsset speakerList, FileFormat fileFormat, string path) {
@@ -146,16 +115,12 @@ namespace ConverseTek.Services {
     }
 
     private void SaveJsonSpeakerList(SpeakerListAsset speakerList, string path) {
-      File.WriteAllText(Path.ChangeExtension(path, ".json"), JsonConvert.SerializeObject(speakerList.SpeakerList, Formatting.Indented));
+      ConversationFiles.SaveSpeakerListJson(speakerList.SpeakerList, Path.ChangeExtension(path, ".json"));
     }
 
     private void SaveBinarySpeakerList(SpeakerListAsset speakerList, string path) {
-      RuntimeTypeModel runtimeTypeModel = TypeModel.Create();
-
       try {
-        using (FileStream fileStream = new FileStream(Path.ChangeExtension(path, ".bytes"), FileMode.Create)) {
-          runtimeTypeModel.Serialize(fileStream, speakerList.SpeakerList);
-        }
+        ConversationFiles.SaveSpeakerListBinary(speakerList.SpeakerList, Path.ChangeExtension(path, ".bytes"));
       } catch (Exception error) {
         Log.Error(error.ToString());
       }

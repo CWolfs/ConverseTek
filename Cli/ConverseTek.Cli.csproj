@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- ctek: headless export, import, check and refs for BattleTech conversation files -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net472</TargetFramework>
+    <AssemblyName>ctek</AssemblyName>
+    <RootNamespace>ConverseTek.Cli</RootNamespace>
+    <Version>1.8.0</Version>
+    <Authors>Richard Griffiths</Authors>
+    <Copyright>Richard Griffiths</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\ConverseTek.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\libs\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+
+    <Reference Include="protobuf-net">
+      <HintPath>..\libs\protobuf-net.dll</HintPath>
+    </Reference>
+
+    <Reference Include="ShadowrunDTO">
+      <HintPath>..\libs\ShadowrunDTO.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

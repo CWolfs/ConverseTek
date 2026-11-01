@@ -5,9 +5,9 @@ namespace ConverseTek.Controllers {
   using Newtonsoft.Json;
   using Newtonsoft.Json.Linq;
 
-  using ProtoBuf.Meta;
   using isogame;
 
+  using ConverseTek.Conversations;
   using ConverseTek.Data;
   using ConverseTek.Host;
   using ConverseTek.Services;
@@ -199,14 +199,9 @@ namespace ConverseTek.Controllers {
         JObject data = JObject.Parse(postDataJson);
         ConversationAsset conversationAsset = JsonConvert.DeserializeObject<ConversationAsset>(data["conversationAsset"].ToString());
 
-        RuntimeTypeModel runtimeTypeModel = TypeModel.Create();
-        using (MemoryStream memoryStream = new MemoryStream()) {
-          runtimeTypeModel.Serialize(memoryStream, conversationAsset.Conversation);
-          memoryStream.Position = 0;
-          Conversation roundTrippedConversation = runtimeTypeModel.Deserialize(memoryStream, null, typeof(Conversation)) as Conversation;
-          result.Success = roundTrippedConversation != null;
-          result.Error = result.Success ? "" : "The generated conversation could not be read back after serialisation.";
-        }
+        Conversation roundTrippedConversation = ConversationFiles.RoundTrip(conversationAsset.Conversation);
+        result.Success = roundTrippedConversation != null;
+        result.Error = result.Success ? "" : "The generated conversation could not be read back after serialisation.";
       } catch (Exception error) {
         result.Success = false;
         result.Error = error.Message;

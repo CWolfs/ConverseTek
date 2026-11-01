@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Shared conversation logic used by the desktop app and the ctek command line tool -->
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <AssemblyName>ConverseTek.Core</AssemblyName>
+    <RootNamespace>ConverseTek</RootNamespace>
+    <Version>1.8.0</Version>
+    <Authors>Richard Griffiths</Authors>
+    <Copyright>Richard Griffiths</Copyright>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="protobuf-net">
+      <HintPath>..\libs\protobuf-net.dll</HintPath>
+    </Reference>
+
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\libs\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+
+    <Reference Include="ShadowrunDTO">
+      <HintPath>..\libs\ShadowrunDTO.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

@@ -63,6 +63,7 @@ MalD - Feature suggestions & testing
   - JSON definition extension support
 - Full support for `ExtendedConversations` mod
 - Flashpoint compatibility
+- `ctek` command line tool to export, import, check and cross-reference conversations without the editor - see [docs/cli.md](docs/cli.md)
 
 ## Dialog Tags
 

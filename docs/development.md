@@ -82,6 +82,10 @@ Backend changes require another `CT: Build Server` and a restart of the desktop 
 - Run `CT: Build All`.
 - Alternatively, run `dotnet build ConverseTek.csproj /t:BuildDebug` from the project directory.
 
+### Command Line Tool
+
+- Run `dotnet build Cli/ConverseTek.Cli.csproj` to build `Cli/bin/Debug/net472/ctek.exe`. See [cli.md](cli.md) for usage.
+
 ## Useful Frontend Commands
 
 Run these from `app/` unless using `npm --prefix app ...` from the repo root.

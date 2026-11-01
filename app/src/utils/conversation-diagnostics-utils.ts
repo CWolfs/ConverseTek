@@ -1,6 +1,8 @@
 import type { ConversationAssetType, ElementNodeType, InputType, OperationArgType, OperationCallType, OperationDefinitionType, PromptNodeType } from 'types';
 import { getId } from './conversation-utils';
 
+// Mirrored in C# by Core/Diagnostics/ConversationDiagnostics.cs for the ctek CLI - keep the checks in step
+
 export type ConversationDiagnosticSeverity = 'error' | 'warning' | 'info';
 export type ConversationDiagnosticCategory = 'content' | 'graph' | 'operation' | 'reference';
 
