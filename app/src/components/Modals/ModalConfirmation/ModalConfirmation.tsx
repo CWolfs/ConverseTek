@@ -42,7 +42,9 @@ export function ModalConfirmation({ globalModalId, type, title, header, body, wi
   const modalStore = useStore<ModalStore>('modal');
 
   const onOk = (event: MouseEvent<HTMLElement>): void => {
-    if (buttons.onPositive) buttons.onPositive(event);
+    if (buttons.onPositive) {
+      buttons.onPositive(event);
+    }
     modalStore.closeModal(globalModalId);
   };
 
@@ -50,7 +52,9 @@ export function ModalConfirmation({ globalModalId, type, title, header, body, wi
     modalStore.setTitle(renderTitleWithType(title, type), globalModalId);
 
     if (buttons?.positiveLabel) {
-      if (buttons.positiveType != null) modalStore.setOkType(buttons.positiveType, globalModalId);
+      if (buttons.positiveType != null) {
+        modalStore.setOkType(buttons.positiveType, globalModalId);
+      }
       modalStore.setOkLabel(buttons.positiveLabel, globalModalId);
       modalStore.setOnOk(onOk, globalModalId);
       modalStore.setShowOkButton(true, globalModalId);
@@ -59,7 +63,9 @@ export function ModalConfirmation({ globalModalId, type, title, header, body, wi
     }
 
     if (buttons?.negativeLabel) {
-      if (buttons.negativeType != null) modalStore.setCancelType(buttons.negativeType, globalModalId);
+      if (buttons.negativeType != null) {
+        modalStore.setCancelType(buttons.negativeType, globalModalId);
+      }
       modalStore.setOnCancel(buttons.onNegative, globalModalId);
       modalStore.setCancelLabel(buttons.negativeLabel, globalModalId);
       modalStore.setShowCancelButton(true, globalModalId);

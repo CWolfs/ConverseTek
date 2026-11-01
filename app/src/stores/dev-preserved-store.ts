@@ -1,7 +1,9 @@
 type DevStoreGlobals = typeof globalThis & Record<string, unknown>;
 
 export function getDevPreservedStore<TStore extends object>(key: string, createStore: () => TStore, prototype: object): TStore {
-  if (!import.meta.env.DEV) return createStore();
+  if (!import.meta.env.DEV) {
+    return createStore();
+  }
 
   const storeGlobals = globalThis as DevStoreGlobals;
   const existingStore = storeGlobals[key];

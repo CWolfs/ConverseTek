@@ -192,9 +192,15 @@ class DefStore {
 
     this.reset();
 
-    if (operations) this.operations = operations;
-    if (presets) this.presets = presets;
-    if (tags) this.tags = tags;
+    if (operations) {
+      this.operations = operations;
+    }
+    if (presets) {
+      this.presets = presets;
+    }
+    if (tags) {
+      this.tags = tags;
+    }
 
     this.definitionCount = this.operations.length + this.presets.length + this.tags.length;
   }
@@ -242,24 +248,40 @@ class DefStore {
     void variableRefValue;
 
     // Use same logic BT uses
-    if (callValue) return 'operation';
-    if (stringValue !== '') return 'string';
-    if (floatValue !== 0 && intValue !== 0) return 'float';
+    if (callValue) {
+      return 'operation';
+    }
+    if (stringValue !== '') {
+      return 'string';
+    }
+    if (floatValue !== 0 && intValue !== 0) {
+      return 'float';
+    }
     return 'int';
   }
 
   getArgValue(arg: OperationArgType | null) {
-    if (arg == null) return { type: null, value: null };
+    if (arg == null) {
+      return { type: null, value: null };
+    }
 
     const { intValue, boolValue, floatValue, stringValue, callValue, variableRefValue, type } = arg;
     void boolValue;
     void variableRefValue;
 
     if (type) {
-      if (type === 'operation') return { type, value: callValue };
-      if (type === 'string') return { type, value: stringValue };
-      if (type === 'float') return { type, value: floatValue };
-      if (type === 'int') return { type, value: intValue };
+      if (type === 'operation') {
+        return { type, value: callValue };
+      }
+      if (type === 'string') {
+        return { type, value: stringValue };
+      }
+      if (type === 'float') {
+        return { type, value: floatValue };
+      }
+      if (type === 'int') {
+        return { type, value: intValue };
+      }
     }
 
     return { type: null, value: null };
@@ -291,21 +313,35 @@ class DefStore {
 
     // FIXME: Consider better immutability instead of modifying existing props
     if (previousType !== type) {
-      if (previousType === 'operation') arg.callValue = null;
-      if (previousType === 'string') arg.stringValue = '';
-      if (previousType === 'float') arg.floatValue = 0.0;
-      if (previousType === 'int') arg.intValue = 0;
+      if (previousType === 'operation') {
+        arg.callValue = null;
+      }
+      if (previousType === 'string') {
+        arg.stringValue = '';
+      }
+      if (previousType === 'float') {
+        arg.floatValue = 0.0;
+      }
+      if (previousType === 'int') {
+        arg.intValue = 0;
+      }
 
       if (type === 'operation') {
         arg.callValue = { functionName: 'Get Preset Value (int)', args: [] };
         this.setOperation(arg.callValue, arg.callValue.functionName);
       }
 
-      if (type === 'string') arg.stringValue = previousValue && !(typeof previousValue === 'object') ? previousValue.toString() : '';
+      if (type === 'string') {
+        arg.stringValue = previousValue && !(typeof previousValue === 'object') ? previousValue.toString() : '';
+      }
 
       if (previousType === 'float' || previousType === 'int' || previousType === 'string') {
-        if (type === 'float') arg.floatValue = tryParseFloat(previousValue as string, 0.0);
-        if (type === 'int') arg.intValue = tryParseInt(previousValue as string, 0);
+        if (type === 'float') {
+          arg.floatValue = tryParseFloat(previousValue as string, 0.0);
+        }
+        if (type === 'int') {
+          arg.intValue = tryParseInt(previousValue as string, 0);
+        }
       }
 
       arg.type = type;
@@ -326,10 +362,18 @@ class DefStore {
     const { type } = argValue;
 
     // FIXME: Consider better immutability instead of modifying existing props
-    if (type === 'operation') arg.callValue = value as OperationCallType;
-    if (type === 'string') arg.stringValue = value as string;
-    if (type === 'float') arg.floatValue = value as number;
-    if (type === 'int') arg.intValue = value as number;
+    if (type === 'operation') {
+      arg.callValue = value as OperationCallType;
+    }
+    if (type === 'string') {
+      arg.stringValue = value as string;
+    }
+    if (type === 'float') {
+      arg.floatValue = value as number;
+    }
+    if (type === 'int') {
+      arg.intValue = value as number;
+    }
 
     arg.type = type;
 
@@ -411,19 +455,27 @@ class DefStore {
       arg.callValue = this.setOperation(opLogic, opLogic.functionName);
     } else if (types.includes('string')) {
       arg.type = 'string';
-      if (defaultValue != null) arg.stringValue = String(defaultValue);
+      if (defaultValue != null) {
+        arg.stringValue = String(defaultValue);
+      }
     } else if (types.includes('float')) {
       arg.type = 'float';
-      if (defaultValue != null) arg.floatValue = Number(defaultValue);
+      if (defaultValue != null) {
+        arg.floatValue = Number(defaultValue);
+      }
     } else if (types.includes('int')) {
       arg.type = 'int';
-      if (defaultValue != null) arg.intValue = Number(defaultValue);
+      if (defaultValue != null) {
+        arg.intValue = Number(defaultValue);
+      }
     }
   }
 
   getPresetValue(key: string, value: string | number): string {
     const preset = this.presets.find((p) => p.key === key);
-    if (preset === undefined) return '[BAD PRESET VALUE]';
+    if (preset === undefined) {
+      return '[BAD PRESET VALUE]';
+    }
     return preset.values[value.toString()];
   }
 
@@ -431,19 +483,25 @@ class DefStore {
     [key: string]: string;
   } | null {
     const preset = this.presets.find((p) => p.key === key);
-    if (preset === undefined) return null;
+    if (preset === undefined) {
+      return null;
+    }
     return preset.values;
   }
 
   getPresetValues(key: string): string[] | null {
     const preset = this.presets.find((p) => p.key === key);
-    if (preset === undefined) return null;
+    if (preset === undefined) {
+      return null;
+    }
     return values(preset.values);
   }
 
   getPresetValuesForOptions(key: string): { text: string; value: string }[] | null {
     const preset = this.presets.find((p) => p.key === key);
-    if (preset === undefined) return null;
+    if (preset === undefined) {
+      return null;
+    }
 
     const presetKeys = keys(preset.values);
     const presetValues = values(preset.values);

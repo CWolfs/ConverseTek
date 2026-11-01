@@ -127,7 +127,9 @@ export function AiDraftConversationTreePreview({ conversationAsset }: Props) {
           treeNode.children && treeNode.children.length > 0
             ? ({ node: currentNode }: { node: RSTNode; path: RSTPath; treeIndex: number }) => {
                 const arboristNode = tree.get(getPreviewTreeNodeId(currentNode as PreviewTreeNode));
-                if (arboristNode == null) return;
+                if (arboristNode == null) {
+                  return;
+                }
 
                 arboristNode.toggle();
                 previewNodeStore.setNodeExpansion(currentNode.id, !arboristNode.isOpen);
@@ -248,10 +250,14 @@ function createPreviewNodeStore(
       ];
     },
     recordTreeIndex: (nodeId, treeIndex) => {
-      if (nodeId) treeIndexByNodeId.set(nodeId, treeIndex);
+      if (nodeId) {
+        treeIndexByNodeId.set(nodeId, treeIndex);
+      }
     },
     getNode: (nodeId) => {
-      if (!nodeId) return null;
+      if (!nodeId) {
+        return null;
+      }
       return nodeById.get(nodeId) || null;
     },
     getPromptNodeByIndex: (index) => promptNodeByIndex.get(index) || null,
@@ -262,10 +268,14 @@ function createPreviewNodeStore(
     setFocusedTreeNode: () => undefined,
     getMaxTreeHorizontalNodePosition: () => maxHorizontalNodePositionRef.current,
     setNodeExpansion: (nodeId, flag) => {
-      if (nodeId) expansionByNodeId.set(nodeId, flag);
+      if (nodeId) {
+        expansionByNodeId.set(nodeId, flag);
+      }
     },
     isNodeExpanded: (nodeId) => {
-      if (!nodeId) return false;
+      if (!nodeId) {
+        return false;
+      }
       return expansionByNodeId.get(nodeId) ?? true;
     },
   };
@@ -299,7 +309,9 @@ function buildElementChildren(
   parentTreeKey: string,
   previewNodeStore: PreviewNodeStore,
 ): PreviewTreeNode[] | null {
-  if (elementNode.nextNodeIndex === -1) return null;
+  if (elementNode.nextNodeIndex === -1) {
+    return null;
+  }
 
   if (elementNode.auxiliaryLink) {
     const linkedPromptNode = previewNodeStore.getPromptNodeByIndex(elementNode.nextNodeIndex);
@@ -318,7 +330,9 @@ function buildElementChildren(
   }
 
   const childPromptNode = previewNodeStore.getPromptNodeByIndex(elementNode.nextNodeIndex);
-  if (!childPromptNode) return null;
+  if (!childPromptNode) {
+    return null;
+  }
 
   return [buildPromptTreeNode(childPromptNode, elementNodeId, `${parentTreeKey}/node-${elementNode.nextNodeIndex}`, previewNodeStore)];
 }

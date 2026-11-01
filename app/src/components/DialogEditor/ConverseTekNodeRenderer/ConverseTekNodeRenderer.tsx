@@ -97,7 +97,9 @@ function hasActionsAndConditions(node: PromptNodeType | ElementNodeType | null):
   let hasActions = false;
   let hasConditions = false;
 
-  if (node == null) return { hasActions, hasConditions };
+  if (node == null) {
+    return { hasActions, hasConditions };
+  }
 
   const { type } = node;
   if (type === 'node') {
@@ -132,7 +134,9 @@ function getHighlightColour(colourConfig: ColourConfigType, nodeType: string): s
 
 function getTruncatedLinkText(nodeStore: ConversationTreeNodeStore, linkIndex: number, maxLength: number) {
   const linkedPromptNode = nodeStore.getPromptNodeByIndex(linkIndex);
-  if (linkedPromptNode == null) return '';
+  if (linkedPromptNode == null) {
+    return '';
+  }
 
   const text = linkedPromptNode.text;
   return text.length < maxLength ? text : `${text.substring(0, maxLength)}...`;
@@ -142,10 +146,14 @@ function getPromptSpeakerBadge(
   node: PromptNodeType | ElementNodeType | null,
   speakerProjectionByNodeId?: Map<string, SpeakerProjection>,
 ): SpeakerProjection | null {
-  if (node == null || node.type !== 'node') return null;
+  if (node == null || node.type !== 'node') {
+    return null;
+  }
 
   const projectedSpeaker = speakerProjectionByNodeId?.get(getId(node));
-  if (projectedSpeaker) return projectedSpeaker;
+  if (projectedSpeaker) {
+    return projectedSpeaker;
+  }
 
   const castId = node.sourceInSceneRef?.id || '';
   const speakerId = node.speakerOverrideId || '';
@@ -170,22 +178,34 @@ function getPromptSpeakerBadge(
 function getMoveHandleIcon(isRoot: boolean, isNode: boolean, isResponse: boolean): ReactElement | null {
   const handleIconStyle = { color: 'white', fontSize: '20px' };
 
-  if (isRoot) return <AntDesignOutlined style={handleIconStyle} />;
-  if (isNode || isResponse) return null;
+  if (isRoot) {
+    return <AntDesignOutlined style={handleIconStyle} />;
+  }
+  if (isNode || isResponse) {
+    return null;
+  }
 
   return null;
 }
 
 function getActionsTooltip(isRoot: boolean, isNode: boolean, isResponse: boolean): string {
-  if (isNode) return 'Prompt actions run when this node is entered, before its text is shown.';
-  if (isRoot) return 'Root actions run when this conversation entry link is resolved, before the target prompt is shown.';
-  if (isResponse) return 'Response actions run after this response is selected, before the target prompt is shown.';
+  if (isNode) {
+    return 'Prompt actions run when this node is entered, before its text is shown.';
+  }
+  if (isRoot) {
+    return 'Root actions run when this conversation entry link is resolved, before the target prompt is shown.';
+  }
+  if (isResponse) {
+    return 'Response actions run after this response is selected, before the target prompt is shown.';
+  }
 
   return 'Actions are configured on this item.';
 }
 
 function getOperationArgRawValue(arg: OperationArgType): string | number | boolean {
-  if (arg.callValue != null) return formatOperationCall(arg.callValue);
+  if (arg.callValue != null) {
+    return formatOperationCall(arg.callValue);
+  }
 
   switch (arg.type) {
     case 'bool':
@@ -208,15 +228,16 @@ function formatOperationCall(operation: OperationCallType): string {
 }
 
 function formatPlainOperationValue(value: string | number | boolean): string {
-  if (typeof value === 'boolean') return value ? 'true' : 'false';
-  if (typeof value === 'number') return Number.isInteger(value) ? value.toLocaleString('en-GB') : String(value);
+  if (typeof value === 'boolean') {
+    return value ? 'true' : 'false';
+  }
+  if (typeof value === 'number') {
+    return Number.isInteger(value) ? value.toLocaleString('en-GB') : String(value);
+  }
   return value === '' ? '(blank)' : value;
 }
 
-function getOperationDefinition(
-  operation: OperationCallType,
-  operationDefinitions: OperationDefinitionType[] = [],
-): OperationDefinitionType | null {
+function getOperationDefinition(operation: OperationCallType, operationDefinitions: OperationDefinitionType[] = []): OperationDefinitionType | null {
   return operationDefinitions.find((definition) => definition.key === operation.functionName) || null;
 }
 
@@ -226,7 +247,9 @@ function getOperationDetailsTooltip(
   fallback: string,
   operationDefinitions: OperationDefinitionType[] = [],
 ): ReactElement | string {
-  if (operations == null || operations.length <= 0) return fallback;
+  if (operations == null || operations.length <= 0) {
+    return fallback;
+  }
 
   return (
     <div className="node-renderer__logic-tooltip">
@@ -258,8 +281,15 @@ function getOperationDetailsTooltip(
 }
 
 function getConditionsTooltip(node: PromptNodeType | ElementNodeType | null, operationDefinitions: OperationDefinitionType[]): ReactElement | string {
-  if (node == null || node.type === 'node') return 'Conditions gate whether this item is available.';
-  return getOperationDetailsTooltip('Conditions', node.conditions?.ops, 'Conditions gate whether this response or root is available.', operationDefinitions);
+  if (node == null || node.type === 'node') {
+    return 'Conditions gate whether this item is available.';
+  }
+  return getOperationDetailsTooltip(
+    'Conditions',
+    node.conditions?.ops,
+    'Conditions gate whether this response or root is available.',
+    operationDefinitions,
+  );
 }
 
 function getActionsTooltipTitle(
@@ -274,6 +304,7 @@ function getActionsTooltipTitle(
 
 /* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
 export const ConverseTekNodeRenderer = observer(
+  // eslint-disable-next-line complexity -- grandfathered, split later
   ({
     dataStore,
     nodeStore,
@@ -329,7 +360,9 @@ export const ConverseTekNodeRenderer = observer(
     void rendererOnlyProps;
     void speakerRevision;
 
-    if (colourConfig == null) return null;
+    if (colourConfig == null) {
+      return null;
+    }
 
     const { hasActions, hasConditions } = hasActionsAndConditions(storedNode);
     const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node);
@@ -524,23 +557,31 @@ export const ConverseTekNodeRenderer = observer(
           const { id, type } = node;
           if (type === 'link') {
             const { linkId } = node;
-            if (!linkId) throw Error(`Link has no link id. Link: ${node.title}`);
+            if (!linkId) {
+              throw Error(`Link has no link id. Link: ${node.title}`);
+            }
 
             const linkTreeIndex = nodeStore.getTreeIndex(linkId);
 
-            if (linkTreeIndex == null) throw Error(`link tree index is not found for linkId ${linkId}`);
+            if (linkTreeIndex == null) {
+              throw Error(`link tree index is not found for linkId ${linkId}`);
+            }
 
             const direction = linkTreeIndex < treeIndex ? 'up' : 'down';
             nodeStore.setActiveNode(linkId);
             nodeStore.initScrollToNode(linkId, direction);
           } else {
-            if (!id) throw Error('id should be valid but it is not defined');
+            if (!id) {
+              throw Error('id should be valid but it is not defined');
+            }
             nodeStore.setActiveNode(id);
 
             defer(() => {
               if (!nodeStore.isNodeVisible(id)) {
                 const nodeTreeIndex = nodeStore.getTreeIndex(id);
-                if (nodeTreeIndex == null) throw Error(`node tree index is not found for nodeId ${id}`);
+                if (nodeTreeIndex == null) {
+                  throw Error(`node tree index is not found for nodeId ${id}`);
+                }
                 const direction = nodeTreeIndex < treeIndex ? 'up' : 'down';
 
                 setTimeout(() => nodeStore.initScrollToNode(id, direction, undefined, true), 250);
@@ -673,10 +714,7 @@ export const ConverseTekNodeRenderer = observer(
           {scaffoldLines.map((line) => (
             <span
               key={line.key}
-              className={classnames(
-                'conversation-node-renderer__scaffold-line',
-                `conversation-node-renderer__scaffold-line--${line.kind}`,
-              )}
+              className={classnames('conversation-node-renderer__scaffold-line', `conversation-node-renderer__scaffold-line--${line.kind}`)}
               style={{ left: line.left }}
             />
           ))}
@@ -686,62 +724,65 @@ export const ConverseTekNodeRenderer = observer(
 
           {toggleChildrenVisibility && hasVisibleChildren && (
             <div>
-            <button
-              type="button"
-              aria-label={node.expanded ? 'Collapse' : 'Expand'}
-              className={classnames(
-                'conversation-node-renderer__toggle-button',
-                node.expanded ? 'rst__collapseButton' : 'rst__expandButton',
-                rowDirectionClass,
-              )}
-              style={buttonStyle}
-              onClick={() => {
-                const isNodeExpanded = nodeStore.isNodeExpanded(node.id);
+              <button
+                type="button"
+                aria-label={node.expanded ? 'Collapse' : 'Expand'}
+                className={classnames(
+                  'conversation-node-renderer__toggle-button',
+                  node.expanded ? 'rst__collapseButton' : 'rst__expandButton',
+                  rowDirectionClass,
+                )}
+                style={buttonStyle}
+                onClick={() => {
+                  const isNodeExpanded = nodeStore.isNodeExpanded(node.id);
 
-                toggleChildrenVisibility({
-                  node,
-                  path,
-                  treeIndex,
-                });
+                  toggleChildrenVisibility({
+                    node,
+                    path,
+                    treeIndex,
+                  });
 
-                nodeStore.setNodeExpansion(node.id, !isNodeExpanded);
-              }}
-            />
-
-            {node.expanded && !isDragging && (
-              <div
-                style={{ width: scaffoldBlockPxWidth }}
-                className={classnames('conversation-node-renderer__line-children', 'rst__lineChildren', rowDirectionClass)}
+                  nodeStore.setNodeExpansion(node.id, !isNodeExpanded);
+                }}
               />
-            )}
+
+              {node.expanded && !isDragging && (
+                <div
+                  style={{ width: scaffoldBlockPxWidth }}
+                  className={classnames('conversation-node-renderer__line-children', 'rst__lineChildren', rowDirectionClass)}
+                />
+              )}
             </div>
           )}
 
-          <div className={classnames('conversation-node-renderer__row-wrapper', 'rst__rowWrapper', rowDirectionClass)} style={{ display: 'inline-block' }}>
-          {/* Set the row preview to be used during drag and drop */}
-          {connectDragPreview(
-            <div
-              className={rowClasses}
-              style={{
-                opacity: isDraggedDescendant
-                  ? 0.5
-                  : activeNodeId == null || isActiveNode || isHoveringOver
-                  ? 1
-                  : colourConfig.dialogueNodeTree.nonActiveOpacity,
-                boxShadow: isActiveNode || (!isAnyNodeActive && wasPreviousActiveNode) || isHoveringOver ? hoverActiveBoxShadowStyle : undefined,
-              }}
-              onMouseEnter={() => setIsHoveringOver(true)}
-              onMouseLeave={() => setIsHoveringOver(false)}
-            >
-              {handle}
+          <div
+            className={classnames('conversation-node-renderer__row-wrapper', 'rst__rowWrapper', rowDirectionClass)}
+            style={{ display: 'inline-block' }}
+          >
+            {/* Set the row preview to be used during drag and drop */}
+            {connectDragPreview(
+              <div
+                className={rowClasses}
+                style={{
+                  opacity: isDraggedDescendant
+                    ? 0.5
+                    : activeNodeId == null || isActiveNode || isHoveringOver
+                      ? 1
+                      : colourConfig.dialogueNodeTree.nonActiveOpacity,
+                  boxShadow: isActiveNode || (!isAnyNodeActive && wasPreviousActiveNode) || isHoveringOver ? hoverActiveBoxShadowStyle : undefined,
+                }}
+                onMouseEnter={() => setIsHoveringOver(true)}
+                onMouseLeave={() => setIsHoveringOver(false)}
+              >
+                {handle}
 
-              {rowContents}
-            </div>,
-          )}
+                {rowContents}
+              </div>,
+            )}
           </div>
 
           <div className="faker" style={{ position: 'absolute', display: 'inline-block', visibility: 'hidden', left: spacerLeftPosition }}>
-          spacer
+            spacer
           </div>
         </div>
       </div>

@@ -28,7 +28,9 @@ export function collapseOtherBranches(
   onNode: (node: RSTNode) => void,
   firstLayer = true,
 ): RSTNode[] {
-  if (node == null) return treeData;
+  if (node == null) {
+    return treeData;
+  }
   const nodeId = getId(node);
   let updatedTreeData = treeData;
 
@@ -62,20 +64,26 @@ export function collapseOtherBranches(
     if (rootNodes) {
       branches = rootNodes;
     } else {
-      if (promptNode == null) return updatedTreeData;
+      if (promptNode == null) {
+        return updatedTreeData;
+      }
       ({ branches } = promptNode);
     }
 
     branches.forEach((elementNode: ElementNodeType) => {
       const elementId = getId(elementNode);
-      if (elementId === nodeId) return;
+      if (elementId === nodeId) {
+        return;
+      }
 
       updatedTreeData = setExpandedInTree(updatedTreeData, elementId, onNode, false);
     });
 
     if (promptNode) {
       const parentNode = nodeStore.getNode(promptNode.parentId);
-      if (parentNode == null) return updatedTreeData;
+      if (parentNode == null) {
+        return updatedTreeData;
+      }
       return collapseOtherBranches(updatedTreeData, parentNode, onNode, false);
     }
   }
@@ -89,7 +97,9 @@ export function collapseOrExpandBranches(
   onNode: (node: RSTNode) => void,
   expand: boolean,
 ): RSTNode[] {
-  if (node == null) return treeData;
+  if (node == null) {
+    return treeData;
+  }
   const nodeId = getId(node);
   let updatedTreeData = treeData;
 
@@ -126,7 +136,9 @@ function setExpandedInTree(treeData: RSTNode[], nodeId: string, onNode: (node: R
     expandFocusMatchPaths: false,
   }) as TreeSearchResult;
 
-  if (matches == null || matches.length <= 0) return treeData;
+  if (matches == null || matches.length <= 0) {
+    return treeData;
+  }
 
   const match = matches[0];
   const { path } = match;
@@ -144,7 +156,9 @@ function setExpandedInTree(treeData: RSTNode[], nodeId: string, onNode: (node: R
 }
 
 export function expandFromCoreToNode(treeData: RSTNode[], node: PromptNodeType | ElementNodeType | null, onNode: (node: RSTNode) => void): RSTNode[] {
-  if (node == null) return treeData;
+  if (node == null) {
+    return treeData;
+  }
 
   const nodeId = getId(node);
   let updatedTreeData = treeData;
@@ -161,13 +175,17 @@ export function expandFromCoreToNode(treeData: RSTNode[], node: PromptNodeType |
 }
 
 export function findTreeNodeParentWithDataNodeId(element: HTMLElement): HTMLElement | null {
-  if (element == null) return null;
+  if (element == null) {
+    return null;
+  }
 
   if (element.hasAttribute('data-node-id')) {
     return element;
   }
 
-  if (element.parentElement == null) return null;
+  if (element.parentElement == null) {
+    return null;
+  }
 
   return findTreeNodeParentWithDataNodeId(element.parentElement);
 }

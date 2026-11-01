@@ -148,7 +148,9 @@ class NodeStore {
 
   getActiveNodeTreeIndex(): number | undefined {
     const activeNodeId = this.getActiveNodeId();
-    if (activeNodeId == null) return 0;
+    if (activeNodeId == null) {
+      return 0;
+    }
     return this.getTreeIndex(activeNodeId);
   }
 
@@ -215,7 +217,9 @@ class NodeStore {
   }
 
   getActiveNodeId(): string | null {
-    if (!this.activeNode) return null;
+    if (!this.activeNode) {
+      return null;
+    }
     return getId(this.activeNode);
   }
 
@@ -230,7 +234,9 @@ class NodeStore {
 
   isNodeVisible(nodeId: string): boolean {
     const element = window.document.querySelector(`[data-node-id="${nodeId}"]`) as HTMLElement;
-    if (element == null) return false;
+    if (element == null) {
+      return false;
+    }
 
     const rect = element.getBoundingClientRect();
     const centerX = rect.left + rect.width / 3;
@@ -238,7 +244,9 @@ class NodeStore {
 
     const topElement = document.elementFromPoint(centerX, centerY);
 
-    if (topElement == null) return false;
+    if (topElement == null) {
+      return false;
+    }
     const parentWithDataId = findTreeNodeParentWithDataNodeId(topElement as HTMLElement);
 
     if (parentWithDataId !== null) {
@@ -270,26 +278,38 @@ class NodeStore {
   scrollToActiveNode(fallbackToPrevious = false) {
     let focusNodeId = this.getActiveNodeId();
 
-    if (focusNodeId == null && !fallbackToPrevious) return;
+    if (focusNodeId == null && !fallbackToPrevious) {
+      return;
+    }
 
     if (focusNodeId == null && fallbackToPrevious && this.previousActiveNodeId) {
       focusNodeId = this.previousActiveNodeId;
     }
 
-    if (focusNodeId == null) return;
+    if (focusNodeId == null) {
+      return;
+    }
 
-    if (this.isNodeVisible(focusNodeId)) return;
+    if (this.isNodeVisible(focusNodeId)) {
+      return;
+    }
 
     const nodeTreeIndex = this.getActiveNodeTreeIndex();
-    if (nodeTreeIndex == null) throw Error(`node tree index is not found for active node`);
+    if (nodeTreeIndex == null) {
+      throw Error(`node tree index is not found for active node`);
+    }
 
     // Get a random visible node id to use for the base check
     const element = window.document.querySelector(`[data-node-id]`) as HTMLElement;
     const baseNodeId = element.getAttribute('data-node-id');
-    if (baseNodeId == null) return;
+    if (baseNodeId == null) {
+      return;
+    }
 
     const baseTreeIndex = this.getTreeIndex(baseNodeId);
-    if (baseTreeIndex == null) return;
+    if (baseTreeIndex == null) {
+      return;
+    }
 
     const direction = nodeTreeIndex < baseTreeIndex ? 'up' : 'down';
 
@@ -303,7 +323,9 @@ class NodeStore {
 
   public scrollToTop(): void {
     const tree = window.document.querySelector('.conversation-tree__list');
-    if (tree) tree.scrollTop = 0;
+    if (tree) {
+      tree.scrollTop = 0;
+    }
   }
 
   private scrollToNode(nodeId: string, direction: 'up' | 'down', cachedTree?: HTMLElement, skipHorizontalScroll = false) {
@@ -315,7 +337,9 @@ class NodeStore {
       const tree = cachedTree || window.document.querySelector('.conversation-tree__list');
       const element = window.document.querySelector(`[data-node-id="${nodeId}"]`) as HTMLElement;
 
-      if (tree == null) throw Error('Tree not found for autoscroll to node. This should not happen.');
+      if (tree == null) {
+        throw Error('Tree not found for autoscroll to node. This should not happen.');
+      }
 
       if (element) {
         const rowElement = element.closest<HTMLElement>('.conversation-tree__row');
@@ -327,7 +351,9 @@ class NodeStore {
 
         const scrollLeft = element.offsetLeft - 50;
         tree.scrollTop = scrollTop;
-        if (!skipHorizontalScroll) tree.scrollLeft = scrollLeft;
+        if (!skipHorizontalScroll) {
+          tree.scrollLeft = scrollLeft;
+        }
       } else if (!element) {
         if (direction === 'up' && tree.scrollTop <= 0) {
           tree.scrollTop = 0;
@@ -379,7 +405,9 @@ class NodeStore {
     };
 
     const node = structuredClone(toJS(this.getNode(nodeId)));
-    if (node === null) return;
+    if (node === null) {
+      return;
+    }
 
     tempClipboard.originalNodeId = nodeId;
 
@@ -440,11 +468,15 @@ class NodeStore {
     if (nextNodeIndex !== -1 && auxiliaryLink) {
       // If any response node is a link to a prompt node that has been copied (and has a cached new prompt node index) - use the new cached prompt node index
       const copiedAndUpdatedNodeId = tempClipboard.nodeIdMap?.get(elementNode.nextNodeIndex);
-      if (copiedAndUpdatedNodeId) elementNode.nextNodeIndex = copiedAndUpdatedNodeId;
+      if (copiedAndUpdatedNodeId) {
+        elementNode.nextNodeIndex = copiedAndUpdatedNodeId;
+      }
     }
 
     // If the response goes nowhere (-1) or is a link to another node (don't follow the link for a copy) then continue on the main reduce
-    if (nextNodeIndex === -1 || auxiliaryLink) return false;
+    if (nextNodeIndex === -1 || auxiliaryLink) {
+      return false;
+    }
 
     // No more links exist at this point onward so generate a new index for the next prompt node on the response node
     const newNextPromptNodeIndex = this.generateNextPromptNodeIndex();
@@ -460,10 +492,14 @@ class NodeStore {
     newNextNodeIndex: number,
     newNodeParentId: string,
   ): void {
-    if (tempClipboard == null) throw Error('Clipboard is null or undefined. Cannot copy nodes with no clipboard');
+    if (tempClipboard == null) {
+      throw Error('Clipboard is null or undefined. Cannot copy nodes with no clipboard');
+    }
 
     const promptNode = structuredClone(toJS(this.getPromptNodeByIndex(nodeIndex)));
-    if (!promptNode) return;
+    if (!promptNode) {
+      return;
+    }
 
     const { index } = promptNode;
 
@@ -494,9 +530,13 @@ class NodeStore {
 
   pasteAsLinkFromClipboard(targetResponseId: string) {
     const responseNode = this.getNode(targetResponseId);
-    if (responseNode === null) return;
+    if (responseNode === null) {
+      return;
+    }
 
-    if (this.clipboard == null) throw Error('Clipboard is null or undefined. Cannot paste as link from clipboard.');
+    if (this.clipboard == null) {
+      throw Error('Clipboard is null or undefined. Cannot paste as link from clipboard.');
+    }
 
     const { originalNodeIndex } = this.clipboard;
 
@@ -505,7 +545,9 @@ class NodeStore {
         const { nextNodeIndex, auxiliaryLink: previousNodeAuxiliaryLink } = responseNode;
 
         // Create the link by setting the new nextNodeIndex and setting aux link
-        if (originalNodeIndex != null) responseNode.nextNodeIndex = originalNodeIndex;
+        if (originalNodeIndex != null) {
+          responseNode.nextNodeIndex = originalNodeIndex;
+        }
         responseNode.auxiliaryLink = true;
 
         // Since the old node is being replaced it effectively is being orphaned
@@ -551,11 +593,17 @@ class NodeStore {
 
   pasteAsCopyFromClipboard(targetNodeId: string) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-    if (this.clipboard == null) throw Error('Clipboard is null or undefined. Cannot paste as copy from clipboard.');
-    if (conversationAsset == null) throw Error('Conversation is null. Cannot paste as copy from cipboard');
+    if (this.clipboard == null) {
+      throw Error('Clipboard is null or undefined. Cannot paste as copy from clipboard.');
+    }
+    if (conversationAsset == null) {
+      throw Error('Conversation is null. Cannot paste as copy from cipboard');
+    }
 
     const targetNode = this.getNode(targetNodeId);
-    if (targetNode == null) throw Error('Node is null');
+    if (targetNode == null) {
+      throw Error('Node is null');
+    }
 
     const { copiedNode: clipboardNode, nodes: clipboardNodes } = this.clipboard;
 
@@ -651,7 +699,9 @@ class NodeStore {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     const { type } = node;
 
-    if (conversationAsset === null) return;
+    if (conversationAsset === null) {
+      return;
+    }
 
     if (type === 'root') {
       updateRootNode(conversationAsset, node);
@@ -666,7 +716,9 @@ class NodeStore {
   }
 
   setNodeId(node: PromptNodeType | ElementNodeType, id: string) {
-    if (node.idRef.id === id) return;
+    if (node.idRef.id === id) {
+      return;
+    }
 
     node.idRef.id = id;
     nodeStore.setRebuild(true);
@@ -704,8 +756,12 @@ class NodeStore {
   }
 
   setPromptNodeSpeakerType(node: PromptNodeType, value: 'castId' | 'speakerId'): void {
-    if (value === 'speakerId') node.sourceInSceneRef = null;
-    if (value === 'castId') node.speakerOverrideId = '';
+    if (value === 'speakerId') {
+      node.sourceInSceneRef = null;
+    }
+    if (value === 'castId') {
+      node.speakerOverrideId = '';
+    }
 
     dataStore.setConversationDirty(true);
     this.bumpSpeakerRevision();
@@ -772,10 +828,14 @@ class NodeStore {
 
   removeNodeAction(node: PromptNodeType | ElementNodeType, index: number): void {
     const { actions } = node;
-    if (!actions || !actions.ops) return;
+    if (!actions || !actions.ops) {
+      return;
+    }
 
     remove(actions.ops, (value, i) => i === index);
-    if (actions.ops.length <= 0) nodeStore.setNodeActions(node, null);
+    if (actions.ops.length <= 0) {
+      nodeStore.setNodeActions(node, null);
+    }
 
     dataStore.setConversationDirty(true);
   }
@@ -807,10 +867,14 @@ class NodeStore {
 
   removeNodeCondition(node: ElementNodeType, index: number): void {
     const { conditions } = node;
-    if (!conditions || !conditions.ops) return;
+    if (!conditions || !conditions.ops) {
+      return;
+    }
 
     remove(conditions.ops, (value, i) => i === index);
-    if (conditions.ops.length <= 0) nodeStore.setElementNodeConditions(node, null);
+    if (conditions.ops.length <= 0) {
+      nodeStore.setElementNodeConditions(node, null);
+    }
 
     dataStore.setConversationDirty(true);
   }
@@ -824,18 +888,28 @@ class NodeStore {
     const { roots, nodes } = conversationAsset.conversation;
 
     const root = roots.find((r) => getId(r) === nodeId);
-    if (root) return root;
+    if (root) {
+      return root;
+    }
 
     let branch = null;
     const node = nodes.find((n) => {
-      if (getId(n) === nodeId) return true;
+      if (getId(n) === nodeId) {
+        return true;
+      }
       branch = n.branches.find((b) => getId(b) === nodeId);
-      if (branch) return true;
+      if (branch) {
+        return true;
+      }
       return false;
     });
 
-    if (branch) return branch;
-    if (node) return node;
+    if (branch) {
+      return branch;
+    }
+    if (node) {
+      return node;
+    }
 
     return null;
   }
@@ -852,23 +926,33 @@ class NodeStore {
 
   getPromptNodeByIndex(index: number): PromptNodeType | null {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-    if (conversationAsset === null) return null;
-    if (index === -1) return null;
+    if (conversationAsset === null) {
+      return null;
+    }
+    if (index === -1) {
+      return null;
+    }
 
     const { nodes } = conversationAsset.conversation;
 
     const node = nodes.find((n) => n.index === index);
-    if (node) return node;
+    if (node) {
+      return node;
+    }
 
     return null;
   }
 
   removeNode(node: PromptNodeType | ElementNodeType, immediate = false): void {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-    if (conversationAsset === null) return;
+    if (conversationAsset === null) {
+      return;
+    }
 
     // No need to mark for deletion if it's already marked to be deleted
-    if (node.deleting) return;
+    if (node.deleting) {
+      return;
+    }
 
     const { roots, nodes } = conversationAsset.conversation;
     const { type } = node;
@@ -878,7 +962,9 @@ class NodeStore {
     if (type === 'root') {
       roots.forEach((r) => {
         const toDelete = getId(r) === nodeId;
-        if (toDelete) r.deleting = true;
+        if (toDelete) {
+          r.deleting = true;
+        }
       });
     } else if (type === 'node') {
       nodes.forEach((n) => {
@@ -894,7 +980,9 @@ class NodeStore {
       nodes.forEach((n) => {
         n.branches.forEach((b) => {
           const toDelete = getId(b) === nodeId;
-          if (toDelete) b.deleting = true;
+          if (toDelete) {
+            b.deleting = true;
+          }
         });
       });
     }
@@ -911,7 +999,9 @@ class NodeStore {
 
   processDeletes = (): void => {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-    if (conversationAsset === null) return;
+    if (conversationAsset === null) {
+      return;
+    }
 
     const { roots, nodes } = conversationAsset.conversation;
 
@@ -952,7 +1042,9 @@ class NodeStore {
 
   addRootNode(): string | null {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-    if (conversationAsset === null) return null;
+    if (conversationAsset === null) {
+      return null;
+    }
 
     const rootNode = createRootNode();
     rootNode.parentId = '0';
@@ -966,7 +1058,9 @@ class NodeStore {
 
   setRootNodesByIds(rootNodeIds: string[]) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-    if (conversationAsset === null) return;
+    if (conversationAsset === null) {
+      return;
+    }
 
     const rootNodes = rootNodeIds.map((rootNodeId: string) => this.getNode(rootNodeId));
     setRootNodes(conversationAsset, rootNodes as ElementNodeType[]);
@@ -977,7 +1071,9 @@ class NodeStore {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
     const { nextNodeIndex: existingNextPromptNodeIndex } = parentElementNode;
 
-    if (conversationAsset === null) return null;
+    if (conversationAsset === null) {
+      return null;
+    }
 
     if (existingNextPromptNodeIndex === -1) {
       const nextPromptNodeIndex = this.generateNextPromptNodeIndex();
@@ -1006,7 +1102,9 @@ class NodeStore {
 
   addResponseNode(parentPromptNode: PromptNodeType): string | null {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-    if (conversationAsset === null) return null;
+    if (conversationAsset === null) {
+      return null;
+    }
 
     const responseNode = createResponseNode();
     responseNode.parentId = getId(parentPromptNode);
@@ -1020,7 +1118,9 @@ class NodeStore {
 
   setResponseNodesByIds(parentId: string, responseIds: string[]) {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-    if (conversationAsset === null) return;
+    if (conversationAsset === null) {
+      return;
+    }
 
     const responseNodes = responseIds.map((responseId) => this.getNode(responseId)) as ElementNodeType[];
     const parentPromptNode = this.getNode(parentId) as PromptNodeType;
@@ -1036,7 +1136,9 @@ class NodeStore {
     }[],
   ): void {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-    if (conversationAsset === null) return;
+    if (conversationAsset === null) {
+      return;
+    }
 
     // Get Response, Old Parent Node and New Parent Node
     const responseNode = this.getNode(responseToMoveId) as ElementNodeType;
@@ -1066,12 +1168,16 @@ class NodeStore {
 
     // Set new root/response parent 'nextNodeIndex' to node 'index'
     const nextParentElementNode = nodeStore.getNode(nextParentResponseId) as ElementNodeType;
-    if (nextParentElementNode == null) throw Error(`Next parent root/response '${nextParentResponseId}' not found`);
+    if (nextParentElementNode == null) {
+      throw Error(`Next parent root/response '${nextParentResponseId}' not found`);
+    }
     nextParentElementNode.nextNodeIndex = nodeIndex;
 
     // Set previous root/response parent 'nextNodeIndex' to -1
     const previousParentElementNode = nodeStore.getNode(previousParentResponseId) as ElementNodeType;
-    if (previousParentElementNode == null) throw Error(`Previous parent root/response '${previousParentResponseId}' not found`);
+    if (previousParentElementNode == null) {
+      throw Error(`Previous parent root/response '${previousParentResponseId}' not found`);
+    }
     previousParentElementNode.nextNodeIndex = -1;
 
     dataStore.setConversationDirty(true);
@@ -1097,7 +1203,9 @@ class NodeStore {
 
   getInboundLinksToPromptNodeIndex(indexToFind: number): ElementNodeType[] {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-    if (conversationAsset === null) return [];
+    if (conversationAsset === null) {
+      return [];
+    }
 
     const { roots, nodes } = conversationAsset.conversation;
     return findInboundLinksToPromptNodeIndex(roots, nodes, indexToFind);
@@ -1108,7 +1216,9 @@ class NodeStore {
    */
   cleanUpDanglingResponseNodeIndexes(indexToClean: number): void {
     const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-    if (conversationAsset === null) return;
+    if (conversationAsset === null) {
+      return;
+    }
 
     const { roots, nodes } = conversationAsset.conversation;
 
@@ -1144,13 +1254,17 @@ class NodeStore {
       remove(this.takenPromptNodeIndexes, (i) => i === index);
       this.removeNode(node);
 
-      if (this.activeNode && getId(this.activeNode) === getId(node)) this.clearActiveNode();
+      if (this.activeNode && getId(this.activeNode) === getId(node)) {
+        this.clearActiveNode();
+      }
     } else if (node.type === 'response') {
       this.deleteBranchCascade(node);
     } else if (node.type === 'root') {
       this.deleteBranchCascade(node);
       this.removeNode(node);
-      if (this.activeNode && getId(this.activeNode) === getId(node)) this.clearActiveNode();
+      if (this.activeNode && getId(this.activeNode) === getId(node)) {
+        this.clearActiveNode();
+      }
     }
   }
 
@@ -1161,10 +1275,14 @@ class NodeStore {
     // BUT, do not follow links!
     if (!auxiliaryLink) {
       const nextNode = this.getPromptNodeByIndex(elementNode.nextNodeIndex);
-      if (nextNode) this.deleteNodeCascade(nextNode);
+      if (nextNode) {
+        this.deleteNodeCascade(nextNode);
+      }
     }
 
-    if (this.activeNode && getId(this.activeNode) === getId(elementNode)) this.clearActiveNode();
+    if (this.activeNode && getId(this.activeNode) === getId(elementNode)) {
+      this.clearActiveNode();
+    }
     this.removeNode(elementNode);
     dataStore.setConversationDirty(true);
   }
@@ -1198,16 +1316,22 @@ class NodeStore {
   }
 
   setNodeExpansion(nodeId: string | undefined, flag: boolean): void {
-    if (!nodeId) return;
+    if (!nodeId) {
+      return;
+    }
 
     this.expandMap.set(nodeId, flag);
   }
 
   isNodeExpanded(nodeId: string | undefined): boolean {
-    if (!nodeId) return false;
+    if (!nodeId) {
+      return false;
+    }
 
     const isNodeExpanded = this.expandMap.get(nodeId);
-    if (isNodeExpanded === undefined) return true;
+    if (isNodeExpanded === undefined) {
+      return true;
+    }
     return isNodeExpanded;
   }
 
@@ -1363,7 +1487,9 @@ class NodeStore {
     const { nextNodeIndex } = elementNode; // root or response/branch
 
     // GUARD - End of branch so this would be tagged as a DIALOG END node
-    if (nextNodeIndex === -1) return null;
+    if (nextNodeIndex === -1) {
+      return null;
+    }
 
     // GUARD - Error if there's a mistake in the file and
     //         no node exists of the index being looked for

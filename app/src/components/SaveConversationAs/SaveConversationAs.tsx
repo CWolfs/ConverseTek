@@ -20,7 +20,9 @@ function SaveConversationAs() {
   const [modifiedFileName, setModifiedFileName] = useState<string | null>(null);
 
   const onOk = () => {
-    if (conversationAsset == null) return;
+    if (conversationAsset == null) {
+      return;
+    }
 
     const { filename: previousFileName, filepath: previousFilePath } = conversationAsset;
 
@@ -53,7 +55,9 @@ function SaveConversationAs() {
     setupModal();
   });
 
-  if (conversationAsset == null) return null;
+  if (conversationAsset == null) {
+    return null;
+  }
 
   return (
     <div className="save-conversation-as">

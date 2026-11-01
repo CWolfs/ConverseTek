@@ -126,7 +126,12 @@ describe('conversation diagnostics', () => {
 
     expect(diagnostics).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ severity: 'warning', title: 'Prompt node has no content or responses', nodeId: getId(secondPrompt), nodeLabel: 'Prompt #2' }),
+        expect.objectContaining({
+          severity: 'warning',
+          title: 'Prompt node has no content or responses',
+          nodeId: getId(secondPrompt),
+          nodeLabel: 'Prompt #2',
+        }),
       ]),
     );
   });
@@ -162,7 +167,7 @@ describe('conversation diagnostics', () => {
         expect.objectContaining({
           severity: 'warning',
           title: 'Duplicate node id',
-          description: expect.stringContaining('sideload entry points'),
+          description: expect.stringContaining('sideload entry points') as string,
           nodeId: getId(response),
         }),
       ]),
@@ -187,7 +192,7 @@ describe('conversation diagnostics', () => {
         expect.objectContaining({
           severity: 'warning',
           title: 'Duplicate conversation id',
-          description: expect.stringContaining("Duplicate Conversation', uses matching id 'other-prefix:conversation_target'"),
+          description: expect.stringContaining("Duplicate Conversation', uses matching id 'other-prefix:conversation_target'") as string,
           nodeId: null,
         }),
       ]),
@@ -258,7 +263,9 @@ describe('conversation diagnostics', () => {
     });
 
     expect(diagnostics).not.toEqual(
-      expect.arrayContaining([expect.objectContaining({ severity: 'warning', title: 'Operation input is outside the expected values', nodeId: getId(prompt) })]),
+      expect.arrayContaining([
+        expect.objectContaining({ severity: 'warning', title: 'Operation input is outside the expected values', nodeId: getId(prompt) }),
+      ]),
     );
   });
 
@@ -308,7 +315,7 @@ describe('conversation diagnostics', () => {
         expect.objectContaining({
           severity: 'info',
           title: 'Operation input is empty',
-          description: expect.stringContaining('clearing the conversation viewscreen'),
+          description: expect.stringContaining('clearing the conversation viewscreen') as string,
           nodeId: getId(prompt),
         }),
       ]),
@@ -329,9 +336,7 @@ describe('conversation diagnostics', () => {
     const diagnostics = buildConversationDiagnostics({ conversationAsset, operationDefinitions: [] });
 
     expect(diagnostics).not.toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ severity: 'error', title: 'Link target is missing', nodeId: getId(root) }),
-      ]),
+      expect.arrayContaining([expect.objectContaining({ severity: 'error', title: 'Link target is missing', nodeId: getId(root) })]),
     );
     expect(diagnostics).toEqual(
       expect.arrayContaining([
@@ -392,9 +397,7 @@ describe('conversation diagnostics', () => {
     });
 
     expect(diagnostics).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ severity: 'warning', title: 'Sideload entry node is missing', nodeId: getId(prompt) }),
-      ]),
+      expect.arrayContaining([expect.objectContaining({ severity: 'warning', title: 'Sideload entry node is missing', nodeId: getId(prompt) })]),
     );
   });
 });

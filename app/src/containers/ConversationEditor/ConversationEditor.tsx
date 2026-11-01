@@ -91,14 +91,18 @@ function ConversationEditor({ conversationAsset }: Props) {
   };
 
   const onRegenerateNodeIdsButtonClicked = () => {
-    if (unsavedActiveConversationAsset == null) throw Error('unsavedActiveConversationAsset is null or undefined.');
+    if (unsavedActiveConversationAsset == null) {
+      throw Error('unsavedActiveConversationAsset is null or undefined.');
+    }
 
     nodeStore.regenerateNodeIds(unsavedActiveConversationAsset);
     nodeStore.setRebuild(true);
   };
 
   const onRegenerateConversationIdButtonClicked = () => {
-    if (unsavedActiveConversationAsset == null) throw Error('unsavedActiveConversationAsset is null or undefined.');
+    if (unsavedActiveConversationAsset == null) {
+      throw Error('unsavedActiveConversationAsset is null or undefined.');
+    }
 
     regenerateConversationId(unsavedActiveConversationAsset);
   };
@@ -139,17 +143,25 @@ function ConversationEditor({ conversationAsset }: Props) {
   }, [conversationAsset]);
 
   useEffect(() => {
-    if (!sidePanelStore.isPanelVisible(diagnosticsSidePanelId)) return;
-    if ((windowSize.width ?? 0) < 1280) return;
+    if (!sidePanelStore.isPanelVisible(diagnosticsSidePanelId)) {
+      return;
+    }
+    if ((windowSize.width ?? 0) < 1280) {
+      return;
+    }
 
     sidePanelStore.setPanelContent(ConversationDiagnosticsPanel, {}, 'Conversation Diagnostics', true, diagnosticsSidePanelId);
   }, [activeConversationId, sidePanelStore, windowSize.width]);
 
   useEffect(() => {
-    if (windowSize.width != null && windowSize.width < 1280) sidePanelStore.closePanel();
+    if (windowSize.width != null && windowSize.width < 1280) {
+      sidePanelStore.closePanel();
+    }
   }, [sidePanelStore, windowSize.width]);
 
-  if (unsavedActiveConversationAsset == null) return null;
+  if (unsavedActiveConversationAsset == null) {
+    return null;
+  }
 
   const { conversation } = unsavedActiveConversationAsset;
   const conversationId = conversation.idRef.id;
@@ -246,7 +258,13 @@ function ConversationEditor({ conversationAsset }: Props) {
           >
             <Button className="conversation-editor__regenerate-ids-button button-secondary" type="primary" size="small" icon={<RetweetOutlined />} />
           </Popconfirm>
-          <Button className="conversation-editor__save-button" {...positiveActionButtonProps} size="small" icon={<SaveOutlined />} onClick={onSaveButtonClicked} />
+          <Button
+            className="conversation-editor__save-button"
+            {...positiveActionButtonProps}
+            size="small"
+            icon={<SaveOutlined />}
+            onClick={onSaveButtonClicked}
+          />
         </div>
       </div>
 

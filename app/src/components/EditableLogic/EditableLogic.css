@@ -19,7 +19,7 @@
     &--even {
       background-color: $backgroundTertiary;
     }
-  
+
     &-label {
       margin-right: $tinySpace;
     }

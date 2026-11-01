@@ -22,7 +22,9 @@ export function ConversationTreeContextMenu({ id, onVisibilityChange }: { id: st
   // };
 
   const onDeleteClicked = ({ props }: ItemParams<EventProps>) => {
-    if (!props) return;
+    if (!props) {
+      return;
+    }
     const { id, title, selected } = props;
 
     const buttons = {
@@ -30,7 +32,9 @@ export function ConversationTreeContextMenu({ id, onVisibilityChange }: { id: st
       positiveLabel: 'Confirm',
       onPositive: () => {
         dataStore.deleteConversation(id);
-        if (selected) dataStore.clearActiveConversation();
+        if (selected) {
+          dataStore.clearActiveConversation();
+        }
       },
       negativeLabel: 'Cancel',
     };

@@ -29,7 +29,9 @@ type Props = {
 };
 
 function parseSize(size: string | undefined, fallback: number): number {
-  if (!size) return fallback;
+  if (!size) {
+    return fallback;
+  }
   if (size.endsWith('%')) {
     const value = Number.parseFloat(size);
     return Number.isFinite(value) ? value : fallback;
@@ -67,18 +69,24 @@ export function Split({
   const clampedPrimarySize = hasSecondaryPane ? clamp(primarySize, minPrimary, maxPrimary) : 100;
 
   const beginResize = (event: PointerEvent<HTMLDivElement>) => {
-    if (!canResize || containerRef.current == null) return;
+    if (!canResize || containerRef.current == null) {
+      return;
+    }
 
     const target = event.currentTarget;
     target.setPointerCapture(event.pointerId);
 
     const handleMove = (moveEvent: globalThis.PointerEvent) => {
-      if (containerRef.current == null) return;
+      if (containerRef.current == null) {
+        return;
+      }
 
       const bounds = containerRef.current.getBoundingClientRect();
       const position = isHorizontal ? moveEvent.clientY - bounds.top : moveEvent.clientX - bounds.left;
       const availableSize = isHorizontal ? bounds.height : bounds.width;
-      if (availableSize <= 0) return;
+      if (availableSize <= 0) {
+        return;
+      }
 
       setPrimarySize(clamp((position / availableSize) * 100, minPrimary, maxPrimary));
     };
@@ -94,11 +102,15 @@ export function Split({
   };
 
   const handleDoubleClick = (event: ReactMouseEvent<HTMLDivElement>) => {
-    if (!canResize || onHandleDoubleClick == null || containerRef.current == null) return;
+    if (!canResize || onHandleDoubleClick == null || containerRef.current == null) {
+      return;
+    }
 
     const bounds = containerRef.current.getBoundingClientRect();
     const containerSize = isHorizontal ? bounds.height : bounds.width;
-    if (containerSize <= 0) return;
+    if (containerSize <= 0) {
+      return;
+    }
 
     onHandleDoubleClick({
       containerElement: containerRef.current,

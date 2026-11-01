@@ -14,7 +14,9 @@ function GlobalModal({ id }: { id: string }) {
 
   const { options: modalOptionsMap } = modalStore;
   const modalOptions = modalOptionsMap.get(id);
-  if (modalOptions == null) return null;
+  if (modalOptions == null) {
+    return null;
+  }
 
   const {
     title,

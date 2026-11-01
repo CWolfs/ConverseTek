@@ -105,7 +105,9 @@ class ModalStore {
     };
 
     this.options.set(globalModalId, observable.object(options, {}, { deep: false }));
-    if (show) this.showModal(true, globalModalId);
+    if (show) {
+      this.showModal(true, globalModalId);
+    }
   }
 
   getModal(globalModalId: string): ReactElement | ElementType | undefined {
@@ -118,136 +120,176 @@ class ModalStore {
 
   setTitle(title: string | ReactElement, globalModalId: string): void {
     const modalOptions = this.options.get(globalModalId);
-    if (modalOptions == null) return;
+    if (modalOptions == null) {
+      return;
+    }
 
     modalOptions.title = title;
   }
 
   setWidth(width: string, globalModalId: string): void {
     const modalOptions = this.options.get(globalModalId);
-    if (modalOptions == null) return;
+    if (modalOptions == null) {
+      return;
+    }
 
     modalOptions.width = width;
   }
 
   setShowCancelButton(flag: boolean, globalModalId: string): void {
     const modalOptions = this.options.get(globalModalId);
-    if (modalOptions == null) return;
+    if (modalOptions == null) {
+      return;
+    }
 
     modalOptions.showCancelButton = flag;
   }
 
   setShowOkButton(flag: boolean, globalModalId: string): void {
     const modalOptions = this.options.get(globalModalId);
-    if (modalOptions == null) return;
+    if (modalOptions == null) {
+      return;
+    }
 
     modalOptions.showOkButton = flag;
   }
 
   setOnOk(onOk: OnOkType, globalModalId: string): void {
     const modalOptions = this.options.get(globalModalId);
-    if (modalOptions == null) return;
+    if (modalOptions == null) {
+      return;
+    }
 
     modalOptions.onOk = onOk;
   }
 
   setOnCancel(onCancel: OnCancelType, globalModalId: string): void {
     const modalOptions = this.options.get(globalModalId);
-    if (modalOptions == null) return;
+    if (modalOptions == null) {
+      return;
+    }
 
     modalOptions.onCancel = (event) => {
-      if (onCancel) onCancel(event);
+      if (onCancel) {
+        onCancel(event);
+      }
       this.closeModal(globalModalId);
     };
   }
 
   setDisableOk(flag: boolean, globalModalId: string): void {
     const modalOptions = this.options.get(globalModalId);
-    if (modalOptions == null) return;
+    if (modalOptions == null) {
+      return;
+    }
 
     modalOptions.disableOk = flag;
   }
 
   setOkType(type: AppButtonIntent, globalModalId: string): void {
     const modalOptions = this.options.get(globalModalId);
-    if (modalOptions == null) return;
+    if (modalOptions == null) {
+      return;
+    }
 
     modalOptions.okType = type;
   }
 
   setOkLabel(label: string, globalModalId: string): void {
     const modalOptions = this.options.get(globalModalId);
-    if (modalOptions == null) return;
+    if (modalOptions == null) {
+      return;
+    }
 
     modalOptions.okLabel = label;
   }
 
   setCancelType(type: AppButtonIntent, globalModalId: string): void {
     const modalOptions = this.options.get(globalModalId);
-    if (modalOptions == null) return;
+    if (modalOptions == null) {
+      return;
+    }
 
     modalOptions.cancelType = type;
   }
 
   setCancelLabel(label: string, globalModalId: string): void {
     const modalOptions = this.options.get(globalModalId);
-    if (modalOptions == null) return;
+    if (modalOptions == null) {
+      return;
+    }
 
     modalOptions.cancelLabel = label;
   }
 
   setIsLoading(flag: boolean, globalModalId: string): void {
     const modalOptions = this.options.get(globalModalId);
-    if (modalOptions == null) return;
+    if (modalOptions == null) {
+      return;
+    }
 
     modalOptions.isLoading = flag;
   }
 
   setLoadingLabel(label: string, globalModalId: string): void {
     const modalOptions = this.options.get(globalModalId);
-    if (modalOptions == null) return;
+    if (modalOptions == null) {
+      return;
+    }
 
     modalOptions.loadingLabel = label;
   }
 
   setClosable(closable: boolean, globalModalId: string): void {
     const modalOptions = this.options.get(globalModalId);
-    if (modalOptions == null) return;
+    if (modalOptions == null) {
+      return;
+    }
 
     modalOptions.closable = closable;
   }
 
   setMaskClosable(maskClosable: boolean, globalModalId: string): void {
     const modalOptions = this.options.get(globalModalId);
-    if (modalOptions == null) return;
+    if (modalOptions == null) {
+      return;
+    }
 
     modalOptions.maskClosable = maskClosable;
   }
 
   showModal(flag: boolean, globalModalId: string): void {
     const modalOptions = this.options.get(globalModalId);
-    if (modalOptions == null) return;
+    if (modalOptions == null) {
+      return;
+    }
 
     modalOptions.isVisible = flag;
   }
 
   closeModal = (globalModalId: string): void => {
     const modalOptions = this.options.get(globalModalId);
-    if (modalOptions == null) return;
+    if (modalOptions == null) {
+      return;
+    }
 
     this.reset(globalModalId);
   };
 
   setProps = (props: object, globalModalId: string): void => {
     const modalOptions = this.options.get(globalModalId);
-    if (modalOptions == null) return;
+    if (modalOptions == null) {
+      return;
+    }
 
     modalOptions.props = props;
   };
 
   reset = (globalModalId: string): void => {
     const modalOptions = this.options.get(globalModalId);
-    if (modalOptions == null) return;
+    if (modalOptions == null) {
+      return;
+    }
 
     modalOptions.isVisible = false;
   };

@@ -7,8 +7,12 @@ type AntdButtonVariant = ButtonProps['variant'];
 export type AppButtonIntent = AntdButtonType | 'danger' | 'positive' | undefined;
 
 export function getAntdButtonType(type: AppButtonIntent): AntdButtonType {
-  if (type === 'danger') return 'primary';
-  if (type === 'positive') return undefined;
+  if (type === 'danger') {
+    return 'primary';
+  }
+  if (type === 'positive') {
+    return undefined;
+  }
   return type;
 }
 

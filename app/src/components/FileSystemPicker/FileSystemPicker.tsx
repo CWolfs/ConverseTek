@@ -23,8 +23,12 @@ const ListItem = List.Item;
 const rootDrivePathPattern = /^[a-zA-Z]:[\\/]{1}$/;
 
 function getItemIcon(item: FileSystemItemType) {
-  if (item.isDirectory && item.hasChildren) return <FolderAddOutlined className="file-system-picker__directory-icon" />;
-  if (item.isFile) return <FileTextOutlined className="file-system-picker__file-icon" />;
+  if (item.isDirectory && item.hasChildren) {
+    return <FolderAddOutlined className="file-system-picker__directory-icon" />;
+  }
+  if (item.isFile) {
+    return <FileTextOutlined className="file-system-picker__file-icon" />;
+  }
   return <FolderOutlined className="file-system-picker__directory-icon" />;
 }
 
@@ -52,7 +56,9 @@ export function FileSystemPicker() {
   });
 
   const onOk = () => {
-    if (selectedItem == null) return;
+    if (selectedItem == null) {
+      return;
+    }
 
     setLoading(true);
     modalStore.setIsLoading(true, globalModalId);
@@ -80,10 +86,14 @@ export function FileSystemPicker() {
 
   const onDirectoryClicked = (item: FileSystemItemType) => {
     // GUARD - lock down things if loading
-    if (loading) return;
+    if (loading) {
+      return;
+    }
 
     // GUARD - prevent selection of backLinks
-    if (item.name === '..') return;
+    if (item.name === '..') {
+      return;
+    }
 
     // Array of debounced click events
     debouncedClickEvents = debouncedClickEvents || [];
@@ -102,7 +112,9 @@ export function FileSystemPicker() {
       newFsItems = sortBy(newFsItems, (fsItem) => fsItem.name.toLowerCase());
 
       modalStore.setDisableOk(!clickedItem.active, globalModalId);
-      if (fileMode && clickedItem.isDirectory) modalStore.setDisableOk(true, globalModalId);
+      if (fileMode && clickedItem.isDirectory) {
+        modalStore.setDisableOk(true, globalModalId);
+      }
 
       setDirectories(newFsItems.filter((fsItem) => fsItem.isDirectory));
       setFiles(newFsItems.filter((fsItem) => fsItem.isFile));
@@ -117,10 +129,14 @@ export function FileSystemPicker() {
 
   const onDirectoryDoubleClicked = (item: DirectoryItemType) => {
     // GUARD - lock down things if loading
-    if (loading) return;
+    if (loading) {
+      return;
+    }
 
     // GUARD - If item has no children then ignore double clicks
-    if (!fileMode && !item.hasChildren) return;
+    if (!fileMode && !item.hasChildren) {
+      return;
+    }
 
     // If there were click events registered we cancel them
     if (debouncedClickEvents && debouncedClickEvents.length > 0) {
@@ -209,7 +225,9 @@ export function FileSystemPicker() {
 
   useEffect(() => {
     const modalOptions = modalStore.getOptions(globalModalId);
-    if (modalOptions == null) return;
+    if (modalOptions == null) {
+      return;
+    }
 
     const modalProps = modalOptions.props;
 
@@ -219,7 +237,9 @@ export function FileSystemPicker() {
 
   useEffect(() => {
     const pendingPath = pendingScrollItemPath.current;
-    if (pendingPath == null) return;
+    if (pendingPath == null) {
+      return;
+    }
 
     scrollToSelectedItem(pendingPath);
   });
@@ -231,7 +251,9 @@ export function FileSystemPicker() {
 
   setQuicklinkStatus();
 
-  if (modalOptions == null || modalProps == null) return null;
+  if (modalOptions == null || modalProps == null) {
+    return null;
+  }
 
   return (
     <div className="file-system-picker">

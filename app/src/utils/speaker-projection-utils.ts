@@ -18,16 +18,22 @@ type SpeakerReference = {
 const unknownSpeakerKey = 'unknown';
 
 function getSpeakerKey(speaker: SpeakerReference | null): string {
-  if (speaker == null) return unknownSpeakerKey;
+  if (speaker == null) {
+    return unknownSpeakerKey;
+  }
   return `${speaker.type}:${speaker.id}`;
 }
 
 function parseSpeakerKey(key: string): SpeakerReference | null {
-  if (key === unknownSpeakerKey) return null;
+  if (key === unknownSpeakerKey) {
+    return null;
+  }
 
   const [type, ...idParts] = key.split(':');
   const id = idParts.join(':');
-  if ((type === 'castId' || type === 'speakerId') && id) return { type, id };
+  if ((type === 'castId' || type === 'speakerId') && id) {
+    return { type, id };
+  }
 
   return null;
 }
@@ -48,7 +54,9 @@ export function formatSpeakerIdLabel(speakerId: string): string {
 function getSpeakerDisplayName(speaker: SpeakerReference): string {
   if (speaker.type === 'speakerId') {
     const knownSpeaker = getKnownSpeaker(speaker.id);
-    if (knownSpeaker != null) return formatSpeakerIdLabel(knownSpeaker.speakerName);
+    if (knownSpeaker != null) {
+      return formatSpeakerIdLabel(knownSpeaker.speakerName);
+    }
   }
 
   return formatSpeakerIdLabel(speaker.id);
@@ -57,36 +65,48 @@ function getSpeakerDisplayName(speaker: SpeakerReference): string {
 function getSpeakerSourceLabel(speaker: SpeakerReference): string {
   if (speaker.type === 'speakerId') {
     const knownSpeaker = getKnownSpeaker(speaker.id);
-    if (knownSpeaker != null) return `speakerName ${knownSpeaker.speakerName}, speakerId ${speaker.id}`;
+    if (knownSpeaker != null) {
+      return `speakerName ${knownSpeaker.speakerName}, speakerId ${speaker.id}`;
+    }
   }
 
   return `${speaker.type} ${speaker.id}`;
 }
 
 function formatSpeakerName(speaker: SpeakerReference | null): string {
-  if (speaker == null) return 'unknown inherited speaker';
+  if (speaker == null) {
+    return 'unknown inherited speaker';
+  }
 
   return getSpeakerDisplayName(speaker);
 }
 
 function formatSpeakerTitle(speaker: SpeakerReference | null): string {
-  if (speaker == null) return 'unknown inherited speaker';
+  if (speaker == null) {
+    return 'unknown inherited speaker';
+  }
 
   return `${formatSpeakerName(speaker)} (${getSpeakerSourceLabel(speaker)})`;
 }
 
 function getExplicitSpeaker(node: PromptNodeType): SpeakerReference | null {
   const castId = node.sourceInSceneRef?.id || '';
-  if (castId) return { type: 'castId', id: castId };
+  if (castId) {
+    return { type: 'castId', id: castId };
+  }
 
   const speakerId = node.speakerOverrideId || '';
-  if (speakerId) return { type: 'speakerId', id: speakerId };
+  if (speakerId) {
+    return { type: 'speakerId', id: speakerId };
+  }
 
   return null;
 }
 
 function getTargetNode(conversationAsset: ConversationAssetType, link: ElementNodeType): PromptNodeType | null {
-  if (link.nextNodeIndex < 0) return null;
+  if (link.nextNodeIndex < 0) {
+    return null;
+  }
 
   return conversationAsset.conversation.nodes[link.nextNodeIndex] || null;
 }
@@ -111,7 +131,9 @@ function buildSingleProjection(speaker: SpeakerReference | null, isExplicit: boo
 function buildProjectedProjection(speakerKeys: Set<string>): SpeakerProjection {
   const speakers = [...speakerKeys].map(parseSpeakerKey);
 
-  if (speakers.length <= 1) return buildSingleProjection(speakers[0] || null, false);
+  if (speakers.length <= 1) {
+    return buildSingleProjection(speakers[0] || null, false);
+  }
 
   return {
     label: 'Multiple',
@@ -132,10 +154,14 @@ export function buildPromptSpeakerProjectionMap(conversationAsset: ConversationA
   while (queue.length > 0) {
     const { link, inheritedSpeaker } = queue.shift() as { link: ElementNodeType; inheritedSpeaker: SpeakerReference | null };
     const targetNode = getTargetNode(conversationAsset, link);
-    if (targetNode == null) continue;
+    if (targetNode == null) {
+      continue;
+    }
 
     const visitKey = `${getId(targetNode)}:${getSpeakerKey(inheritedSpeaker)}`;
-    if (visited.has(visitKey)) continue;
+    if (visited.has(visitKey)) {
+      continue;
+    }
     visited.add(visitKey);
 
     const explicitSpeaker = getExplicitSpeaker(targetNode);

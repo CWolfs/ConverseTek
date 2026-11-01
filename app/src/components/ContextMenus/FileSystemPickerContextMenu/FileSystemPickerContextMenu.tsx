@@ -31,7 +31,9 @@ export function FileSystemPickerContextMenu({
   });
 
   const onAddQuickLinkClicked = ({ props }: ItemParams<EventProps>) => {
-    if (!props) return;
+    if (!props) {
+      return;
+    }
     const { item } = props;
 
     const buttons = {
@@ -59,7 +61,9 @@ export function FileSystemPickerContextMenu({
   };
 
   const onRemoveQuickLinkClicked = ({ props }: ItemParams<EventProps>) => {
-    if (!props) return;
+    if (!props) {
+      return;
+    }
     const { item } = props;
 
     void removeQuickLink(item.name, item.path).then((updatedQuickLinks: QuickLinkType[]) => {

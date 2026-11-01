@@ -20,8 +20,9 @@ export function isElementNodeType(node: PromptNodeType | ElementNodeType): node 
 }
 
 export function detectType(type: string | null): NodeTypeDetectionResult {
-  if (type == null)
+  if (type == null) {
     return { isCore: false, isBaseCore: false, isIsolatedCore: false, isRoot: false, isNode: false, isResponse: false, isLink: false };
+  }
 
   return {
     isCore: type.includes('core'),
@@ -35,20 +36,30 @@ export function detectType(type: string | null): NodeTypeDetectionResult {
 }
 
 export function isAllowedToCreateNode(nodeId: string | undefined) {
-  if (!nodeId) return false;
-  if (nodeId === '0') return true; // for the 'Core'
+  if (!nodeId) {
+    return false;
+  }
+  if (nodeId === '0') {
+    return true;
+  } // for the 'Core'
 
   const node = nodeStore.getNode(nodeId);
 
   // GUARD
-  if (!node) return false;
+  if (!node) {
+    return false;
+  }
 
   const { type } = node;
-  if (type === 'node') return true;
+  if (type === 'node') {
+    return true;
+  }
 
   const { nextNodeIndex } = node;
   if (type === 'root' || type === 'response') {
-    if (nextNodeIndex === -1) return true;
+    if (nextNodeIndex === -1) {
+      return true;
+    }
     return false;
   }
 
@@ -56,11 +67,15 @@ export function isAllowedToCreateNode(nodeId: string | undefined) {
 }
 
 export function isAllowedToPasteCopy(nodeId: string | undefined, clipboard: ClipboardType | null) {
-  if (!nodeId) return false;
+  if (!nodeId) {
+    return false;
+  }
   const node = nodeStore.getNode(nodeId);
 
   // GUARD
-  if (node == null || clipboard == null) return false;
+  if (node == null || clipboard == null) {
+    return false;
+  }
   const { type: nodeType } = node;
 
   const { copiedNode } = clipboard;
@@ -71,28 +86,40 @@ export function isAllowedToPasteCopy(nodeId: string | undefined, clipboard: Clip
 
   if (isRoot || isResponse) {
     // Only allow nodes to be copied in if target is a root or response
-    if (!clipboardIsNode) return false;
+    if (!clipboardIsNode) {
+      return false;
+    }
   } else if (isNode) {
     // Only allow response to be copied in
-    if (!clipboardIsResponse) return false;
+    if (!clipboardIsResponse) {
+      return false;
+    }
   }
 
   return true;
 }
 
 export function isAllowedToPasteLink(nodeId: string | undefined, clipboard: ClipboardType | null) {
-  if (!nodeId) return false;
+  if (!nodeId) {
+    return false;
+  }
   // GUARD - Don't allow pasting link into a root
-  if (nodeId === '0') return false;
+  if (nodeId === '0') {
+    return false;
+  }
 
   const node = nodeStore.getNode(nodeId);
   const originalNode = nodeStore.getNode(clipboard?.originalNodeId);
 
   // Don't allow linking to deleted nodes
-  if (originalNode == null || originalNode.deleting) return false;
+  if (originalNode == null || originalNode.deleting) {
+    return false;
+  }
 
   // GUARD
-  if (node == null || clipboard == null) return false;
+  if (node == null || clipboard == null) {
+    return false;
+  }
 
   const { copiedNode: clipboardNode } = clipboard;
 
@@ -103,15 +130,23 @@ export function isAllowedToPasteLink(nodeId: string | undefined, clipboard: Clip
   const { isNode: clipboardIsNode } = detectType(clipboardType);
 
   // GUARD - Only allow pasting links into responses
-  if (!isResponse) return false;
+  if (!isResponse) {
+    return false;
+  }
 
   // GUARD - Only allow pasting of nodes
-  if (!clipboardIsNode) return false;
+  if (!clipboardIsNode) {
+    return false;
+  }
 
   let auxiliaryLink;
-  if ('auxiliaryLink' in node) ({ auxiliaryLink } = node);
+  if ('auxiliaryLink' in node) {
+    ({ auxiliaryLink } = node);
+  }
 
-  if (!auxiliaryLink) return true;
+  if (!auxiliaryLink) {
+    return true;
+  }
 
   return false;
 }

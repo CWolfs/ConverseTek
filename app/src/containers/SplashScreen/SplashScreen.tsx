@@ -1,4 +1,3 @@
-
 import './SplashScreen.css';
 
 export const SplashScreen = () => (

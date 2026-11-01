@@ -37,21 +37,35 @@ type CategoryFilterValue = 'all' | ConversationDiagnosticCategory;
 type SegmentedOptions = NonNullable<ComponentProps<typeof Segmented>['options']>;
 
 function getSeverityLabel(severity: ConversationDiagnosticSeverity): string {
-  if (severity === 'error') return 'Error';
-  if (severity === 'info') return 'Info';
+  if (severity === 'error') {
+    return 'Error';
+  }
+  if (severity === 'info') {
+    return 'Info';
+  }
   return 'Warning';
 }
 
 function getSeverityTagColour(severity: ConversationDiagnosticSeverity): string {
-  if (severity === 'error') return 'error';
-  if (severity === 'info') return 'processing';
+  if (severity === 'error') {
+    return 'error';
+  }
+  if (severity === 'info') {
+    return 'processing';
+  }
   return 'warning';
 }
 
 function getCategoryLabel(category: ConversationDiagnostic['category']): string {
-  if (category === 'graph') return 'Graph';
-  if (category === 'operation') return 'Operation';
-  if (category === 'reference') return 'Reference';
+  if (category === 'graph') {
+    return 'Graph';
+  }
+  if (category === 'operation') {
+    return 'Operation';
+  }
+  if (category === 'reference') {
+    return 'Reference';
+  }
   return 'Content';
 }
 
@@ -80,11 +94,23 @@ function ConversationDiagnosticsContent({ globalModalId, variant = 'modal' }: Pr
   const infoCount = diagnostics.filter((diagnostic) => diagnostic.severity === 'info').length;
   const normalisedSearchText = searchText.trim().toLowerCase();
   const filteredDiagnostics = diagnostics.filter((diagnostic) => {
-    if (filter !== 'all' && diagnostic.severity !== filter) return false;
-    if (categoryFilter !== 'all' && diagnostic.category !== categoryFilter) return false;
-    if (normalisedSearchText === '') return true;
+    if (filter !== 'all' && diagnostic.severity !== filter) {
+      return false;
+    }
+    if (categoryFilter !== 'all' && diagnostic.category !== categoryFilter) {
+      return false;
+    }
+    if (normalisedSearchText === '') {
+      return true;
+    }
 
-    return [diagnostic.title, diagnostic.nodeLabel, diagnostic.description, getCategoryLabel(diagnostic.category), getSeverityLabel(diagnostic.severity)]
+    return [
+      diagnostic.title,
+      diagnostic.nodeLabel,
+      diagnostic.description,
+      getCategoryLabel(diagnostic.category),
+      getSeverityLabel(diagnostic.severity),
+    ]
       .join(' ')
       .toLowerCase()
       .includes(normalisedSearchText);
@@ -125,10 +151,14 @@ function ConversationDiagnosticsContent({ globalModalId, variant = 'modal' }: Pr
   };
 
   const jumpToNode = (diagnostic: ConversationDiagnostic) => {
-    if (diagnostic.nodeId == null) return;
+    if (diagnostic.nodeId == null) {
+      return;
+    }
 
     nodeStore.setActiveNode(diagnostic.nodeId);
-    if (globalModalId != null) modalStore.closeModal(globalModalId);
+    if (globalModalId != null) {
+      modalStore.closeModal(globalModalId);
+    }
     window.setTimeout(() => nodeStore.scrollToActiveNode(true), 50);
   };
 
@@ -161,7 +191,9 @@ function ConversationDiagnosticsContent({ globalModalId, variant = 'modal' }: Pr
   };
 
   useEffect(() => {
-    if (globalModalId == null) return;
+    if (globalModalId == null) {
+      return;
+    }
 
     modalStore.setTitle('Conversation Diagnostics', globalModalId);
     modalStore.setWidth('min(74rem, 86vw)', globalModalId);
@@ -185,15 +217,23 @@ function ConversationDiagnosticsContent({ globalModalId, variant = 'modal' }: Pr
       })}
     >
       {variant !== 'side-panel' && (
-        <section className={`conversation-diagnostics__summary conversation-diagnostics__summary--${getSummaryTone(errorCount, warningCount, infoCount)}`}>
+        <section
+          className={`conversation-diagnostics__summary conversation-diagnostics__summary--${getSummaryTone(errorCount, warningCount, infoCount)}`}
+        >
           <div className="conversation-diagnostics__summary-icon" aria-hidden="true">
-            {errorCount > 0 ? <ExclamationCircleOutlined /> : warningCount > 0 ? <WarningOutlined /> : infoCount > 0 ? <InfoCircleOutlined /> : <CheckCircleOutlined />}
+            {errorCount > 0 ? (
+              <ExclamationCircleOutlined />
+            ) : warningCount > 0 ? (
+              <WarningOutlined />
+            ) : infoCount > 0 ? (
+              <InfoCircleOutlined />
+            ) : (
+              <CheckCircleOutlined />
+            )}
           </div>
           <div className="conversation-diagnostics__summary-copy">
             <div className="conversation-diagnostics__summary-title">
-              {diagnostics.length > 0
-                ? `${diagnostics.length} diagnostic${diagnostics.length === 1 ? '' : 's'} found`
-                : 'No diagnostics found'}
+              {diagnostics.length > 0 ? `${diagnostics.length} diagnostic${diagnostics.length === 1 ? '' : 's'} found` : 'No diagnostics found'}
             </div>
             <div className="conversation-diagnostics__summary-description">
               {diagnostics.length > 0
@@ -214,12 +254,7 @@ function ConversationDiagnosticsContent({ globalModalId, variant = 'modal' }: Pr
 
       {diagnostics.length > 0 && (
         <div className="conversation-diagnostics__toolbar">
-          <Segmented
-            size="small"
-            options={filterOptions}
-            value={filter}
-            onChange={(value) => setFilter(value as FilterValue)}
-          />
+          <Segmented size="small" options={filterOptions} value={filter} onChange={(value) => setFilter(value as FilterValue)} />
           <div className="conversation-diagnostics__toolbar-controls">
             <Input
               allowClear
@@ -261,7 +296,10 @@ function ConversationDiagnosticsContent({ globalModalId, variant = 'modal' }: Pr
       )}
 
       {filteredDiagnostics.length <= 0 ? (
-        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={diagnostics.length <= 0 ? 'No diagnostics found' : 'No diagnostics in this filter'} />
+        <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description={diagnostics.length <= 0 ? 'No diagnostics found' : 'No diagnostics in this filter'}
+        />
       ) : (
         <div className="conversation-diagnostics__list">
           {filteredDiagnostics.map((diagnostic) => {
@@ -321,9 +359,15 @@ function ConversationDiagnosticsContent({ globalModalId, variant = 'modal' }: Pr
 }
 
 function getSummaryTone(errorCount: number, warningCount: number, infoCount: number): ConversationDiagnosticSeverity | 'success' {
-  if (errorCount > 0) return 'error';
-  if (warningCount > 0) return 'warning';
-  if (infoCount > 0) return 'info';
+  if (errorCount > 0) {
+    return 'error';
+  }
+  if (warningCount > 0) {
+    return 'warning';
+  }
+  if (infoCount > 0) {
+    return 'info';
+  }
   return 'success';
 }
 

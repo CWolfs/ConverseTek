@@ -2,13 +2,17 @@ import { RefObject, useEffect } from 'react';
 
 export const useControlWheel = (targetRef: RefObject<HTMLElement | null>, onControlWheel: (increaseZoom: boolean) => void) => {
   useEffect(() => {
-    if (!targetRef.current) return;
+    if (!targetRef.current) {
+      return;
+    }
     const targetElement = targetRef.current;
 
     const handleWheel = (event: WheelEvent) => {
       const { deltaY } = event;
 
-      if (!event.ctrlKey || deltaY === 0) return;
+      if (!event.ctrlKey || deltaY === 0) {
+        return;
+      }
 
       event.preventDefault();
       event.stopPropagation();

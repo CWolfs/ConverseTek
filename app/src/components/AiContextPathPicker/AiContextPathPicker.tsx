@@ -21,8 +21,12 @@ type Props = {
 };
 
 function getItemIcon(item: FileSystemItemType) {
-  if (item.isFile) return <FileTextOutlined className="ai-context-path-picker__file-icon" />;
-  if (item.name === '..') return <ArrowUpOutlined className="ai-context-path-picker__directory-icon" />;
+  if (item.isFile) {
+    return <FileTextOutlined className="ai-context-path-picker__file-icon" />;
+  }
+  if (item.name === '..') {
+    return <ArrowUpOutlined className="ai-context-path-picker__directory-icon" />;
+  }
   return item.hasChildren ? (
     <FolderAddOutlined className="ai-context-path-picker__directory-icon" />
   ) : (
@@ -65,7 +69,9 @@ function AiContextPathPicker({ globalModalId, initialPath, onSelectPath }: Props
   };
 
   const selectItem = (item: FileSystemItemType) => {
-    if (loading || item.name === '..') return;
+    if (loading || item.name === '..') {
+      return;
+    }
 
     const nextSelectedItem = selectedItem && selectedItem.path === item.path ? null : item;
     setSelectedItem(nextSelectedItem);
@@ -73,7 +79,9 @@ function AiContextPathPicker({ globalModalId, initialPath, onSelectPath }: Props
   };
 
   const openDirectory = (item: DirectoryItemType) => {
-    if (loading) return;
+    if (loading) {
+      return;
+    }
     loadPath(item.path === '{drives}' ? '' : item.path);
   };
 
@@ -84,7 +92,9 @@ function AiContextPathPicker({ globalModalId, initialPath, onSelectPath }: Props
     modalStore.setCancelLabel('Cancel', globalModalId);
     modalStore.setDisableOk(selectedItem == null, globalModalId);
     modalStore.setOnOk(() => {
-      if (!selectedItem) return;
+      if (!selectedItem) {
+        return;
+      }
       onSelectPath(selectedItem.path);
       modalStore.closeModal(globalModalId);
     }, globalModalId);

@@ -1,150 +1,148 @@
-namespace ConverseTek.Controllers {
-  using System;
-  using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
+using ConverseTek.Data;
+using ConverseTek.Host;
+using ConverseTek.Infrastructure;
+using ConverseTek.Services;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
-  using Newtonsoft.Json;
-  using Newtonsoft.Json.Linq;
+namespace ConverseTek.Controllers;
 
-  using ConverseTek.Data;
-  using ConverseTek.Host;
-  using ConverseTek.Infrastructure;
-  using ConverseTek.Services;
+public class ConversationController {
 
-  public class ConversationController {
+  public void RegisterRoutes(AppRouteDispatcher dispatcher) {
+    dispatcher.RegisterGet("/conversations", GetConversations);
+    dispatcher.RegisterPost("/conversations/put", UpdateConversations);
+    dispatcher.RegisterPost("/conversations/export", ExportConversations);
+    dispatcher.RegisterPost("/conversations/export-all", ExportAllConversations);
+    dispatcher.RegisterPost("/conversations/import", ImportConversation);
+    dispatcher.RegisterPost("/conversations/delete", DeleteConversation);
+  }
 
-    public void RegisterRoutes(AppRouteDispatcher dispatcher) {
-      dispatcher.RegisterGet("/conversations", this.GetConversations);
-      dispatcher.RegisterPost("/conversations/put", this.UpdateConversations);
-      dispatcher.RegisterPost("/conversations/export", this.ExportConversations);
-      dispatcher.RegisterPost("/conversations/export-all", this.ExportAllConversations);
-      dispatcher.RegisterPost("/conversations/import", this.ImportConversation);
-      dispatcher.RegisterPost("/conversations/delete", this.DeleteConversation);
+  private AppResponse GetConversations(AppRequest request) {
+    ConversationService conversationService = ConversationService.getInstance();
+    List<ConversationAsset> conversations = conversationService.LoadConversations();
+
+    string conversationsJson = JsonConvert.SerializeObject(conversations);
+
+    AppResponse response = new AppResponse();
+    response.Data = conversationsJson;
+    return response;
+  }
+
+  private AppResponse UpdateConversations(AppRequest request) {
+    IDictionary<string, object> parameters = request.Parameters;
+    string postDataJson = request.PostData;
+    JObject data = JObject.Parse(postDataJson);
+
+    ConversationService conversationService = ConversationService.getInstance();
+
+    try {
+      ConversationAsset conversationAsset = JsonConvert.DeserializeObject<ConversationAsset>(data["conversationAsset"].ToString());
+      conversationService.SaveConversation(conversationAsset, FileFormat.BINARY);
+    } catch (Exception e) {
+      Log.Error(e);
     }
 
-    private AppResponse GetConversations(AppRequest request) {
-      ConversationService conversationService = ConversationService.getInstance();
-      List<ConversationAsset> conversations = conversationService.LoadConversations();
+    List<ConversationAsset> conversations = conversationService.LoadConversations();
+    string conversationsJson = JsonConvert.SerializeObject(conversations);
+    AppResponse response = new AppResponse();
+    response.Data = conversationsJson;
+    return response;
+  }
 
-      string conversationsJson = JsonConvert.SerializeObject(conversations);
+  private AppResponse ExportConversations(AppRequest request) {
+    IDictionary<string, object> parameters = request.Parameters;
+    string postDataJson = request.PostData;
+    JObject data = JObject.Parse(postDataJson);
 
-      AppResponse response = new AppResponse();
-      response.Data = conversationsJson;
-      return response;
+    ConversationService conversationService = ConversationService.getInstance();
+
+    try {
+      ConversationAsset conversationAsset = JsonConvert.DeserializeObject<ConversationAsset>(data["conversationAsset"].ToString());
+      conversationService.SaveConversation(conversationAsset, FileFormat.JSON);
+    } catch (Exception e) {
+      Log.Error(e);
     }
 
-    private AppResponse UpdateConversations(AppRequest request) {
-      IDictionary<string, object> parameters = request.Parameters;
-      string postDataJson = request.PostData;
-      JObject data = JObject.Parse(postDataJson);
+    List<ConversationAsset> conversations = conversationService.LoadConversations();
+    string conversationsJson = JsonConvert.SerializeObject(conversations);
+    AppResponse response = new AppResponse();
+    response.Data = conversationsJson;
+    return response;
+  }
 
-      ConversationService conversationService = ConversationService.getInstance();
+  private AppResponse ImportConversation(AppRequest request) {
+    IDictionary<string, object> requestParams = request.Parameters;
+    string path = (string)requestParams["path"];
 
-      try {
-        ConversationAsset conversationAsset = JsonConvert.DeserializeObject<ConversationAsset>(data["conversationAsset"].ToString());
-        conversationService.SaveConversation(conversationAsset, FileFormat.BINARY);
-      } catch (Exception e) {
-        Log.Error(e);
-      }
+    ConversationService conversationService = ConversationService.getInstance();
 
-      List<ConversationAsset> conversations = conversationService.LoadConversations();
-      string conversationsJson = JsonConvert.SerializeObject(conversations);
-      AppResponse response = new AppResponse();
-      response.Data = conversationsJson;
-      return response;
+    try {
+      ConversationAsset conversationAsset = conversationService.ImportConversation(path);
+      conversationService.SaveConversation(conversationAsset, FileFormat.BINARY);
+    } catch (Exception e) {
+      Log.Error(e);
     }
 
-    private AppResponse ExportConversations(AppRequest request) {
-      IDictionary<string, object> parameters = request.Parameters;
-      string postDataJson = request.PostData;
-      JObject data = JObject.Parse(postDataJson);
+    List<ConversationAsset> conversations = conversationService.LoadConversations();
+    string conversationsJson = JsonConvert.SerializeObject(conversations);
+    AppResponse response = new AppResponse();
+    response.Data = conversationsJson;
+    return response;
+  }
 
-      ConversationService conversationService = ConversationService.getInstance();
+  private AppResponse ExportAllConversations(AppRequest request) {
+    IDictionary<string, object> parameters = request.Parameters;
+    string postDataJson = request.PostData;
+    JObject data = JObject.Parse(postDataJson);
 
-      try {
-        ConversationAsset conversationAsset = JsonConvert.DeserializeObject<ConversationAsset>(data["conversationAsset"].ToString());
+    ConversationService conversationService = ConversationService.getInstance();
+
+    List<ConversationAsset> conversations = conversationService.LoadConversations();
+    foreach (ConversationAsset conversationAsset in conversations) {
+      conversationService.SaveConversation(conversationAsset, FileFormat.JSON);
+    }
+
+    try {
+      string conversationAssetString = data["conversationAsset"].ToString();
+
+      if (conversationAssetString != "") {
+        ConversationAsset conversationAsset = JsonConvert.DeserializeObject<ConversationAsset>(conversationAssetString);
         conversationService.SaveConversation(conversationAsset, FileFormat.JSON);
-      } catch (Exception e) {
-        Log.Error(e);
       }
-
-      List<ConversationAsset> conversations = conversationService.LoadConversations();
-      string conversationsJson = JsonConvert.SerializeObject(conversations);
-      AppResponse response = new AppResponse();
-      response.Data = conversationsJson;
-      return response;
+    } catch (Exception e) {
+      Log.Error(e);
     }
 
-    private AppResponse ImportConversation(AppRequest request) {
-      IDictionary<string, object> requestParams = request.Parameters;
-      string path = (string)requestParams["path"];
+    List<ConversationAsset> updatedConversations = conversationService.LoadConversations();
+    string conversationsJson = JsonConvert.SerializeObject(updatedConversations);
+    AppResponse response = new AppResponse();
+    response.Data = conversationsJson;
+    return response;
+  }
 
-      ConversationService conversationService = ConversationService.getInstance();
 
-      try {
-        ConversationAsset conversationAsset = conversationService.ImportConversation(path);
-        conversationService.SaveConversation(conversationAsset, FileFormat.BINARY);
-      } catch (Exception e) {
-        Log.Error(e);
+  private AppResponse DeleteConversation(AppRequest request) {
+    IDictionary<string, object> requestParams = request.Parameters;
+    string path = (string)requestParams["path"];
+
+    ConversationService conversationService = ConversationService.getInstance();
+
+    try {
+      bool success = conversationService.DeleteConversation(path);
+      if (!success) {
+        Log.Error("Delete failed");
       }
-
-      List<ConversationAsset> conversations = conversationService.LoadConversations();
-      string conversationsJson = JsonConvert.SerializeObject(conversations);
-      AppResponse response = new AppResponse();
-      response.Data = conversationsJson;
-      return response;
+    } catch (Exception e) {
+      Log.Error(e);
     }
 
-    private AppResponse ExportAllConversations(AppRequest request) {
-      IDictionary<string, object> parameters = request.Parameters;
-      string postDataJson = request.PostData;
-      JObject data = JObject.Parse(postDataJson);
-
-      ConversationService conversationService = ConversationService.getInstance();
-
-      List<ConversationAsset> conversations = conversationService.LoadConversations();
-      foreach (ConversationAsset conversationAsset in conversations) {
-        conversationService.SaveConversation(conversationAsset, FileFormat.JSON);
-      }
-
-      try {
-        string conversationAssetString = data["conversationAsset"].ToString();
-
-        if (conversationAssetString != "") {
-          ConversationAsset conversationAsset = JsonConvert.DeserializeObject<ConversationAsset>(conversationAssetString);
-          conversationService.SaveConversation(conversationAsset, FileFormat.JSON);
-        }
-      } catch (Exception e) {
-        Log.Error(e);
-      }
-
-      List<ConversationAsset> updatedConversations = conversationService.LoadConversations();
-      string conversationsJson = JsonConvert.SerializeObject(updatedConversations);
-      AppResponse response = new AppResponse();
-      response.Data = conversationsJson;
-      return response;
-    }
-
-
-    private AppResponse DeleteConversation(AppRequest request) {
-      IDictionary<string, object> requestParams = request.Parameters;
-      string path = (string)requestParams["path"];
-
-      ConversationService conversationService = ConversationService.getInstance();
-
-      try {
-        bool success = conversationService.DeleteConversation(path);
-        if (!success) {
-          Log.Error("Delete failed");
-        }
-      } catch (Exception e) {
-        Log.Error(e);
-      }
-
-      List<ConversationAsset> conversations = conversationService.LoadConversations();
-      string conversationsJson = JsonConvert.SerializeObject(conversations);
-      AppResponse response = new AppResponse();
-      response.Data = conversationsJson;
-      return response;
-    }
+    List<ConversationAsset> conversations = conversationService.LoadConversations();
+    string conversationsJson = JsonConvert.SerializeObject(conversations);
+    AppResponse response = new AppResponse();
+    response.Data = conversationsJson;
+    return response;
   }
 }

@@ -135,9 +135,15 @@ const elementBranchQuickShotPrompts: QuickShotPrompt[] = [
 ];
 
 function getQuickShotPrompts(mode: AiDraftModeType, selectedNode: PromptNodeType | ElementNodeType | null): QuickShotPrompt[] {
-  if (mode === 'nodeSuggestion') return rewriteQuickShotPrompts;
-  if (mode === 'branchExpansion' && selectedNode?.type === 'node') return promptBranchQuickShotPrompts;
-  if (mode === 'branchExpansion') return elementBranchQuickShotPrompts;
+  if (mode === 'nodeSuggestion') {
+    return rewriteQuickShotPrompts;
+  }
+  if (mode === 'branchExpansion' && selectedNode?.type === 'node') {
+    return promptBranchQuickShotPrompts;
+  }
+  if (mode === 'branchExpansion') {
+    return elementBranchQuickShotPrompts;
+  }
   return [];
 }
 
@@ -170,19 +176,29 @@ type ProviderUi = {
 };
 
 function getModeTitle(mode: AiDraftModeType): string {
-  if (mode === 'fullConversation') return 'Draft Assist';
-  if (mode === 'branchExpansion') return 'AI Expand Branch';
+  if (mode === 'fullConversation') {
+    return 'Draft Assist';
+  }
+  if (mode === 'branchExpansion') {
+    return 'AI Expand Branch';
+  }
   return 'AI Suggest Node Text';
 }
 
 function getAcceptLabel(mode: AiDraftModeType): string {
-  if (mode === 'fullConversation') return 'Open In Main Editor';
+  if (mode === 'fullConversation') {
+    return 'Open In Main Editor';
+  }
   return 'Accept';
 }
 
 function getRewriteContextLabel(selectedNode: PromptNodeType | ElementNodeType | null): string {
-  if (selectedNode?.type === 'node') return 'Current prompt';
-  if (selectedNode?.type === 'root') return 'Current root response';
+  if (selectedNode?.type === 'node') {
+    return 'Current prompt';
+  }
+  if (selectedNode?.type === 'root') {
+    return 'Current root response';
+  }
   return 'Current response';
 }
 
@@ -201,8 +217,14 @@ function splitDraftWarnings(warnings: string[]): { structuralWarnings: string[];
   );
 }
 
-function shouldShowSelectedNodeContext(mode: AiDraftModeType, selectedNode: PromptNodeType | ElementNodeType | null, draft: AiConversationDraftType | null): boolean {
-  if (selectedNode == null || draft != null) return false;
+function shouldShowSelectedNodeContext(
+  mode: AiDraftModeType,
+  selectedNode: PromptNodeType | ElementNodeType | null,
+  draft: AiConversationDraftType | null,
+): boolean {
+  if (selectedNode == null || draft != null) {
+    return false;
+  }
   return mode === 'nodeSuggestion' || (mode === 'branchExpansion' && selectedNode.type === 'node');
 }
 
@@ -262,19 +284,27 @@ function createWorkspaceSettings(workingDirectory: string, defaultPersonalities:
 }
 
 function getConversationHistoryIdentity(conversationAsset: ConversationAssetType | null): string {
-  if (conversationAsset == null) return '__no_conversation__';
+  if (conversationAsset == null) {
+    return '__no_conversation__';
+  }
   const fileIdentity = conversationAsset.filepath || conversationAsset.filename;
-  if (fileIdentity.trim() !== '') return normaliseWorkspaceKey(fileIdentity);
+  if (fileIdentity.trim() !== '') {
+    return normaliseWorkspaceKey(fileIdentity);
+  }
   return conversationAsset.conversation.idRef.id || '__no_conversation__';
 }
 
 function getConversationHistoryLabel(conversationAsset: ConversationAssetType | null): string {
-  if (conversationAsset == null) return 'Workspace';
+  if (conversationAsset == null) {
+    return 'Workspace';
+  }
   return conversationAsset.conversation.uiName || conversationAsset.conversation.idRef.id || conversationAsset.filename || 'Conversation';
 }
 
 function getBriefHistoryScopeKey(mode: AiDraftModeType, conversationAsset: ConversationAssetType | null): string {
-  if (mode === 'fullConversation') return 'workspace:fullConversation';
+  if (mode === 'fullConversation') {
+    return 'workspace:fullConversation';
+  }
   return `conversation:${mode}:${getConversationHistoryIdentity(conversationAsset)}`;
 }
 
@@ -284,10 +314,14 @@ function addBriefHistoryEntry(
   conversationAsset: ConversationAssetType | null,
   brief: string,
 ): AiWorkspaceSettingsType | null {
-  if (workspaceSettings == null) return null;
+  if (workspaceSettings == null) {
+    return null;
+  }
 
   const trimmedBrief = brief.trim();
-  if (trimmedBrief === '') return workspaceSettings;
+  if (trimmedBrief === '') {
+    return workspaceSettings;
+  }
 
   const scopeKey = getBriefHistoryScopeKey(mode, conversationAsset);
   const nextEntry: AiBriefHistoryEntryType = {
@@ -309,10 +343,14 @@ function addBriefHistoryEntry(
 }
 
 function formatBriefHistoryDate(value: string): string {
-  if (value.trim() === '') return '';
+  if (value.trim() === '') {
+    return '';
+  }
 
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '';
+  if (Number.isNaN(date.getTime())) {
+    return '';
+  }
 
   return date.toLocaleString('en-GB', {
     day: '2-digit',
@@ -366,7 +404,9 @@ function normaliseIdTags(values: string[]): string[] {
     .filter(Boolean)
     .forEach((value) => {
       const key = value.toLowerCase();
-      if (seenValues.has(key)) return;
+      if (seenValues.has(key)) {
+        return;
+      }
       seenValues.add(key);
       normalisedValues.push(value);
     });
@@ -376,13 +416,16 @@ function normaliseIdTags(values: string[]): string[] {
 
 function matchesPersonalitySearch(personality: AiCastPersonalityType, searchTerm: string): boolean {
   const trimmedSearchTerm = searchTerm.trim().toLowerCase();
-  if (trimmedSearchTerm === '') return true;
+  if (trimmedSearchTerm === '') {
+    return true;
+  }
 
   return [personality.label, personality.defaultKey, ...personality.castIds, ...personality.speakerIds]
     .filter(Boolean)
     .some((value) => value.toLowerCase().includes(trimmedSearchTerm));
 }
 
+// eslint-disable-next-line complexity -- grandfathered, split later
 function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
   const dataStore = useStore<DataStore>('data');
   const defStore = useStore<DefStore>('def');
@@ -410,7 +453,9 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
   const { workingDirectory, unsavedActiveConversationAsset } = dataStore;
   const isVisible = modalStore.options.get(globalModalId)?.isVisible === true;
   const selectedNode = useMemo(() => {
-    if (!selectedNodeId) return nodeStore.activeNode;
+    if (!selectedNodeId) {
+      return nodeStore.activeNode;
+    }
     return nodeStore.getNode(selectedNodeId);
   }, [selectedNodeId, nodeStore.activeNode]);
   const providerName = settings.selectedProvider || 'codex';
@@ -434,7 +479,9 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
 
   const getCachedModelCatalog = (targetSettings: AiSettingsType, targetProviderName: string) => {
     const catalog = targetSettings.modelCatalogs ? targetSettings.modelCatalogs[targetProviderName] : null;
-    if (catalog == null || !catalog.models || catalog.models.length === 0) return null;
+    if (catalog == null || !catalog.models || catalog.models.length === 0) {
+      return null;
+    }
     return {
       ...catalog,
       fromCache: true,
@@ -519,7 +566,9 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
   };
 
   useEffect(() => {
-    if (!isVisible) return;
+    if (!isVisible) {
+      return;
+    }
 
     void loadConfiguration(true);
   }, [isVisible, workingDirectory]);
@@ -534,8 +583,12 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
   }, [draft, mode, selectedNode, defStore.operations, unsavedActiveConversationAsset]);
 
   useEffect(() => {
-    if (workspaceSettings == null) return;
-    if (workspaceSettings.castPersonalities.some((personality) => personality.id === selectedPersonalityId)) return;
+    if (workspaceSettings == null) {
+      return;
+    }
+    if (workspaceSettings.castPersonalities.some((personality) => personality.id === selectedPersonalityId)) {
+      return;
+    }
     setSelectedPersonalityId(workspaceSettings.castPersonalities[0]?.id || '');
   }, [workspaceSettings, selectedPersonalityId]);
 
@@ -564,7 +617,9 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
   };
 
   const updateSelectedPersonality = (patch: Partial<AiCastPersonalityType>) => {
-    if (selectedPersonality == null) return;
+    if (selectedPersonality == null) {
+      return;
+    }
 
     updateCastPersonalities(
       castPersonalities.map((personality) =>
@@ -585,7 +640,9 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
   };
 
   const duplicateSelectedPersonality = () => {
-    if (selectedPersonality == null) return;
+    if (selectedPersonality == null) {
+      return;
+    }
 
     const personality = cloneCastPersonality(selectedPersonality);
     updateCastPersonalities([...castPersonalities, personality]);
@@ -593,7 +650,9 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
   };
 
   const deleteSelectedPersonality = () => {
-    if (selectedPersonality == null) return;
+    if (selectedPersonality == null) {
+      return;
+    }
 
     const nextPersonalities = castPersonalities.filter((personality) => personality.id !== selectedPersonality.id);
     updateCastPersonalities(nextPersonalities);
@@ -601,7 +660,9 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
   };
 
   const restoreSelectedDefaultPersonality = () => {
-    if (selectedPersonality == null || selectedDefaultPersonality == null) return;
+    if (selectedPersonality == null || selectedDefaultPersonality == null) {
+      return;
+    }
 
     updateSelectedPersonality({
       label: selectedDefaultPersonality.label,
@@ -630,7 +691,9 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
 
   const addContextPath = (path: string) => {
     const existingPaths = workspaceSettings?.contextPaths || [];
-    if (existingPaths.includes(path)) return;
+    if (existingPaths.includes(path)) {
+      return;
+    }
     updateWorkspaceSettings({ contextPaths: [...existingPaths, path] });
   };
 
@@ -793,10 +856,19 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
   };
 
   const acceptDraft = async () => {
-    if (draft == null || workingDirectory == null) return;
+    if (draft == null || workingDirectory == null) {
+      return;
+    }
 
     try {
-      const acceptedDraft = buildAcceptedDraft(draft, mode, workingDirectory, selectedNode, selectedSuggestionIndex, dataStore.unsavedActiveConversationAsset);
+      const acceptedDraft = buildAcceptedDraft(
+        draft,
+        mode,
+        workingDirectory,
+        selectedNode,
+        selectedSuggestionIndex,
+        dataStore.unsavedActiveConversationAsset,
+      );
 
       if (acceptedDraft.kind === 'fullConversation') {
         const roundTripResult = await validateConversationRoundTrip(acceptedDraft.conversationAsset);
@@ -811,7 +883,9 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
           nodeStore.setRebuild(true);
         });
       } else if (acceptedDraft.kind === 'nodeText') {
-        if (selectedNode == null) return;
+        if (selectedNode == null) {
+          return;
+        }
 
         runInAction(() => {
           nodeStore.setNodeText(selectedNode, acceptedDraft.text);
@@ -819,7 +893,9 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
         });
       } else {
         const activeConversation = dataStore.unsavedActiveConversationAsset;
-        if (activeConversation == null) return;
+        if (activeConversation == null) {
+          return;
+        }
 
         runInAction(() => {
           const { parentElementNode, nodes } = acceptedDraft.patch;
@@ -919,11 +995,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
             }}
           >
             <span>{entry.brief}</span>
-            {(entry.conversationLabel || entryDate) && (
-              <small>
-                {[entry.conversationLabel, entryDate].filter(Boolean).join(' - ')}
-              </small>
-            )}
+            {(entry.conversationLabel || entryDate) && <small>{[entry.conversationLabel, entryDate].filter(Boolean).join(' - ')}</small>}
           </button>
         );
       })}
@@ -958,13 +1030,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
           >
             {getAcceptLabel(mode)}
           </Button>
-          <Button
-            type="primary"
-            danger
-            className="ai-draft-modal__action-button"
-            disabled={isLoading}
-            onClick={() => setDraft(null)}
-          >
+          <Button type="primary" danger className="ai-draft-modal__action-button" disabled={isLoading} onClick={() => setDraft(null)}>
             Reject
           </Button>
         </>
@@ -1017,7 +1083,9 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                   <TextArea
                     value={brief}
                     onChange={(event: ChangeEvent<HTMLTextAreaElement>) => {
-                      if (isLoading) return;
+                      if (isLoading) {
+                        return;
+                      }
                       setBrief(event.target.value);
                     }}
                     disabled={isLoading}
@@ -1203,11 +1271,7 @@ function AiDraftModal({ globalModalId, mode, selectedNodeId }: Props) {
                     </Tooltip>
                   </div>
                   {modelCatalog && modelCatalog.error && (
-                    <Alert
-                      className="ai-draft-modal__inline-alert"
-                      type="warning"
-                      title={modelCatalog.error || 'Could not load provider models.'}
-                    />
+                    <Alert className="ai-draft-modal__inline-alert" type="warning" title={modelCatalog.error || 'Could not load provider models.'} />
                   )}
                   {modelCatalog?.success && (
                     <div className="ai-draft-modal__field-note">
@@ -1531,7 +1595,10 @@ function DraftPreview({
   onSelectedSuggestionIndexChange: (index: number) => void;
 }) {
   const previewConversationAsset = useMemo(
-    () => (mode === 'fullConversation' ? null : buildPreviewConversationAssetFromDraft(draft, mode, workingDirectory, selectedNode, existingConversationAsset)),
+    () =>
+      mode === 'fullConversation'
+        ? null
+        : buildPreviewConversationAssetFromDraft(draft, mode, workingDirectory, selectedNode, existingConversationAsset),
     [draft, mode, workingDirectory, selectedNode, existingConversationAsset],
   );
   const originalText = useMemo(() => (mode === 'nodeSuggestion' ? getOriginalNodeText(selectedNode) : ''), [mode, selectedNode]);
@@ -1591,7 +1658,9 @@ function DraftPreview({
                   tabIndex={0}
                   onClick={() => onSelectedSuggestionIndexChange(index)}
                   onKeyDown={(event) => {
-                    if (event.key !== 'Enter' && event.key !== ' ') return;
+                    if (event.key !== 'Enter' && event.key !== ' ') {
+                      return;
+                    }
                     event.preventDefault();
                     onSelectedSuggestionIndexChange(index);
                   }}
@@ -1618,14 +1687,22 @@ function DraftPreview({
 }
 
 function titleCaseReasoningEffort(effort: string): string {
-  if (effort === 'xhigh') return 'Extra high';
-  if (effort === '') return 'Auto';
+  if (effort === 'xhigh') {
+    return 'Extra high';
+  }
+  if (effort === '') {
+    return 'Auto';
+  }
   return effort.charAt(0).toUpperCase() + effort.slice(1);
 }
 
 function getSelectedModelOption(modelCatalog: AiModelCatalogResultType | null, codexModel: string): AiModelOptionType | null {
-  if (!modelCatalog) return null;
-  if (!codexModel) return null;
+  if (!modelCatalog) {
+    return null;
+  }
+  if (!codexModel) {
+    return null;
+  }
   return modelCatalog.models.find((model) => model.slug === codexModel) || null;
 }
 
@@ -1643,7 +1720,9 @@ function getReasoningEffortOptions(selectedModel: AiModelOptionType | null, sele
   if (selectedModel?.supportedReasoningLevels.length) {
     knownOptions.clear();
     selectedModel.supportedReasoningLevels.forEach((level) => {
-      if (!level.effort) return;
+      if (!level.effort) {
+        return;
+      }
       knownOptions.set(level.effort, {
         effort: level.effort,
         label: titleCaseReasoningEffort(level.effort),

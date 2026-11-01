@@ -50,7 +50,9 @@
 .side-panel__resize-handle:focus-visible::before,
 .side-panel-resizing .side-panel__resize-handle::before {
   background: rgba(42, 176, 247, 0.95);
-  box-shadow: 0 0 0 1px rgba(42, 176, 247, 0.24), 0 0 8px rgba(42, 176, 247, 0.44);
+  box-shadow:
+    0 0 0 1px rgba(42, 176, 247, 0.24),
+    0 0 8px rgba(42, 176, 247, 0.44);
 }
 
 .side-panel__resize-handle:focus-visible {

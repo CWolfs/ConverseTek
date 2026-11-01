@@ -1,6 +1,6 @@
-namespace ConverseTek.Data {
-  public enum FileFormat {
-    JSON,
-    BINARY
-  };
-}
+namespace ConverseTek.Data;
+
+public enum FileFormat {
+  JSON,
+  BINARY
+};

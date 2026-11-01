@@ -36,7 +36,9 @@ function formatMarkdownJsonBlocks(content: string): AiArtifactDisplayContent {
   const notes = new Set<string>();
   const formattedContent = content.replace(/```json\s*\r?\n([\s\S]*?)```/gi, (match, jsonBlock: string) => {
     const parsedBlock = parseJson(jsonBlock);
-    if (parsedBlock == null) return match;
+    if (parsedBlock == null) {
+      return match;
+    }
 
     const expandedBlock = expandEmbeddedJson(parsedBlock);
     notes.add('Formatted prompt JSON block.');
@@ -95,10 +97,14 @@ function containsExpandedJsonString(originalValue: JsonDisplayValue, expandedVal
 
 function parseEmbeddedJsonString(value: string): JsonDisplayValue | null {
   const trimmedValue = value.trim();
-  if (!trimmedValue.startsWith('{') && !trimmedValue.startsWith('[')) return null;
+  if (!trimmedValue.startsWith('{') && !trimmedValue.startsWith('[')) {
+    return null;
+  }
 
   const parsedValue = parseJson(trimmedValue);
-  if (parsedValue == null || typeof parsedValue !== 'object') return null;
+  if (parsedValue == null || typeof parsedValue !== 'object') {
+    return null;
+  }
 
   return parsedValue;
 }
@@ -118,4 +124,3 @@ function stringifyJson(value: JsonDisplayValue): string {
 function isJsonObject(value: JsonDisplayValue | undefined): value is JsonObjectValue {
   return value != null && typeof value === 'object' && !Array.isArray(value);
 }
-

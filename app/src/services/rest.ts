@@ -63,12 +63,16 @@ function sendBridgeRequest<T>(request: WebViewBridgeRequest): Promise<T> {
 }
 
 function ensureMessageListener() {
-  if (messageListenerAttached || window.chrome?.webview == null) return;
+  if (messageListenerAttached || window.chrome?.webview == null) {
+    return;
+  }
 
   window.chrome.webview.addEventListener('message', (event: MessageEvent<WebViewBridgeResponse>) => {
     const response = event.data;
     const pendingRequest = pendingRequests.get(response.id);
-    if (pendingRequest == null) return;
+    if (pendingRequest == null) {
+      return;
+    }
 
     pendingRequests.delete(response.id);
 
@@ -84,7 +88,9 @@ function ensureMessageListener() {
 }
 
 function parseResponseData(data: string) {
-  if (data == null || data === '') return null;
+  if (data == null || data === '') {
+    return null;
+  }
   return JSON.parse(data) as unknown;
 }
 

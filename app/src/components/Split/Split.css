@@ -54,7 +54,9 @@
 .split__handle:hover::before,
 .split__handle:active::before {
   background: rgba(42, 176, 247, 0.95);
-  box-shadow: 0 0 0 1px rgba(42, 176, 247, 0.24), 0 0 8px rgba(42, 176, 247, 0.44);
+  box-shadow:
+    0 0 0 1px rgba(42, 176, 247, 0.24),
+    0 0 8px rgba(42, 176, 247, 0.44);
 }
 
 .split--horizontal > .split__handle {

@@ -73,7 +73,9 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
           style={{ width: 120 }}
           onChange={(value: EditableSelectValue) => {
             if (typeof value === 'string' && InputTypeTypes.includes(value as InputTypeType)) {
-              if (parentLogic) defStore.setArgType(parentLogic, parentArg, value as InputTypeType);
+              if (parentLogic) {
+                defStore.setArgType(parentLogic, parentArg, value as InputTypeType);
+              }
             }
           }}
         />
@@ -85,7 +87,9 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
         options={operations}
         placeholder="Select an operation"
         onChange={(value: EditableSelectValue) => {
-          if (typeof value === 'string') defStore.setOperation(logic, value);
+          if (typeof value === 'string') {
+            defStore.setOperation(logic, value);
+          }
         }}
       />
     );
@@ -103,17 +107,22 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
     const { functionName, args } = logic;
     const { key: logicDefKey, inputs } = logicDef;
 
+    // eslint-disable-next-line complexity -- grandfathered, split later
     return inputs.map((input, index) => {
       const { label, types, values, tooltip, defaultValue = null } = input;
       const arg = args.length > index ? args[index] : defStore.createNewArg(types[0], defaultValue);
       const argValue = defStore.getArgValue(arg);
       let content = null;
 
-      if (argValue == null) throw Error('Arg value is null or undefined');
+      if (argValue == null) {
+        throw Error('Arg value is null or undefined');
+      }
 
       const { type: argType, value: argVal } = argValue;
 
-      if (argVal == null) throw Error("Arg value is null or undefined. This shouldn't be the case");
+      if (argVal == null) {
+        throw Error("Arg value is null or undefined. This shouldn't be the case");
+      }
 
       let argsContainerClasses = classnames('editable-logic__args-container');
       argsContainerClasses = classnames(argsContainerClasses, {
@@ -150,12 +159,16 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
       } else if (argType === 'operation' && !types.includes('operation')) {
         console.error(`[EditableLogic] Argument and input type mismatch for ${label}`);
       } else {
-        if (typeSelector) content = <span className="editable-logic__logic-type">{typeSelector}</span>;
+        if (typeSelector) {
+          content = <span className="editable-logic__logic-type">{typeSelector}</span>;
+        }
 
         if (argVal !== null) {
           if (argType === 'string' && types.includes('string')) {
             if (logicDefKey.includes('Preset')) {
-              if (parentLogic == null) throw Error('parentLogic is null or undefined. This should not happen');
+              if (parentLogic == null) {
+                throw Error('parentLogic is null or undefined. This should not happen');
+              }
 
               const presetKey = `${parentLogic.functionName}-${functionName}`.replace(/\s/g, '');
               content = (
@@ -192,7 +205,9 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
               const presetArg = args[0];
               const presetArgValue = defStore.getArgValue(presetArg);
 
-              if (presetArgValue == null) throw Error('Present Arg Value is null or undefined');
+              if (presetArgValue == null) {
+                throw Error('Present Arg Value is null or undefined');
+              }
 
               const { value: presetValue } = presetArgValue;
 
@@ -296,7 +311,9 @@ function EditableLogic({ scope = 'all', category, logic, isEven = false, parentL
         }
       }
 
-      if (!content) content = <div>Unprocessed Input: {input.label}</div>;
+      if (!content) {
+        content = <div>Unprocessed Input: {input.label}</div>;
+      }
 
       return (
         <div className={argsContainerClasses} key={index}>

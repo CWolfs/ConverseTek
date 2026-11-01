@@ -38,27 +38,37 @@ function EditableInput({ value = null, options = null, onChange, onBlur, optionL
   } as CSSProperties;
 
   if (isAutocomplete) {
-    if (value !== null && value !== undefined) conditionalProps.value = value;
-    if (optionLabelProp) conditionalProps.optionLabelProp = optionLabelProp;
+    if (value !== null && value !== undefined) {
+      conditionalProps.value = value;
+    }
+    if (optionLabelProp) {
+      conditionalProps.optionLabelProp = optionLabelProp;
+    }
 
     if (!displayValueLabel) {
       displayValueLabel =
         options.find((option: string | number | { text: string; value: string | number }): boolean => {
           if (typeof option === 'object' && 'value' in option) {
-            if (option.value === value) return true;
+            if (option.value === value) {
+              return true;
+            }
             // if (Number(option.value) === value) return true;
           }
           return false;
         }) || null;
 
-      if (displayValueLabel && typeof displayValueLabel === 'object' && 'text' in displayValueLabel) displayValueLabel = displayValueLabel.text;
+      if (displayValueLabel && typeof displayValueLabel === 'object' && 'text' in displayValueLabel) {
+        displayValueLabel = displayValueLabel.text;
+      }
       if (!displayValueLabel) {
         valueLabelStyle.color = '#ff6666';
       }
     }
 
     const autoCompleteOptions = options.map((option) => {
-      if (typeof option === 'object') return { value: option.value, label: option.text };
+      if (typeof option === 'object') {
+        return { value: option.value, label: option.text };
+      }
       return { value: option, label: option };
     });
 

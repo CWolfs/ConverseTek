@@ -1,4 +1,12 @@
-import type { ConversationAssetType, ElementNodeType, InputType, OperationArgType, OperationCallType, OperationDefinitionType, PromptNodeType } from 'types';
+import type {
+  ConversationAssetType,
+  ElementNodeType,
+  InputType,
+  OperationArgType,
+  OperationCallType,
+  OperationDefinitionType,
+  PromptNodeType,
+} from 'types';
 import { getId } from './conversation-utils';
 
 // Mirrored in C# by Core/Diagnostics/ConversationDiagnostics.cs for the ctek CLI - keep the checks in step
@@ -123,7 +131,8 @@ function scanConversationShape(
           severity: 'warning',
           category: 'content',
           title: 'Prompt node has no content or responses',
-          description: 'This prompt has no speaker text, no response options, and no actions. Check that the player will not be left on stale or missing dialogue text.',
+          description:
+            'This prompt has no speaker text, no response options, and no actions. Check that the player will not be left on stale or missing dialogue text.',
           context,
         }),
       );
@@ -141,7 +150,9 @@ function scanDuplicateNodeIds(conversationAsset: ConversationAssetType, diagnost
 
   const scanNodeId = (node: ElementNodeType | PromptNodeType, context: NodeContext): void => {
     const nodeId = getId(node);
-    if (nodeId === '' || nodeId === '-1') return;
+    if (nodeId === '' || nodeId === '-1') {
+      return;
+    }
 
     const existingContext = nodeContextsById.get(nodeId);
     if (existingContext != null) {
@@ -220,10 +231,14 @@ function scanReachability(
 ): void {
   const reachableIndexes = new Set<number>();
   const visitPromptIndex = (index: number): void => {
-    if (index === -1 || reachableIndexes.has(index)) return;
+    if (index === -1 || reachableIndexes.has(index)) {
+      return;
+    }
 
     const node = promptNodesByIndex.get(index);
-    if (node == null) return;
+    if (node == null) {
+      return;
+    }
 
     reachableIndexes.add(index);
     node.branches.forEach((branch) => visitPromptIndex(branch.nextNodeIndex));
@@ -232,14 +247,17 @@ function scanReachability(
   conversationAsset.conversation.roots.forEach((root) => visitPromptIndex(root.nextNodeIndex));
 
   conversationAsset.conversation.nodes.forEach((node, runtimeIndex) => {
-    if (reachableIndexes.has(runtimeIndex)) return;
+    if (reachableIndexes.has(runtimeIndex)) {
+      return;
+    }
 
     diagnostics.push(
       createDiagnostic({
         severity: 'warning',
         category: 'graph',
         title: 'Prompt node is not reachable from a root',
-        description: 'This prompt node cannot be reached by following roots and responses in this conversation. If it is only used as an explicit sideload entry, this can be intentional.',
+        description:
+          'This prompt node cannot be reached by following roots and responses in this conversation. If it is only used as an explicit sideload entry, this can be intentional.',
         context: getPromptNodeContext(node),
       }),
     );
@@ -256,13 +274,31 @@ function scanOperations(
 
   roots.forEach((root, index) => {
     const context = getElementNodeContext(root, `Root ${index + 1}`);
-    scanOperationList(root.conditions?.ops, { ...context, logicKind: 'condition', path: 'root conditions' }, diagnostics, operationDefinitionsByName, loadedConversationsById);
-    scanOperationList(root.actions?.ops, { ...context, logicKind: 'action', path: 'root actions' }, diagnostics, operationDefinitionsByName, loadedConversationsById);
+    scanOperationList(
+      root.conditions?.ops,
+      { ...context, logicKind: 'condition', path: 'root conditions' },
+      diagnostics,
+      operationDefinitionsByName,
+      loadedConversationsById,
+    );
+    scanOperationList(
+      root.actions?.ops,
+      { ...context, logicKind: 'action', path: 'root actions' },
+      diagnostics,
+      operationDefinitionsByName,
+      loadedConversationsById,
+    );
   });
 
   nodes.forEach((node) => {
     const context = getPromptNodeContext(node);
-    scanOperationList(node.actions?.ops, { ...context, logicKind: 'action', path: 'prompt actions' }, diagnostics, operationDefinitionsByName, loadedConversationsById);
+    scanOperationList(
+      node.actions?.ops,
+      { ...context, logicKind: 'action', path: 'prompt actions' },
+      diagnostics,
+      operationDefinitionsByName,
+      loadedConversationsById,
+    );
 
     node.branches.forEach((response, index) => {
       const responseContext = getElementNodeContext(response, `Response ${index + 1} from ${context.nodeLabel}`);
@@ -292,7 +328,13 @@ function scanOperationList(
   loadedConversationsById: Map<string, ConversationAssetType>,
 ): void {
   operations?.forEach((operation, index) => {
-    scanOperation(operation, { ...context, path: `${context.path} > ${context.logicKind} ${index + 1}` }, diagnostics, operationDefinitionsByName, loadedConversationsById);
+    scanOperation(
+      operation,
+      { ...context, path: `${context.path} > ${context.logicKind} ${index + 1}` },
+      diagnostics,
+      operationDefinitionsByName,
+      loadedConversationsById,
+    );
   });
 }
 
@@ -411,7 +453,9 @@ function scanSideloadConversationOperation(
   const conversationId = getStringArgValue(operation.args[0]);
   const entryNodeId = getStringArgValue(operation.args[1]);
 
-  if (conversationId == null || conversationId.trim() === '') return;
+  if (conversationId == null || conversationId.trim() === '') {
+    return;
+  }
 
   const sideloadedConversation = loadedConversationsById.get(conversationId) ?? loadedConversationsById.get(getComparableId(conversationId));
   if (sideloadedConversation == null) {
@@ -427,7 +471,9 @@ function scanSideloadConversationOperation(
     return;
   }
 
-  if (entryNodeId == null || entryNodeId.trim() === '') return;
+  if (entryNodeId == null || entryNodeId.trim() === '') {
+    return;
+  }
 
   if (!conversationContainsNodeId(sideloadedConversation, entryNodeId)) {
     diagnostics.push(
@@ -488,38 +534,68 @@ function getConversationContext(conversationAsset: ConversationAssetType): NodeC
 }
 
 function getEffectiveArgType(arg: OperationArgType): 'operation' | 'string' | 'float' | 'int' | 'bool' | null {
-  if (arg.type != null) return arg.type;
-  if (arg.callValue != null) return 'operation';
-  if (arg.stringValue !== '') return 'string';
-  if (arg.floatValue !== 0) return 'float';
-  if (arg.boolValue) return 'bool';
-  if (arg.intValue !== 0) return 'int';
+  if (arg.type != null) {
+    return arg.type;
+  }
+  if (arg.callValue != null) {
+    return 'operation';
+  }
+  if (arg.stringValue !== '') {
+    return 'string';
+  }
+  if (arg.floatValue !== 0) {
+    return 'float';
+  }
+  if (arg.boolValue) {
+    return 'bool';
+  }
+  if (arg.intValue !== 0) {
+    return 'int';
+  }
   return null;
 }
 
 function getStringArgValue(arg: OperationArgType | undefined): string | null {
-  if (arg == null || arg.callValue != null) return null;
-  if (arg.type != null && arg.type !== 'string') return null;
+  if (arg == null || arg.callValue != null) {
+    return null;
+  }
+  if (arg.type != null && arg.type !== 'string') {
+    return null;
+  }
   return arg.stringValue;
 }
 
 function isEmptyRequiredArg(arg: OperationArgType, input: InputType): boolean {
-  if (input.types.includes('operation') && input.types.length === 1) return arg.callValue == null;
-  if (input.types.includes('string') && !input.types.includes('operation')) return arg.stringValue.trim() === '';
-  if (input.types.includes('string') && input.types.includes('operation')) return arg.callValue == null && arg.stringValue.trim() === '';
+  if (input.types.includes('operation') && input.types.length === 1) {
+    return arg.callValue == null;
+  }
+  if (input.types.includes('string') && !input.types.includes('operation')) {
+    return arg.stringValue.trim() === '';
+  }
+  if (input.types.includes('string') && input.types.includes('operation')) {
+    return arg.callValue == null && arg.stringValue.trim() === '';
+  }
   return false;
 }
 
 function isInputOptional(functionName: string, input: InputType): boolean {
   const inputText = `${input.label || ''} ${input.tooltip || ''}`.toLowerCase();
-  if (inputText.includes('optional')) return true;
-  if (functionName === sideloadConversationOperation && input.label.toLowerCase() === 'entry node id') return true;
+  if (inputText.includes('optional')) {
+    return true;
+  }
+  if (functionName === sideloadConversationOperation && input.label.toLowerCase() === 'entry node id') {
+    return true;
+  }
   return false;
 }
 
 function isInformationalEmptyArg(functionName: string, input: InputType): boolean {
-  if (functionName === 'Start Conversation Custom' && input.label.toLowerCase() === 'conversation sub header') return true;
-  if (functionName === setBattleTechViewscreenImageOperation && input.label.toLowerCase() === 'key') return true;
+  if (functionName === 'Start Conversation Custom' && input.label.toLowerCase() === 'conversation sub header') {
+    return true;
+  }
+  if (functionName === setBattleTechViewscreenImageOperation && input.label.toLowerCase() === 'key') {
+    return true;
+  }
   return false;
 }
 
@@ -528,7 +604,9 @@ function getEmptyRequiredArgDescription(functionName: string, inputPath: string,
     return `${inputPath} is empty. BattleTech treats this as clearing the conversation viewscreen, so check that the reset is intentional.`;
   }
 
-  if (severity === 'info') return `${inputPath} is empty. This is valid, but check that the missing value is intentional.`;
+  if (severity === 'info') {
+    return `${inputPath} is empty. This is valid, but check that the missing value is intentional.`;
+  }
   return `${inputPath} is empty. This may fail or do nothing at runtime.`;
 }
 
@@ -552,14 +630,20 @@ function scanActiveConversationIdDuplicates(
   const rawId = conversationAsset.conversation.idRef.id;
   const comparableId = getComparableId(rawId);
   const duplicateConversation = loadedConversationAssets.find((loadedConversationAsset) => {
-    if (loadedConversationAsset === conversationAsset) return false;
-    if (loadedConversationAsset.filepath === conversationAsset.filepath) return false;
+    if (loadedConversationAsset === conversationAsset) {
+      return false;
+    }
+    if (loadedConversationAsset.filepath === conversationAsset.filepath) {
+      return false;
+    }
 
     const loadedRawId = loadedConversationAsset.conversation.idRef.id;
     return loadedRawId === rawId || getComparableId(loadedRawId) === comparableId;
   });
 
-  if (duplicateConversation == null) return;
+  if (duplicateConversation == null) {
+    return;
+  }
 
   const duplicateRawId = duplicateConversation.conversation.idRef.id;
   const duplicateName = duplicateConversation.conversation.uiName || duplicateRawId;

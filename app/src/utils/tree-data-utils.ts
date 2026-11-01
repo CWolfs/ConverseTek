@@ -39,9 +39,11 @@ type TraversalHit = {
   path: TreePath;
 };
 
-type TraversalResult = TraversalHit | {
-  nextIndex: number;
-};
+type TraversalResult =
+  | TraversalHit
+  | {
+      nextIndex: number;
+    };
 
 function hasTraversalHit(result: TraversalResult): result is TraversalHit {
   return 'node' in result;
@@ -670,6 +672,7 @@ type AddNodeResult = {
  * Finds an insertion point at the requested depth and minimum tree index,
  * returning enough metadata for callers to focus the inserted node.
  */
+// eslint-disable-next-line complexity -- grandfathered, split later
 function addNodeAtDepthAndIndex({
   targetDepth,
   minimumTreeIndex,

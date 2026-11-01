@@ -30,7 +30,9 @@ export function regenerateConversationId(conversationAsset: ConversationAssetTyp
 */
 export function getId(idContainer: IdRef | { idRef: IdRef }): string {
   let id: string | null = null;
-  if (idContainer == null) return '-1';
+  if (idContainer == null) {
+    return '-1';
+  }
 
   if (typeof idContainer === 'object' && 'id' in idContainer) {
     id = idContainer.id;
@@ -45,7 +47,9 @@ export function createId(idRef: IdRef, newId: string): string {
   const { id } = idRef;
 
   // strip any colons - this is a special character for ids
-  if (newId.includes(':')) newId.replace(':', '');
+  if (newId.includes(':')) {
+    newId.replace(':', '');
+  }
 
   if (id.includes(':')) {
     const builtId = id.split(':')[0];
@@ -144,8 +148,12 @@ export function createResponseNode(): ElementNodeType {
 export function consolidateSpeaker(conversationAsset: ConversationAssetType): void {
   const { nodes } = conversationAsset.conversation;
   nodes.forEach((node) => {
-    if (node.sourceInSceneRef?.id === '') node.sourceInSceneRef = null;
-    if (node.sourceInSceneRef?.id) node.speakerOverrideId = '';
+    if (node.sourceInSceneRef?.id === '') {
+      node.sourceInSceneRef = null;
+    }
+    if (node.sourceInSceneRef?.id) {
+      node.speakerOverrideId = '';
+    }
   });
 }
 
@@ -213,7 +221,9 @@ export function removeAllOldFillerNodes(conversationAsset: ConversationAssetType
   // Remove all padding nodes first
   nodes.forEach((node, position) => {
     const { index } = node;
-    if (index === -1) nodesToRemove.push(position);
+    if (index === -1) {
+      nodesToRemove.push(position);
+    }
   });
 
   forEachRight(nodesToRemove, (position) => {

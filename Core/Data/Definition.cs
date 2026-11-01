@@ -1,17 +1,17 @@
-namespace ConverseTek.Data {
 
-  using System.Collections.Generic;
+using System.Collections.Generic;
 
-  public abstract class Definition {
-    public string Type { get; set; }
-    public List<string> View { get; set; }
+namespace ConverseTek.Data;
 
-    public Definition(string type) {
-      this.Type = type;
-    }
+public abstract class Definition {
+  public string Type { get; set; }
+  public List<string> View { get; set; }
 
-    public void AddView(string propertyName) {
-      this.View.Add(propertyName);
-    }
+  public Definition(string type) {
+    Type = type;
+  }
+
+  public void AddView(string propertyName) {
+    View.Add(propertyName);
   }
 }

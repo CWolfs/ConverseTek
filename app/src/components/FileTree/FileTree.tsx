@@ -29,7 +29,7 @@ const expandedRootTreeKeys = [rootTreeKey];
 function getConversationTreeData(dataStore: DataStore, data: { key: string; label: string }[] | null): TreeData {
   const { isConversationDirty, unsavedActiveConversationAsset: conversationAsset } = dataStore;
 
-  if (data)
+  if (data) {
     return data.map((item) => {
       const { key } = item;
       let style: CSSProperties = { visibility: 'hidden' };
@@ -54,6 +54,7 @@ function getConversationTreeData(dataStore: DataStore, data: { key: string; labe
         title: label,
       };
     });
+  }
   return [];
 }
 
@@ -79,7 +80,9 @@ const FileTree = ({ title, data = null, onSelected = () => {}, selectedKeys = []
 
   const onRightClickTree = ({ event, node }: TreeRightClickInfo) => {
     const eventKey = String(node.key);
-    if (eventKey === rootTreeKey) return;
+    if (eventKey === rootTreeKey) {
+      return;
+    }
 
     const item = data?.find((conversation) => conversation.key === eventKey);
     show({ event, props: { id: eventKey, title: item?.label || String(eventKey), selected: selectedKeys.includes(eventKey) } });
@@ -87,7 +90,9 @@ const FileTree = ({ title, data = null, onSelected = () => {}, selectedKeys = []
 
   const onSelectTree = (nextSelectedKeys: Key[], event: TreeSelectInfo) => {
     const selectedTreeKeys = nextSelectedKeys.map(String);
-    if (selectedTreeKeys.includes(rootTreeKey)) return;
+    if (selectedTreeKeys.includes(rootTreeKey)) {
+      return;
+    }
 
     onSelected(selectedTreeKeys, event);
   };
@@ -97,7 +102,15 @@ const FileTree = ({ title, data = null, onSelected = () => {}, selectedKeys = []
       {title && <h4 className="file-tree__title">{title}</h4>}
       <div className="file-tree__tree">
         <div className="file-tree__scroll">
-          <Tree showIcon showLine expandedKeys={expandedRootTreeKeys} treeData={treeData} onSelect={onSelectTree} selectedKeys={selectedKeys} onRightClick={onRightClickTree} />
+          <Tree
+            showIcon
+            showLine
+            expandedKeys={expandedRootTreeKeys}
+            treeData={treeData}
+            onSelect={onSelectTree}
+            selectedKeys={selectedKeys}
+            onRightClick={onRightClickTree}
+          />
         </div>
       </div>
     </div>

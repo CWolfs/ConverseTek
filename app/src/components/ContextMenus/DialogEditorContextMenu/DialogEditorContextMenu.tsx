@@ -36,6 +36,7 @@ function getAddLabel(type: string) {
   return addItemLabel;
 }
 
+// eslint-disable-next-line complexity -- grandfathered, split later
 export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string; onVisibilityChange: (flag: boolean) => void }) {
   const nodeStore = useStore<NodeStore>('node');
   const modalStore = useStore<ModalStore>('modal');
@@ -47,7 +48,9 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
   const { focusedTreeNode: focusedNode, clipboard } = nodeStore;
 
   // GUARD - no need to render the menu if there's no focused node
-  if (!focusedNode) return null;
+  if (!focusedNode) {
+    return null;
+  }
 
   const { id: focusedNodeId, type } = focusedNode;
   const { isCore, isIsolatedCore, isRoot, isNode, isResponse } = detectType(type);
@@ -59,49 +62,65 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
   const showBranchActions = isNode || isResponse || isRoot;
 
   const onAddClicked = ({ props }: ItemParams<EventProps>) => {
-    if (!props) return;
+    if (!props) {
+      return;
+    }
     nodeStore.addNodeByParentId(props.id);
     hideAll();
   };
 
   const onCopyClicked = ({ props }: ItemParams<EventProps>) => {
-    if (!props) return;
+    if (!props) {
+      return;
+    }
     nodeStore.setClipboard(props.id);
     hideAll();
   };
 
   const onPasteAsCopy = ({ props }: ItemParams<EventProps>) => {
-    if (!props) return;
+    if (!props) {
+      return;
+    }
     nodeStore.pasteAsCopyFromClipboard(props.id);
     hideAll();
   };
 
   const onPasteAsLink = ({ props }: ItemParams<EventProps>) => {
-    if (!props) return;
+    if (!props) {
+      return;
+    }
     nodeStore.pasteAsLinkFromClipboard(props.id);
     hideAll();
   };
 
   const onDeleteClicked = ({ props }: ItemParams<EventProps>) => {
-    if (!props) return;
+    if (!props) {
+      return;
+    }
     handleDeleteIntent({ props, nodeStore, modalStore });
     hideAll();
   };
 
   const onAiSuggestNode = ({ props }: ItemParams<EventProps>) => {
-    if (!props) return;
+    if (!props) {
+      return;
+    }
     modalStore.setModelContent(AiDraftModal, { mode: 'nodeSuggestion', selectedNodeId: props.id }, 'global1');
     hideAll();
   };
 
   const onAiExpandBranch = ({ props }: ItemParams<EventProps>) => {
-    if (!props) return;
+    if (!props) {
+      return;
+    }
     modalStore.setModelContent(AiDraftModal, { mode: 'branchExpansion', selectedNodeId: props.id }, 'global1');
     hideAll();
   };
 
   const onExpandBranch = ({ props }: ItemParams<EventProps>) => {
-    if (!props) return;
+    if (!props) {
+      return;
+    }
 
     const { id: nodeId } = props;
     nodeStore.setExpandOnNodeId(nodeId);
@@ -109,7 +128,9 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
   };
 
   const onCollapseBranch = ({ props }: ItemParams<EventProps>) => {
-    if (!props) return;
+    if (!props) {
+      return;
+    }
 
     const { id: nodeId } = props;
 
@@ -118,7 +139,9 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
   };
 
   const onCollapseOtherBranches = ({ props }: ItemParams<EventProps>) => {
-    if (!props) return;
+    if (!props) {
+      return;
+    }
 
     const { id: nodeId } = props;
 
@@ -127,7 +150,9 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
   };
 
   const onIsolateBranch = ({ props }: ItemParams<EventProps>) => {
-    if (!props) return;
+    if (!props) {
+      return;
+    }
 
     const { id: nodeId } = props;
 
@@ -136,7 +161,9 @@ export function DialogEditorContextMenu({ id, onVisibilityChange }: { id: string
   };
 
   const onExitIsolateBranch = ({ props }: ItemParams<EventProps>) => {
-    if (!props) return;
+    if (!props) {
+      return;
+    }
 
     nodeStore.setIsolateOnNodeId('exit');
     hideAll();

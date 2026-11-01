@@ -42,7 +42,9 @@ export function Header() {
       label: 'Save Conversation',
       onClick: () => {
         const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-        if (!conversationAsset) return;
+        if (!conversationAsset) {
+          return;
+        }
 
         void updateConversation(conversationAsset.conversation.idRef.id, conversationAsset).then(() => {
           void message.success('Save successful');
@@ -65,7 +67,9 @@ export function Header() {
       label: 'Export Conversation as JSON',
       onClick: () => {
         const { unsavedActiveConversationAsset: conversationAsset } = dataStore;
-        if (!conversationAsset) return;
+        if (!conversationAsset) {
+          return;
+        }
 
         void exportConversation(conversationAsset.conversation.idRef.id, conversationAsset).then(() => {
           void message.success('Export successful');

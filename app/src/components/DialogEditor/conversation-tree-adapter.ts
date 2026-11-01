@@ -14,7 +14,9 @@ export type ConversationTreeMoveResult = {
 };
 
 export function getConversationTreeNodeId(node: RSTNode): string {
-  if (node.id) return node.id;
+  if (node.id) {
+    return node.id;
+  }
 
   const linkIndex = node.linkIndex == null ? 'unknown' : node.linkIndex;
   return `${node.type}-${node.parentId || 'root'}-${linkIndex}`;
@@ -27,7 +29,9 @@ export function buildInitialOpenState<T extends RSTNode>(
   const openState: Record<string, boolean> = {};
 
   const visit = (nodes: readonly RSTNode[] | null | undefined) => {
-    if (nodes == null) return;
+    if (nodes == null) {
+      return;
+    }
 
     nodes.forEach((node) => {
       const children = node.children;
@@ -54,11 +58,10 @@ export function getConversationTreePath<T extends RSTNode>(node: NodeApi<T>): RS
   return path;
 }
 
-export function getConversationTreeScaffoldLines<T extends RSTNode>(
-  node: NodeApi<T>,
-  scaffoldBlockPxWidth = 44,
-): ConversationTreeScaffoldLine[] {
-  if (node.level <= 0) return [];
+export function getConversationTreeScaffoldLines<T extends RSTNode>(node: NodeApi<T>, scaffoldBlockPxWidth = 44): ConversationTreeScaffoldLine[] {
+  if (node.level <= 0) {
+    return [];
+  }
 
   const halfScaffoldBlockPxWidth = scaffoldBlockPxWidth / 2;
   const lines: ConversationTreeScaffoldLine[] = [
@@ -90,7 +93,9 @@ export function getConversationTreeScaffoldLines<T extends RSTNode>(
 
 export function findConversationTreeMaxRightEdge(node: HTMLElement | null): number {
   let maxRight = 0;
-  if (node == null) return maxRight;
+  if (node == null) {
+    return maxRight;
+  }
 
   const nodeRect = node.getBoundingClientRect();
   const scrollContainer = node.matches('.conversation-tree__list') ? node : node.querySelector<HTMLElement>('.conversation-tree__list');
@@ -104,12 +109,21 @@ export function findConversationTreeMaxRightEdge(node: HTMLElement | null): numb
   return maxRight;
 }
 
-export function moveConversationTreeNode(treeData: RSTNode[], nodeId: string, nextParentId: string | null, nextIndex: number): ConversationTreeMoveResult | null {
+export function moveConversationTreeNode(
+  treeData: RSTNode[],
+  nodeId: string,
+  nextParentId: string | null,
+  nextIndex: number,
+): ConversationTreeMoveResult | null {
   const removed = removeNode(treeData, nodeId);
-  if (removed == null) return null;
+  if (removed == null) {
+    return null;
+  }
 
   const insertion = insertNode(removed.treeData, { ...removed.node, parentId: nextParentId }, nextParentId, nextIndex);
-  if (insertion == null) return null;
+  if (insertion == null) {
+    return null;
+  }
 
   return {
     treeData: insertion.treeData,
@@ -130,7 +144,9 @@ function removeNode(treeData: RSTNode[], nodeId: string): { treeData: RSTNode[];
       };
     }
 
-    if (node.children == null) continue;
+    if (node.children == null) {
+      continue;
+    }
 
     const childResult = removeNode(node.children, nodeId);
     if (childResult != null) {
@@ -146,8 +162,15 @@ function removeNode(treeData: RSTNode[], nodeId: string): { treeData: RSTNode[];
   return null;
 }
 
-function insertNode(treeData: RSTNode[], nodeToInsert: RSTNode, nextParentId: string | null, nextIndex: number): { treeData: RSTNode[]; parentNode: RSTNode } | null {
-  if (nextParentId == null) return null;
+function insertNode(
+  treeData: RSTNode[],
+  nodeToInsert: RSTNode,
+  nextParentId: string | null,
+  nextIndex: number,
+): { treeData: RSTNode[]; parentNode: RSTNode } | null {
+  if (nextParentId == null) {
+    return null;
+  }
 
   for (let index = 0; index < treeData.length; index += 1) {
     const node = treeData[index];
@@ -162,7 +185,9 @@ function insertNode(treeData: RSTNode[], nodeToInsert: RSTNode, nextParentId: st
       };
     }
 
-    if (node.children == null) continue;
+    if (node.children == null) {
+      continue;
+    }
 
     const childResult = insertNode(node.children, nodeToInsert, nextParentId, nextIndex);
     if (childResult != null) {

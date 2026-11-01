@@ -1,31 +1,33 @@
-namespace ConverseTek.Services {
-  using System;
-  using System.IO;
-  using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using ConverseTek.Data;
+using ConverseTek.Definitions;
+using ConverseTek.Infrastructure;
 
-  using ConverseTek.Data;
-  using ConverseTek.Definitions;
-  using ConverseTek.Infrastructure;
+namespace ConverseTek.Services;
 
-  public class DefinitionService {
-    private static DefinitionService instance;
+public class DefinitionService {
+  private static DefinitionService instance;
 
-    public static DefinitionService getInstance() {
-      if (instance == null) instance = new DefinitionService();
-      return instance;
+  public static DefinitionService getInstance() {
+    if (instance == null) {
+      instance = new DefinitionService();
     }
 
-    public DefinitionService() {}
+    return instance;
+  }
 
-    public Dictionary<string, List<Definition>> LoadDefinitions() {
-      try {
-        string defsDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "defs");
-        return DefinitionSet.Load(defsDirectory).ToDictionary();
-      } catch (Exception e) {
-        Log.Error(e);
-      }
+  public DefinitionService() { }
 
-      return new Dictionary<string, List<Definition>>();
+  public Dictionary<string, List<Definition>> LoadDefinitions() {
+    try {
+      string defsDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "defs");
+      return DefinitionSet.Load(defsDirectory).ToDictionary();
+    } catch (Exception e) {
+      Log.Error(e);
     }
+
+    return new Dictionary<string, List<Definition>>();
   }
 }

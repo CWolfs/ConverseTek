@@ -3,10 +3,7 @@ export type DeleteConfirmationContent = {
   body: string | string[];
 };
 
-export function buildDeleteConfirmationContent(opts: {
-  isLink: boolean;
-  inboundLinkCount: number;
-}): DeleteConfirmationContent {
+export function buildDeleteConfirmationContent(opts: { isLink: boolean; inboundLinkCount: number }): DeleteConfirmationContent {
   const { isLink, inboundLinkCount } = opts;
 
   const title = `Are you sure you want to delete this ${isLink ? 'link' : 'node'}?`;

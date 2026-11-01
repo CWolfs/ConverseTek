@@ -1,10 +1,6 @@
 import type { ElementNodeType, PromptNodeType } from 'types';
 
-export function findInboundLinksToPromptNodeIndex(
-  roots: ElementNodeType[],
-  nodes: PromptNodeType[],
-  indexToFind: number,
-): ElementNodeType[] {
+export function findInboundLinksToPromptNodeIndex(roots: ElementNodeType[], nodes: PromptNodeType[], indexToFind: number): ElementNodeType[] {
   const linkers: ElementNodeType[] = [];
 
   roots.forEach((rootNode) => {

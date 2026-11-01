@@ -107,12 +107,7 @@ function getNodeLayoutStyle(style: CSSProperties): CSSProperties {
 
 function ConversationTreeRow({ attrs, innerRef, children }: RowRendererProps<RSTNode>) {
   return (
-    <div
-      {...attrs}
-      ref={innerRef}
-      className={classnames(attrs.className, 'conversation-tree__row')}
-      onFocus={(event) => event.stopPropagation()}
-    >
+    <div {...attrs} ref={innerRef} className={classnames(attrs.className, 'conversation-tree__row')} onFocus={(event) => event.stopPropagation()}>
       {children}
     </div>
   );
@@ -157,10 +152,7 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
   const expandFromCoreToNodeId = nodeStore.getExpandFromCoreToNodeId();
   const isolateOnNodeId = nodeStore.getIsolateOnNodeId();
   const speakerRevision = nodeStore.getSpeakerRevision();
-  const speakerProjectionByNodeId = useMemo(
-    () => buildPromptSpeakerProjectionMap(conversationAsset),
-    [conversationAsset, rebuild, speakerRevision],
-  );
+  const speakerProjectionByNodeId = useMemo(() => buildPromptSpeakerProjectionMap(conversationAsset), [conversationAsset, rebuild, speakerRevision]);
   const cameraProjectionByNodeId = useMemo(
     () => buildPromptCameraProjectionMap(conversationAsset),
     [conversationAsset, rebuild, dataStore.conversationMutationRevision],
@@ -181,11 +173,15 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
       const rootIds = (parentChildren || []).map((child) => child.id).filter((id): id is string => id != null);
       nodeStore.setRootNodesByIds(rootIds);
     } else if (isNode) {
-      if (nodeId == null || previousParentId == null || nextParentNodeId == null) return;
+      if (nodeId == null || previousParentId == null || nextParentNodeId == null) {
+        return;
+      }
 
       nodeStore.movePromptNode(nodeId, nextParentNodeId, previousParentId);
     } else if (isResponse) {
-      if (nodeId == null || nextParentNodeId == null) return;
+      if (nodeId == null || nextParentNodeId == null) {
+        return;
+      }
 
       nodeStore.moveResponseNode(
         nodeId,
@@ -197,13 +193,19 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
 
   const onMove = ({ dragIds, parentId, index }: { dragIds: string[]; parentId: string | null; index: number }) => {
     const dragId = dragIds[0];
-    if (dragId == null) return;
+    if (dragId == null) {
+      return;
+    }
 
     setTreeData((currentTreeData) => {
-      if (currentTreeData == null) return currentTreeData;
+      if (currentTreeData == null) {
+        return currentTreeData;
+      }
 
       const moveResult = moveConversationTreeNode(currentTreeData, dragId, parentId, index);
-      if (moveResult == null) return currentTreeData;
+      if (moveResult == null) {
+        return currentTreeData;
+      }
 
       commitMove(moveResult.movedNode, moveResult.nextParentNode, moveResult.previousParentId);
       return moveResult.treeData;
@@ -218,22 +220,30 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
   };
 
   const canDrop = (node: RSTNode, nextParent: RSTNode | null) => {
-    if (nextParent == null) return false;
+    if (nextParent == null) {
+      return false;
+    }
 
     const { type: nodeType } = node;
     const { isRoot, isNode, isResponse } = detectType(nodeType);
 
     const { type: nextParentType, id: parentId } = nextParent;
-    if (parentId == null) return false;
+    if (parentId == null) {
+      return false;
+    }
 
     let allowDrop = true;
     const nextNode = nodeStore.getNode(parentId);
 
     // Don't allow nodes to be moved under the same type
-    if (nodeType === nextParentType) allowDrop = false;
+    if (nodeType === nextParentType) {
+      allowDrop = false;
+    }
 
     // Only allow roots to be moved around under the top level node
-    if (allowDrop) allowDrop = (isRoot && nextParent.id === '0') || ((isNode || isResponse) && nextParent.id !== '0');
+    if (allowDrop) {
+      allowDrop = (isRoot && nextParent.id === '0') || ((isNode || isResponse) && nextParent.id !== '0');
+    }
 
     // Only allow dragging within the same parent for roots and responses,
     // for nodes, only allow if the target response is empty
@@ -254,7 +264,9 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
         }
 
         const { nextNodeIndex } = parent;
-        if (nextNodeIndex !== -1) allowDrop = false;
+        if (nextNodeIndex !== -1) {
+          allowDrop = false;
+        }
       }
     }
 
@@ -263,14 +275,18 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
 
   const disableDrop = ({ parentNode, dragNodes }: { parentNode: NodeApi<RSTNode>; dragNodes: NodeApi<RSTNode>[]; index: number }) => {
     const dragNode = dragNodes[0];
-    if (dragNode == null || parentNode == null || parentNode.isRoot) return true;
+    if (dragNode == null || parentNode == null || parentNode.isRoot) {
+      return true;
+    }
 
     return !canDrop(dragNode.data, parentNode.data);
   };
 
   const onClicked = (event: MouseEvent<HTMLElement>) => {
     const target = event.target as HTMLElement;
-    if (target.closest('.conversation-node-renderer__toggle-button')) return;
+    if (target.closest('.conversation-node-renderer__toggle-button')) {
+      return;
+    }
 
     if (!target.closest('.conversation-node-renderer__row-contents')) {
       nodeStore.clearActiveNode();
@@ -368,7 +384,9 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
   }, [conversationAsset]);
 
   useEffect(() => {
-    if (treeData == null || rebuild == false) return;
+    if (treeData == null || rebuild == false) {
+      return;
+    }
 
     // in isolation mode
     if (wholeTreeData.current && activeIsolateOnNodeId.current) {
@@ -390,14 +408,18 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
     setTimeout(() => {
       if (treeElement.current) {
         const calculatedTreeWidth = treeElement.current.clientWidth;
-        if (treeWidth !== calculatedTreeWidth) resize();
+        if (treeWidth !== calculatedTreeWidth) {
+          resize();
+        }
       }
     }, 50);
   }, [windowSize.width, windowSize.height, zoomLevel]);
 
   // Expand or collapse all nodes
   useEffect(() => {
-    if (treeData == null) return;
+    if (treeData == null) {
+      return;
+    }
 
     const updatedTreeData = toggleExpandedForAll({
       treeData,
@@ -412,7 +434,9 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
 
   // To collapse all other branches except the provided branch starting at the node id
   useEffect(() => {
-    if (collapseOthersOnNodeId == null || treeData == null) return;
+    if (collapseOthersOnNodeId == null || treeData == null) {
+      return;
+    }
 
     const node = nodeStore.getNode(collapseOthersOnNodeId);
     const updatedTreeData = collapseOtherBranches(treeData, node, (node: RSTNode) => {
@@ -425,7 +449,9 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
 
   // To collapse branch below provided node id
   useEffect(() => {
-    if (collapseOnNodeId == null || treeData == null) return;
+    if (collapseOnNodeId == null || treeData == null) {
+      return;
+    }
 
     const node = nodeStore.getNode(collapseOnNodeId);
     const updatedTreeData = collapseOrExpandBranches(
@@ -443,7 +469,9 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
 
   // To expand branch below provided node id
   useEffect(() => {
-    if (expandOnNodeId == null || treeData == null) return;
+    if (expandOnNodeId == null || treeData == null) {
+      return;
+    }
 
     const node = nodeStore.getNode(expandOnNodeId);
     const updatedTreeData = collapseOrExpandBranches(
@@ -461,7 +489,9 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
 
   // To expand from the core to the node id provided - used for autoscroll to uncover a node (e.g. follow link / go to active node)
   useEffect(() => {
-    if (expandFromCoreToNodeId == null || treeData == null) return;
+    if (expandFromCoreToNodeId == null || treeData == null) {
+      return;
+    }
 
     const node = nodeStore.getNode(expandFromCoreToNodeId);
     const updatedTreeData = expandFromCoreToNode(treeData, node, (node: RSTNode) => {
@@ -474,7 +504,9 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
 
   // To isolate a branch starting from the provided node id
   useEffect(() => {
-    if (isolateOnNodeId == null || treeData == null) return;
+    if (isolateOnNodeId == null || treeData == null) {
+      return;
+    }
 
     if (isolateOnNodeId === 'exit') {
       // Restore the whole tree
@@ -486,7 +518,9 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
       nodeStore.setRebuild(true);
     } else {
       const node = nodeStore.getNode(isolateOnNodeId);
-      if (node == null) return;
+      if (node == null) {
+        return;
+      }
 
       // Backup the whole tree
       if (!wholeTreeData.current) {
@@ -503,7 +537,9 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
 
   useControlWheel(treeElement, onControlWheel);
 
-  if (treeData === null) return null;
+  if (treeData === null) {
+    return null;
+  }
 
   const dialogeEditorClasses = classnames('dialog-editor', {
     'dialog-editor--isolated': wholeTreeData.current,
@@ -516,15 +552,18 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
     const { node, tree, style, dragHandle } = props;
     const treeNode = node.data;
     const treeIndex = node.rowIndex ?? 0;
-    if (treeNode.id) nodeStore.addNodeIdAndTreeIndexPair(treeNode.id, treeIndex);
+    if (treeNode.id) {
+      nodeStore.addNodeIdAndTreeIndexPair(treeNode.id, treeIndex);
+    }
 
     const draggedNode = tree.dragNode?.data || null;
     const nodeParent = getNodePathNode(node.parent);
-    const dragSource = (element: ReactElement) =>
-      cloneElement(element as ReactElement<{ ref?: Ref<HTMLDivElement> }>, { ref: dragHandle });
+    const dragSource = (element: ReactElement) => cloneElement(element as ReactElement<{ ref?: Ref<HTMLDivElement> }>, { ref: dragHandle });
     const toggleChildrenVisibility = ({ node: currentNode }: { node: RSTNode; path: RSTPath; treeIndex: number }) => {
       const arboristNode = tree.get(getConversationTreeNodeId(currentNode));
-      if (arboristNode == null) return;
+      if (arboristNode == null) {
+        return;
+      }
 
       arboristNode.toggle();
       nodeStore.setNodeExpansion(currentNode.id, !arboristNode.isOpen);
@@ -570,24 +609,25 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
     );
   };
   const TreeDragPreview = ({ mouse, id, isDragging }: DragPreviewProps) => {
-    if (!isDragging || mouse == null || id == null) return null;
+    if (!isDragging || mouse == null || id == null) {
+      return null;
+    }
 
     const treeNode = arboristTreeRef.current?.get(id)?.data;
-    if (treeNode == null) return null;
+    if (treeNode == null) {
+      return null;
+    }
     const treeRect = treeElement.current?.getBoundingClientRect();
-    if (treeRect == null) return null;
+    if (treeRect == null) {
+      return null;
+    }
 
     const storedNode = treeNode.id ? nodeStore.getNode(treeNode.id) : null;
     const { isRoot, isNode, isResponse, isLink } = detectType(treeNode.type);
     const anchorX = isLink ? 0 : dragPreviewHandleAnchorX;
     const previewX = (mouse.x - treeRect.left) / zoomLevel - anchorX;
     const previewY = (mouse.y - treeRect.top) / zoomLevel - dragPreviewHandleAnchorY;
-    const previewTitle =
-      storedNode == null
-        ? treeNode.title
-        : storedNode.type === 'node'
-        ? storedNode.text
-        : storedNode.responseText;
+    const previewTitle = storedNode == null ? treeNode.title : storedNode.type === 'node' ? storedNode.text : storedNode.responseText;
 
     return (
       <div className="conversation-tree__drag-preview-layer">
@@ -640,7 +680,9 @@ function DialogEditor({ conversationAsset, rebuild, expandAll }: { conversationA
             onMove={onMove}
             onToggle={(nodeId) => {
               const node = arboristTreeRef.current?.get(nodeId);
-              if (node) nodeStore.setNodeExpansion(node.data.id, node.isOpen);
+              if (node) {
+                nodeStore.setNodeExpansion(node.data.id, node.isOpen);
+              }
             }}
             renderRow={ConversationTreeRow}
             renderDragPreview={TreeDragPreview}

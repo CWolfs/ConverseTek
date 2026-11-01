@@ -30,11 +30,15 @@ const Conversations = () => {
   const { definitionCount } = defStore;
 
   useEffect(() => {
-    if (definitionCount <= 0) void getDefinitions();
+    if (definitionCount <= 0) {
+      void getDefinitions();
+    }
   }, [definitionCount]);
 
   useEffect(() => {
-    if (definitionCount > 0 && conversationAssets.size <= 0) void getConversations();
+    if (definitionCount > 0 && conversationAssets.size <= 0) {
+      void getConversations();
+    }
   }, [conversationAssets.size, definitionCount]);
 
   const mainView = activeConversationAsset ? <ConversationEditor conversationAsset={activeConversationAsset} /> : <SplashScreen />;
@@ -43,10 +47,14 @@ const Conversations = () => {
   const fitConversationListToContent = ({ containerSize, setPrimarySize }: SplitHandleDoubleClickContext) => {
     const treeDock = conversationTreeDockRef.current;
     const treeContent = conversationTreeContentRef.current;
-    if (treeDock == null || treeContent == null) return;
+    if (treeDock == null || treeContent == null) {
+      return;
+    }
 
     const treeElement = treeContent.querySelector<HTMLElement>('.ant-tree');
-    if (treeElement == null) return;
+    if (treeElement == null) {
+      return;
+    }
 
     const measuredTree = treeElement.cloneNode(true) as HTMLElement;
     measuredTree.style.position = 'fixed';
@@ -62,13 +70,12 @@ const Conversations = () => {
     const contentWidth = Math.ceil(Math.max(measuredTree.scrollWidth, measuredTree.getBoundingClientRect().width));
     document.body.removeChild(measuredTree);
 
-    if (contentWidth <= 0) return;
+    if (contentWidth <= 0) {
+      return;
+    }
 
     const dockStyle = window.getComputedStyle(treeDock);
-    const desiredWidth =
-      contentWidth +
-      Number.parseFloat(dockStyle.paddingLeft || '0') +
-      Number.parseFloat(dockStyle.paddingRight || '0');
+    const desiredWidth = contentWidth + Number.parseFloat(dockStyle.paddingLeft || '0') + Number.parseFloat(dockStyle.paddingRight || '0');
 
     setPrimarySize((desiredWidth / containerSize) * 100);
     setIsConversationListOpen(true);

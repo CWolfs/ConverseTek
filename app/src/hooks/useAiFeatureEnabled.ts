@@ -11,10 +11,14 @@ export function useAiFeatureEnabled(defaultEnabled = true): boolean {
 
     void getAiSettings()
       .then((settings) => {
-        if (isMounted) setEnabled(settings.enabled !== false);
+        if (isMounted) {
+          setEnabled(settings.enabled !== false);
+        }
       })
       .catch(() => {
-        if (isMounted) setEnabled(defaultEnabled);
+        if (isMounted) {
+          setEnabled(defaultEnabled);
+        }
       });
 
     const onSettingsUpdated = (event: Event) => {

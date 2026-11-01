@@ -23,10 +23,16 @@ function ViewableLogic({ logic }: Props) {
     const { value: key } = defStore.getArgValue(args.length > 0 ? args[0] : null);
     const { value } = defStore.getArgValue(args.length > 1 ? args[1] : null);
 
-    if (key == null || value == null) throw Error('renderResult key and/or value are null or undefined');
+    if (key == null || value == null) {
+      throw Error('renderResult key and/or value are null or undefined');
+    }
 
-    if (typeof key !== 'string') throw Error('Investigate: key should be a string');
-    if (typeof value !== 'string' && typeof value !== 'number') throw Error('Investigate: value should be a string or number');
+    if (typeof key !== 'string') {
+      throw Error('Investigate: key should be a string');
+    }
+    if (typeof value !== 'string' && typeof value !== 'number') {
+      throw Error('Investigate: value should be a string or number');
+    }
 
     const presetValue = defStore.getPresetValue(key, value);
     return <span>{presetValue} </span>;
@@ -42,13 +48,17 @@ function ViewableLogic({ logic }: Props) {
         args.map((arg, index) => {
           const argValue = defStore.getArgValue(arg);
 
-          if (argValue == null) throw Error('argValue is null or undefined');
+          if (argValue == null) {
+            throw Error('argValue is null or undefined');
+          }
 
           const { type, value } = argValue;
           const input = inputs[index];
           const { viewLabel, values: inputValues } = input;
 
-          if (type === 'operation' && value !== null) return <ObservingViewableLogic key={index} logic={value} />;
+          if (type === 'operation' && value !== null) {
+            return <ObservingViewableLogic key={index} logic={value} />;
+          }
 
           const { value: valueFromArg } = argValue;
           let displayValue = valueFromArg;
@@ -66,8 +76,12 @@ function ViewableLogic({ logic }: Props) {
 
           if (inputValues) {
             const inputVal = inputValues.find((inputValue) => {
-              if (inputValue.value === valueFromArg) return true;
-              if (Number(inputValue.value) === valueFromArg) return true;
+              if (inputValue.value === valueFromArg) {
+                return true;
+              }
+              if (Number(inputValue.value) === valueFromArg) {
+                return true;
+              }
               return false;
             });
 
@@ -87,7 +101,9 @@ function ViewableLogic({ logic }: Props) {
           }
 
           const renderedDisplayValue =
-            typeof displayValue === 'string' || typeof displayValue === 'number' || displayValue == null ? displayValue : JSON.stringify(displayValue);
+            typeof displayValue === 'string' || typeof displayValue === 'number' || displayValue == null
+              ? displayValue
+              : JSON.stringify(displayValue);
 
           return <span key={index}>{renderedDisplayValue} </span>;
         })}

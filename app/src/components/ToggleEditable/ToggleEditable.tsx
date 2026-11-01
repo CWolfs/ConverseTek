@@ -7,7 +7,9 @@ import './ToggleEditable.css';
 export function ToggleEditable({ children }: { children: ReactElement[] }) {
   const [editable] = useState(false);
 
-  if (!children) return null;
+  if (!children) {
+    return null;
+  }
 
   const renderFirstChild = (): ReactElement => children[0];
   const renderSecondChild = (): ReactElement => children[1];

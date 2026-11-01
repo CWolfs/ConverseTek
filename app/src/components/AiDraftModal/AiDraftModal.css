@@ -334,7 +334,9 @@
   border-radius: 4px;
   background: #fff;
   color: $textColourOnLight;
-  box-shadow: 0 0 0 1px rgba(31, 47, 67, 0.12), 0 2px 8px rgba(31, 47, 67, 0.06);
+  box-shadow:
+    0 0 0 1px rgba(31, 47, 67, 0.12),
+    0 2px 8px rgba(31, 47, 67, 0.06);
   transition-property: background, box-shadow;
   transition-duration: 140ms;
   transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
@@ -343,7 +345,9 @@
 .ai-draft-modal__context-path-item:hover,
 .ai-draft-modal__context-path-item:focus-within {
   background: #f6f8fb;
-  box-shadow: 0 0 0 1px rgba(31, 95, 139, 0.3), 0 4px 12px rgba(31, 47, 67, 0.1);
+  box-shadow:
+    0 0 0 1px rgba(31, 95, 139, 0.3),
+    0 4px 12px rgba(31, 47, 67, 0.1);
 }
 
 .ai-draft-modal__context-path-text {
@@ -402,7 +406,9 @@
   border-radius: 4px;
   background: #fff;
   color: $textColourOnLight;
-  box-shadow: inset 0 0 0 1px rgba(31, 47, 67, 0.12), 0 2px 8px rgba(31, 47, 67, 0.06);
+  box-shadow:
+    inset 0 0 0 1px rgba(31, 47, 67, 0.12),
+    0 2px 8px rgba(31, 47, 67, 0.06);
 }
 
 .ai-draft-modal__rewrite-context span {
@@ -571,7 +577,9 @@
   border: 0;
   border-radius: 4px;
   background: #fff;
-  box-shadow: 0 0 0 1px rgba(31, 47, 67, 0.12), 0 2px 8px rgba(31, 47, 67, 0.08);
+  box-shadow:
+    0 0 0 1px rgba(31, 47, 67, 0.12),
+    0 2px 8px rgba(31, 47, 67, 0.08);
   color: $textColourOnLight;
   cursor: pointer;
   text-align: left;
@@ -588,19 +596,25 @@
 .ai-draft-personalities__item:not(.ai-draft-personalities__item--active):focus {
   outline: none;
   background: #f6f8fb;
-  box-shadow: 0 0 0 1px rgba(31, 95, 139, 0.3), 0 4px 12px rgba(31, 47, 67, 0.12);
+  box-shadow:
+    0 0 0 1px rgba(31, 95, 139, 0.3),
+    0 4px 12px rgba(31, 47, 67, 0.12);
 }
 
 .ai-draft-personalities__item--active {
   outline: none;
   background: #eef6fb;
-  box-shadow: 0 0 0 2px rgba(31, 95, 139, 0.34), 0 4px 12px rgba(31, 47, 67, 0.14);
+  box-shadow:
+    0 0 0 2px rgba(31, 95, 139, 0.34),
+    0 4px 12px rgba(31, 47, 67, 0.14);
 }
 
 .ai-draft-personalities__item--active:hover,
 .ai-draft-personalities__item--active:focus {
   background: #eef6fb;
-  box-shadow: 0 0 0 2px rgba(31, 95, 139, 0.42), 0 4px 12px rgba(31, 47, 67, 0.14);
+  box-shadow:
+    0 0 0 2px rgba(31, 95, 139, 0.42),
+    0 4px 12px rgba(31, 47, 67, 0.14);
 }
 
 .ai-draft-personalities__item--disabled {
@@ -804,7 +818,9 @@
   border-radius: 4px;
   background: #fff;
   color: $textColourOnLight;
-  box-shadow: inset 0 0 0 1px rgba(31, 47, 67, 0.12), 0 2px 8px rgba(31, 47, 67, 0.08);
+  box-shadow:
+    inset 0 0 0 1px rgba(31, 47, 67, 0.12),
+    0 2px 8px rgba(31, 47, 67, 0.08);
 }
 
 .ai-draft-preview__text-card--version {
@@ -817,12 +833,16 @@
 .ai-draft-preview__text-card--version:hover,
 .ai-draft-preview__text-card--version:focus-within {
   background: #f6f8fb;
-  box-shadow: inset 0 0 0 1px rgba(31, 95, 139, 0.3), 0 4px 12px rgba(31, 47, 67, 0.12);
+  box-shadow:
+    inset 0 0 0 1px rgba(31, 95, 139, 0.3),
+    0 4px 12px rgba(31, 47, 67, 0.12);
 }
 
 .ai-draft-preview__text-card--selected {
   background: #eef6fb;
-  box-shadow: inset 0 0 0 2px rgba(31, 95, 139, 0.34), 0 4px 12px rgba(31, 47, 67, 0.14);
+  box-shadow:
+    inset 0 0 0 2px rgba(31, 95, 139, 0.34),
+    0 4px 12px rgba(31, 47, 67, 0.14);
 }
 
 .ai-draft-preview__text-card--empty {
@@ -833,7 +853,10 @@
   position: relative;
   padding-left: 16px;
   background: linear-gradient(90deg, #f0f3f7 0, #fafafa 100%);
-  box-shadow: inset 4px 0 0 #7d8da1, inset 0 0 0 1px rgba(31, 47, 67, 0.16), 0 2px 8px rgba(31, 47, 67, 0.06);
+  box-shadow:
+    inset 4px 0 0 #7d8da1,
+    inset 0 0 0 1px rgba(31, 47, 67, 0.16),
+    0 2px 8px rgba(31, 47, 67, 0.06);
 }
 
 .ai-draft-preview__text-card .ant-radio-wrapper {
@@ -863,7 +886,9 @@
   overflow: hidden;
   border-radius: 4px;
   background: #f3f6fa;
-  box-shadow: 0 0 0 1px rgba(31, 47, 67, 0.12), 0 10px 24px rgba(31, 47, 67, 0.12);
+  box-shadow:
+    0 0 0 1px rgba(31, 47, 67, 0.12),
+    0 10px 24px rgba(31, 47, 67, 0.12);
 }
 
 .ai-draft-preview-tree__toolbar {
@@ -977,7 +1002,9 @@
   border: 1px solid rgba(255, 255, 255, 0.92);
   border-radius: 3px;
   background: #1f2f43;
-  box-shadow: 0 0 0 2px rgba(22, 119, 194, 0.55), 0 8px 18px rgba(0, 0, 0, 0.28);
+  box-shadow:
+    0 0 0 2px rgba(22, 119, 194, 0.55),
+    0 8px 18px rgba(0, 0, 0, 0.28);
   color: #fff;
   font-size: 12px;
   font-weight: 400;

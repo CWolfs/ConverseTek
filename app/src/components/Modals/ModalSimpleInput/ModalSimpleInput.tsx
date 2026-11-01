@@ -30,11 +30,7 @@ type Props = {
 function renderTitleWithType(title: string, type: string) {
   void type;
 
-  return (
-    <>
-      {title}
-    </>
-  );
+  return <>{title}</>;
 }
 
 export function ModalSimpleInput({ globalModalId, type, title, header, body, width, buttons, closable = true }: Props) {
@@ -42,7 +38,9 @@ export function ModalSimpleInput({ globalModalId, type, title, header, body, wid
   const [inputValue, setInputValue] = useState<string>('');
 
   const onOk = (event: MouseEvent<HTMLElement>): void => {
-    if (buttons.onPositive) buttons.onPositive(event, inputValue.trim());
+    if (buttons.onPositive) {
+      buttons.onPositive(event, inputValue.trim());
+    }
     modalStore.closeModal(globalModalId);
   };
 
@@ -50,7 +48,9 @@ export function ModalSimpleInput({ globalModalId, type, title, header, body, wid
     modalStore.setTitle(renderTitleWithType(title, type), globalModalId);
 
     if (buttons?.positiveLabel) {
-      if (buttons.positiveType != null) modalStore.setOkType(buttons.positiveType, globalModalId);
+      if (buttons.positiveType != null) {
+        modalStore.setOkType(buttons.positiveType, globalModalId);
+      }
       modalStore.setOkLabel(buttons.positiveLabel, globalModalId);
       modalStore.setOnOk(onOk, globalModalId);
       modalStore.setShowOkButton(true, globalModalId);
@@ -60,7 +60,9 @@ export function ModalSimpleInput({ globalModalId, type, title, header, body, wid
     }
 
     if (buttons?.negativeLabel) {
-      if (buttons.negativeType != null) modalStore.setCancelType(buttons.negativeType, globalModalId);
+      if (buttons.negativeType != null) {
+        modalStore.setCancelType(buttons.negativeType, globalModalId);
+      }
       modalStore.setOnCancel(buttons.onNegative, globalModalId);
       modalStore.setCancelLabel(buttons.negativeLabel, globalModalId);
       modalStore.setShowCancelButton(true, globalModalId);

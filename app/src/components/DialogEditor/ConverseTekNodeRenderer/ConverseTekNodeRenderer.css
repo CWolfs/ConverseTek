@@ -730,7 +730,9 @@
 .rst__collapseButton:focus,
 .rst__expandButton:focus {
   outline: none;
-  box-shadow: 0 0 0 1px #000, 0 0 1px 3px #83bef9;
+  box-shadow:
+    0 0 0 1px #000,
+    0 0 1px 3px #83bef9;
 }
 .rst__collapseButton:hover:not(:active),
 .rst__expandButton:hover:not(:active) {

@@ -89,6 +89,7 @@ export function parseAiDraft(draftJson: string): AiConversationDraftType {
   return JSON.parse(draftJson) as AiConversationDraftType;
 }
 
+// eslint-disable-next-line complexity -- grandfathered, split later
 export function validateAiDraft(
   draft: AiConversationDraftType | null,
   operations: OperationDefinitionType[],
@@ -142,10 +143,14 @@ export function validateAiDraft(
 
   const nodeKeys = new Set<string>();
   structuralDraft.nodes?.forEach((node) => {
-    if (node.key && node.key.trim() !== '') nodeKeys.add(node.key);
+    if (node.key && node.key.trim() !== '') {
+      nodeKeys.add(node.key);
+    }
   });
   const externalTargetKeys =
-    mode === 'branchExpansion' ? buildExistingTargetKeySet(existingConversationAsset?.conversation.nodes || [], structuralDraft.warnings || []) : new Set<string>();
+    mode === 'branchExpansion'
+      ? buildExistingTargetKeySet(existingConversationAsset?.conversation.nodes || [], structuralDraft.warnings || [])
+      : new Set<string>();
 
   const seenNodeKeys = new Set<string>();
   structuralDraft.nodes?.forEach((node) => {
@@ -169,9 +174,7 @@ export function validateAiDraft(
   });
 
   if (mode === 'fullConversation') {
-    structuralDraft.roots?.forEach((root, index) =>
-      validateChoice(`root ${index + 1}`, root, nodeKeys, operations, errors, warnings, index === 0),
-    );
+    structuralDraft.roots?.forEach((root, index) => validateChoice(`root ${index + 1}`, root, nodeKeys, operations, errors, warnings, index === 0));
   } else if (mode === 'branchExpansion' && activeNode?.type === 'node') {
     const promptChoice = getBranchExpansionPromptChoice(structuralDraft);
     if (promptChoice != null) {
@@ -180,7 +183,9 @@ export function validateAiDraft(
     }
   }
   structuralDraft.warnings?.forEach((warning) => {
-    if (mode === 'branchExpansion' && isTargetMappingWarning(warning)) return;
+    if (mode === 'branchExpansion' && isTargetMappingWarning(warning)) {
+      return;
+    }
     warnings.push(`AI warning: ${warning}`);
   });
 
@@ -188,7 +193,9 @@ export function validateAiDraft(
 }
 
 function validateSpeaker(nodeKey: string, speaker: { type: string; id: string }, warnings: string[]): void {
-  if (speaker.type === 'none') return;
+  if (speaker.type === 'none') {
+    return;
+  }
 
   if (!speaker.id || speaker.id.trim() === '') {
     warnings.push(`Prompt node '${nodeKey}' has a speaker type but no speaker id.`);
@@ -236,7 +243,9 @@ function validateOperations(
   errors: string[],
   warnings: string[],
 ): void {
-  if (!intents) return;
+  if (!intents) {
+    return;
+  }
 
   intents.forEach((intent, intentIndex) => {
     const operationLabel = `${label} operation ${intentIndex + 1}`;
@@ -251,7 +260,14 @@ function validateOperations(
     }
 
     intent.args.forEach((arg, argIndex) => {
-      validateOperationArg(`${operationLabel} '${intent.functionName}' arg ${argIndex + 1}`, arg, definition.inputs[argIndex], operations, errors, warnings);
+      validateOperationArg(
+        `${operationLabel} '${intent.functionName}' arg ${argIndex + 1}`,
+        arg,
+        definition.inputs[argIndex],
+        operations,
+        errors,
+        warnings,
+      );
     });
   });
 }
@@ -264,7 +280,9 @@ function validateOperationArg(
   errors: string[],
   warnings: string[],
 ): void {
-  if (input == null) return;
+  if (input == null) {
+    return;
+  }
 
   if (!input.types.includes(arg.type)) {
     errors.push(`${label} uses type '${arg.type}', but the definition allows ${input.types.join(', ')}.`);
@@ -275,7 +293,9 @@ function validateOperationArg(
     warnings.push(`${label} uses type '${arg.type}', but '${input.preferredType}' is preferred for generated drafts.`);
   }
 
-  if (arg.type !== 'operation') return;
+  if (arg.type !== 'operation') {
+    return;
+  }
 
   if (!isAiDraftOperationCall(arg.value)) {
     errors.push(`${label} is an operation argument but does not contain a nested operation call.`);
@@ -286,7 +306,9 @@ function validateOperationArg(
 }
 
 function isAiDraftOperationCall(value: AiDraftArgType['value']): value is AiDraftOperationCallType {
-  if (value == null || typeof value !== 'object') return false;
+  if (value == null || typeof value !== 'object') {
+    return false;
+  }
 
   const maybeCall = value as Partial<AiDraftOperationCallType>;
   return typeof maybeCall.functionName === 'string' && Array.isArray(maybeCall.args);
@@ -334,9 +356,7 @@ export function buildConversationAssetFromDraft(draft: AiConversationDraftType, 
   const context = createDraftBuildContext(draft);
   const nodes = buildPromptNodeShells(draft);
   conversationAsset.conversation.nodes = nodes;
-  conversationAsset.conversation.roots = draft.roots.map((root, index) =>
-    buildElementNode(root, 'root', '0', nodes, context, index === 0),
-  );
+  conversationAsset.conversation.roots = draft.roots.map((root, index) => buildElementNode(root, 'root', '0', nodes, context, index === 0));
   populatePromptNodeBranches(draft, nodes, context);
 
   return conversationAsset;
@@ -349,8 +369,12 @@ export function buildPreviewConversationAssetFromDraft(
   activeNode: PromptNodeType | ElementNodeType | null,
   existingConversationAsset: ConversationAssetType | null = null,
 ): ConversationAssetType | null {
-  if (mode === 'nodeSuggestion') return null;
-  if (mode === 'fullConversation') return buildConversationAssetFromDraft(draft, workingDirectory);
+  if (mode === 'nodeSuggestion') {
+    return null;
+  }
+  if (mode === 'fullConversation') {
+    return buildConversationAssetFromDraft(draft, workingDirectory);
+  }
 
   const conversationAsset = createConversation(workingDirectory);
   const structuralDraft = mode === 'branchExpansion' ? normaliseBranchExpansionDraft(draft) : draft;
@@ -410,9 +434,7 @@ export function buildBranchExpansionPatch(
   }
 
   const parentElementNode =
-    activeNode.type === 'node'
-      ? buildPromptBranchResponse(structuralDraft, activeNode, nodes, context)
-      : cloneElementNode(activeNode);
+    activeNode.type === 'node' ? buildPromptBranchResponse(structuralDraft, activeNode, nodes, context) : cloneElementNode(activeNode);
 
   if (activeNode.type !== 'node') {
     parentElementNode.nextNodeIndex = nodes[0].index;
@@ -443,7 +465,9 @@ export function getSuggestedNodeTexts(draft: AiConversationDraftType, activeNode
   }
 
   const rootTexts = (draft.roots || []).map((root) => root.text || '').filter((text) => text.trim() !== '');
-  if (rootTexts.length > 0) return rootTexts;
+  if (rootTexts.length > 0) {
+    return rootTexts;
+  }
 
   return (draft.nodes || [])
     .flatMap((node) => node.choices || [])
@@ -452,7 +476,9 @@ export function getSuggestedNodeTexts(draft: AiConversationDraftType, activeNode
 }
 
 export function getOriginalNodeText(activeNode: PromptNodeType | ElementNodeType | null): string {
-  if (activeNode?.type === 'node') return activeNode.text || '';
+  if (activeNode?.type === 'node') {
+    return activeNode.text || '';
+  }
   return activeNode?.responseText || '';
 }
 
@@ -501,7 +527,9 @@ function normaliseBranchExpansionDraft(draft: AiConversationDraftType): AiConver
     }
   });
 
-  if (redirectByKey.size === 0) return draft;
+  if (redirectByKey.size === 0) {
+    return draft;
+  }
 
   return {
     ...draft,
@@ -516,9 +544,15 @@ function normaliseBranchExpansionDraft(draft: AiConversationDraftType): AiConver
 }
 
 function isBlankConnectorDraftNode(node: AiDraftNodeType): boolean {
-  if (node.text?.trim() !== '') return false;
-  if ((node.actions || []).length > 0) return false;
-  if ((node.choices || []).length !== 1) return false;
+  if (node.text?.trim() !== '') {
+    return false;
+  }
+  if ((node.actions || []).length > 0) {
+    return false;
+  }
+  if ((node.choices || []).length !== 1) {
+    return false;
+  }
 
   const onlyChoice = node.choices[0];
   return !onlyChoice.endsConversation && (onlyChoice.conditions || []).length === 0 && (onlyChoice.actions || []).length === 0;
@@ -576,8 +610,12 @@ function buildExistingTargetKeySet(existingNodes: PromptNodeType[], targetMappin
 
 function addExistingTargetKey(indexByKey: Map<string, number>, key: string | null | undefined, index: number): void {
   const normalisedKey = key?.trim();
-  if (!normalisedKey) return;
-  if (!indexByKey.has(normalisedKey)) indexByKey.set(normalisedKey, index);
+  if (!normalisedKey) {
+    return;
+  }
+  if (!indexByKey.has(normalisedKey)) {
+    indexByKey.set(normalisedKey, index);
+  }
 }
 
 function addDerivedExistingTargetAliases(indexByKey: Map<string, number>, existingNodes: PromptNodeType[]): void {
@@ -598,7 +636,9 @@ function addDerivedExistingTargetAliases(indexByKey: Map<string, number>, existi
   });
 
   aliasCandidates.forEach((indexes, alias) => {
-    if (indexes.size !== 1) return;
+    if (indexes.size !== 1) {
+      return;
+    }
     const [index] = Array.from(indexes);
     addExistingTargetKey(indexByKey, alias, index);
     addExistingTargetKey(indexByKey, `existing_${alias}`, index);
@@ -607,8 +647,12 @@ function addDerivedExistingTargetAliases(indexByKey: Map<string, number>, existi
 }
 
 function addDerivedExistingAliasCandidate(aliasCandidates: Map<string, Set<number>>, alias: string, index: number): void {
-  if (!alias) return;
-  if (!aliasCandidates.has(alias)) aliasCandidates.set(alias, new Set<number>());
+  if (!alias) {
+    return;
+  }
+  if (!aliasCandidates.has(alias)) {
+    aliasCandidates.set(alias, new Set<number>());
+  }
   aliasCandidates.get(alias)?.add(index);
 }
 
@@ -632,7 +676,9 @@ function getExistingAliasTokens(value: string): string[] {
 }
 
 function getNextPromptNodeIndex(existingNodes: PromptNodeType[]): number {
-  if (existingNodes.length === 0) return 0;
+  if (existingNodes.length === 0) {
+    return 0;
+  }
   return Math.max(...existingNodes.map((node) => node.index)) + 1;
 }
 
@@ -660,8 +706,12 @@ function extractTargetMappingAliases(warning: string): { alias: string; index: n
 }
 
 function isTargetMappingWarning(warning: string): boolean {
-  if (extractTargetMappingAliases(warning).length > 0) return true;
-  if (/\bexisting_[A-Za-z0-9-]{8,}\b/i.test(warning) && /\b(target|key|refer|existing prompt|existing conversation node|id)\b/i.test(warning)) return true;
+  if (extractTargetMappingAliases(warning).length > 0) {
+    return true;
+  }
+  if (/\bexisting_[A-Za-z0-9-]{8,}\b/i.test(warning) && /\b(target|key|refer|existing prompt|existing conversation node|id)\b/i.test(warning)) {
+    return true;
+  }
   return /\bexisting_node_\d+\b/i.test(warning) && /\b(target|key|map|refer|existing conversation node|index)/i.test(warning);
 }
 
@@ -691,36 +741,44 @@ function buildElementNode(
   if (targetIndex !== -1 && !useAuxiliaryLink) {
     context.structuralParentByIndex.set(targetIndex, getId(elementNode));
     const targetNode = nodes.find((node) => node.index === targetIndex);
-    if (targetNode) targetNode.parentId = getId(elementNode);
+    if (targetNode) {
+      targetNode.parentId = getId(elementNode);
+    }
   }
 
   return elementNode;
 }
 
-function resolveTargetIndex(
-  targetKey: string,
-  nodes: PromptNodeType[],
-  context: DraftBuildContext,
-): number {
-  if (!targetKey) return -1;
+function resolveTargetIndex(targetKey: string, nodes: PromptNodeType[], context: DraftBuildContext): number {
+  if (!targetKey) {
+    return -1;
+  }
   const normalisedTargetKey = targetKey.trim();
   const indexByDraftKey = context.indexByKey.get(normalisedTargetKey);
-  if (indexByDraftKey !== undefined) return indexByDraftKey;
+  if (indexByDraftKey !== undefined) {
+    return indexByDraftKey;
+  }
 
   const indexByExistingKey = context.externalIndexByKey.get(normalisedTargetKey);
-  if (indexByExistingKey !== undefined) return indexByExistingKey;
+  if (indexByExistingKey !== undefined) {
+    return indexByExistingKey;
+  }
 
   const targetNode = nodes.find((node) => getId(node) === normalisedTargetKey || node.comment === normalisedTargetKey);
   return targetNode?.index ?? -1;
 }
 
 function normaliseDraftComment(comment: string | null | undefined): string {
-  if (!comment) return '';
+  if (!comment) {
+    return '';
+  }
   return comment.trim();
 }
 
 function buildOperationsContainer(intents: AiDraftOperationIntentType[] | null | undefined): { ops: OperationCallType[] | null } | null {
-  if (!intents || intents.length === 0) return null;
+  if (!intents || intents.length === 0) {
+    return null;
+  }
   return {
     ops: intents.map(buildOperationCall),
   };
@@ -761,13 +819,19 @@ function getBranchExpansionPromptChoice(draft: AiConversationDraftType): AiDraft
 
 function getBranchExpansionResponseText(draft: AiConversationDraftType): string {
   const rootText = getBranchExpansionPromptChoice(draft)?.text?.trim();
-  if (rootText) return rootText;
+  if (rootText) {
+    return rootText;
+  }
 
   const titleText = normaliseResponseFallback(draft.title);
-  if (titleText) return titleText;
+  if (titleText) {
+    return titleText;
+  }
 
   const summaryText = normaliseResponseFallback(draft.summary);
-  if (summaryText) return summaryText;
+  if (summaryText) {
+    return summaryText;
+  }
 
   return 'Open new branch';
 }
@@ -778,7 +842,9 @@ function getBranchExpansionResponseComment(draft: AiConversationDraftType): stri
 
 function normaliseResponseFallback(value: string | null | undefined): string {
   const trimmedValue = value?.trim();
-  if (!trimmedValue) return '';
+  if (!trimmedValue) {
+    return '';
+  }
 
   const firstSentence = trimmedValue.split(/[.!?]/)[0]?.trim() || trimmedValue;
   return firstSentence.length > 48 ? `${firstSentence.slice(0, 45).trim()}...` : firstSentence;

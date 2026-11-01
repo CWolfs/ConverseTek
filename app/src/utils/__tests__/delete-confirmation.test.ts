@@ -55,7 +55,7 @@ describe('CT-128: warn on prompt-node deletion when linked', () => {
       expect(linkers[0]).toBe(rootLinker);
     });
 
-    it("ignores a structural parent (nextNodeIndex matches but auxiliaryLink is false)", () => {
+    it('ignores a structural parent (nextNodeIndex matches but auxiliaryLink is false)', () => {
       const structural = makeResponse({ nextNodeIndex: 5, auxiliaryLink: false });
       const owner = makePromptNode(2, [structural]);
       const target = makePromptNode(5, []);

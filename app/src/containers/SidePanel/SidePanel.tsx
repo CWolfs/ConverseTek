@@ -33,7 +33,9 @@ function SidePanel() {
     return () => window.clearTimeout(timeoutId);
   }, [options.isVisible]);
 
-  if (!shouldRender || panel == null) return null;
+  if (!shouldRender || panel == null) {
+    return null;
+  }
 
   const setPanelWidth = (nextWidth: number) => {
     sidePanelStore.setWidth(`${clampPanelWidth(nextWidth)}px`);
@@ -45,11 +47,15 @@ function SidePanel() {
   };
 
   const beginResize = (event: PointerEvent<HTMLDivElement>) => {
-    if (event.button !== 0) return;
+    if (event.button !== 0) {
+      return;
+    }
 
     event.preventDefault();
     const sidePanelElement = event.currentTarget.closest<HTMLElement>('.side-panel');
-    if (sidePanelElement == null) return;
+    if (sidePanelElement == null) {
+      return;
+    }
 
     const panelRight = sidePanelElement.getBoundingClientRect().right;
     const target = event.currentTarget;
@@ -61,7 +67,9 @@ function SidePanel() {
     };
 
     const handleUp = (upEvent: globalThis.PointerEvent) => {
-      if (target.hasPointerCapture(upEvent.pointerId)) target.releasePointerCapture(upEvent.pointerId);
+      if (target.hasPointerCapture(upEvent.pointerId)) {
+        target.releasePointerCapture(upEvent.pointerId);
+      }
       document.body.classList.remove('side-panel-resizing');
       window.removeEventListener('pointermove', handleMove);
       window.removeEventListener('pointerup', handleUp);
@@ -105,7 +113,13 @@ function SidePanel() {
       />
       <header className="side-panel__header">
         <div className="side-panel__title">{options.title}</div>
-        <Button aria-label="Close side panel" className="side-panel__close" type="text" icon={<CloseOutlined />} onClick={sidePanelStore.closePanel} />
+        <Button
+          aria-label="Close side panel"
+          className="side-panel__close"
+          type="text"
+          icon={<CloseOutlined />}
+          onClick={sidePanelStore.closePanel}
+        />
       </header>
       <div className="side-panel__content">{isValidElement(panel) ? panel : null}</div>
     </aside>

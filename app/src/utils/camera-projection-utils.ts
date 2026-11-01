@@ -74,19 +74,25 @@ function normaliseCameraTarget(target: string): string {
 
 function getArgStringValue(op: OperationCallType): string {
   const arg = op.args[0];
-  if (arg == null) return '';
+  if (arg == null) {
+    return '';
+  }
 
   return arg.stringValue || '';
 }
 
 function getCameraKey(camera: CameraReference | null): string {
-  if (camera == null) return noCameraKey;
+  if (camera == null) {
+    return noCameraKey;
+  }
 
   return `${camera.cameraLockTarget || ''}:${camera.hardLockTarget || ''}`;
 }
 
 function parseCameraKey(key: string): EffectiveCameraReference | null {
-  if (key === noCameraKey) return null;
+  if (key === noCameraKey) {
+    return null;
+  }
 
   const [cameraLockTarget, hardLockTarget] = key.split(':');
   if (hardLockTarget) {
@@ -131,7 +137,9 @@ function applyOperation(op: OperationCallType, camera: CameraReference | null): 
 
   if (op.functionName === cameraHardLockAction) {
     const target = normaliseCameraTarget(getArgStringValue(op));
-    if (!target) return camera;
+    if (!target) {
+      return camera;
+    }
 
     return {
       cameraLockTarget: validCameraTargets.has(target) ? target : null,
@@ -143,7 +151,9 @@ function applyOperation(op: OperationCallType, camera: CameraReference | null): 
 }
 
 function applyActions(actions: { ops: OperationCallType[] | null } | null, camera: CameraReference | null): CameraReference | null {
-  if (actions?.ops == null) return camera;
+  if (actions?.ops == null) {
+    return camera;
+  }
 
   return actions.ops.reduce((currentCamera, op) => applyOperation(op, currentCamera), camera);
 }
@@ -153,7 +163,9 @@ function hasCameraAction(linkOrNode: ElementNodeType | PromptNodeType): boolean 
 }
 
 function getTargetNode(conversationAsset: ConversationAssetType, link: ElementNodeType): PromptNodeType | null {
-  if (link.nextNodeIndex < 0) return null;
+  if (link.nextNodeIndex < 0) {
+    return null;
+  }
 
   return conversationAsset.conversation.nodes[link.nextNodeIndex] || null;
 }
@@ -174,14 +186,20 @@ function buildProjectedProjection(cameraKeys: Set<string>): CameraProjection | n
   const cameras = [...cameraKeys].map(parseCameraKey);
   const activeCameras = cameras.filter((camera): camera is EffectiveCameraReference => camera != null);
 
-  if (activeCameras.length === 0) return null;
-  if (cameras.length === 1 && activeCameras.length === 1) return buildProjection(activeCameras[0]);
+  if (activeCameras.length === 0) {
+    return null;
+  }
+  if (cameras.length === 1 && activeCameras.length === 1) {
+    return buildProjection(activeCameras[0]);
+  }
 
   return {
     label: 'Multiple',
     title: `Possible camera states: ${cameras
       .map((camera) => {
-        if (camera == null) return 'unlocked';
+        if (camera == null) {
+          return 'unlocked';
+        }
 
         return `${camera.hardLock ? 'hard lock' : 'lock'} ${formatCameraTarget(camera.target)}`;
       })
@@ -203,14 +221,20 @@ export function buildPromptCameraProjectionMap(conversationAsset: ConversationAs
   while (queue.length > 0) {
     const { link, inheritedCamera } = queue.shift() as { link: ElementNodeType; inheritedCamera: CameraReference | null };
     const cameraAfterLink = applyActions(link.actions, inheritedCamera);
-    if (hasCameraAction(link)) directCameraByElementId.set(getId(link), cameraAfterLink);
+    if (hasCameraAction(link)) {
+      directCameraByElementId.set(getId(link), cameraAfterLink);
+    }
 
     const targetNode = getTargetNode(conversationAsset, link);
-    if (targetNode == null) continue;
+    if (targetNode == null) {
+      continue;
+    }
 
     const cameraAfterNode = applyActions(targetNode.actions, cameraAfterLink);
     const visitKey = `${getId(targetNode)}:${getCameraKey(cameraAfterNode)}`;
-    if (visited.has(visitKey)) continue;
+    if (visited.has(visitKey)) {
+      continue;
+    }
     visited.add(visitKey);
 
     const targetNodeId = getId(targetNode);
@@ -229,12 +253,16 @@ export function buildPromptCameraProjectionMap(conversationAsset: ConversationAs
   const projections = new Map<string, CameraProjection>();
   directCameraByElementId.forEach((camera, elementId) => {
     const projection = buildProjectedProjection(new Set([getCameraKey(camera)]));
-    if (projection) projections.set(elementId, projection);
+    if (projection) {
+      projections.set(elementId, projection);
+    }
   });
 
   nodes.forEach((node) => {
     const projection = buildProjectedProjection(possibleCamerasByNodeId.get(getId(node)) || new Set([noCameraKey]));
-    if (projection) projections.set(getId(node), projection);
+    if (projection) {
+      projections.set(getId(node), projection);
+    }
   });
 
   return projections;

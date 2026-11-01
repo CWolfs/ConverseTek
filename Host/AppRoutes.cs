@@ -1,16 +1,16 @@
-namespace ConverseTek.Host {
-  using ConverseTek.Controllers;
+using ConverseTek.Controllers;
 
-  public static class AppRoutes {
-    public static AppRouteDispatcher CreateDefaultDispatcher() {
-      AppRouteDispatcher dispatcher = new AppRouteDispatcher();
+namespace ConverseTek.Host;
 
-      new FileSystemController().RegisterRoutes(dispatcher);
-      new DefinitionController().RegisterRoutes(dispatcher);
-      new ConversationController().RegisterRoutes(dispatcher);
-      new AiController().RegisterRoutes(dispatcher);
+public static class AppRoutes {
+  public static AppRouteDispatcher CreateDefaultDispatcher() {
+    AppRouteDispatcher dispatcher = new AppRouteDispatcher();
 
-      return dispatcher;
-    }
+    new FileSystemController().RegisterRoutes(dispatcher);
+    new DefinitionController().RegisterRoutes(dispatcher);
+    new ConversationController().RegisterRoutes(dispatcher);
+    new AiController().RegisterRoutes(dispatcher);
+
+    return dispatcher;
   }
 }

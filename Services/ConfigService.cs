@@ -1,272 +1,375 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Windows;
-using System.Collections.Generic;
-
 using ConverseTek.Infrastructure;
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using ConverseTek.Data;
 
-namespace ConverseTek.Services {
-  using ConverseTek.Data;
+namespace ConverseTek.Services;
 
-  public class ConfigService {
-    private static ConfigService instance;
-    private static string BASE_DIRECTORY = AppDomain.CurrentDomain.BaseDirectory;
-    private static string CONFIG_PATH = $"{BASE_DIRECTORY}/config";
+public class ConfigService {
+  private static ConfigService instance;
+  private static readonly string BaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+  private static readonly string ConfigPath = $"{BaseDirectory}/config";
 
-    private static string QUICKLINKS_PATH = $"{CONFIG_PATH}/quicklinks.json";
-    private static string COLOURS_PATH = $"{CONFIG_PATH}/colours.json";
-    private static string AI_PATH = $"{CONFIG_PATH}/ai.json";
-    private static string AI_PERSONALITIES_PATH = $"{CONFIG_PATH}/ai-personalities.json";
+  private static readonly string QuicklinksPath = $"{ConfigPath}/quicklinks.json";
+  private static readonly string ColoursPath = $"{ConfigPath}/colours.json";
+  private static readonly string AiPath = $"{ConfigPath}/ai.json";
+  private static readonly string AiPersonalitiesPath = $"{ConfigPath}/ai-personalities.json";
 
-    public static ConfigService getInstance() {
-      if (instance == null) instance = new ConfigService();
-      return instance;
+  public static ConfigService getInstance() {
+    if (instance == null) {
+      instance = new ConfigService();
     }
 
-    private ConfigService() {
-      if (!Directory.Exists(CONFIG_PATH)) {
-        Directory.CreateDirectory(CONFIG_PATH);
+    return instance;
+  }
+
+  private ConfigService() {
+    if (!Directory.Exists(ConfigPath)) {
+      Directory.CreateDirectory(ConfigPath);
+    }
+
+    // Create quicklinks if it doesn't exist
+    if (!File.Exists(QuicklinksPath)) {
+      File.WriteAllText(QuicklinksPath, JsonConvert.SerializeObject(new object { }, Formatting.Indented));
+    }
+
+    // Create quicklinks if it doesn't exist
+    if (!File.Exists(ColoursPath)) {
+      File.WriteAllText(ColoursPath, JsonConvert.SerializeObject(new object { }, Formatting.Indented));
+    }
+
+    if (!File.Exists(AiPath)) {
+      SaveAiSettings(AiSettings.CreateDefault());
+    }
+  }
+
+  public Dictionary<string, string> GetQuickLinksConfig() {
+    try {
+      if (!File.Exists(QuicklinksPath)) {
+        File.WriteAllText(QuicklinksPath, JsonConvert.SerializeObject(new object { }, Formatting.Indented));
       }
 
-      // Create quicklinks if it doesn't exist
-      if (!File.Exists(QUICKLINKS_PATH)) {
-        File.WriteAllText(QUICKLINKS_PATH, JsonConvert.SerializeObject(new object { }, Formatting.Indented));
+      string json = File.ReadAllText(QuicklinksPath);
+      Log.Debug("[ConfigService] Quick links are " + json);
+      Dictionary<string, string> quickLinks = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+      return quickLinks;
+    } catch (Exception error) {
+      Log.Error(error.ToString());
+      return null;
+    }
+  }
+
+  public Dictionary<string, string> AddQuickLink(string title, string path) {
+    Dictionary<string, string> quickLinks = GetQuickLinksConfig();
+    quickLinks.Add(title, path);
+    File.WriteAllText(QuicklinksPath, JsonConvert.SerializeObject(quickLinks, Formatting.Indented));
+    return quickLinks;
+  }
+
+  public Dictionary<string, string> RemoveQuickLink(string title, string path) {
+    Dictionary<string, string> quickLinks = GetQuickLinksConfig();
+    string keyToRemove = null;
+
+    foreach (var kvp in quickLinks) {
+      if (kvp.Value == path) {
+        keyToRemove = kvp.Key;
+        break;
+      }
+    }
+
+    if (keyToRemove != null) {
+      quickLinks.Remove(keyToRemove);
+    }
+
+    File.WriteAllText(QuicklinksPath, JsonConvert.SerializeObject(quickLinks, Formatting.Indented));
+    return quickLinks;
+  }
+
+  public Dictionary<string, Dictionary<string, string>> GetColourConfig() {
+    try {
+      if (!File.Exists(ColoursPath)) {
+        File.WriteAllText(ColoursPath, JsonConvert.SerializeObject(new object { }, Formatting.Indented));
       }
 
-      // Create quicklinks if it doesn't exist
-      if (!File.Exists(COLOURS_PATH)) {
-        File.WriteAllText(COLOURS_PATH, JsonConvert.SerializeObject(new object { }, Formatting.Indented));
-      }
+      string json = File.ReadAllText(ColoursPath);
+      Dictionary<string, Dictionary<string, string>> colourConfig = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(json);
+      return colourConfig;
+    } catch (Exception error) {
+      Log.Error(error.ToString());
+      return null;
+    }
+  }
 
-      if (!File.Exists(AI_PATH)) {
+  public AiSettings GetAiSettings() {
+    try {
+      if (!File.Exists(AiPath)) {
         SaveAiSettings(AiSettings.CreateDefault());
       }
+
+      string json = File.ReadAllText(AiPath);
+      AiSettings settings = JsonConvert.DeserializeObject<AiSettings>(json);
+      return NormaliseAiSettings(settings);
+    } catch (Exception error) {
+      Log.Error(error.ToString());
+      return AiSettings.CreateDefault();
+    }
+  }
+
+  public AiSettings SaveAiSettings(AiSettings settings) {
+    if (settings == null) {
+      settings = AiSettings.CreateDefault();
     }
 
-    public Dictionary<string, string> GetQuickLinksConfig() {
-      try {
-        if (!File.Exists(QUICKLINKS_PATH)) {
-          File.WriteAllText(QUICKLINKS_PATH, JsonConvert.SerializeObject(new object { }, Formatting.Indented));
-        }
-
-        string json = File.ReadAllText(QUICKLINKS_PATH);
-        Log.Debug("[ConfigService] Quick links are " + json);
-        Dictionary<string, string> quickLinks = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-        return quickLinks;
-      } catch (Exception error) {
-        Log.Error(error.ToString());
-        return null;
-      }
+    AiSettings existingSettings = null;
+    if (File.Exists(AiPath)) {
+      existingSettings = JsonConvert.DeserializeObject<AiSettings>(File.ReadAllText(AiPath));
     }
 
-    public Dictionary<string, string> AddQuickLink(string title, string path) {
-      Dictionary<string, string> quickLinks = GetQuickLinksConfig();
-      quickLinks.Add(title, path);
-      File.WriteAllText(QUICKLINKS_PATH, JsonConvert.SerializeObject(quickLinks, Formatting.Indented));
-      return quickLinks;
+    if ((settings.ModelCatalogs == null || settings.ModelCatalogs.Count == 0) &&
+      existingSettings != null &&
+      existingSettings.ModelCatalogs != null &&
+      existingSettings.ModelCatalogs.Count > 0) {
+      settings.ModelCatalogs = existingSettings.ModelCatalogs;
     }
 
-    public Dictionary<string, string> RemoveQuickLink(string title, string path) {
-      Dictionary<string, string> quickLinks = GetQuickLinksConfig();
-      string keyToRemove = null;
+    settings = NormaliseAiSettings(settings);
+    File.WriteAllText(AiPath, JsonConvert.SerializeObject(settings, Formatting.Indented));
+    return settings;
+  }
 
-      foreach (var kvp in quickLinks) {
-        if (kvp.Value == path) {
-          keyToRemove = kvp.Key;
-          break;
-        }
-      }
+  public AiWorkspaceSettings GetAiWorkspaceSettings(string workingDirectory) {
+    AiSettings settings = GetAiSettings();
+    string key = NormaliseWorkspaceKey(workingDirectory);
 
-      if (keyToRemove != null) {
-        quickLinks.Remove(keyToRemove);
-      }
-
-      File.WriteAllText(QUICKLINKS_PATH, JsonConvert.SerializeObject(quickLinks, Formatting.Indented));
-      return quickLinks;
+    if (string.IsNullOrEmpty(key)) {
+      return AiWorkspaceSettings.CreateDefault("");
     }
 
-    public Dictionary<string, Dictionary<string, string>> GetColourConfig() {
-      try {
-        if (!File.Exists(COLOURS_PATH)) {
-          File.WriteAllText(COLOURS_PATH, JsonConvert.SerializeObject(new object { }, Formatting.Indented));
-        }
-
-        string json = File.ReadAllText(COLOURS_PATH);
-        Dictionary<string, Dictionary<string, string>> colourConfig = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(json);
-        return colourConfig;
-      } catch (Exception error) {
-        Log.Error(error.ToString());
-        return null;
-      }
+    if (!settings.Workspaces.ContainsKey(key) || settings.Workspaces[key] == null) {
+      settings.Workspaces[key] = AiWorkspaceSettings.CreateDefault(workingDirectory);
+      SaveAiSettings(settings);
     }
 
-    public AiSettings GetAiSettings() {
-      try {
-        if (!File.Exists(AI_PATH)) {
-          SaveAiSettings(AiSettings.CreateDefault());
-        }
+    return NormaliseAiWorkspaceSettings(settings.Workspaces[key], workingDirectory);
+  }
 
-        string json = File.ReadAllText(AI_PATH);
-        AiSettings settings = JsonConvert.DeserializeObject<AiSettings>(json);
-        return NormaliseAiSettings(settings);
-      } catch (Exception error) {
-        Log.Error(error.ToString());
-        return AiSettings.CreateDefault();
-      }
+  public AiSettings SaveAiWorkspaceSettings(AiWorkspaceSettings workspaceSettings) {
+    AiSettings settings = GetAiSettings();
+    workspaceSettings = NormaliseAiWorkspaceSettings(workspaceSettings, workspaceSettings == null ? "" : workspaceSettings.WorkingDirectory);
+    string key = NormaliseWorkspaceKey(workspaceSettings.WorkingDirectory);
+
+    if (!string.IsNullOrEmpty(key)) {
+      settings.Workspaces[key] = workspaceSettings;
     }
 
-    public AiSettings SaveAiSettings(AiSettings settings) {
-      if (settings == null) settings = AiSettings.CreateDefault();
+    return SaveAiSettings(settings);
+  }
 
-      AiSettings existingSettings = null;
-      if (File.Exists(AI_PATH)) {
-        existingSettings = JsonConvert.DeserializeObject<AiSettings>(File.ReadAllText(AI_PATH));
-      }
-
-      if ((settings.ModelCatalogs == null || settings.ModelCatalogs.Count == 0) &&
-        existingSettings != null &&
-        existingSettings.ModelCatalogs != null &&
-        existingSettings.ModelCatalogs.Count > 0) {
-        settings.ModelCatalogs = existingSettings.ModelCatalogs;
-      }
-
-      settings = NormaliseAiSettings(settings);
-      File.WriteAllText(AI_PATH, JsonConvert.SerializeObject(settings, Formatting.Indented));
-      return settings;
-    }
-
-    public AiWorkspaceSettings GetAiWorkspaceSettings(string workingDirectory) {
-      AiSettings settings = GetAiSettings();
-      string key = NormaliseWorkspaceKey(workingDirectory);
-
-      if (string.IsNullOrEmpty(key)) {
-        return AiWorkspaceSettings.CreateDefault("");
-      }
-
-      if (!settings.Workspaces.ContainsKey(key) || settings.Workspaces[key] == null) {
-        settings.Workspaces[key] = AiWorkspaceSettings.CreateDefault(workingDirectory);
-        SaveAiSettings(settings);
-      }
-
-      return NormaliseAiWorkspaceSettings(settings.Workspaces[key], workingDirectory);
-    }
-
-    public AiSettings SaveAiWorkspaceSettings(AiWorkspaceSettings workspaceSettings) {
-      AiSettings settings = GetAiSettings();
-      workspaceSettings = NormaliseAiWorkspaceSettings(workspaceSettings, workspaceSettings == null ? "" : workspaceSettings.WorkingDirectory);
-      string key = NormaliseWorkspaceKey(workspaceSettings.WorkingDirectory);
-
-      if (!string.IsNullOrEmpty(key)) {
-        settings.Workspaces[key] = workspaceSettings;
-      }
-
-      return SaveAiSettings(settings);
-    }
-
-    public List<AiCastPersonality> GetAiCastPersonalityDefaults() {
-      try {
-        if (!File.Exists(AI_PERSONALITIES_PATH)) return new List<AiCastPersonality>();
-
-        JObject config = JObject.Parse(File.ReadAllText(AI_PERSONALITIES_PATH));
-        JToken personalitiesToken = config["castPersonalities"] ?? config["CastPersonalities"];
-        if (personalitiesToken == null) return new List<AiCastPersonality>();
-
-        List<AiCastPersonality> personalities = JsonConvert.DeserializeObject<List<AiCastPersonality>>(personalitiesToken.ToString());
-        if (personalities == null) return new List<AiCastPersonality>();
-
-        for (int i = 0; i < personalities.Count; i++) {
-          personalities[i] = NormaliseAiCastPersonality(personalities[i]);
-        }
-
-        return personalities;
-      } catch (Exception error) {
-        Log.Error(error.ToString());
+  public List<AiCastPersonality> GetAiCastPersonalityDefaults() {
+    try {
+      if (!File.Exists(AiPersonalitiesPath)) {
         return new List<AiCastPersonality>();
       }
-    }
 
-    private AiSettings NormaliseAiSettings(AiSettings settings) {
-      if (settings == null) settings = AiSettings.CreateDefault();
-      if (settings.Enabled == null) settings.Enabled = true;
-      if (string.IsNullOrEmpty(settings.SelectedProvider)) settings.SelectedProvider = "codex";
-      if (string.IsNullOrEmpty(settings.CodexCommand)) settings.CodexCommand = "codex";
-      if (settings.CodexModel == null) settings.CodexModel = "";
-      settings.CodexReasoningEffort = NormaliseCodexReasoningEffort(settings.CodexReasoningEffort);
-      if (settings.CodexProfile == null) settings.CodexProfile = "";
-      if (settings.TimeoutSeconds <= 0) settings.TimeoutSeconds = 300;
-      if (settings.ModelCatalogs == null) settings.ModelCatalogs = new Dictionary<string, AiModelCatalogResult>();
-      if (settings.Workspaces == null) settings.Workspaces = new Dictionary<string, AiWorkspaceSettings>();
-      foreach (string key in new List<string>(settings.Workspaces.Keys)) {
-        AiWorkspaceSettings workspaceSettings = settings.Workspaces[key];
-        string fallbackWorkingDirectory = workspaceSettings == null ? "" : workspaceSettings.WorkingDirectory;
-        settings.Workspaces[key] = NormaliseAiWorkspaceSettings(workspaceSettings, fallbackWorkingDirectory);
-      }
-      return settings;
-    }
-
-    private AiWorkspaceSettings NormaliseAiWorkspaceSettings(AiWorkspaceSettings workspaceSettings, string fallbackWorkingDirectory) {
-      if (workspaceSettings == null) workspaceSettings = AiWorkspaceSettings.CreateDefault(fallbackWorkingDirectory);
-      if (workspaceSettings.WorkingDirectory == null) workspaceSettings.WorkingDirectory = fallbackWorkingDirectory ?? "";
-      if (workspaceSettings.ContextPaths == null) workspaceSettings.ContextPaths = new List<string>();
-      if (workspaceSettings.HouseStyleNotes == null) workspaceSettings.HouseStyleNotes = "";
-      if (workspaceSettings.DefaultCampaignBrief == null) workspaceSettings.DefaultCampaignBrief = "";
-      if (workspaceSettings.BriefHistoryByScope == null) workspaceSettings.BriefHistoryByScope = new Dictionary<string, List<AiBriefHistoryEntry>>();
-      foreach (string key in new List<string>(workspaceSettings.BriefHistoryByScope.Keys)) {
-        List<AiBriefHistoryEntry> entries = workspaceSettings.BriefHistoryByScope[key] ?? new List<AiBriefHistoryEntry>();
-        for (int i = 0; i < entries.Count; i++) {
-          entries[i] = NormaliseAiBriefHistoryEntry(entries[i]);
-        }
-        workspaceSettings.BriefHistoryByScope[key] = entries;
-      }
-      if (workspaceSettings.CastPersonalities == null) workspaceSettings.CastPersonalities = GetAiCastPersonalityDefaults();
-      for (int i = 0; i < workspaceSettings.CastPersonalities.Count; i++) {
-        workspaceSettings.CastPersonalities[i] = NormaliseAiCastPersonality(workspaceSettings.CastPersonalities[i]);
-      }
-      return workspaceSettings;
-    }
-
-    private AiBriefHistoryEntry NormaliseAiBriefHistoryEntry(AiBriefHistoryEntry entry) {
-      if (entry == null) entry = new AiBriefHistoryEntry();
-      if (entry.Brief == null) entry.Brief = "";
-      if (entry.Mode == null) entry.Mode = "";
-      if (entry.CreatedAt == null) entry.CreatedAt = "";
-      if (entry.ConversationLabel == null) entry.ConversationLabel = "";
-      return entry;
-    }
-
-    private AiCastPersonality NormaliseAiCastPersonality(AiCastPersonality personality) {
-      if (personality == null) personality = new AiCastPersonality();
-      if (string.IsNullOrEmpty(personality.Id)) personality.Id = Guid.NewGuid().ToString("N");
-      if (personality.Label == null) personality.Label = "";
-      if (personality.CastIds == null) personality.CastIds = new List<string>();
-      if (personality.SpeakerIds == null) personality.SpeakerIds = new List<string>();
-      if (personality.Rules == null) personality.Rules = "";
-      if (personality.Enabled == null) personality.Enabled = true;
-      if (personality.DefaultKey == null) personality.DefaultKey = "";
-      return personality;
-    }
-
-    private string NormaliseCodexReasoningEffort(string effort) {
-      if (string.IsNullOrWhiteSpace(effort)) return "";
-
-      string normalisedEffort = effort.Trim().ToLowerInvariant();
-      if (normalisedEffort == "auto" || normalisedEffort == "default") return "";
-      if (normalisedEffort == "low" ||
-        normalisedEffort == "medium" ||
-        normalisedEffort == "high" ||
-        normalisedEffort == "xhigh") {
-        return normalisedEffort;
+      JObject config = JObject.Parse(File.ReadAllText(AiPersonalitiesPath));
+      JToken personalitiesToken = config["castPersonalities"] ?? config["CastPersonalities"];
+      if (personalitiesToken == null) {
+        return new List<AiCastPersonality>();
       }
 
+      List<AiCastPersonality> personalities = JsonConvert.DeserializeObject<List<AiCastPersonality>>(personalitiesToken.ToString());
+      if (personalities == null) {
+        return new List<AiCastPersonality>();
+      }
+
+      for (int i = 0; i < personalities.Count; i++) {
+        personalities[i] = NormaliseAiCastPersonality(personalities[i]);
+      }
+
+      return personalities;
+    } catch (Exception error) {
+      Log.Error(error.ToString());
+      return new List<AiCastPersonality>();
+    }
+  }
+
+  private AiSettings NormaliseAiSettings(AiSettings settings) {
+    if (settings == null) {
+      settings = AiSettings.CreateDefault();
+    }
+
+    if (settings.Enabled == null) {
+      settings.Enabled = true;
+    }
+
+    if (string.IsNullOrEmpty(settings.SelectedProvider)) {
+      settings.SelectedProvider = "codex";
+    }
+
+    if (string.IsNullOrEmpty(settings.CodexCommand)) {
+      settings.CodexCommand = "codex";
+    }
+
+    if (settings.CodexModel == null) {
+      settings.CodexModel = "";
+    }
+
+    settings.CodexReasoningEffort = NormaliseCodexReasoningEffort(settings.CodexReasoningEffort);
+    if (settings.CodexProfile == null) {
+      settings.CodexProfile = "";
+    }
+
+    if (settings.TimeoutSeconds <= 0) {
+      settings.TimeoutSeconds = 300;
+    }
+
+    if (settings.ModelCatalogs == null) {
+      settings.ModelCatalogs = new Dictionary<string, AiModelCatalogResult>();
+    }
+
+    if (settings.Workspaces == null) {
+      settings.Workspaces = new Dictionary<string, AiWorkspaceSettings>();
+    }
+
+    foreach (string key in new List<string>(settings.Workspaces.Keys)) {
+      AiWorkspaceSettings workspaceSettings = settings.Workspaces[key];
+      string fallbackWorkingDirectory = workspaceSettings == null ? "" : workspaceSettings.WorkingDirectory;
+      settings.Workspaces[key] = NormaliseAiWorkspaceSettings(workspaceSettings, fallbackWorkingDirectory);
+    }
+    return settings;
+  }
+
+  private AiWorkspaceSettings NormaliseAiWorkspaceSettings(AiWorkspaceSettings workspaceSettings, string fallbackWorkingDirectory) {
+    if (workspaceSettings == null) {
+      workspaceSettings = AiWorkspaceSettings.CreateDefault(fallbackWorkingDirectory);
+    }
+
+    if (workspaceSettings.WorkingDirectory == null) {
+      workspaceSettings.WorkingDirectory = fallbackWorkingDirectory ?? "";
+    }
+
+    if (workspaceSettings.ContextPaths == null) {
+      workspaceSettings.ContextPaths = new List<string>();
+    }
+
+    if (workspaceSettings.HouseStyleNotes == null) {
+      workspaceSettings.HouseStyleNotes = "";
+    }
+
+    if (workspaceSettings.DefaultCampaignBrief == null) {
+      workspaceSettings.DefaultCampaignBrief = "";
+    }
+
+    if (workspaceSettings.BriefHistoryByScope == null) {
+      workspaceSettings.BriefHistoryByScope = new Dictionary<string, List<AiBriefHistoryEntry>>();
+    }
+
+    foreach (string key in new List<string>(workspaceSettings.BriefHistoryByScope.Keys)) {
+      List<AiBriefHistoryEntry> entries = workspaceSettings.BriefHistoryByScope[key] ?? new List<AiBriefHistoryEntry>();
+      for (int i = 0; i < entries.Count; i++) {
+        entries[i] = NormaliseAiBriefHistoryEntry(entries[i]);
+      }
+      workspaceSettings.BriefHistoryByScope[key] = entries;
+    }
+    if (workspaceSettings.CastPersonalities == null) {
+      workspaceSettings.CastPersonalities = GetAiCastPersonalityDefaults();
+    }
+
+    for (int i = 0; i < workspaceSettings.CastPersonalities.Count; i++) {
+      workspaceSettings.CastPersonalities[i] = NormaliseAiCastPersonality(workspaceSettings.CastPersonalities[i]);
+    }
+    return workspaceSettings;
+  }
+
+  private AiBriefHistoryEntry NormaliseAiBriefHistoryEntry(AiBriefHistoryEntry entry) {
+    if (entry == null) {
+      entry = new AiBriefHistoryEntry();
+    }
+
+    if (entry.Brief == null) {
+      entry.Brief = "";
+    }
+
+    if (entry.Mode == null) {
+      entry.Mode = "";
+    }
+
+    if (entry.CreatedAt == null) {
+      entry.CreatedAt = "";
+    }
+
+    if (entry.ConversationLabel == null) {
+      entry.ConversationLabel = "";
+    }
+
+    return entry;
+  }
+
+  private AiCastPersonality NormaliseAiCastPersonality(AiCastPersonality personality) {
+    if (personality == null) {
+      personality = new AiCastPersonality();
+    }
+
+    if (string.IsNullOrEmpty(personality.Id)) {
+      personality.Id = Guid.NewGuid().ToString("N");
+    }
+
+    if (personality.Label == null) {
+      personality.Label = "";
+    }
+
+    if (personality.CastIds == null) {
+      personality.CastIds = new List<string>();
+    }
+
+    if (personality.SpeakerIds == null) {
+      personality.SpeakerIds = new List<string>();
+    }
+
+    if (personality.Rules == null) {
+      personality.Rules = "";
+    }
+
+    if (personality.Enabled == null) {
+      personality.Enabled = true;
+    }
+
+    if (personality.DefaultKey == null) {
+      personality.DefaultKey = "";
+    }
+
+    return personality;
+  }
+
+  private string NormaliseCodexReasoningEffort(string effort) {
+    if (string.IsNullOrWhiteSpace(effort)) {
       return "";
     }
 
-    private string NormaliseWorkspaceKey(string workingDirectory) {
-      if (string.IsNullOrEmpty(workingDirectory)) return "";
-      return workingDirectory.Trim().Replace("\\", "/").TrimEnd('/').ToLowerInvariant();
+    string normalisedEffort = effort.Trim().ToLowerInvariant();
+    if (normalisedEffort == "auto" || normalisedEffort == "default") {
+      return "";
     }
+
+    if (normalisedEffort == "low" ||
+      normalisedEffort == "medium" ||
+      normalisedEffort == "high" ||
+      normalisedEffort == "xhigh") {
+      return normalisedEffort;
+    }
+
+    return "";
+  }
+
+  private string NormaliseWorkspaceKey(string workingDirectory) {
+    if (string.IsNullOrEmpty(workingDirectory)) {
+      return "";
+    }
+
+    return workingDirectory.Trim().Replace("\\", "/").TrimEnd('/').ToLowerInvariant();
   }
 }

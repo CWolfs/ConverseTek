@@ -379,10 +379,14 @@ function normaliseAiBriefHistoryEntries(entries: AiBriefHistoryEntryResponseType
 
   for (const entry of entries) {
     const normalisedEntry = normaliseAiBriefHistoryEntry(entry);
-    if (normalisedEntry.brief === '' || seenBriefs.has(normalisedEntry.brief)) continue;
+    if (normalisedEntry.brief === '' || seenBriefs.has(normalisedEntry.brief)) {
+      continue;
+    }
     seenBriefs.add(normalisedEntry.brief);
     normalisedEntries.push(normalisedEntry);
-    if (normalisedEntries.length >= 10) break;
+    if (normalisedEntries.length >= 10) {
+      break;
+    }
   }
 
   return normalisedEntries;
@@ -654,10 +658,12 @@ export function getRootDrives(): Promise<DirectoryItemType[]> {
 }
 
 export function getDirectories(path: string, includeFiles = false, fileExtensions: string[] = []): Promise<DirectoryListingType> {
-  return get<DirectoryListingResponseType>('/directories', { path, includeFiles, fileExtensions }).then((result): DirectoryListingType => ({
-    directories: result.directories.map(normaliseDirectory),
-    files: result.files.map(normaliseFile),
-  }));
+  return get<DirectoryListingResponseType>('/directories', { path, includeFiles, fileExtensions }).then(
+    (result): DirectoryListingType => ({
+      directories: result.directories.map(normaliseDirectory),
+      files: result.files.map(normaliseFile),
+    }),
+  );
 }
 
 export function getQuickLinks(): Promise<QuickLinkType[]> {

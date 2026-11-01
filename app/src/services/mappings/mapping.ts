@@ -75,7 +75,10 @@ export function lowercasePropertyNames(obj: unknown, firstCharacterLower = false
     const newObj: JsonObject = {};
 
     for (const [key, value] of Object.entries(obj)) {
-      newObj[firstCharacterLower ? `${key[0].toLowerCase()}${key.substring(1)}` : key.toLowerCase()] = lowercasePropertyNames(value, firstCharacterLower);
+      newObj[firstCharacterLower ? `${key[0].toLowerCase()}${key.substring(1)}` : key.toLowerCase()] = lowercasePropertyNames(
+        value,
+        firstCharacterLower,
+      );
     }
 
     return newObj;

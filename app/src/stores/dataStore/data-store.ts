@@ -78,7 +78,9 @@ class DataStore {
 
       runInAction(() => {
         const conversationAsset = this.unsavedActiveConversationAsset;
-        if (conversationAsset == null) return;
+        if (conversationAsset == null) {
+          return;
+        }
 
         void updateConversation(getId(conversationAsset.conversation), conversationAsset).then(() => {
           void message.success('Save successful');
@@ -88,7 +90,9 @@ class DataStore {
   };
 
   setWorkingDirectory(directoryPath: string, directoryName: string): void {
-    if (directoryPath !== this.workingDirectory) this.clearActiveConversation();
+    if (directoryPath !== this.workingDirectory) {
+      this.clearActiveConversation();
+    }
     this.workingDirectory = directoryPath;
     this.workingDirectoryName = directoryName;
   }
@@ -126,12 +130,16 @@ class DataStore {
 
   setConversationDirty(flag: boolean): void {
     this.isConversationDirty = flag;
-    if (flag) this.conversationMutationRevision += 1;
+    if (flag) {
+      this.conversationMutationRevision += 1;
+    }
   }
 
   getConversationAsset(id: string): ConversationAssetType | null {
     const conversationAsset = this.conversationAssets.get(id);
-    if (conversationAsset == null) return null;
+    if (conversationAsset == null) {
+      return null;
+    }
     return conversationAsset;
   }
 
@@ -147,7 +155,9 @@ class DataStore {
 
   deleteConversation(id: string): void {
     const conversationAsset = this.conversationAssets.get(id);
-    if (conversationAsset == null) return;
+    if (conversationAsset == null) {
+      return;
+    }
 
     this.removeConversation(id);
     void deleteConversation(conversationAsset.filepath);

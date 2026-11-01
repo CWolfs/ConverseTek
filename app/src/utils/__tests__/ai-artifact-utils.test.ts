@@ -37,4 +37,3 @@ describe('AI artifact utilities', () => {
     expect(result.formattedContent).toBe(content);
   });
 });
-

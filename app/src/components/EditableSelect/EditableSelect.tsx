@@ -17,7 +17,9 @@ type Props = {
 
 function EditableSelect({ value, options, placeholder, style = {}, onChange }: Props) {
   const conditionalProps: { defaultValue?: string } = {};
-  if (value) conditionalProps.defaultValue = value;
+  if (value) {
+    conditionalProps.defaultValue = value;
+  }
 
   return (
     <Select

@@ -71,14 +71,20 @@ function ConversationGeneral({ node }: Props) {
   };
 
   const handleIdBlur = () => {
-    if (nodeId === getId(node)) return;
+    if (nodeId === getId(node)) {
+      return;
+    }
     nodeStore.setNodeId(node, createId(node.idRef, nodeId));
   };
 
   const handleSpeakerChange = (value: string) => {
     const { type } = node;
-    if (type !== 'node') return;
-    if (value !== 'speakerId' && value !== 'castId') throw Error(`Invalid speaker change with value ${value}`);
+    if (type !== 'node') {
+      return;
+    }
+    if (value !== 'speakerId' && value !== 'castId') {
+      throw Error(`Invalid speaker change with value ${value}`);
+    }
 
     nodeStore.setPromptNodeSpeakerType(node, value);
     setSelectedSpeakerType(value);
@@ -86,7 +92,9 @@ function ConversationGeneral({ node }: Props) {
 
   const handleCastIdChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { type } = node;
-    if (type !== 'node') return;
+    if (type !== 'node') {
+      return;
+    }
 
     const newCastId = event.target.value.trim();
     nodeStore.setPromptNodeSourceInSceneId(node, newCastId);
@@ -94,7 +102,9 @@ function ConversationGeneral({ node }: Props) {
 
   const handleSpeakerIdChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { type } = node;
-    if (type !== 'node') return;
+    if (type !== 'node') {
+      return;
+    }
 
     const newSpeakerId = event.target.value.trim();
     nodeStore.setPromptNodeSpeakerId(node, newSpeakerId);
@@ -107,7 +117,9 @@ function ConversationGeneral({ node }: Props) {
 
   const handleAvailbleOnceChange = (event: CheckboxChangeEvent) => {
     const { type } = node;
-    if (type === 'node') return;
+    if (type === 'node') {
+      return;
+    }
 
     const newAvailableOnlyOnce = event.target.checked;
     nodeStore.setElementNodeOnlyOnce(node, newAvailableOnlyOnce);
@@ -115,7 +127,9 @@ function ConversationGeneral({ node }: Props) {
 
   const handleHideIfUnavailableChange = (event: CheckboxChangeEvent) => {
     const { type } = node;
-    if (type === 'node') return;
+    if (type === 'node') {
+      return;
+    }
 
     const newAlwaysShow = event.target.checked;
     nodeStore.setElementNodeHideIfUnavailable(node, !newAlwaysShow);
@@ -154,11 +168,7 @@ function ConversationGeneral({ node }: Props) {
           </Col>
           <Col {...colTwoLayout}>
             <div className="conversation-general__speaker-group">
-              <Select
-                className="conversation-general__speaker-select"
-                value={selectedSpeakerType}
-                onChange={handleSpeakerChange}
-              >
+              <Select className="conversation-general__speaker-select" value={selectedSpeakerType} onChange={handleSpeakerChange}>
                 <Option value="castId">Cast Id</Option>
                 <Option value="speakerId">Speaker Id</Option>
               </Select>
@@ -184,11 +194,7 @@ function ConversationGeneral({ node }: Props) {
             <div className="conversation-general__label">Only Once</div>
           </Col>
           <Col {...colTwoLayout}>
-            <Checkbox
-              className="conversation-general__checkbox"
-              onChange={handleAvailbleOnceChange}
-              checked={node.onlyOnce}
-            />
+            <Checkbox className="conversation-general__checkbox" onChange={handleAvailbleOnceChange} checked={node.onlyOnce} />
           </Col>
         </Row>
       )}
@@ -199,11 +205,7 @@ function ConversationGeneral({ node }: Props) {
             <div className="conversation-general__label">Always Show</div>
           </Col>
           <Col {...colTwoLayout}>
-            <Checkbox
-              className="conversation-general__checkbox"
-              onChange={handleHideIfUnavailableChange}
-              checked={!node.hideIfUnavailable}
-            />
+            <Checkbox className="conversation-general__checkbox" onChange={handleHideIfUnavailableChange} checked={!node.hideIfUnavailable} />
           </Col>
         </Row>
       )}

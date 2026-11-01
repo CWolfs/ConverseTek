@@ -545,9 +545,7 @@ describe('AI draft utilities', () => {
     } as unknown as PromptNodeType;
     const draft = makeDraft({
       mode: 'branchExpansion',
-      warnings: [
-        'Target key existing_battle_intel is intended to link to the existing prompt at index 7: "Existing Darius battle-intel thought."',
-      ],
+      warnings: ['Target key existing_battle_intel is intended to link to the existing prompt at index 7: "Existing Darius battle-intel thought."'],
       nodes: [
         {
           ...makeDraft().nodes[0],
@@ -628,7 +626,9 @@ describe('AI draft utilities', () => {
     const patch = buildBranchExpansionPatch(draft, prompt, { existingNodes: [prompt, existingTarget] });
 
     expect(validation.errors).toEqual([]);
-    expect(validation.warnings).not.toContain('AI warning: Target keys existing_node_2 and existing_node_3 refer to existing conversation nodes with indexes 2 and 3.');
+    expect(validation.warnings).not.toContain(
+      'AI warning: Target keys existing_node_2 and existing_node_3 refer to existing conversation nodes with indexes 2 and 3.',
+    );
     expect(patch.nodes[0].branches[0].nextNodeIndex).toBe(2);
     expect(patch.nodes[0].branches[0].auxiliaryLink).toBe(true);
   });
